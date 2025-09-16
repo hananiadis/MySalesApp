@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+  <!-- Base application theme -->
+  <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
+    <!-- Provide a value for colorBackground so AAPT can resolve it -->
+    <item name="android:colorBackground">@color/white</item>
+
+    <!-- Optional but nice to have -->
+    <item name="android:windowBackground">@color/white</item>
+    <item name="android:statusBarColor">@android:color/transparent</item>
+    <item name="android:navigationBarColor">@android:color/transparent</item>
+  </style>
+
+</resources>

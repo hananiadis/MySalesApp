@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- RNFS.DocumentDirectoryPath maps to the app's internal files dir -->
+    <files-path name="files" path="." />
+    <!-- Handy if you ever save to cache -->
+    <cache-path name="cache" path="." />
+</paths>

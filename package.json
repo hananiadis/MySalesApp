@@ -1,0 +1,48 @@
+{
+  "name": "MySalesApp",
+  "version": "0.1.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "react-native start",
+    "android": "react-native run-android",
+    "ios": "react-native run-ios"
+  },
+  "dependencies": {
+    "@gorhom/bottom-sheet": "^5.1.6",
+    "@react-native-async-storage/async-storage": "^1.24.0",
+    "@react-native-community/geolocation": "^3.4.0",
+    "@react-native-community/netinfo": "^11.4.1",
+    "@react-native-firebase/app": "^22.2.1",
+    "@react-native-firebase/auth": "^22.4.0",
+    "@react-native-firebase/firestore": "^22.2.1",
+    "@react-native-picker/picker": "^2.4.12",
+    "@react-native/metro-config": "^0.80.0",
+    "@react-navigation/native": "^7.1.11",
+    "@react-navigation/native-stack": "^7.3.16",
+    "@shopify/flash-list": "^1.8.3",
+    "lodash.debounce": "^4.0.8",
+    "lodash.isequal": "^4.5.0",
+    "react-native-autocomplete-input": "^5.5.6",
+    "react-native-crypto": "^2.2.0",
+    "react-native-fs": "^2.20.0",
+    "react-native-geolocation-service": "^5.3.1",
+    "react-native-gesture-handler": "^2.26.0",
+    "react-native-get-random-values": "^1.11.0",
+    "react-native-keyboard-aware-scroll-view": "^0.9.5",
+    "react-native-modal": "^14.0.0-rc.1",
+    "react-native-paper": "^5.14.5",
+    "react-native-reanimated": "^3.18.0",
+    "react-native-rsa-native": "^2.0.5",
+    "react-native-safe-area-context": "^5.4.1",
+    "react-native-screens": "^4.11.1",
+    "react-native-share": "^12.1.0",
+    "react-native-vector-icons": "^10.2.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@babel/plugin-transform-export-namespace-from": "^7.27.1",
+    "@react-native-community/cli": "^18.0.0",
+    "@react-native-community/cli-platform-android": "^18.0.0",
+    "react-native": "^0.80.0"
+  }
+}
