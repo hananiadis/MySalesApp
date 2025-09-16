@@ -62,3 +62,9 @@ serviceAccountKey.json
 *.rar
 *.tar
 *.tar.gz
+
+# Archives
+*.7z
+
+# Xcode local env
+ios/.xcode.env
