@@ -1,8 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import RNFS from 'react-native-fs';
 
-// Choose ONE and use everywhere: DocumentDirectoryPath for long-term, CachesDirectoryPath for temp
-export const IMAGES_DIR = `${RNFS.DocumentDirectoryPath}/product_images/`;
+export const IMAGES_DIR = `${RNFS.DocumentDirectoryPath}/product_images`;
 
 // Format date for user-friendly logs
 const formatNow = () => {
@@ -107,11 +106,12 @@ export async function getImagesLastAction() {
   }
 }
 
-// Ensure directory exists (can be imported from imageHelpers.js to avoid duplication)
 const ensureDirExists = async () => {
   try {
     const exists = await RNFS.exists(IMAGES_DIR);
-    if (!exists) await RNFS.mkdir(IMAGES_DIR);
+    if (!exists) {
+      await RNFS.mkdir(IMAGES_DIR);
+    }
   } catch (e) {
     // Optional: log error
   }
@@ -125,15 +125,13 @@ export async function cacheProductImages(products) {
     if (prod.frontCover && prod.productCode) {
       const imgUri = prod.frontCover;
       const fileName = `${prod.productCode}.jpg`;
-      const filePath = IMAGES_DIR + fileName;
+      const filePath = `${IMAGES_DIR}/${fileName}`;
       try {
-        // Always overwrite for freshness
         if (await RNFS.exists(filePath)) await RNFS.unlink(filePath);
         const downloadResult = await RNFS.downloadFile({ fromUrl: imgUri, toFile: filePath }).promise;
         if (downloadResult.statusCode === 200) count++;
       } catch (e) {
-        // Could not download, ignore/log if you want
-        // console.warn(`Image failed for ${prod.productCode}:`, e);
+        // Could not download, ignore/log if needed
       }
     }
   }
@@ -154,5 +152,5 @@ export async function clearProductImagesCache() {
 
 // Helper to get a local image file path (use for <Image source={{uri: ...}}/>)
 export function getLocalProductImage(productCode) {
-  return `file://${IMAGES_DIR}${productCode}.jpg`;
+  return `file://${IMAGES_DIR}/${productCode}.jpg`;
 }

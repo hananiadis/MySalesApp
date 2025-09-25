@@ -37,7 +37,7 @@ const ProductRow = ({ item, navigation, immediateStock }) => {
     navigation.navigate('ProductDetail', {
       product: {
         ...item,
-        availableStock: stockDisplay,
+        availableΑπόθεμα: stockDisplay,
       },
     });
   };
@@ -66,11 +66,11 @@ const ProductRow = ({ item, navigation, immediateStock }) => {
           <View style={styles.infoRow}>
             {isOutOfStock ? (
               <View style={styles.stockPill}>
-                <Text style={[styles.stockPillText, { fontSize: 12 }]}>Stock: 0</Text>
+                <Text style={[styles.stockPillText, { fontSize: 12 }]}>Απόθεμα: 0</Text>
               </View>
             ) : (
               <Text style={[styles.stock, isStockNA && styles.stockNA]}>
-                Stock: {stockDisplay}
+                Απόθεμα: {stockDisplay}
               </Text>
             )}
             <Text style={styles.price}>
@@ -83,14 +83,6 @@ const ProductRow = ({ item, navigation, immediateStock }) => {
                 {item.srp !== undefined ? `€${Number(item.srp).toFixed(2)}` : '—'}
               </Text>
             </Text>
-            <TouchableOpacity
-              style={styles.quickAddBtn}
-              onPress={(e) => { e.stopPropagation && e.stopPropagation(); Alert.alert('Quick Add', 'Θα υλοποιηθεί σύντομα'); }}
-              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-              onPressIn={(ev) => ev.stopPropagation && ev.stopPropagation()}
-            >
-              <Ionicons name="cart-outline" size={18} color="#00ADEF" />
-            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -401,13 +393,6 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#007AFF',
     fontSize: 12,
-  },
-  quickAddBtn: {
-    marginLeft: 'auto',
-    padding: 4,
-    backgroundColor: '#e6f6fa',
-    borderRadius: 14,
-    alignSelf: 'center',
   },
   stockPill: {
     backgroundColor: '#FF3333',

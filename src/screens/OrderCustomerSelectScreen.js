@@ -16,7 +16,8 @@ export default function OrderCustomerSelectScreen() {
   const insets = useSafeAreaInsets();
   const cleanupRef = useRef(null); // Store cleanup function reference
 
-  const { startOrder, setCurrentCustomer } = useOrder();
+  const { startOrder } = useOrder();
+  const brandKey = route.params?.brand ?? null;
 
   const [customers, setCustomers] = useState([]);
   const [search, setSearch] = useState('');
@@ -57,20 +58,19 @@ export default function OrderCustomerSelectScreen() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [route.params?.prefillCustomer]);
 
-  const filtered = customers.filter((c) => {
-    const q = search.trim().toLowerCase();
-    return (
-      c.name?.toLowerCase().includes(q) ||
-      (c.vatInfo?.registrationNo || '').toLowerCase().includes(q) ||
-      (c.customerCode || '').toLowerCase().includes(q)
-    );
+  const filtered = customers.filter((customer) => {
+    const query = search.trim().toLowerCase();
+    if (!query) return true;
+    try {
+      return JSON.stringify(customer).toLowerCase().includes(query);
+    } catch (error) {
+      return false;
+    }
   });
 
   async function selectCustomerAndGo(customerObj) {
     try {
       Keyboard.dismiss();
-      setCurrentCustomer?.(customerObj);
-
       const orderId = `${Date.now()}_${Math.floor(Math.random() * 10000)}`;
 
       if (!startOrder) {
@@ -78,14 +78,14 @@ export default function OrderCustomerSelectScreen() {
       }
 
       // Context handles GPS internally; we keep API simple: (orderId, customer)
-      const result = await startOrder(orderId, customerObj);
+      const result = await startOrder(orderId, customerObj, brandKey);
       
       // Store cleanup function reference
       if (result && result.cleanup) {
         cleanupRef.current = result.cleanup;
       }
 
-      navigation.replace('OrderProductSelectionScreen');
+      navigation.replace('OrderProductSelectionScreen', { brand: brandKey });
     } catch (e) {
       console.log('startOrder/select crash:', e);
       Alert.alert('Σφάλμα', 'Δεν ήταν δυνατή η έναρξη παραγγελίας.');

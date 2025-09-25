@@ -3,8 +3,8 @@
 import RNFS from 'react-native-fs';
 import { useState, useEffect } from 'react';
 
-// Directory for product images (in cache; use DocumentDirectoryPath for more permanent storage)
-export const IMAGES_DIR = `${RNFS.CachesDirectoryPath}/product_images`;
+// Directory for product images (stored in the app's documents directory for persistence)
+export const IMAGES_DIR = `${RNFS.DocumentDirectoryPath}/product_images`;
 
 /**
  * Ensure the images directory exists.
@@ -12,7 +12,9 @@ export const IMAGES_DIR = `${RNFS.CachesDirectoryPath}/product_images`;
 export async function ensureImagesDir() {
   try {
     const exists = await RNFS.exists(IMAGES_DIR);
-    if (!exists) await RNFS.mkdir(IMAGES_DIR);
+    if (!exists) {
+      await RNFS.mkdir(IMAGES_DIR);
+    }
   } catch (e) {
     console.warn('Failed to ensure image directory:', e.message || e);
   }
@@ -36,11 +38,9 @@ export async function downloadAndCacheImage(productCode, remoteUrl) {
 
   const localPath = getLocalImagePath(productCode);
   try {
-    // Check if image already exists
     const exists = await RNFS.exists(localPath);
     if (exists) return localPath;
 
-    // Download image
     const res = await RNFS.downloadFile({
       fromUrl: remoteUrl,
       toFile: localPath,
@@ -48,11 +48,14 @@ export async function downloadAndCacheImage(productCode, remoteUrl) {
 
     if (res && res.statusCode >= 200 && res.statusCode < 300) {
       return localPath;
-    } else {
-      // Remove partially downloaded file if any
-      try { await RNFS.unlink(localPath); } catch (e) {}
-      throw new Error(`Download failed with status: ${res.statusCode}, url: ${remoteUrl}`);
     }
+
+    try {
+      await RNFS.unlink(localPath);
+    } catch (e) {
+      // ignore cleanup error
+    }
+    throw new Error(`Download failed with status: ${res.statusCode}, url: ${remoteUrl}`);
   } catch (err) {
     console.warn(`Image download failed for ${productCode}:`, remoteUrl, err.message || err);
     return null;
@@ -72,6 +75,7 @@ export function useLocalOrRemoteImage(productCode, remoteUrl, forceDownload = fa
 
   useEffect(() => {
     let mounted = true;
+
     async function load() {
       if (!productCode || !remoteUrl) {
         if (mounted) setUri(null);
@@ -83,11 +87,14 @@ export function useLocalOrRemoteImage(productCode, remoteUrl, forceDownload = fa
         await downloadAndCacheImage(productCode, remoteUrl);
         exists = await RNFS.exists(localPath);
       }
-      if (exists && mounted) setUri('file://' + localPath);
+      if (exists && mounted) setUri(`file://${localPath}`);
       else if (mounted) setUri(remoteUrl);
     }
+
     load();
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, [productCode, remoteUrl, forceDownload]);
 
   return uri;

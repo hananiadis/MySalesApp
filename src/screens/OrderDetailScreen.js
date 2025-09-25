@@ -1,167 +1,211 @@
-import React, { useEffect, useState } from 'react';
+// src/screens/OrderDetailScreen.js
+import React, { useMemo } from 'react';
 import {
-  View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, ScrollView, Alert
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  TouchableOpacity,
+  TextInput,
 } from 'react-native';
-import { useRoute, useNavigation } from '@react-navigation/native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { exportOrderAsXLSX, exportOrderAsPDF } from '../utils/exportOrderUtils';
-import { getOrders } from '../utils/localOrders';
-import OrderLineItem from '../components/OrderLineItem';
+import Icon from 'react-native-vector-icons/Ionicons';
+import SafeScreen from '../components/SafeScreen';
+import { useOrder } from '../context/OrderContext';
 
-export default function OrderDetailScreen() {
-  const route = useRoute();
-  const navigation = useNavigation();
-  const { orderId } = route.params || {};
-  const [order, setOrder] = useState(null);
-  const [loading, setLoading] = useState(true);
+export default function OrderDetailScreen({ navigation }) {
+  const { orderLines, setOrderLines, customer } = useOrder();
 
-  useEffect(() => {
-    async function loadOrder() {
-      setLoading(true);
-      try {
-        const all = await getOrders();
-        const found = all.find(o => o.id === orderId);
-        setOrder(found || null);
-      } catch {
-        setOrder(null);
-      }
-      setLoading(false);
-    }
-    loadOrder();
-  }, [orderId]);
+  const lines = useMemo(
+    () => (Array.isArray(orderLines) ? orderLines.filter(Boolean) : []),
+    [orderLines]
+  );
 
-  const handleExport = async (format = 'xlsx') => {
-    try {
-      if (!order) return;
-      if (format === 'xlsx') {
-        await exportOrderAsXLSX(order);
-      } else if (format === 'pdf') {
-        await exportOrderAsPDF(order);
-      }
-    } catch (err) {
-      Alert.alert('Σφάλμα', err.message || 'Αποτυχία εξαγωγής.');
-    }
+  const adjustQty = (code, delta) => {
+    setOrderLines((prev) =>
+      (Array.isArray(prev) ? prev : []).map((l) =>
+        l.productCode === code
+          ? { ...l, quantity: Math.max(1, Number(l.quantity || 1) + delta) }
+          : l
+      )
+    );
   };
 
-  if (loading) {
-    return (
-      <View style={styles.centered}>
-        <ActivityIndicator size="large" color="#007AFF" />
-      </View>
+  const handleQtyChange = (code, val) => {
+    const parsed = Math.max(
+      1,
+      parseInt(String(val).replace(/[^0-9]/g, ''), 10) || 1
     );
-  }
-  if (!order) {
-    return (
-      <View style={styles.centered}>
-        <Text style={{ color: '#888', fontSize: 18 }}>Η παραγγελία δεν βρέθηκε.</Text>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={{ marginTop: 16 }}>
-          <Ionicons name="arrow-back" size={24} color="#007AFF" />
-          <Text style={{ color: '#007AFF', fontWeight: 'bold' }}>Επιστροφή</Text>
-        </TouchableOpacity>
-      </View>
+    setOrderLines((prev) =>
+      (Array.isArray(prev) ? prev : []).map((l) =>
+        l.productCode === code ? { ...l, quantity: parsed } : l
+      )
     );
-  }
+  };
 
-  const customer = order.customer || {};
+  const removeLine = (code) => {
+    setOrderLines((prev) =>
+      (Array.isArray(prev) ? prev : []).filter((l) => l.productCode !== code)
+    );
+  };
+
+  const headerRight = (
+    <TouchableOpacity onPress={() => navigation.navigate('OrderReviewScreen')}>
+      <Icon name="checkmark-done-outline" size={22} color="#1976d2" />
+    </TouchableOpacity>
+  );
 
   return (
-    <ScrollView style={styles.safeArea} contentContainerStyle={{ paddingBottom: 32 }}>
-      <View style={styles.headerRow}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <Ionicons name="arrow-back" size={26} color="#007AFF" />
-        </TouchableOpacity>
-        <Text style={styles.header}>Λεπτομέρειες Παραγγελίας</Text>
-      </View>
-
-      {/* Customer Info */}
-      <View style={styles.section}>
-        <Text style={styles.custName}>{customer.name} ({customer.customerCode || ''})</Text>
-        <Text style={styles.custField}>
-          ΑΦΜ: {customer.vatno || customer.vatInfo?.registrationNo || ''}    ΔΟΥ: {customer.vatInfo?.office || ''}
-        </Text>
-        <Text style={styles.custField}>
-          {customer.address?.street || ''}, {customer.address?.postalCode || ''} {customer.address?.city || ''}
-        </Text>
-        <Text style={styles.custField}>
-          Τηλ: {customer.telephone || customer.contact?.telephone1 || ''}
-        </Text>
-      </View>
-
-      {/* Order Lines */}
-      <View style={styles.section}>
-        <Text style={styles.sectionHeader}>Προϊόντα</Text>
-        {order.lines && order.lines.length ? (
-          order.lines.map(line => (
-            <OrderLineItem
-              key={line.productCode}
-              line={line}
-              editable={false}
-            />
-          ))
-        ) : (
-          <Text style={{ color: '#888' }}>Δεν υπάρχουν προϊόντα στην παραγγελία.</Text>
-        )}
-      </View>
-
-      {/* Cost breakdown */}
-      <View style={styles.section}>
-        <Text style={styles.totalText}>Καθαρή αξία: <Text style={styles.totalValue}>€{(order.netValue || 0).toFixed(2)}</Text></Text>
-        <Text style={styles.totalText}>Έκπτωση: <Text style={styles.totalValue}>€{(order.discount || 0).toFixed(2)}</Text></Text>
-        <Text style={styles.totalText}>ΦΠΑ 24%: <Text style={styles.totalValue}>€{(order.vat || 0).toFixed(2)}</Text></Text>
-        <Text style={styles.finalText}>Τελική αξία: <Text style={styles.finalValue}>€{(order.finalValue || 0).toFixed(2)}</Text></Text>
-      </View>
-
-      {/* Payment and Notes */}
-      <View style={styles.section}>
-        <Text style={styles.sectionHeader}>Τρόπος Πληρωμής</Text>
-        <Text style={styles.custField}>{order.paymentMethodLabel}</Text>
-      </View>
-      {order.notes ? (
-        <View style={styles.section}>
-          <Text style={styles.sectionHeader}>Σημειώσεις</Text>
-          <Text style={styles.custField}>{order.notes}</Text>
+    <SafeScreen title="Καλάθι" headerRight={headerRight}>
+      {customer ? (
+        <View style={styles.customerBar}>
+          <Icon name="person-circle-outline" size={18} color="#1976d2" />
+          <Text style={styles.customerName} numberOfLines={1}>
+            {customer?.name || customer?.displayName || '—'}
+          </Text>
         </View>
       ) : null}
 
-      {/* Export Buttons */}
-      <View style={styles.section}>
-        <Text style={styles.sectionHeader}>Εξαγωγή παραγγελίας</Text>
-        <TouchableOpacity
-          style={styles.exportBtn}
-          onPress={() => handleExport('xlsx')}
-        >
-          <Ionicons name="document-outline" size={20} color="#fff" />
-          <Text style={styles.exportBtnText}>Εξαγωγή σε XLSX</Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.exportBtn}
-          onPress={() => handleExport('pdf')}
-        >
-          <Ionicons name="document-outline" size={20} color="#fff" />
-          <Text style={styles.exportBtnText}>Εξαγωγή σε PDF</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+      {lines.length === 0 ? (
+        <View style={{ marginTop: 20 }}>
+          <Text style={{ textAlign: 'center', color: '#6b7280' }}>
+            Δεν υπάρχουν προϊόντα στο καλάθι.
+          </Text>
+          <TouchableOpacity
+            style={[styles.bottomPrimary, { marginTop: 14, position: 'relative' }]}
+            onPress={() => navigation.goBack()}
+          >
+            <Icon name="add-outline" size={18} color="#fff" />
+            <Text style={styles.bottomPrimaryText}>Προσθήκη προϊόντων</Text>
+          </TouchableOpacity>
+        </View>
+      ) : (
+        <>
+          <FlatList
+            data={lines}
+            keyExtractor={(item) => String(item.productCode)}
+            ItemSeparatorComponent={() => <View style={styles.sep} />}
+            renderItem={({ item }) => (
+              <View style={styles.row}>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.code}>{item.productCode}</Text>
+                  <Text style={styles.title} numberOfLines={1}>
+                    {item.description}
+                  </Text>
+                  <Text style={styles.sub}>
+                    Χονδρική: €{Number(item.wholesalePrice || 0).toFixed(2)} ·
+                    Λιανική: €{Number(item.srp || 0).toFixed(2)}
+                  </Text>
+                </View>
+
+                <View style={styles.qtyBoxRow}>
+                  <TouchableOpacity
+                    onPress={() => adjustQty(item.productCode, -1)}
+                    style={styles.qtyTouch}
+                  >
+                    <Text style={styles.qtyBtn}>-</Text>
+                  </TouchableOpacity>
+                  <TextInput
+                    style={styles.qtyInput}
+                    keyboardType="numeric"
+                    value={String(item.quantity)}
+                    onChangeText={(val) => handleQtyChange(item.productCode, val)}
+                    maxLength={4}
+                    returnKeyType="done"
+                    blurOnSubmit
+                  />
+                  <TouchableOpacity
+                    onPress={() => adjustQty(item.productCode, +1)}
+                    style={styles.qtyTouch}
+                  >
+                    <Text style={styles.qtyBtn}>+</Text>
+                  </TouchableOpacity>
+                </View>
+
+                <TouchableOpacity onPress={() => removeLine(item.productCode)}>
+                  <Icon name="trash-outline" size={20} color="#b91c1c" />
+                </TouchableOpacity>
+              </View>
+            )}
+          />
+
+          <TouchableOpacity
+            style={styles.bottomPrimary}
+            onPress={() => navigation.navigate('OrderReviewScreen')}
+          >
+            <Icon name="checkmark-done-outline" size={18} color="#fff" />
+            <Text style={styles.bottomPrimaryText}>Συνέχεια</Text>
+          </TouchableOpacity>
+        </>
+      )}
+    </SafeScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#fafdff', padding: 16, paddingTop: 34 },
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#fafdff' },
-  headerRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 5 },
-  backBtn: { padding: 5, marginRight: 8 },
-  header: { fontSize: 22, fontWeight: 'bold', color: '#007AFF', flex: 1, textAlign: 'center' },
-  section: { marginBottom: 18, paddingHorizontal: 2 },
-  custName: { fontSize: 18, fontWeight: 'bold', color: '#00599d' },
-  custField: { fontSize: 15, color: '#444', marginTop: 2 },
-  sectionHeader: { fontSize: 16, fontWeight: 'bold', marginBottom: 6, color: '#007AFF' },
-  totalText: { fontSize: 15, fontWeight: 'bold', color: '#212121', marginTop: 2 },
-  totalValue: { fontSize: 15, color: '#00ADEF' },
-  finalText: { fontSize: 17, fontWeight: 'bold', color: '#00ADEF', marginTop: 5 },
-  finalValue: { fontSize: 17, fontWeight: 'bold', color: '#00ADEF' },
-  exportBtn: {
-    backgroundColor: '#007AFF', padding: 14, borderRadius: 8, marginBottom: 10,
-    alignItems: 'center', flexDirection: 'row', justifyContent: 'center'
+  customerBar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#e9f3ff',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 8,
+    marginTop: 8,
+    marginBottom: 6,
   },
-  exportBtnText: { color: '#fff', fontSize: 15, fontWeight: 'bold', marginLeft: 7 },
+  customerName: {
+    marginLeft: 6,
+    fontSize: 13,
+    color: '#1f2937',
+    fontWeight: '600',
+  },
+  sep: { height: StyleSheet.hairlineWidth, backgroundColor: '#e5e7eb' },
+  row: {
+    paddingVertical: 12,
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 10,
+  },
+  code: { color: '#1565c0', fontWeight: '700' },
+  title: { color: '#111827', fontSize: 15, fontWeight: '600', marginTop: 2 },
+  sub: { color: '#6b7280', fontSize: 12, marginTop: 2 },
+  qtyBoxRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    minHeight: 36,
+    minWidth: 96,
+    paddingHorizontal: 4,
+    borderWidth: 1.2,
+    borderColor: '#1976d2',
+    borderRadius: 8,
+  },
+  qtyTouch: { paddingHorizontal: 6, paddingVertical: 4 },
+  qtyBtn: { fontSize: 22, color: '#1976d2', fontWeight: 'bold' },
+  qtyInput: {
+    width: 42,
+    height: 32,
+    textAlign: 'center',
+    fontSize: 16,
+    color: '#111',
+    marginHorizontal: 3,
+    backgroundColor: '#f5fafd',
+    borderRadius: 5,
+    fontWeight: 'bold',
+    paddingVertical: 0,
+  },
+  bottomPrimary: {
+    position: 'absolute',
+    left: 14,
+    right: 14,
+    bottom: 16,
+    height: 46,
+    borderRadius: 12,
+    backgroundColor: '#1976d2',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    elevation: 3,
+  },
+  bottomPrimaryText: { color: '#fff', fontWeight: 'bold' },
 });

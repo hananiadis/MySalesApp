@@ -15,6 +15,8 @@ import { OrderProvider } from './src/context/OrderContext';
 // Screens
 import HomeScreen from './src/screens/HomeScreen';
 import PlaymobilScreen from './src/screens/PlaymobilScreen';
+import KivosScreen from './src/screens/KivosScreen';
+import JohnScreen from './src/screens/JohnScreen';
 import ProductsScreen from './src/screens/ProductsScreen';
 import CustomersScreen from './src/screens/CustomersScreen';
 import DataScreen from './src/screens/DataScreen';
@@ -30,6 +32,9 @@ import OrderReviewScreen from './src/screens/OrderReviewScreen';
 import OrderSummaryScreen from './src/screens/OrderSummaryScreen';
 import ExportSuccessScreen from './src/screens/ExportSuccessScreen';
 import OrderDetailScreen from './src/screens/OrderDetailScreen';
+import ProfileScreen from './src/screens/ProfileScreen';
+import SettingsScreen from './src/screens/SettingsScreen';
+import UserManagementScreen from './src/screens/UserManagementScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -51,6 +56,8 @@ function AppNavigator() {
         {/* Main */}
         <Stack.Screen name="Home" component={HomeScreen} />
         <Stack.Screen name="Playmobil" component={PlaymobilScreen} />
+        <Stack.Screen name="Kivos" component={KivosScreen} />
+        <Stack.Screen name="John" component={JohnScreen} />
         <Stack.Screen name="Products" component={ProductsScreen} />
         <Stack.Screen name="Customers" component={CustomersScreen} />
         <Stack.Screen name="Data" component={DataScreen} />
@@ -61,6 +68,8 @@ function AppNavigator() {
         <Stack.Screen name="CustomerSalesDetail" component={CustomerSalesDetail} />
         <Stack.Screen name="OrdersManagement" component={OrdersManagementScreen} />
         <Stack.Screen name="OrderDetail" component={OrderDetailScreen} />
+        <Stack.Screen name="Settings" component={SettingsScreen} />
+        <Stack.Screen name="UserManagement" component={UserManagementScreen} />
 
         {/* Order flow (names used by navigation.navigate) */}
         <Stack.Screen
@@ -83,6 +92,7 @@ function AppNavigator() {
           name="ExportSuccessScreen"
           component={ExportSuccessScreen}
         />
+        <Stack.Screen name="Profile" component={ProfileScreen} />
       </Stack.Navigator>
     </>
   );

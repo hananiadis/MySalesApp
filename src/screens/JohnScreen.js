@@ -11,9 +11,9 @@ const STRINGS = {
   back: '\u03a0\u03af\u03c3\u03c9',
 };
 
-const BRAND_KEY = 'playmobil';
+const BRAND_KEY = 'john';
 
-const PlaymobilScreen = ({ navigation }) => {
+const JohnScreen = ({ navigation }) => {
   const buttons = [
     {
       key: 'new',
@@ -50,7 +50,7 @@ const PlaymobilScreen = ({ navigation }) => {
   ];
 
   return (
-    <SafeScreen title="Playmobil" style={styles.container} bodyStyle={styles.body}>
+    <SafeScreen title="John" style={styles.container} bodyStyle={styles.body}>
       <View style={styles.buttonGrid}>
         {buttons.map((button) => (
           <TouchableOpacity
@@ -147,4 +147,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default PlaymobilScreen;
+export default JohnScreen;

@@ -24,6 +24,21 @@ const PERMISSIONS_BY_ROLE = {
   [ROLES.WAREHOUSE_MANAGER]: ['warehouse.view', 'warehouse.edit'],
 };
 
+const splitDisplayName = (displayName) => {
+  if (!displayName) {
+    return { firstName: '', lastName: '' };
+  }
+
+  const parts = displayName.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) {
+    return { firstName: '', lastName: '' };
+  }
+
+  const firstName = parts[0];
+  const lastName = parts.slice(1).join(' ');
+  return { firstName, lastName };
+};
+
 export function AuthProvider({ children }) {
   const [init, setInit] = useState(true);
   const [user, setUser] = useState(null);
@@ -58,9 +73,13 @@ export function AuthProvider({ children }) {
           if (!active) return;
           try {
             if (!snapshot.exists) {
+              const { firstName, lastName } = splitDisplayName(user.displayName || '');
+              const fallbackName = [firstName, lastName].filter(Boolean).join(' ') || user.displayName || '';
               const data = {
                 uid: user.uid,
-                name: user.displayName || '',
+                firstName,
+                lastName,
+                name: fallbackName,
                 email: user.email || '',
                 role: ROLES.CUSTOMER,
                 brands: [],
@@ -104,20 +123,25 @@ export function AuthProvider({ children }) {
     return auth().signInWithEmailAndPassword(email.trim(), password);
   };
 
-  const signUp = async (name, email, password) => {
-    const trimmedEmail = email.trim();
-    const trimmedName = name ? name.trim() : '';
+  const signUp = async (firstName, lastName, email, password) => {
+    const trimmedFirst = (firstName || '').trim();
+    const trimmedLast = (lastName || '').trim();
+    const trimmedEmail = (email || '').trim();
+    const fullName = [trimmedFirst, trimmedLast].filter(Boolean).join(' ');
+
     const credential = await auth().createUserWithEmailAndPassword(trimmedEmail, password);
 
-    if (trimmedName) {
-      await credential.user.updateProfile({ displayName: trimmedName });
+    if (fullName) {
+      await credential.user.updateProfile({ displayName: fullName });
     }
 
     const ref = firestore().collection('users').doc(credential.user.uid);
     await ref.set(
       {
         uid: credential.user.uid,
-        name: trimmedName,
+        firstName: trimmedFirst,
+        lastName: trimmedLast,
+        name: fullName || trimmedFirst || trimmedLast || credential.user.email || '',
         email: credential.user.email,
         role: ROLES.CUSTOMER,
         brands: [],
@@ -131,6 +155,42 @@ export function AuthProvider({ children }) {
   const signOut = async () => {
     await auth().signOut();
     setProfile(null);
+  };
+
+  const updateProfileInfo = async ({ firstName, lastName, email, password }) => {
+    const current = auth().currentUser;
+    if (!current) {
+      throw new Error('No authenticated user.');
+    }
+
+    const trimmedFirst = (firstName || '').trim();
+    const trimmedLast = (lastName || '').trim();
+    const trimmedEmail = (email || '').trim() || current.email || '';
+    const fullName = [trimmedFirst, trimmedLast].filter(Boolean).join(' ');
+
+    if (trimmedEmail !== current.email) {
+      await current.updateEmail(trimmedEmail);
+    }
+
+    if (fullName && fullName !== (current.displayName || '')) {
+      await current.updateProfile({ displayName: fullName });
+    }
+
+    if (password) {
+      await current.updatePassword(password);
+    }
+
+    const ref = firestore().collection('users').doc(current.uid);
+    await ref.set(
+      {
+        firstName: trimmedFirst,
+        lastName: trimmedLast,
+        name: fullName || trimmedFirst || trimmedLast || trimmedEmail,
+        email: trimmedEmail,
+        updatedAt: firestoreModule.FieldValue.serverTimestamp(),
+      },
+      { merge: true }
+    );
   };
 
   const myRole = profile?.role || null;
@@ -163,12 +223,13 @@ export function AuthProvider({ children }) {
       signIn,
       signUp,
       signOut,
+      updateProfileInfo,
       hasRole,
       hasBrand,
       can,
       ROLES,
     }),
-    [init, user, profile, loadingProfile, myRole, myBrands]
+    [init, user, profile, loadingProfile, myRole, myBrands, updateProfileInfo]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

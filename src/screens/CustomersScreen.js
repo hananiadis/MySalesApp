@@ -1,3 +1,4 @@
+// src/screens/CustomersScreen.js
 import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
@@ -10,22 +11,23 @@ import {
   ActivityIndicator,
   Platform,
 } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { getCustomersFromLocal } from '../utils/localData';
+import SafeScreen from '../components/SafeScreen';
 
 const PLACEHOLDER_AVATAR = require('../../assets/avatar_placeholder.png'); // change to your path
 
 export default function CustomersScreen() {
   const navigation = useNavigation();
+  const route = useRoute();
+  const brand = route?.params?.brand ?? null;
   const [customers, setCustomers] = useState([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getCustomersFromLocal()
-      .then((data) => setCustomers(data))
-      .finally(() => setLoading(false));
+    getCustomersFromLocal().then((data) => setCustomers(data)).finally(() => setLoading(false));
   }, []);
 
   const filtered = useMemo(() => {
@@ -63,11 +65,7 @@ export default function CustomersScreen() {
         activeOpacity={0.75}
         onPress={() => navigation.navigate('CustomerDetail', { customerId: item.id })}
       >
-        <Image
-          source={PLACEHOLDER_AVATAR}
-          style={styles.avatar}
-          resizeMode="contain"
-        />
+        <Image source={PLACEHOLDER_AVATAR} style={styles.avatar} resizeMode="contain" />
         <View style={styles.infoCol}>
           <Text style={styles.customerMain}>
             {item.customerCode} - {item.name}
@@ -80,9 +78,7 @@ export default function CustomersScreen() {
       {/* Cart icon to start new order */}
       <TouchableOpacity
         style={styles.cartBtn}
-        onPress={() =>
-          navigation.navigate('OrderCustomerSelectScreen', { prefillCustomer: item })
-        }
+        onPress={() => navigation.navigate('OrderCustomerSelectScreen', { prefillCustomer: item, brand })}
       >
         <Ionicons name="cart" size={28} color="#007AFF" />
       </TouchableOpacity>
@@ -90,58 +86,75 @@ export default function CustomersScreen() {
   );
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Πελάτες</Text>
-      <TextInput
-        style={styles.searchInput}
-        placeholder="Αναζήτηση επωνυμίας, ΑΦΜ, ή κωδικού"
-        value={search}
-        onChangeText={setSearch}
-        autoCorrect={false}
-        autoCapitalize="none"
-        placeholderTextColor="#90caf9"
-      />
+    <SafeScreen>
+      <View style={styles.header}>
+        <Text style={styles.title}>Πελάτες</Text>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Αναζήτηση επωνυμίας, ΑΦΜ, ή κωδικού"
+          value={search}
+          onChangeText={setSearch}
+          autoCorrect={false}
+          autoCapitalize="none"
+          placeholderTextColor="#90caf9"
+        />
+      </View>
+
       {loading ? (
-        <ActivityIndicator size="large" color="#007AFF" style={{ marginTop: 40 }} />
+        <ActivityIndicator size="large" color="#007AFF" style={{ marginTop: 16 }} />
       ) : (
         <FlatList
           data={filtered}
           keyExtractor={(item) => item.id || item.customerCode || Math.random().toString()}
           renderItem={renderItem}
           keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{ paddingBottom: 80 }}
+          contentContainerStyle={{ paddingBottom: 80, paddingHorizontal: 18 }}
           ListEmptyComponent={
-            <Text style={{ color: '#aaa', textAlign: 'center', marginTop: 30 }}>
-              Δεν βρέθηκαν πελάτες
-            </Text>
+            <Text style={{ color: '#aaa', textAlign: 'center', marginTop: 30 }}>Δεν βρέθηκαν πελάτες</Text>
           }
         />
       )}
-    </View>
+    </SafeScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fafdff', padding: 18, paddingTop: 34 },
+  header: { paddingHorizontal: 18, paddingTop: 6 },
   title: { fontSize: 23, fontWeight: 'bold', color: '#007AFF', marginBottom: 9 },
   searchInput: {
-    borderWidth: 1, borderColor: '#90caf9', backgroundColor: '#fff',
-    borderRadius: 12, fontSize: 17, color: '#222',
-    paddingHorizontal: 13, paddingVertical: Platform.OS === 'ios' ? 10 : 8,
-    marginBottom: 13
+    borderWidth: 1,
+    borderColor: '#90caf9',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    fontSize: 17,
+    color: '#222',
+    paddingHorizontal: 13,
+    paddingVertical: Platform.OS === 'ios' ? 10 : 8,
+    marginBottom: 8,
   },
   infoRow: {
-    flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff',
-    borderRadius: 11, marginBottom: 6, padding: 12, elevation: 1,
-    shadowColor: '#000', shadowOpacity: 0.03, shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 }
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 11,
+    marginBottom: 6,
+    padding: 12,
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOpacity: 0.03,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
   },
   avatar: { width: 44, height: 44, borderRadius: 24, marginRight: 14, backgroundColor: '#e6e6e6' },
   infoCol: { flex: 1, justifyContent: 'center' },
   customerMain: { fontWeight: 'bold', color: '#00599d', fontSize: 15 },
   customerSub: { color: '#444', fontSize: 13 },
   cartBtn: {
-    backgroundColor: '#eaf6ff', borderRadius: 22, padding: 7,
-    alignItems: 'center', justifyContent: 'center', marginLeft: 8
+    backgroundColor: '#eaf6ff',
+    borderRadius: 22,
+    padding: 7,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: 8,
   },
 });

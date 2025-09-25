@@ -1,20 +1,20 @@
+// src/screens/CustomerSalesSummary.js
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import SafeScreen from '../components/SafeScreen';
 
 const CustomerSalesSummary = ({ navigation }) => {
-  // TODO: fetch and display summary stats for the customer
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Σύνοψη Πωλήσεων Πελάτη</Text>
-      <Text style={styles.placeholder}>[Προσεχώς: γράφημα 2ετίας ή πίνακας σύνοψης]</Text>
+    <SafeScreen>
+      <View style={styles.container}>
+        <Text style={styles.header}>Σύνοψη Πωλήσεων Πελάτη</Text>
+        <Text style={styles.placeholder}>[Προσεχώς: γράφημα 2ετίας ή πίνακας σύνοψης]</Text>
 
-      <TouchableOpacity
-        style={styles.salesButton}
-        onPress={() => navigation.navigate('CustomerSalesDetail')}
-      >
-        <Text style={styles.salesButtonText}>Αναλυτικά στοιχεία πωλήσεων</Text>
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity style={styles.salesButton} onPress={() => navigation.navigate('CustomerSalesDetail')}>
+          <Text style={styles.salesButtonText}>Αναλυτικά στοιχεία πωλήσεων</Text>
+        </TouchableOpacity>
+      </View>
+    </SafeScreen>
   );
 };
 

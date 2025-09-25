@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useReducer, useEffect, useCallback, useRef } from 'react';
 import { Platform, InteractionManager, PermissionsAndroid } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
+import { useAuth } from './AuthProvider';
 
 import { saveOrder, updateOrderStatus, getOrders, deleteOrder } from '../utils/localOrders';
 import { updateOrder } from '../utils/firestoreOrders'; // ⬅️ upsert only
@@ -12,6 +13,8 @@ const initialState = {
   status: 'draft',
   customer: null,
   customerId: null,
+  brand: null,
+  createdBy: null,
   lines: [],
   notes: '',
   paymentMethod: 'prepaid_cash',
@@ -63,6 +66,8 @@ export function OrderProvider({ children }) {
   useEffect(() => { orderRef.current = order; }, [order]);
 
   const { isConnected } = useOnlineStatus();
+  const { user } = useAuth();
+  const currentUserId = user?.uid || user?.id || null;
 
   const calculateTotals = useCallback((o) => {
     const lines = Array.isArray(o?.lines) ? o.lines : [];
@@ -122,7 +127,12 @@ export function OrderProvider({ children }) {
       const isDraft = order.status === 'draft';
 
       const totals = calculateTotals(order);
-      const withTotals = { ...order, ...totals };
+      const withTotals = {
+        ...order,
+        ...totals,
+        userId: order.userId || currentUserId || 'demoUserId',
+        createdBy: order.createdBy || order.userId || currentUserId || 'demoUserId',
+      };
 
       // Don’t store truly empty drafts
       if (isDraft && !hasLines && !hasNotes) {
@@ -139,7 +149,8 @@ export function OrderProvider({ children }) {
           const firestoreOrder = {
             ...withTotals,
             customerId: order.customerId || order.customer?.id || null,
-            userId: order.userId || 'demoUserId',
+            userId: withTotals.userId,
+            createdBy: withTotals.createdBy,
             createdAt: order.createdAt || new Date().toISOString(),
             updatedAt: order.updatedAt || new Date().toISOString(),
           };
@@ -157,27 +168,54 @@ export function OrderProvider({ children }) {
     dispatch({ type: 'LOAD_ORDER', payload: orderData });
   };
 
-  const startOrder = async (orderId, customerObj) => {
-    if (!orderId || !customerObj) throw new Error('Λείπουν στοιχεία πελάτη/παραγγελίας.');
+  const startOrder = async (orderId, customerObj, brandKey = null) => {
+    if (!orderId || !customerObj) throw new Error('Απαιτείται αριθμός παραγγελίας και πελάτης.');
 
+    const resolvedBrand = brandKey ?? orderRef.current?.brand ?? null;
     const startedAt = new Date().toISOString();
-    const draft = {
+    let draft = {
       ...initialState,
       id: orderId,
       number: generateOrderNumber(),
       customer: customerObj,
       customerId: customerObj?.id ?? customerObj?.customerId ?? null,
+      brand: resolvedBrand,
       status: 'draft',
       lines: [],
       startedAt,
       startedLocation: null,
       createdAt: startedAt,
-      userId: 'demoUserId',
+      userId: currentUserId || 'demoUserId',
+      createdBy: currentUserId || 'demoUserId',
     };
 
+    try {
+      draft = await saveOrder(draft, 'draft');
+    } catch (error) {
+      console.warn('Failed to persist draft order locally', error);
+    }
+
+    if (isConnected) {
+      try {
+        const firestoreDraft = {
+          ...draft,
+          ...calculateTotals(draft),
+          customerId: draft.customerId,
+          userId: draft.userId || currentUserId || 'demoUserId',
+          createdBy: draft.createdBy || draft.userId || currentUserId || 'demoUserId',
+          brand: draft.brand ?? null,
+          createdAt: draft.createdAt,
+          updatedAt: draft.updatedAt || new Date().toISOString(),
+        };
+        await updateOrder(draft.id, firestoreDraft);
+      } catch (error) {
+        console.log('Error creating draft order in Firestore:', error);
+      }
+    }
+
     dispatch({ type: 'INIT_ORDER', payload: draft });
-    const cleanup = queueStartedLocationCapture(orderId);
-    return { orderId, cleanup };
+    const cleanup = queueStartedLocationCapture(draft.id);
+    return { orderId: draft.id, cleanup };
   };
 
   const setCurrentCustomer = (customerObj) => {
@@ -216,7 +254,10 @@ export function OrderProvider({ children }) {
 
     const next = {
       ...order,
+      userId: order.userId || currentUserId || 'demoUserId',
+      createdBy: order.createdBy || order.userId || currentUserId || 'demoUserId',
       status: 'sent',
+      sent: true,
       exported: true,
       exportedAt,
       exportedLocation,
@@ -233,13 +274,16 @@ export function OrderProvider({ children }) {
         const firestoreOrder = {
           ...next,
           customerId: order.customerId || order.customer?.id || null,
-          userId: order.userId || 'demoUserId',
+          userId: next.userId || 'demoUserId',
+          createdBy: next.createdBy || next.userId,
         };
         await updateOrder(order.id, firestoreOrder); // ⬅️ upsert sent state
       } catch (error) {
         console.log('Error updating sent order in Firestore:', error);
       }
     }
+
+    return next;
   };
 
   // 🔧 FIX: don’t delete sent orders; only delete truly empty drafts

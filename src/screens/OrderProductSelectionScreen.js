@@ -28,6 +28,8 @@ export default function OrderProductSelectionScreen({ navigation, route }) {
 
   const routeProducts = Array.isArray(route?.params?.products) ? route.params.products : [];
   const [products, setProducts] = useState(routeProducts);
+  const brandKey = route?.params?.brand ?? null;
+  const fromOrders = Boolean(route?.params?.fromOrders);
 
   function ensureVisible(index) {
     try {
@@ -87,6 +89,11 @@ export default function OrderProductSelectionScreen({ navigation, route }) {
     const code = codeOf(p);
     const mapped = getImmediateStock(code);
     if (mapped != null && mapped !== '') return mapped;
+    const normalizedCode = normalizeStockCode(code);
+    if (normalizedCode && normalizedCode !== code) {
+      const fallback = getImmediateStock(normalizedCode);
+      if (fallback != null && fallback !== '') return fallback;
+    }
     const fallback = p?.availableStock ?? p?.stock ?? p?.Stock ?? p?.AvailableStock ?? null;
     return fallback != null && fallback !== '' ? fallback : 'n/a';
   };
@@ -164,7 +171,12 @@ export default function OrderProductSelectionScreen({ navigation, route }) {
   }, [orderLines]);
 
   const goNext = () => {
-    if (totalItems > 0) navigation.navigate('OrderReviewScreen');
+    if (totalItems <= 0) return;
+    if (fromOrders) {
+      navigation.replace('OrderReviewScreen', { fromOrders: true, brand: brandKey ?? null });
+    } else {
+      navigation.navigate('OrderReviewScreen');
+    }
   };
 
   const searchIndex = useMemo(() => {
@@ -463,5 +475,3 @@ const styles = StyleSheet.create({
   fabDisabled: { opacity: 0.5 },
   fabText: { color: '#fff', fontWeight: '800', fontSize: 15.5 },
 });
-
-

@@ -8,7 +8,7 @@ const serviceAccount = require('./serviceAccountKey.json');
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
   projectId: 'mysalesapp-38ccf',
-  ignoreUndefinedProperties: true
+  ignoreUndefinedProperties: true,
 });
 
 const db = admin.firestore();
@@ -35,7 +35,7 @@ function normalizeDecimal(value) {
 function parseBoolean(value) {
   if (typeof value === 'boolean') return value;
   if (typeof value !== 'string') return true; // Default to true
-  
+
   const normalized = value.trim().toLowerCase();
   return normalized === 'true' || normalized === 'yes' || normalized === '1';
 }
@@ -44,10 +44,10 @@ async function importProducts() {
   try {
     console.log('🚀 Starting CSV import from Google Sheets...');
     const response = await axios.get(csvUrl, { responseType: 'stream' });
-    
+
     let processedCount = 0;
     let skippedCount = 0;
-    
+
     response.data
       .pipe(csv())
       .on('data', async (row) => {
@@ -61,9 +61,11 @@ async function importProducts() {
 
           const docId = row['Product Code'].trim();
           const docRef = db.collection('products').doc(docId);
-          
+
           // Prepare clean data
           const cleanData = {
+            productCode: docId,
+            code: docId,
             barcode: row['Barcode'] || null,
             playingTheme: row['Playing Theme'] || null,
             description: row['Product Description'] || null,
@@ -77,40 +79,38 @@ async function importProducts() {
             frontCover: row['Front Cover'] || null,
             availableStock: row['Available Stock GR'] || null,
             isActive: parseBoolean(row['IsActive']), // Get from Column N
-            lastUpdated: admin.firestore.FieldValue.serverTimestamp()
+            lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
           };
 
-          
-const docSnapshot = await docRef.get();
+          const docSnapshot = await docRef.get();
 
-if (!docSnapshot.exists) {
-  await docRef.set(cleanData);
-  processedCount++;
-  console.log(`🆕 Added new: ${docId}`);
-} else {
-  const existingData = docSnapshot.data();
-  const updates = {};
+          if (!docSnapshot.exists) {
+            await docRef.set(cleanData);
+            processedCount++;
+            console.log(`🆕 Added new: ${docId}`);
+          } else {
+            const existingData = docSnapshot.data();
+            const updates = {};
 
-  for (const key in cleanData) {
-    if (
-      cleanData[key] !== undefined &&
-      JSON.stringify(cleanData[key]) !== JSON.stringify(existingData[key])
-    ) {
-      updates[key] = cleanData[key];
-    }
-  }
+            for (const key in cleanData) {
+              if (
+                cleanData[key] !== undefined &&
+                JSON.stringify(cleanData[key]) !== JSON.stringify(existingData[key])
+              ) {
+                updates[key] = cleanData[key];
+              }
+            }
 
-  if (Object.keys(updates).length > 0) {
-    updates.lastUpdated = admin.firestore.FieldValue.serverTimestamp();
-    await docRef.update(updates);
-    processedCount++;
-    console.log(`📝 Updated: ${docId} ▸ ${Object.keys(updates).join(', ')}`);
-  } else {
-    skippedCount++;
-    console.log(`⏭️ No change: ${docId}`);
-  }
-}
-
+            if (Object.keys(updates).length > 0) {
+              updates.lastUpdated = admin.firestore.FieldValue.serverTimestamp();
+              await docRef.update(updates);
+              processedCount++;
+              console.log(`📝 Updated: ${docId} ▸ ${Object.keys(updates).join(', ')}`);
+            } else {
+              skippedCount++;
+              console.log(`⏭️ No change: ${docId}`);
+            }
+          }
         } catch (error) {
           console.error(`❌ Error processing ${row['Product Code']}:`, error.message);
           skippedCount++;
@@ -121,7 +121,7 @@ if (!docSnapshot.exists) {
         console.log(`✔️ Processed: ${processedCount}`);
         console.log(`⏭️ Skipped: ${skippedCount}`);
         console.log('✨ Import completed!');
-        
+
         // Optional: Output a sample document structure
         if (processedCount > 0) {
           console.log('\n📝 Sample document structure:');
@@ -130,7 +130,7 @@ if (!docSnapshot.exists) {
             description: 'Sample Product',
             srp: 19.99,
             isActive: true,
-            lastUpdated: 'Firestore server timestamp'
+            lastUpdated: 'Firestore server timestamp',
           });
         }
       })
