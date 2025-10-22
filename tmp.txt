@@ -1,0 +1,531 @@
+﻿import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  ActivityIndicator,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+
+import { useOrder } from '../context/OrderContext';
+import { computeOrderTotals } from '../utils/orderTotals';
+import { getStoreInventory } from '../services/supermarketInventory';
+import { normalizeBrandKey, isSuperMarketBrand } from '../constants/brands';
+import { fetchSuperMarketListings } from '../services/supermarketData';
+
+const DEFAULT_SUPERMARKET_BRAND = 'john';
+const VAT_MULTIPLIER = 1.24;
+const FALLBACK_CATEGORY = 'Λοιπές κατηγορίες';
+
+const STRINGS = {
+  title: 'Επιλογή προϊόντων SuperMarket',
+  companiesAll: 'Όλες οι εταιρείες',
+  searchPlaceholder: 'Αναζήτηση με κωδικό, περιγραφή ή barcode…',
+  noProducts: 'Δεν βρέθηκαν προϊόντα.',
+  emptyHint: 'Δοκίμασε ανανέωση από την οθόνη Δεδομένων.',
+  suggestedQty: 'Προτεινόμενη ποσότητα',
+  orderedQty: 'Παραγγελθείσα ποσότητα',
+  storeStock: 'Απόθεμα καταστήματος',
+  inventoryStock: 'Απόθεμα αποθήκης',
+  price: 'Τιμή',
+  srp: 'Λιανική',
+  back: 'Πίσω',
+  applySuggested: 'Εφαρμογή προτεινόμενων ποσοτήτων',
+  review: 'Σύνοψη παραγγελίας',
+  reviewDisabled: 'Πρόσθεσε προϊόντα για να συνεχίσεις',
+  summary: (items, quantity, total) => `${items} προϊόντα · ${quantity} τεμ · ${total}`,
+  groupCollapse: 'Σύμπτυξη',
+  groupExpand: 'Ανάπτυξη',
+};
+
+const normalizeText = (value) => (value ? String(value).trim().toLowerCase() : '');
+
+const parseNumber = (value) => {
+  if (value === null || value === undefined) return null;
+  if (typeof value === 'number') {
+    return Number.isFinite(value) ? value : null;
+  }
+  const sanitized = String(value)
+    .replace(/\s+/g, '')
+    .replace(/,/g, '.')
+    .replace(/[^0-9.-]/g, '');
+  if (!sanitized) return null;
+  const parsed = Number(sanitized);
+  return Number.isFinite(parsed) ? parsed : null;
+};
+
+const formatCurrency = (value) => {
+  const amount = Number(value || 0);
+  return `€${amount.toFixed(2)}`;
+};
+
+const translateCategoryCode = (value) => {
+  const text = normalizeText(value);
+  if (!text) return '';
+  if (text.includes('grand')) return 'A';
+  if (text.includes('express')) return 'C';
+
+  switch (text.replace(/\s+/g, '')) {
+    case 'α':
+    case 'a':
+      return 'A';
+    case 'β':
+    case 'b':
+      return 'B';
+    case 'γ':
+    case 'g':
+    case 'c':
+      return 'C';
+    case 'δ':
+    case 'd':
+      return 'D';
+    default:
+      return text.toUpperCase();
+  }
+};
+
+const deriveStoreCategories = (store) => {
+  const derived = new Set();
+  const candidates = [store?.storeCategory, store?.storeCategoryCode, store?.hasToys, store?.category];
+
+  candidates.forEach((candidate) => {
+    const normalized = normalizeText(candidate);
+    if (!normalized) return;
+    normalized
+      .split(/[\/,'\u0387]+/)
+      .map((part) => translateCategoryCode(part))
+      .filter(Boolean)
+      .forEach((code) => derived.add(code));
+  });
+
+  if (!derived.size) {
+    derived.add('A');
+    derived.add('B');
+    derived.add('C');
+  }
+
+  return Array.from(derived);
+};
+
+const collectListingCategories = (listing) => {
+  const categories = new Set();
+  if (Array.isArray(listing?.activeCategories)) {
+    listing.activeCategories.forEach((cat) => {
+      const normalized = translateCategoryCode(cat);
+      if (normalized) categories.add(normalized);
+    });
+  }
+  if (listing?.isAActive) categories.add('A');
+  if (listing?.isBActive) categories.add('B');
+  if (listing?.isCActive) categories.add('C');
+  if (listing?.category) {
+    const normalized = translateCategoryCode(listing.category);
+    if (normalized) categories.add(normalized);
+  }
+  return Array.from(categories);
+};
+
+const buildOrderLine = (product, quantity, brand) => {
+  const qty = Number(quantity || 0);
+  if (!Number.isFinite(qty) || qty <= 0) {
+    return null;
+  }
+
+  return {
+    id: `supermarket_${product.code}`,
+    productCode: product.code,
+    code: product.code,
+    description: product.description,
+    quantity: qty,
+    packaging: product.packaging,
+    wholesalePrice: product.priceNumber ?? 0,
+    srp: product.srpNumber ?? null,
+    barcode: product.barcode || null,
+    isNew: product.isNew || false,
+    suggestedQty: product.suggestedQtyNumber ?? null,
+    currentStock: product.currentStock ?? null,
+    storeStock: product.storeStock ?? null,
+    listingId: product.listingId,
+    brand,
+    orderType: 'supermarket',
+    photoUrl: product.photoUrl || null,
+  };
+};
+
+const fingerprintListings = (list = []) =>
+  list
+    .map((entry = {}) => {
+      const code = entry?.productCode || entry?.code || '';
+      const updated = entry?.updatedAt || entry?.lastModified || '';
+      return `${code}#${updated}`;
+    })
+    .join('|');
+
+const SuperMarketProductSelectionScreen = ({ navigation, route }) => {
+  const insets = useSafeAreaInsets();
+  const { store = {}, orderLines, setOrderLines, updateCurrentOrder, paymentMethod, order } = useOrder();
+
+  const routeBrand = route?.params?.brand;
+  const orderBrand = order?.brand;
+  const brandKey = useMemo(() => {
+    const candidate = normalizeBrandKey(routeBrand || orderBrand || DEFAULT_SUPERMARKET_BRAND);
+    return isSuperMarketBrand(candidate) ? candidate : DEFAULT_SUPERMARKET_BRAND;
+  }, [routeBrand, orderBrand]);
+
+  useEffect(() => {
+    if (orderBrand !== brandKey) {
+      updateCurrentOrder?.({ brand: brandKey });
+    }
+  }, [brandKey, orderBrand, updateCurrentOrder]);
+
+  const activeStore = Object.keys(store || {}).length ? store : route?.params?.store || {};
+  const storeCategories = useMemo(() => deriveStoreCategories(activeStore), [activeStore]);
+  const storeCategoriesKey = useMemo(() => storeCategories.slice().sort().join('|'), [storeCategories]);
+  const storeFingerprint = useMemo(() => {
+    const storeId = activeStore?.id || activeStore?.refId || activeStore?.storeCode || 'unknown';
+    return `${brandKey}::${storeId}`;
+  }, [activeStore?.id, activeStore?.refId, activeStore?.storeCode, brandKey]);
+
+  const listingFingerprintRef = useRef(fingerprintListings(order?.supermarketListings || []));
+
+  const [loadingListings, setLoadingListings] = useState(true);
+  const [loadingInventory, setLoadingInventory] = useState(true);
+  const [listings, setListings] = useState([]);
+  const [inventoryMap, setInventoryMap] = useState({});
+  const [searchValue, setSearchValue] = useState('');
+  const [selectedCompany, setSelectedCompany] = useState('all');
+  const [collapsedGroups, setCollapsedGroups] = useState(() => new Set());
+
+  const orderLinesMap = useMemo(() => {
+    const map = new Map();
+    (Array.isArray(orderLines) ? orderLines : []).forEach((line) => {
+      if (line && line.productCode) {
+        map.set(line.productCode, line);
+      }
+    });
+    return map;
+  }, [orderLines]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadListings = async () => {
+      setLoadingListings(true);
+      try {
+        const listingsData = await fetchSuperMarketListings(brandKey, { onlyActive: true });
+        if (cancelled) return;
+
+        const records = listingsData
+          .filter((item) => {
+            const listingCategories = collectListingCategories(item);
+            if (!listingCategories.length) return true;
+            return listingCategories.some((cat) => storeCategories.includes(cat));
+          })
+          .map((item) => {
+            const priceValue = parseNumber(item.price ?? item.wholesalePrice);
+            const priceNumber = priceValue !== null ? priceValue : null;
+            const srpNumber = priceValue !== null ? +(priceValue * VAT_MULTIPLIER).toFixed(2) : null;
+            const suggestedQtyNumber = parseNumber(item.suggestedQty);
+            return {
+              listingId: item.id,
+              code: item.productCode || item.code,
+              productCode: item.productCode || item.code,
+              description: item.description || item.listingLabel || '',
+              barcode: item.barcode || '',
+              packaging: item.packaging || '',
+              priceNumber,
+              srpNumber,
+              suggestedQtyNumber: Number.isFinite(suggestedQtyNumber) ? suggestedQtyNumber : 0,
+              storeStock: parseNumber(item.storeStock),
+              photoUrl: item.photoUrl || item.imageUrl || null,
+              isNew: Boolean(item.isNew),
+              categories: collectListingCategories(item),
+              productCategory: item.productCategory || item.category || null,
+            };
+          })
+          .filter((entry) => entry.code);
+
+        setListings(records);
+        const fingerprint = fingerprintListings(records);
+        if (listingFingerprintRef.current !== fingerprint) {
+          listingFingerprintRef.current = fingerprint;
+          updateCurrentOrder?.({ supermarketListings: records });
+        }
+      } catch (err) {
+        if (!cancelled) {
+          console.warn('Failed to load SuperMarket listings', err);
+          setListings([]);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoadingListings(false);
+        }
+      }
+    };
+
+    loadListings();
+    return () => {
+      cancelled = true;
+    };
+  }, [brandKey, storeCategoriesKey, storeFingerprint, storeCategories, updateCurrentOrder]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const loadInventory = async () => {
+      setLoadingInventory(true);
+      try {
+        const data = await getStoreInventory(activeStore.storeCode);
+        if (!cancelled) {
+          setInventoryMap(data || {});
+          updateCurrentOrder?.({ inventorySnapshot: data || {} });
+        }
+      } catch (err) {
+        if (!cancelled) {
+          console.warn('Failed to load SuperMarket inventory', err);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoadingInventory(false);
+        }
+      }
+    };
+
+    if (activeStore?.storeCode) {
+      loadInventory();
+    } else {
+      setInventoryMap({});
+      setLoadingInventory(false);
+    }
+
+    return () => {
+      cancelled = true;
+    };
+  }, [activeStore?.storeCode, storeFingerprint, updateCurrentOrder]);
+
+  const companies = useMemo(() => {
+    const unique = new Map();
+    listings.forEach((listing) => {
+      const slug = normalizeText(listing.companySlug || listing.companyName || listing.company || '');
+      if (!slug) return;
+      if (!unique.has(slug)) {
+        unique.set(slug, {
+          slug,
+          name: listing.companyName || listing.company || listing.companySlug || slug,
+        });
+      }
+    });
+    return Array.from(unique.values()).sort((a, b) => a.name.localeCompare(b.name, 'el', { sensitivity: 'base' }));
+  }, [listings]);
+
+  const filteredListings = useMemo(() => {
+    const query = normalizeText(searchValue);
+    return listings.filter((listing) => {
+      if (selectedCompany !== 'all') {
+        const slug = normalizeText(listing.companySlug || listing.companyName || listing.company || '');
+        if (slug !== selectedCompany) {
+          return false;
+        }
+      }
+      if (!query) return true;
+      const haystack = [
+        listing.code,
+        listing.description,
+        listing.barcode,
+        listing.packaging,
+      ]
+        .map(normalizeText)
+        .filter(Boolean);
+      return haystack.some((value) => value.includes(query));
+    });
+  }, [listings, searchValue, selectedCompany]);
+
+  const inventoryLookup = useMemo(() => {
+    const map = new Map();
+    Object.values(inventoryMap || {}).forEach((entry = {}) => {
+      const code = entry.productCodeNormalized || entry.productCode || '';
+      if (code) {
+        map.set(code, entry);
+      }
+    });
+    return map;
+  }, [inventoryMap]);
+
+  const products = useMemo(() => {
+    return filteredListings.map((listing) => {
+      const orderLine = orderLinesMap.get(listing.code);
+      const inventoryEntry = inventoryLookup.get(listing.code?.replace(/\s+/g, '').toUpperCase());
+      const rawCategory =
+        (typeof listing.productCategory === 'string' && listing.productCategory.trim()) ||
+        (typeof listing.category === 'string' && listing.category.trim()) ||
+        FALLBACK_CATEGORY;
+      const productCategory = rawCategory || FALLBACK_CATEGORY;
+
+      return {
+        ...listing,
+        productCategory,
+        quantity: Number(orderLine?.quantity || 0),
+        currentStock: inventoryEntry?.stockQty ?? orderLine?.currentStock ?? null,
+        storeStock: inventoryEntry?.storeStock ?? orderLine?.storeStock ?? listing.storeStock ?? null,
+      };
+    });
+  }, [filteredListings, orderLinesMap, inventoryLookup]);
+
+  const groupedProducts = useMemo(() => {
+    const map = new Map();
+    products.forEach((product) => {
+      const category = product.productCategory || FALLBACK_CATEGORY;
+      if (!map.has(category)) {
+        map.set(category, []);
+      }
+      map.get(category).push(product);
+    });
+    return Array.from(map.entries())
+      .map(([category, items]) => ({
+        category,
+        items: items
+          .slice()
+          .sort((a, b) => (a.description || '').localeCompare(b.description || '', 'el', { sensitivity: 'base', numeric: true })),
+      }))
+      .sort((a, b) => a.category.localeCompare(b.category, 'el', { sensitivity: 'base', numeric: true }));
+  }, [products]);
+
+  useEffect(() => {
+    setCollapsedGroups((prev) => {
+      const allowed = new Set(groupedProducts.map((group) => group.category));
+      let changed = false;
+      const next = new Set();
+      prev.forEach((category) => {
+        if (allowed.has(category)) {
+          next.add(category);
+        } else {
+          changed = true;
+        }
+      });
+      if (!changed && next.size === prev.size) {
+        return prev;
+      }
+      return next;
+    });
+  }, [groupedProducts]);
+
+  const toggleGroup = useCallback((category) => {
+    setCollapsedGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(category)) {
+        next.delete(category);
+      } else {
+        next.add(category);
+      }
+      return next;
+    });
+  }, []);
+
+  const suggestionAvailable = useMemo(
+    () =>
+      products.some(
+        (product) => Number.isFinite(product.suggestedQtyNumber) && product.suggestedQtyNumber > 0
+      ),
+    [products]
+  );
+
+  const summary = useMemo(() => {
+    const currentLines = Array.isArray(orderLines) ? orderLines : [];
+    const items = currentLines.filter((line) => Number(line?.quantity || 0) > 0).length;
+    const quantity = currentLines.reduce((sum, line) => sum + Number(line?.quantity || 0), 0);
+    const totals = computeOrderTotals({
+      lines: currentLines,
+      brand: order?.brand || brandKey,
+      paymentMethod,
+      customer: order?.customer,
+    });
+    return {
+      items,
+      quantity,
+      net: totals.net,
+      total: totals.total,
+    };
+  }, [orderLines, order?.brand, order?.customer, paymentMethod, brandKey]);
+
+  const updateQuantity = useCallback(
+    (product, nextQuantity) => {
+      const line = buildOrderLine(product, nextQuantity, brandKey);
+      setOrderLines((prev = []) => {
+        const base = Array.isArray(prev) ? prev : [];
+        const filtered = base.filter((existing) => existing?.productCode !== product.code);
+        if (!line) {
+          return filtered;
+        }
+        return [...filtered, line];
+      });
+    },
+    [brandKey, setOrderLines]
+  );
+
+  const handleQuantityChange = useCallback(
+    (product, text) => {
+      const parsed = parseNumber(text);
+      const next = parsed !== null ? Math.max(0, Math.round(parsed)) : 0;
+      updateQuantity(product, next);
+    },
+    [updateQuantity]
+  );
+
+  const handleQuantityStep = useCallback(
+    (product, delta) => {
+      const current = orderLinesMap.get(product.code);
+      const currentQty = Number(current?.quantity || 0);
+      const next = Math.max(0, currentQty + delta);
+      updateQuantity(product, next);
+    },
+    [orderLinesMap, updateQuantity]
+  );
+
+  const handleApplySuggested = useCallback(() => {
+    const applicable = products.filter((product) => product.suggestedQtyNumber > 0);
+    if (!applicable.length) return;
+    setOrderLines((prev = []) => {
+      const map = new Map();
+      (Array.isArray(prev) ? prev : []).forEach((line) => {
+        if (line?.productCode) {
+          map.set(line.productCode, line);
+        }
+      });
+      applicable.forEach((product) => {
+        const line = buildOrderLine(product, product.suggestedQtyNumber, brandKey);
+        if (line) {
+          map.set(product.code, line);
+        }
+      });
+      return Array.from(map.values());
+    });
+  }, [products, brandKey, setOrderLines]);
+
+  const goToReview = useCallback(() => {
+    navigation.navigate('OrderReviewScreen', { brand: brandKey });
+  }, [navigation, brandKey]);
+
+  const goBack = useCallback(() => {
+    navigation.goBack();
+  }, [navigation]);
+
+  const inventoryLookup = useMemo(() => {
+    const map = new Map();
+    Object.values(inventoryMap || {}).forEach((entry = {}) => {
+      const code = entry.productCodeNormalized or entry.productCode or '';
+      if (code) {
+        map.set(code, entry);
+      }
+    });
+    return map;
+  }, [inventoryMap]);
+
+  const renderProductCard = useCallback(
+    (product) => {
+      const qty = Number(product.quantity or 0);

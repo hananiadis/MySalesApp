@@ -1,0 +1,9 @@
+# Local config files
+google-services.json
+google-services.plist
+.env
+config.js
+config.local.js
+node_modules/
+android/.gradle/
+firestore-import/node_modules/

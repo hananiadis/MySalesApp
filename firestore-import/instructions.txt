@@ -1,0 +1,14 @@
+Requires node.js
+
+in a cmd run:
+
+npm install firebase-admin axios csv-parser
+
+customer import -> importCustomers.js
+products import -> importProducts.js
+delete entries -> firestoreMultiManager.js
+
+
+to run it  use
+
+node firestoreManager_full.js

@@ -1,0 +1,127 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function me() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function myRole() {
+      return isSignedIn() ? me().data.role : null;
+    }
+
+    function myBrands() {
+      return (isSignedIn() && me().data.brands is list) ? me().data.brands : [];
+    }
+
+    function brandIsAccessible(brand) {
+      return brand == null || brand in myBrands();
+    }
+
+    function isAdmin() {
+      return myRole() in ['owner', 'admin', 'developer'];
+    }
+
+    function isAdminForBrand(brand) {
+      return isAdmin() && brandIsAccessible(brand);
+    }
+
+    function isOrderOwner(order) {
+      return isSignedIn() && order.userId == request.auth.uid;
+    }
+
+    function brandOrNull(order) {
+      return order.brand == null ? null : order.brand;
+    }
+
+    function orderCreator(order) {
+      return order.createdBy == null ? order.userId : order.createdBy;
+    }
+
+    function canReadOrder(order) {
+      return isOrderOwner(order) || isAdminForBrand(brandOrNull(order));
+    }
+
+    function canCreateOrder(data) {
+      let brand = brandOrNull(data);
+      let creator = orderCreator(data);
+      let ownerGuard = isSignedIn() && creator == request.auth.uid && brandIsAccessible(brand);
+      return ownerGuard || isAdminForBrand(brand);
+    }
+
+    function canUpdateOrder(newData, existing) {
+      let newBrand = brandOrNull(newData);
+      let currentBrand = brandOrNull(existing);
+      let creatorPreserved = orderCreator(newData) == orderCreator(existing);
+      let ownerGuard =
+        isOrderOwner(existing) &&
+        newData.userId == existing.userId &&
+        creatorPreserved &&
+        brandIsAccessible(newBrand) &&
+        brandIsAccessible(currentBrand);
+      let adminGuard = isAdminForBrand(newBrand) && isAdminForBrand(currentBrand);
+      return ownerGuard || adminGuard;
+    }
+
+    function canDeleteOrder(order) {
+      return isOrderOwner(order) || isAdminForBrand(brandOrNull(order));
+    }
+
+    match /users/{uid} {
+      allow read: if isSignedIn() && (request.auth.uid == uid || isAdmin());
+      allow create: if isSignedIn() && request.auth.uid == uid;
+      allow update: if isSignedIn() && (request.auth.uid == uid || isAdmin());
+      allow delete: if isAdmin();
+    }
+
+    match /products/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /products_john/{docId} {
+      allow read: if isSignedIn() && brandIsAccessible('john');
+      allow write: if isAdminForBrand('john');
+    }
+
+    match /products_kivos/{docId} {
+      allow read: if isSignedIn() && brandIsAccessible('kivos');
+      allow write: if isAdminForBrand('kivos');
+    }
+
+    match /customers/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /customers_john/{docId} {
+      allow read: if isSignedIn() && brandIsAccessible('john');
+      allow write: if isAdminForBrand('john');
+    }
+
+    match /customers_kivos/{docId} {
+      allow read: if isSignedIn() && brandIsAccessible('kivos');
+      allow write: if isAdminForBrand('kivos');
+    }
+
+    match /images/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    match /orders/{orderId} {
+      allow read: if canReadOrder(resource.data);
+      allow create: if canCreateOrder(request.resource.data);
+      allow update: if canUpdateOrder(request.resource.data, resource.data);
+      allow delete: if canDeleteOrder(resource.data);
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

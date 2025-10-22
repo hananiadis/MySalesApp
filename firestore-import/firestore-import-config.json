@@ -1,0 +1,7 @@
+{
+  "supermarket": {
+    "listings": "https://docs.google.com/spreadsheets/d/1GPfMydqVMyDjjmhEIjWLP5kN2Vs21v8YdJgr15ins0c/gviz/tq?tqx=out:json",
+    "stores": "https://docs.google.com/spreadsheets/d/1pr6HRuTRbRUpqYVYKLuiV7qZ2uqR-bm0sObZom6_m1s/gviz/tq?tqx=out:json",
+    "inventory": "https://docs.google.com/spreadsheets/d/1A1HlA27aaamZy-smzvbr6DckmH7MGME2NNwMMNOnZVI/gviz/tq?tqx=out:json"
+  }
+}
