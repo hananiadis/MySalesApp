@@ -7,3 +7,5 @@ config.local.js
 node_modules/
 android/.gradle/
 firestore-import/node_modules/
+scripts/serviceAccountKey.json
+firestore-import/serviceAccountKey.json
