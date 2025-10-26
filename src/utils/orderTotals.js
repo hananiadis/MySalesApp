@@ -6,9 +6,28 @@ const KIVOS_GROUP_ONE = new Set(['logo', 'good', 'logo scripto', 'borg']);
 const KIVOS_GROUP_TWO = new Set(['artline', 'penac']);
 const KIVOS_GROUP_ONE_THRESHOLD = 166.67;
 
+const resolveLinePrice = (line) => {
+  const candidates = [
+    line?.wholesalePrice,
+    line?.price,
+    line?.unitPrice,
+    line?.netPrice,
+    line?.wholesale,
+  ];
+
+  for (const candidate of candidates) {
+    const numeric = Number(candidate);
+    if (Number.isFinite(numeric)) {
+      return numeric;
+    }
+  }
+
+  return 0;
+};
+
 const getLineTotal = (line) => {
   const quantity = Number(line?.quantity || 0);
-  const price = Number(line?.wholesalePrice || 0);
+  const price = resolveLinePrice(line);
   if (!Number.isFinite(quantity) || !Number.isFinite(price)) {
     return 0;
   }

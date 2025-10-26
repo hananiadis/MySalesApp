@@ -1,232 +1,320 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { canonicalCode, toNumberSafe } from '../utils/codeNormalization';
 
-import {
-  SUPERMARKET_INVENTORY_SHEET_URL,
-} from '../config/firebase';
+const INVENTORY_SHEET_URL =
+  'https://docs.google.com/spreadsheets/d/1A1HlA27aaamZy-smzvbr6DckmH7MGME2NNwMMNOnZVI/export?format=csv&gid=1490385526';
 
-const CACHE_KEY = 'supermarket_inventory_cache';
-const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+const CACHE_KEY = 'supermarket_inventory_cache_v4';
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+const memoryCache = new Map();
 
-const COLUMN_MATCHERS = {
-  storeCode: ['κωδικός καταστήματος', 'store code'],
-  storeName: ['κατάστημα', 'store name'],
-  productCode: ['κωδ.είδους προμηθευτή', 'κωδ. είδους προμηθευτή', 'supplier item code', 'product code'],
-  masterCode: ['μητρικός κωδ.', 'μητρικός κωδ', 'master code'],
-  description: ['περιγραφή', 'description'],
-  stockQty: ['τελικό απόθεμα (τεμ.)', 'stock qty', 'stock quantity'],
-  stockCost: ['τελικό απόθεμα (κόστος)', 'stock cost'],
+const HEADER_MAP = {
+  storeCode: ["Κωδικός Καταστήματος", "Κωδ. Καταστ.", "Store Code", "Κωδικός"],
+  masterCode: ["Μητρικός Κωδ.", "Master Code", "Μητρικός", "Μητρικός Κωδικός"],
+  supplierCode: [
+    "Κωδ.Είδους Προμηθευτή",
+    "Κωδ. Είδους Προμηθευτή",
+    "Supplier Product Code",
+    "Κωδ.Ειδους Προμηθευτή",
+  ],
+  description: ["Περιγραφή", "Description"],
+  stockQty: [
+    "Τελικό Απόθεμα (Τεμ.)",
+    "Τελικό Απόθεμα (pcs)",
+    "Final Stock (pcs)",
+    "Stock Qty",
+    "Τελικό Απόθεμα Τεμ",
+  ],
 };
 
-const GREEK_MAP = {
-  α: 'a', ά: 'a',
-  β: 'b',
-  γ: 'g',
-  δ: 'd',
-  ε: 'e', έ: 'e',
-  ζ: 'z',
-  η: 'i', ή: 'i',
-  θ: 'th',
-  ι: 'i', ί: 'i', ϊ: 'i', ΐ: 'i',
-  κ: 'k',
-  λ: 'l',
-  μ: 'm',
-  ν: 'n',
-  ξ: 'x',
-  ο: 'o', ό: 'o',
-  π: 'p',
-  ρ: 'r',
-  σ: 's', ς: 's',
-  τ: 't',
-  υ: 'y', ύ: 'y', ϋ: 'y', ΰ: 'y',
-  φ: 'f',
-  χ: 'ch',
-  ψ: 'ps',
-  ω: 'o', ώ: 'o',
+const normalizeStoreCode = (value) => {
+  if (value === null || value === undefined) return '';
+  return String(value).trim().toUpperCase();
 };
 
-const sanitizeText = (value) => {
-  if (value === null || value === undefined) return null;
-  const text = String(value).trim();
-  return text.length ? text : null;
-};
+const buildStoreCodeVariants = (raw) => {
+  const variants = new Set();
+  const base = normalizeStoreCode(raw);
+  if (!base) return [];
 
-const normalizeLabel = (label) => {
-  if (!label) return '';
-  const lower = String(label)
-    .trim()
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '');
+  variants.add(base);
+  variants.add(base.replace(/\s+/g, ''));
 
-  return lower.replace(/[\u0370-\u03FF]/g, (char) => GREEK_MAP[char] ?? char);
-};
-
-const normalizeCode = (value) => {
-  const text = sanitizeText(value);
-  return text ? text.replace(/\s+/g, '').toUpperCase() : null;
-};
-
-const parseNumber = (value) => {
-  if (value === null || value === undefined) return null;
-  if (typeof value === 'number') {
-    return Number.isFinite(value) ? value : null;
-  }
-  const numeric = String(value)
-    .replace(/€|%/g, '')
-    .replace(/\s+/g, '')
-    .replace(/\./g, '.')
-    .replace(/,/g, '.')
-    .replace(/[^0-9.-]/g, '');
-  if (!numeric) return null;
-  const parsed = Number(numeric);
-  return Number.isFinite(parsed) ? parsed : null;
-};
-
-const safeCellValue = (cell) => {
-  if (!cell) return null;
-  if (cell.v !== null && cell.v !== undefined) return cell.v;
-  if (cell.f !== null && cell.f !== undefined) return cell.f;
-  return null;
-};
-
-const stripVisualizationWrapper = (payload) => {
-  if (!payload) return '';
-  const prefixIndex = payload.indexOf('(');
-  const suffixIndex = payload.lastIndexOf(')');
-  if (prefixIndex === -1 || suffixIndex === -1) {
-    return payload;
-  }
-  return payload.slice(prefixIndex + 1, suffixIndex);
-};
-
-const findColumnIndex = (columns, candidates) => {
-  if (!Array.isArray(columns) || !columns.length) return -1;
-  const normalizedColumns = columns.map((col) => normalizeLabel(col?.label || col?.id || ''));
-  for (const candidate of candidates) {
-    const target = normalizeLabel(candidate);
-    if (!target) continue;
-    const index = normalizedColumns.findIndex((col) => col.includes(target));
-    if (index !== -1) {
-      return index;
+  const digits = base.replace(/\D+/g, '');
+  if (digits) {
+    variants.add(digits);
+    variants.add(String(Number(digits)));
+    for (let len = digits.length; len <= Math.max(digits.length, 6); len += 1) {
+      variants.add(digits.padStart(len, '0'));
     }
   }
-  return -1;
+
+  return Array.from(variants);
 };
 
-const parseInventorySheet = (text) => {
-  const wrapped = stripVisualizationWrapper(text);
-  const parsed = JSON.parse(wrapped);
-  const table = parsed?.table ?? {};
-  const columns = table.cols || [];
-  const rows = table.rows || [];
-
-  const colIndexes = {
-    storeCode: findColumnIndex(columns, COLUMN_MATCHERS.storeCode),
-    storeName: findColumnIndex(columns, COLUMN_MATCHERS.storeName),
-    productCode: findColumnIndex(columns, COLUMN_MATCHERS.productCode),
-    masterCode: findColumnIndex(columns, COLUMN_MATCHERS.masterCode),
-    description: findColumnIndex(columns, COLUMN_MATCHERS.description),
-    stockQty: findColumnIndex(columns, COLUMN_MATCHERS.stockQty),
-    stockCost: findColumnIndex(columns, COLUMN_MATCHERS.stockCost),
-  };
-
-  if (colIndexes.productCode === -1 || colIndexes.storeCode === -1) {
-    throw new Error('SuperMarket inventory sheet is missing required columns.');
-  }
-
-  const result = {};
-  rows.forEach((row) => {
-    const cells = Array.isArray(row?.c) ? row.c : [];
-
-    const storeCodeRaw = colIndexes.storeCode !== -1 ? safeCellValue(cells[colIndexes.storeCode]) : null;
-    const productCodeRaw = colIndexes.productCode !== -1 ? safeCellValue(cells[colIndexes.productCode]) : null;
-    const masterCodeRaw = colIndexes.masterCode !== -1 ? safeCellValue(cells[colIndexes.masterCode]) : null;
-
-    const storeCode = sanitizeText(storeCodeRaw);
-    const productCode = sanitizeText(productCodeRaw);
-    if (!storeCode || !productCode) {
-      return;
+const getField = (row, keys) => {
+  for (const key of keys) {
+    if (row[key] != null) {
+      const text = String(row[key]).trim();
+      if (text) return text;
     }
-
-    const normalizedStoreCode = normalizeCode(storeCode);
-    const normalizedProductCode = normalizeCode(productCode);
-
-    const key = `${normalizedStoreCode || storeCode}_${normalizedProductCode || productCode}`;
-
-    result[key] = {
-      storeCode,
-      storeCodeNormalized: normalizedStoreCode,
-      storeName: sanitizeText(colIndexes.storeName !== -1 ? safeCellValue(cells[colIndexes.storeName]) : null),
-      productCode,
-      productCodeNormalized: normalizedProductCode,
-      masterCode: sanitizeText(masterCodeRaw),
-      description: sanitizeText(colIndexes.description !== -1 ? safeCellValue(cells[colIndexes.description]) : null),
-      stockQty: parseNumber(colIndexes.stockQty !== -1 ? safeCellValue(cells[colIndexes.stockQty]) : null),
-      stockCost: parseNumber(colIndexes.stockCost !== -1 ? safeCellValue(cells[colIndexes.stockCost]) : null),
-    };
-  });
-
-  return result;
+  }
+  return '';
 };
 
-export async function getInventoryData(forceRefresh = false) {
+async function loadDiskCache() {
   try {
-    if (!forceRefresh) {
-      const cachedValue = await AsyncStorage.getItem(CACHE_KEY);
-      if (cachedValue) {
-        try {
-          const parsed = JSON.parse(cachedValue);
-          if (parsed?.expiresAt && parsed.expiresAt > Date.now() && parsed?.data) {
-            return parsed.data;
-          }
-        } catch {
-          // ignore parsing errors and refresh cache
-        }
-      }
-    }
-
-    const response = await fetch(SUPERMARKET_INVENTORY_SHEET_URL);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch inventory sheet: HTTP ${response.status}`);
-    }
-    const text = await response.text();
-    const data = parseInventorySheet(text);
-
-    await AsyncStorage.setItem(
-      CACHE_KEY,
-      JSON.stringify({
-        lastFetched: Date.now(),
-        expiresAt: Date.now() + CACHE_DURATION,
-        data,
-      })
-    );
-
-    return data;
+    const raw = await AsyncStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed.timestamp || !parsed.data) return null;
+    if (Date.now() - parsed.timestamp > CACHE_TTL_MS) return null;
+    return parsed.data;
   } catch (error) {
-    console.warn('Failed to load supermarket inventory data', error);
-    throw error;
+    console.warn('[inventory] Failed to read cache', error);
+    return null;
   }
 }
 
-export async function getStoreInventory(storeCode, { forceRefresh = false } = {}) {
-  const data = await getInventoryData(forceRefresh);
-  if (!storeCode || !data) {
+async function saveDiskCache(data) {
+  try {
+    await AsyncStorage.setItem(CACHE_KEY, JSON.stringify({ timestamp: Date.now(), data }));
+    console.log('💾 Inventory cache saved');
+  } catch (error) {
+    console.warn('[inventory] Failed to persist cache', error);
+  }
+}
+
+function parseCSV(text) {
+  if (!text) return [];
+
+  const rows = [];
+  let currentValue = '';
+  let currentRow = [];
+  let inQuotes = false;
+
+  const pushValue = () => {
+    currentRow.push(currentValue);
+    currentValue = '';
+  };
+
+  const pushRow = () => {
+    pushValue();
+    const hasContent = currentRow.some((value) => value.trim() !== '');
+    if (hasContent) {
+      rows.push(currentRow);
+    }
+    currentRow = [];
+  };
+
+  for (let i = 0; i < text.length; i += 1) {
+    const char = text[i];
+
+    if (char === '"') {
+      const nextChar = text[i + 1];
+      if (inQuotes && nextChar === '"') {
+        currentValue += '"';
+        i += 1;
+      } else {
+        inQuotes = !inQuotes;
+      }
+      continue;
+    }
+
+    if (char === ',' && !inQuotes) {
+      pushValue();
+      continue;
+    }
+
+    if ((char === '\n' || char === '\r') && !inQuotes) {
+      if (char === '\r' && text[i + 1] === '\n') {
+        i += 1;
+      }
+      pushRow();
+      continue;
+    }
+
+    currentValue += char;
+  }
+
+  if (currentValue.length > 0 || currentRow.length) {
+    pushRow();
+  }
+
+  if (!rows.length) return [];
+
+  const headers = rows[0].map((header) => header.trim());
+  return rows.slice(1).reduce((acc, values) => {
+    if (!values || !values.length) return acc;
+    const row = {};
+    headers.forEach((header, idx) => {
+      if (!header) return;
+      const rawValue = values[idx] ?? '';
+      row[header] = String(rawValue).trim();
+    });
+    const hasValues = Object.values(row).some((value) => value !== '');
+    if (hasValues) {
+      acc.push(row);
+    }
+    return acc;
+  }, []);
+}
+
+async function fetchInventoryFromServer() {
+  try {
+    console.log('🌐 Fetching inventory from:', INVENTORY_SHEET_URL);
+    const response = await fetch(INVENTORY_SHEET_URL);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const csvText = await response.text();
+    console.log('📄 CSV fetched, size:', csvText.length, 'bytes');
+
+    const rows = parseCSV(csvText);
+    console.log('📊 Parsed rows:', rows.length);
+    if (rows.length) {
+      console.log('📋 Sample row:', rows[0]);
+    }
+
+    const storeInventories = {};
+
+    rows.forEach((row, index) => {
+      const storeCodeRaw = getField(row, HEADER_MAP.storeCode);
+      const masterCodeRaw = getField(row, HEADER_MAP.masterCode);
+      const supplierCodeRaw = getField(row, HEADER_MAP.supplierCode);
+      const stockQtyRaw = getField(row, HEADER_MAP.stockQty);
+      const stockQty = toNumberSafe(stockQtyRaw, 0);
+      const description = getField(row, HEADER_MAP.description);
+
+      if (!storeCodeRaw || (!masterCodeRaw && !supplierCodeRaw)) {
+        if (index < 5) {
+          console.log('WARN Inventory row skipped (missing store/master code):', row);
+        }
+        return;
+      }
+
+      const codes = new Set();
+      const masterCode = canonicalCode(masterCodeRaw);
+      const supplierCode = canonicalCode(supplierCodeRaw);
+
+      if (storeCodeRaw === '101' && (supplierCodeRaw?.includes('03980') || supplierCodeRaw?.includes('03823'))) {
+        console.log('🔎 Tracking row for store 101:', {
+          masterCodeRaw,
+          supplierCodeRaw,
+          stockQtyRaw,
+          stockQty,
+          normalizedCodes: { masterCode, supplierCode },
+        });
+      }
+      if (masterCode) codes.add(masterCode);
+      if (supplierCode) codes.add(supplierCode);
+      if (!codes.size) {
+        if (index < 5) {
+          console.log('WARN Inventory row skipped (unusable product codes):', row);
+        }
+        return;
+      }
+
+      buildStoreCodeVariants(storeCodeRaw).forEach((variant) => {
+        if (!variant) return;
+        if (!storeInventories[variant]) {
+          storeInventories[variant] = {};
+        }
+        codes.forEach((codeKey) => {
+          storeInventories[variant][codeKey] = {
+            masterCode: masterCodeRaw || supplierCodeRaw || codeKey,
+            supplierCode: supplierCodeRaw || masterCodeRaw || codeKey,
+            description,
+            stockQty,
+            stockQtyRaw,
+            storeCode: variant,
+            rawStoreCode: storeCodeRaw,
+            codes: Array.from(codes),
+          };
+        });
+      });
+    });
+
+    console.log('📦 Processed inventory for stores:', Object.keys(storeInventories).length);
+    return storeInventories;
+  } catch (error) {
+    console.error('❌ Inventory fetch failed:', error);
     return {};
   }
-  const target = normalizeCode(storeCode);
-  const result = {};
+}
 
-  Object.values(data).forEach((entry) => {
-    if (!entry) return;
-    const entryStoreCode = entry.storeCodeNormalized || normalizeCode(entry.storeCode);
-    if (entryStoreCode && entryStoreCode === target) {
-      result[entry.productCode] = entry;
+const resolveStoreInventory = (allStores, storeCode) => {
+  if (!storeCode || !allStores) return {};
+  const variantsTried = buildStoreCodeVariants(storeCode);
+  for (const key of variantsTried) {
+    if (key && allStores[key]) {
+      console.log('✅ Matched inventory key variant:', key);
+      return allStores[key];
     }
-  });
+  }
 
-  return result;
+  const normalized = normalizeStoreCode(storeCode);
+  if (normalized && allStores[normalized]) {
+    console.log('✅ Matched normalized inventory key:', normalized);
+    return allStores[normalized];
+  }
+
+  console.log('⚠️ No inventory match for store code:', storeCode, 'variants:', variantsTried);
+  return {};
+};
+
+export async function getStoreInventory(storeCode) {
+  if (!storeCode) {
+    console.warn('⚠️ getStoreInventory called without storeCode');
+    return {};
+  }
+
+  console.log('📦 Loading inventory for store:', storeCode);
+
+  const memEntry = memoryCache.get('all_stores');
+  if (memEntry && Date.now() - memEntry.timestamp < CACHE_TTL_MS) {
+    console.log('✅ Using memory cache');
+    const cached = resolveStoreInventory(memEntry.data, storeCode);
+    if (Object.keys(cached).length) {
+      return cached;
+    }
+  }
+
+  const diskCache = await loadDiskCache();
+  if (diskCache) {
+    console.log('✅ Using disk cache');
+    memoryCache.set('all_stores', { data: diskCache, timestamp: Date.now() });
+    const cached = resolveStoreInventory(diskCache, storeCode);
+    if (Object.keys(cached).length) {
+      return cached;
+    }
+  }
+
+  console.log('🌐 Fetching fresh inventory...');
+  const allInventories = await fetchInventoryFromServer();
+  memoryCache.set('all_stores', { data: allInventories, timestamp: Date.now() });
+  await saveDiskCache(allInventories);
+
+  const resolved = resolveStoreInventory(allInventories, storeCode);
+  console.log('📦 Returning inventory:', Object.keys(resolved).length, 'items');
+  return resolved;
 }
 
 export async function clearSupermarketInventoryCache() {
-  await AsyncStorage.removeItem(CACHE_KEY);
+  try {
+    memoryCache.clear();
+    await AsyncStorage.removeItem(CACHE_KEY);
+    console.log('🗑️ Supermarket inventory cache cleared.');
+  } catch (error) {
+    console.warn('[inventory] Failed to clear cache', error);
+  }
 }
+
+export async function refreshInventory() {
+  console.log('🔄 Force refreshing inventory...');
+  await clearSupermarketInventoryCache();
+  return fetchInventoryFromServer();
+}
+
+

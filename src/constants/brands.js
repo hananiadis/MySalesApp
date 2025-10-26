@@ -66,7 +66,12 @@ export function normalizeBrandKey(rawBrand) {
 
 export const SUPERMARKET_BRANDS = ['playmobil', 'john'];
 
-export const isSuperMarketBrand = (brand) => {
-  const key = normalizeBrandKey(brand);
-  return SUPERMARKET_BRANDS.includes(key);
+export function isSuperMarketBrand(brand) {
+  return ['john', 'kivos', 'playmobil', 'supermarket'].includes(brand);
+}
+
+export const SUPERMARKET_COLLECTIONS = {
+  listings: 'supermarket_listings',
+  stores: 'supermarket_stores',
+  meta: 'supermarket_meta',
 };

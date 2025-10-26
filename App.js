@@ -43,6 +43,7 @@ import SuperMarketStoreSelectScreen from './src/screens/SuperMarketStoreSelectSc
 import SuperMarketProductSelectionScreen from './src/screens/SuperMarketProductSelectionScreen';
 import SuperMarketOrderReviewScreen from './src/screens/SuperMarketOrderReviewScreen';
 import SuperMarketOrderSummaryScreen from './src/screens/SuperMarketOrderSummaryScreen';
+import SuperMarketStoreDetailsScreen from './src/screens/SuperMarketStoreDetailsScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -119,6 +120,10 @@ function AppNavigator() {
         <Stack.Screen
           name="SuperMarketOrderSummary"
           component={SuperMarketOrderSummaryScreen}
+        />
+        <Stack.Screen
+          name="SuperMarketStoreDetails"
+          component={SuperMarketStoreDetailsScreen}
         />
         <Stack.Screen name="Profile" component={ProfileScreen} />
       </Stack.Navigator>

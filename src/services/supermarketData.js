@@ -1,6 +1,7 @@
 import firestore from '@react-native-firebase/firestore';
 
-import { normalizeBrandKey, isSuperMarketBrand } from '../constants/brands';
+import { normalizeBrandKey, isSuperMarketBrand, PRODUCT_COLLECTIONS } from '../constants/brands';
+import { canonicalCode, toNumberSafe } from '../utils/codeNormalization';
 
 const resolveDocBrand = (data) => {
   if (!data || typeof data !== 'object') {
@@ -109,11 +110,87 @@ export const fetchSuperMarketListings = async (brand, { onlyActive = false } = {
         (typeof payload.category === 'string' && payload.category.trim()) ? payload.category.trim() :
         null;
 
+      const rawCode = String(
+        payload.productCode ?? payload.masterCode ?? payload.code ?? ''
+      ).trim();
+      const displayProductCode = rawCode ? rawCode.toUpperCase() : '';
+      const normalizedProductCode = canonicalCode(rawCode || displayProductCode);
+      const price = toNumberSafe(payload.price, payload.wholesalePrice ?? 0);
+
       return {
         ...payload,
+        productCode: normalizedProductCode,
+        displayProductCode: displayProductCode || normalizedProductCode,
+        price,
         isActive,
         productCategory,
       };
     },
   });
+};
+
+export const fetchBrandProductsByCodes = async (brand, codes = []) => {
+  const collectionName = PRODUCT_COLLECTIONS[brand];
+  if (!collectionName || !Array.isArray(codes) || !codes.length) {
+    return new Map();
+  }
+
+  const uniqueCodes = Array.from(
+    new Set(
+      codes
+        .map((code) => (code == null ? '' : String(code).trim()))
+        .filter((code) => code.length > 0)
+    )
+  );
+
+  if (!uniqueCodes.length) {
+    return new Map();
+  }
+
+  const results = new Map();
+  const docIdSet = new Set();
+  uniqueCodes.forEach((code) => {
+    docIdSet.add(code);
+    docIdSet.add(code.toUpperCase());
+  });
+
+  const docIds = Array.from(docIdSet).filter(Boolean);
+  const chunkSize = 20;
+
+  for (let i = 0; i < docIds.length; i += chunkSize) {
+    const chunk = docIds.slice(i, i + chunkSize);
+    const tasks = chunk.map((docId) =>
+      firestore()
+        .collection(collectionName)
+        .doc(docId)
+        .get()
+        .catch(() => null)
+    );
+
+    const snapshots = await Promise.all(tasks);
+    snapshots.forEach((snapshot) => {
+      if (!snapshot || !snapshot.exists) {
+        return;
+      }
+      const data = snapshot.data() || {};
+      const productCode = data.productCode || data.code || snapshot.id;
+      const entry = {
+        id: snapshot.id,
+        ...data,
+        productCode,
+      };
+
+      const canonicalKey = canonicalCode(productCode);
+      const rawKey = String(productCode || '').trim().toUpperCase();
+
+      if (rawKey) {
+        results.set(rawKey, entry);
+      }
+      if (canonicalKey) {
+        results.set(canonicalKey, entry);
+      }
+    });
+  }
+
+  return results;
 };

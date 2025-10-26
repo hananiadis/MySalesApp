@@ -6,6 +6,7 @@ const STRINGS = {
   newOrder: '\u039d\u03ad\u03b1 \u03c0\u03b1\u03c1\u03b1\u03b3\u03b3\u03b5\u03bb\u03af\u03b1',
   products: '\u03a0\u03c1\u03bf\u03ca\u03cc\u03bd\u03c4\u03b1',
   customers: '\u03a0\u03b5\u03bb\u03ac\u03c4\u03b5\u03c2',
+  catalogs: '\u039a\u03b1\u03c4\u03ac\u03bb\u03bf\u03b3\u03bf\u03b9',
   data: '\u0394\u03b5\u03b4\u03bf\u03bc\u03ad\u03bd\u03b1 Firestore',
   orders: '\u03a0\u03b1\u03c1\u03b1\u03b3\u03b3\u03b5\u03bb\u03af\u03b5\u03c2',
   back: '\u03a0\u03af\u03c3\u03c9',
@@ -29,6 +30,11 @@ const KivosScreen = ({ navigation }) => {
       key: 'customers',
       title: STRINGS.customers,
       onPress: () => navigation.navigate('Customers', { brand: BRAND_KEY }),
+    },
+    {
+      key: 'catalogs',
+      title: STRINGS.catalogs,
+      onPress: () => navigation.navigate('Catalog', { brand: BRAND_KEY }),
     },
     {
       key: 'data',
@@ -152,4 +158,3 @@ const styles = StyleSheet.create({
 });
 
 export default KivosScreen;
-

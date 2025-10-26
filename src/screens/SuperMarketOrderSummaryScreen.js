@@ -1,58 +1,82 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   Alert,
-  Platform,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
   ActivityIndicator,
-  Share,
   Image,
 } from 'react-native';
+import Share from 'react-native-share';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useOrder } from '../context/OrderContext';
 import { exportOrderAsXLSX } from '../utils/exportOrderUtils';
-import { normalizeBrandKey } from '../constants/brands';
+import { computeOrderTotals } from '../utils/orderTotals';
+import { exportSupermarketXLSX } from '../utils/exportSupermarketXLSX';
+import { canonicalCode } from '../utils/codeNormalization';
 
 const STRINGS = {
-  screenTitle: 'Σύνοψη Παραγγελίας SuperMarket',
-  storeInfo: 'Πληροφορίες Καταστήματος',
-  orderInfo: 'Πληροφορίες Παραγγελίας',
-  productsInfo: 'Προϊόντα Παραγγελίας',
-  totalsInfo: 'Σύνολα',
-  exportOptions: 'Επιλογές Εξαγωγής',
-  exportOrderOnly: 'Εξαγωγή Μόνο Παραγγελίας',
-  exportFullListing: 'Εξαγωγή Πλήρους Καταλόγου',
-  exportOrderOnlyDesc: 'Εξάγει μόνο τα επιλεγμένα προϊόντα της παραγγελίας',
-  exportFullListingDesc: 'Εξάγει όλον τον κατάλογο καταστήματος με τις επιλεγμένες ποσότητες',
-  netValue: 'Καθαρή Αξία',
-  vat: 'ΦΠΑ 24%',
-  totalValue: 'Συνολική Αξία',
-  confirmOrder: 'Επιβεβαίωση Παραγγελίας',
-  exportOrder: 'Εξαγωγή Παραγγελίας',
-  cancelOrder: 'Ακύρωση Παραγγελίας',
-  error: 'Σφάλμα',
-  exportFailed: 'Η εξαγωγή απέτυχε. Δοκιμάστε ξανά.',
-  confirmCancel: 'Επιβεβαίωση Ακύρωσης',
-  cancelMessage: 'Είστε σίγουροι ότι θέλετε να ακυρώσετε την παραγγελία;',
-  yes: 'Ναι',
-  no: 'Όχι',
-  orderNumber: 'Αριθμός Παραγγελίας',
-  createdAt: 'Ημερομηνία Δημιουργίας',
-  storeName: 'Όνομα Καταστήματος',
-  storeCode: 'Κωδικός Καταστήματος',
-  storeCategory: 'Κατηγορία Καταστήματος',
-  companyName: 'Εταιρεία',
-  totalProducts: 'Συνολικά Προϊόντα',
-  totalQuantity: 'Συνολική Ποσότητα',
-  notes: 'Σημειώσεις',
-  noNotes: 'Δεν υπάρχουν σημειώσεις',
+  screenTitle: '\u03a3\u03cd\u03bd\u03bf\u03c8\u03b7 \u03a0\u03b1\u03c1\u03b1\u03b3\u03b3\u03b5\u03bb\u03af\u03b1\u03c2 SuperMarket',
+  storeInfo: '\u03a3\u03c4\u03bf\u03b9\u03c7\u03b5\u03af\u03b1 \u03ba\u03b1\u03c4\u03b1\u03c3\u03c4\u03ae\u03bc\u03b1\u03c4\u03bf\u03c2',
+  orderInfo: '\u03a3\u03c4\u03bf\u03b9\u03c7\u03b5\u03af\u03b1 \u03c0\u03b1\u03c1\u03b1\u03b3\u03b3\u03b5\u03bb\u03af\u03b1\u03c2',
+  productsInfo: '\u03a0\u03bb\u03b7\u03c1\u03bf\u03c6\u03bf\u03c1\u03af\u03b5\u03c2 \u03c0\u03c1\u03bf\u03ca\u03cc\u03bd\u03c4\u03c9\u03bd',
+  totalsInfo: '\u03a3\u03cd\u03bd\u03bf\u03bb\u03b1',
+  exportOptions: '\u0395\u03c0\u03b9\u03bb\u03bf\u03b3\u03ad\u03c2 \u03b5\u03be\u03b1\u03b3\u03c9\u03b3\u03ae\u03c2',
+  exportOrderOnly: '\u0395\u03be\u03b1\u03b3\u03c9\u03b3\u03ae \u03bc\u03cc\u03bd\u03bf \u03c0\u03b1\u03c1\u03b1\u03b3\u03b3\u03b5\u03bb\u03af\u03b1\u03c2',
+  exportFullListing: '\u0395\u03be\u03b1\u03b3\u03c9\u03b3\u03ae \u03c0\u03bb\u03ae\u03c1\u03bf\u03c5\u03c2 listing',
+  exportOrderOnlyDesc: '\u0394\u03b7\u03bc\u03b9\u03bf\u03c5\u03c1\u03b3\u03b5\u03af \u03b1\u03c1\u03c7\u03b5\u03af\u03bf \u03bc\u03cc\u03bd\u03bf \u03bc\u03b5 \u03c4\u03b1 \u03c0\u03c1\u03bf\u03ca\u03cc\u03bd\u03c4\u03b1 \u03c4\u03b7\u03c2 \u03c0\u03b1\u03c1\u03b1\u03b3\u03b3\u03b5\u03bb\u03af\u03b1\u03c2.',
+  exportFullListingDesc: '\u0394\u03b7\u03bc\u03b9\u03bf\u03c5\u03c1\u03b3\u03b5\u03af \u03b1\u03c1\u03c7\u03b5\u03af\u03bf \u03bc\u03b5 \u03cc\u03bb\u03b7 \u03c4\u03b7 \u03bb\u03af\u03c3\u03c4\u03b1 \u03c0\u03c1\u03bf\u03ca\u03cc\u03bd\u03c4\u03c9\u03bd \u03ba\u03b1\u03b9 \u03c4\u03b1 \u03c3\u03c4\u03bf\u03b9\u03c7\u03b5\u03af\u03b1 \u03b1\u03c0\u03bf\u03b8\u03ad\u03bc\u03b1\u03c4\u03bf\u03c2.',
+  netValue: '\u039a\u03b1\u03b8\u03b1\u03c1\u03ae \u03b1\u03be\u03af\u03b1',
+  vat: '\u03a6\u03a0\u0391 24%',
+  totalValue: '\u03a3\u03c5\u03bd\u03bf\u03bb\u03b9\u03ba\u03ae \u03b1\u03be\u03af\u03b1',
+  confirmOrder: '\u039f\u03c1\u03b9\u03c3\u03c4\u03b9\u03ba\u03bf\u03c0\u03bf\u03af\u03b7\u03c3\u03b7 \u03c0\u03b1\u03c1\u03b1\u03b3\u03b3\u03b5\u03bb\u03af\u03b1\u03c2',
+  exportOrder: '\u0395\u03be\u03b1\u03b3\u03c9\u03b3\u03ae \u03c0\u03b1\u03c1\u03b1\u03b3\u03b3\u03b5\u03bb\u03af\u03b1\u03c2',
+  cancelOrder: '\u0391\u03ba\u03cd\u03c1\u03c9\u03c3\u03b7',
+  error: '\u03a3\u03c6\u03ac\u03bb\u03bc\u03b1',
+  exportFailed: '\u0397 \u03b5\u03be\u03b1\u03b3\u03c9\u03b3\u03ae \u03b1\u03c0\u03ad\u03c4\u03c5\u03c7\u03b5. \u03a0\u03c1\u03bf\u03c3\u03c0\u03b1\u03b8\u03ae\u03c3\u03c4\u03b5 \u03be\u03b1\u03bd\u03ac.',
+  confirmCancel: '\u0395\u03c0\u03b9\u03b2\u03b5\u03b2\u03b1\u03af\u03c9\u03c3\u03b7 \u03b1\u03ba\u03cd\u03c1\u03c9\u03c3\u03b7\u03c2',
+  cancelMessage: '\u0398\u03ad\u03bb\u03b5\u03c4\u03b5 \u03c3\u03af\u03b3\u03bf\u03c5\u03c1\u03b1 \u03bd\u03b1 \u03b1\u03ba\u03c5\u03c1\u03ce\u03c3\u03b5\u03c4\u03b5 \u03c4\u03b7\u03bd \u03c0\u03b1\u03c1\u03b1\u03b3\u03b3\u03b5\u03bb\u03af\u03b1;',
+  noProductsError: '\u0394\u03b5\u03bd \u03c5\u03c0\u03ac\u03c1\u03c7\u03bf\u03c5\u03bd \u03c0\u03c1\u03bf\u03ca\u03cc\u03bd\u03c4\u03b1 \u03b3\u03b9\u03b1 \u03b5\u03be\u03b1\u03b3\u03c9\u03b3\u03ae.',
+  cancelFailed: '\u0397 \u03b1\u03ba\u03cd\u03c1\u03c9\u03c3\u03b7 \u03b4\u03b5\u03bd \u03bf\u03bb\u03bf\u03ba\u03bb\u03b7\u03c1\u03ce\u03b8\u03b7\u03ba\u03b5. \u03a0\u03c1\u03bf\u03c3\u03c0\u03b1\u03b8\u03ae\u03c3\u03c4\u03b5 \u03be\u03b1\u03bd\u03ac.',
+  yes: '\u039d\u03b1\u03b9',
+  no: '\u038c\u03c7\u03b9',
+  orderNumber: '\u0391\u03c1\u03b9\u03b8\u03bc\u03cc\u03c2 \u03c0\u03b1\u03c1\u03b1\u03b3\u03b3\u03b5\u03bb\u03af\u03b1\u03c2',
+  createdAt: '\u0397\u03bc\u03b5\u03c1\u03bf\u03bc\u03b7\u03bd\u03af\u03b1 \u03b4\u03b7\u03bc\u03b9\u03bf\u03c5\u03c1\u03b3\u03af\u03b1\u03c2',
+  storeName: '\u038c\u03bd\u03bf\u03bc\u03b1 \u03ba\u03b1\u03c4\u03b1\u03c3\u03c4\u03ae\u03bc\u03b1\u03c4\u03bf\u03c2',
+  storeCode: '\u039a\u03c9\u03b4\u03b9\u03ba\u03cc\u03c2 \u03ba\u03b1\u03c4\u03b1\u03c3\u03c4\u03ae\u03bc\u03b1\u03c4\u03bf\u03c2',
+  storeCategory: '\u039a\u03b1\u03c4\u03b7\u03b3\u03bf\u03c1\u03af\u03b1 \u03ba\u03b1\u03c4\u03b1\u03c3\u03c4\u03ae\u03bc\u03b1\u03c4\u03bf\u03c2',
+  companyName: '\u0395\u03c0\u03c9\u03bd\u03c5\u03bc\u03af\u03b1',
+  totalProducts: '\u03a3\u03cd\u03bd\u03bf\u03bb\u03bf \u03c0\u03c1\u03bf\u03ca\u03cc\u03bd\u03c4\u03c9\u03bd',
+  totalQuantity: '\u03a3\u03c5\u03bd\u03bf\u03bb\u03b9\u03ba\u03ae \u03c0\u03bf\u03c3\u03cc\u03c4\u03b7\u03c4\u03b1',
+  notes: '\u03a3\u03b7\u03bc\u03b5\u03b9\u03ce\u03c3\u03b5\u03b9\u03c2',
+  noNotes: '\u0394\u03b5\u03bd \u03c5\u03c0\u03ac\u03c1\u03c7\u03bf\u03c5\u03bd \u03c3\u03b7\u03bc\u03b5\u03b9\u03ce\u03c3\u03b5\u03b9\u03c2.',
+  packagingLabel: '\u03a3\u03c5\u03c3\u03ba\u03b5\u03c5\u03b1\u03c3\u03af\u03b1',
+  unitsSuffix: ' \u03c4\u03b5\u03bc.',
+  newBadge: '\u039d\u0395\u039f',
+  srpInfo: '\u039b\u03b9\u03b1\u03bd\u03b9\u03ba\u03ae \u03c4\u03b9\u03bc\u03ae',
+  stockInfo: '\u0391\u03c0\u03cc\u03b8\u03b5\u03bc\u03b1',
+  suggestedInfo: '\u03a0\u03c1\u03bf\u03c4\u03b5\u03b9\u03bd\u03cc\u03bc\u03b5\u03bd\u03b7',
+  quantityLabel: '\u03a0\u03bf\u03c3\u03cc\u03c4\u03b7\u03c4\u03b1:',
+  wholesaleLabel: '\u03a7\u03bf\u03bd\u03b4\u03c1\u03b9\u03ba\u03ae:',
+  postExportTitle: '\u0397 \u03b5\u03be\u03b1\u03b3\u03c9\u03b3\u03ae \u03bf\u03bb\u03bf\u03ba\u03bb\u03b7\u03c1\u03ce\u03b8\u03b7\u03ba\u03b5',
+  postExportMessage: '\u03a4\u03b9 \u03b8\u03ad\u03bb\u03b5\u03c4\u03b5 \u03bd\u03b1 \u03ba\u03ac\u03bd\u03b5\u03c4\u03b5 \u03c3\u03c4\u03b7 \u03c3\u03c5\u03bd\u03ad\u03c7\u03b5\u03b9\u03b1;',
+  newOrderOption: '\u039d\u03ad\u03b1 \u03c0\u03b1\u03c1\u03b1\u03b3\u03b3\u03b5\u03bb\u03af\u03b1 SuperMarket',
+  backToJohnOption: '\u0395\u03c0\u03b9\u03c3\u03c4\u03c1\u03bf\u03c6\u03ae \u03c3\u03c4\u03b7\u03bd \u03bf\u03b8\u03cc\u03bd\u03b7 John',
+  cancelOption: '\u0391\u03ba\u03cd\u03c1\u03c9\u03c3\u03b7',
+  productCountSuffix: ' \u03c0\u03c1\u03bf\u03ca\u03cc\u03bd\u03c4\u03b1',
+  exporting: 'Γίνεται εξαγωγή...',
 };
+
+const SYMBOLS = {
+  euro: '\u20ac',
+};
+
+const formatEuro = (value) => `${SYMBOLS.euro}${Number(value || 0).toFixed(2)}`;
 
 const SuperMarketOrderSummaryScreen = () => {
   const navigation = useNavigation();
@@ -75,11 +99,17 @@ const SuperMarketOrderSummaryScreen = () => {
 
   const linesData = Array.isArray(order?.lines) ? order.lines : [];
   const hasProducts = linesData.length > 0;
+  const allListings = useMemo(() => {
+    if (Array.isArray(order?.supermarketListings) && order.supermarketListings.length) {
+      return order.supermarketListings;
+    }
+    if (Array.isArray(order?.listings) && order.listings.length) {
+      return order.listings;
+    }
+    return [];
+  }, [order?.supermarketListings, order?.listings]);
 
   const customer = order?.customer || {};
-  const brandKey = order?.brand ?? null;
-  const brandRoute = brandKey ? brandKey.charAt(0).toUpperCase() + brandKey.slice(1) : 'John';
-
   const getVat = () =>
     customer?.vatno ||
     customer?.vat ||
@@ -115,47 +145,143 @@ const SuperMarketOrderSummaryScreen = () => {
     return linesData.reduce((sum, line) => sum + (Number(line.quantity) || 0), 0);
   }, [linesData]);
 
+  const totals = useMemo(
+    () =>
+      computeOrderTotals({
+        lines: linesData,
+        brand: order?.brand,
+        paymentMethod: order?.paymentMethod,
+        customer,
+      }),
+    [linesData, order?.brand, order?.paymentMethod, customer]
+  );
+  const netValue = Number.isFinite(totals.net) ? totals.net : 0;
+  const vatValue = Number.isFinite(totals.vat) ? totals.vat : 0;
+  const totalValue = Number.isFinite(totals.total) ? totals.total : netValue + vatValue;
+
   const showPostExportDialog = useCallback(() => {
     Alert.alert(
-      'Επιτυχής Εξαγωγή',
-      'Η παραγγελία εξήχθη επιτυχώς!',
+      STRINGS.postExportTitle,
+      STRINGS.postExportMessage,
       [
         {
-          text: 'Εντάξει',
+          text: STRINGS.backToJohnOption,
           onPress: () => {
             navigation.reset({
               index: 0,
-              routes: [{ name: 'HomeScreen' }],
+              routes: [{ name: 'John' }],
             });
           },
         },
-      ]
+        {
+          text: STRINGS.newOrderOption,
+          onPress: () => {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'SuperMarketOrderFlow' }],
+            });
+          },
+        },
+        { text: STRINGS.cancelOption, style: 'cancel' },
+      ],
+      { cancelable: true }
     );
   }, [navigation]);
 
-  const handleExport = async () => {
-    const allowEmptyExport = isSuperMarket;
+  const goToReview = useCallback(() => {
+    navigation.navigate('SuperMarketOrderReview', {
+      store: route?.params?.store,
+      orderId: route?.params?.orderId,
+      brand: route?.params?.brand,
+      fromSummary: true,
+    });
+  }, [navigation, route?.params?.brand, route?.params?.orderId, route?.params?.store]);
 
-    if (!allowEmptyExport && !hasProducts) {
-      Alert.alert(STRINGS.error, 'Η παραγγελία πρέπει να περιέχει τουλάχιστον ένα προϊόν.');
-      return;
-    }
-
-    if (isMounted.current) setLoading(true);
-    try {
-      const sentOrder = await markOrderSent();
-      const exportPayload = sentOrder || {
+  const createExportPayload = useCallback(async () => {
+    const sentOrder = await markOrderSent();
+    const exportPayload =
+      sentOrder || {
         ...order,
         status: 'sent',
         sent: true,
         exported: true,
         exportedAt: new Date().toISOString(),
       };
-      const exportConfig = isSuperMarket
-        ? { mode: exportMode, includeImages: true }
-        : { mode: 'order', includeImages: false };
-      const { uri, mime, fileName } = await exportOrderAsXLSX(exportPayload, exportConfig);
-      await Share.open({ url: uri, type: mime, failOnCancel: false, filename: fileName });
+    exportPayload.netValue = netValue;
+    exportPayload.vatValue = vatValue;
+    exportPayload.totalValue = totalValue;
+    return exportPayload;
+  }, [markOrderSent, order, netValue, vatValue, totalValue]);
+
+  const runSupermarketExport = useCallback(
+    async (fullList) => {
+      const baseProducts = fullList
+        ? (allListings.length ? allListings : linesData)
+        : linesData.filter((line) => Number(line.quantity || line.qty || 0) > 0);
+
+      if (!baseProducts.length) {
+        Alert.alert(STRINGS.error, STRINGS.noProductsError);
+        return;
+      }
+
+      const quantityMap = new Map();
+      linesData.forEach((line = {}) => {
+        const key = canonicalCode(line.productCode || line.code || line.masterCode);
+        if (!key) return;
+        quantityMap.set(key, Number(line.quantity ?? line.qty ?? 0));
+      });
+
+      if (isMounted.current) setLoading(true);
+      try {
+        const exportPayload = await createExportPayload();
+        const normalizedProducts = baseProducts.map((item = {}) => {
+          const key = canonicalCode(item.productCode || item.code || item.masterCode);
+          const mappedQuantity = quantityMap.has(key) ? quantityMap.get(key) : item.quantity;
+          return {
+            ...item,
+            quantity: Number(mappedQuantity ?? 0),
+          };
+        });
+
+        await exportSupermarketXLSX(normalizedProducts, exportPayload, fullList);
+        setTimeout(() => {
+          if (isMounted.current) showPostExportDialog();
+        }, 200);
+      } catch (error) {
+        console.error('[SuperMarket] XLSX export failed:', error);
+        Alert.alert(STRINGS.error, STRINGS.exportFailed);
+      } finally {
+        if (isMounted.current) setLoading(false);
+      }
+    },
+    [allListings, linesData, createExportPayload, showPostExportDialog]
+  );
+
+  const handleExport = useCallback(async () => {
+    const allowEmptyExport = isSuperMarket && exportMode === 'listing';
+
+    if (!allowEmptyExport && !hasProducts) {
+      Alert.alert(STRINGS.error, STRINGS.noProductsError);
+      return;
+    }
+
+    if (isSuperMarket) {
+      await runSupermarketExport(exportMode === 'listing');
+      return;
+    }
+
+    if (isMounted.current) setLoading(true);
+    try {
+      const exportPayload = await createExportPayload();
+      const exportConfig = { mode: 'order', includeImages: false };
+      const { uri, fileName, mime } = await exportOrderAsXLSX(exportPayload, exportConfig);
+
+      await Share.open({
+        url: uri,
+        type: mime,
+        failOnCancel: false,
+        filename: fileName,
+      });
       setTimeout(() => {
         if (isMounted.current) showPostExportDialog();
       }, 200);
@@ -164,7 +290,14 @@ const SuperMarketOrderSummaryScreen = () => {
     } finally {
       if (isMounted.current) setLoading(false);
     }
-  };
+  }, [
+    isSuperMarket,
+    hasProducts,
+    exportMode,
+    createExportPayload,
+    showPostExportDialog,
+    runSupermarketExport,
+  ]);
 
   const handleCancel = useCallback(() => {
     Alert.alert(
@@ -183,7 +316,7 @@ const SuperMarketOrderSummaryScreen = () => {
                 routes: [{ name: 'HomeScreen' }],
               });
             } catch (error) {
-              Alert.alert(STRINGS.error, 'Αδυναμία ακύρωσης της παραγγελίας.');
+              Alert.alert(STRINGS.error, STRINGS.cancelFailed);
             }
           },
         },
@@ -192,8 +325,14 @@ const SuperMarketOrderSummaryScreen = () => {
   }, [cancelOrder, navigation]);
 
   const renderProductRow = ({ item: line, index }) => {
-    const stockLevel = line.currentStock || 0;
+    const stockLevel = Number(line.currentStock || 0);
     const stockColor = stockLevel > 10 ? '#10b981' : stockLevel > 0 ? '#f59e0b' : '#ef4444';
+    const displayCode = line.displayProductCode || line.productCode;
+    const packagingLabel = line.packaging || '-';
+    const wholesaleValue = Number(line.wholesalePrice ?? line.price ?? 0);
+    const formattedWholesale = formatEuro(wholesaleValue);
+    const srpValue = Number(line.srp ?? 0);
+    const formattedSrp = Number.isFinite(srpValue) && srpValue > 0 ? formatEuro(srpValue) : null;
     
     return (
       <View style={styles.productRow}>
@@ -208,7 +347,7 @@ const SuperMarketOrderSummaryScreen = () => {
         </View>
         
         <View style={styles.productInfo}>
-          <Text style={styles.productCode}>{line.productCode}</Text>
+          <Text style={styles.productCode}>{displayCode}</Text>
           <Text style={styles.productDescription} numberOfLines={2}>
             {line.description}
           </Text>
@@ -217,38 +356,39 @@ const SuperMarketOrderSummaryScreen = () => {
             <View style={styles.stockContainer}>
               <View style={[styles.stockIndicator, { backgroundColor: stockColor }]} />
               <Text style={styles.stockText}>
-                Απόθεμα: {stockLevel} τεμ.
+                {STRINGS.stockInfo}: {stockLevel}{STRINGS.unitsSuffix}
               </Text>
             </View>
+            <Text style={styles.stockText}>{STRINGS.packagingLabel}: {packagingLabel}</Text>
             
             {line.suggestedQty > 0 && (
               <Text style={styles.suggestedText}>
-                Προτεινόμενη: {line.suggestedQty} τεμ.
+                {STRINGS.suggestedInfo}: {line.suggestedQty}{STRINGS.unitsSuffix}
               </Text>
             )}
             
             {line.isNew && (
               <View style={styles.newBadge}>
-                <Text style={styles.newBadgeText}>ΝΕΟ</Text>
+                <Text style={styles.newBadgeText}>{STRINGS.newBadge}</Text>
               </View>
             )}
           </View>
           
           <View style={styles.priceRow}>
             <Text style={styles.priceText}>
-              Τιμή: €{line.price?.toFixed(2) || '0.00'}
+              {STRINGS.wholesaleLabel} {formattedWholesale}
             </Text>
-            {line.srp && (
+            {formattedSrp && (
               <Text style={styles.srpText}>
-                Λιανική: €{line.srp}
+                {STRINGS.srpInfo}: {formattedSrp}
               </Text>
             )}
           </View>
         </View>
         
         <View style={styles.quantityInfo}>
-          <Text style={styles.quantityLabel}>Παραγγελία:</Text>
-          <Text style={styles.quantityValue}>{line.quantity} τεμ.</Text>
+          <Text style={styles.quantityLabel}>{STRINGS.quantityLabel}</Text>
+          <Text style={styles.quantityValue}>{line.quantity}{STRINGS.unitsSuffix}</Text>
         </View>
       </View>
     );
@@ -257,6 +397,17 @@ const SuperMarketOrderSummaryScreen = () => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+        <View style={styles.quickNavRow}>
+          <TouchableOpacity
+            style={styles.quickNavButton}
+            onPress={goToReview}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="arrow-back" size={16} color="#1f4f8f" />
+            <Text style={styles.quickNavText}>{STRINGS.reviewShortcut}</Text>
+          </TouchableOpacity>
+        </View>
+
         {/* Store Information */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{STRINGS.storeInfo}</Text>
@@ -298,11 +449,11 @@ const SuperMarketOrderSummaryScreen = () => {
             </View>
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>{STRINGS.totalProducts}:</Text>
-              <Text style={styles.infoValue}>{linesData.length} προϊόντα</Text>
+              <Text style={styles.infoValue}>{linesData.length}{STRINGS.productCountSuffix}</Text>
             </View>
             <View style={styles.infoRow}>
               <Text style={styles.infoLabel}>{STRINGS.totalQuantity}:</Text>
-              <Text style={styles.infoValue}>{totalQuantity} τεμ.</Text>
+              <Text style={styles.infoValue}>{totalQuantity}{STRINGS.unitsSuffix}</Text>
             </View>
           </View>
         </View>
@@ -325,7 +476,7 @@ const SuperMarketOrderSummaryScreen = () => {
           {showProducts && (
             <View style={styles.productsCard}>
               {linesData.length === 0 ? (
-                <Text style={styles.emptyText}>Δεν υπάρχουν προϊόντα στην παραγγελία</Text>
+                <Text style={styles.emptyText}>{STRINGS.noProductsError}</Text>
               ) : (
                 linesData.map((line, index) => (
                   <View key={`${line.productCode}-${index}`}>
@@ -344,15 +495,15 @@ const SuperMarketOrderSummaryScreen = () => {
           <View style={styles.totalsCard}>
             <View style={styles.totalRow}>
               <Text style={styles.totalLabel}>{STRINGS.netValue}</Text>
-              <Text style={styles.totalValue}>€{order?.netValue?.toFixed(2) || '0.00'}</Text>
+              <Text style={styles.totalValue}>{formatEuro(netValue)}</Text>
             </View>
             <View style={styles.totalRow}>
               <Text style={styles.totalLabel}>{STRINGS.vat}</Text>
-              <Text style={styles.totalValue}>€{order?.vat?.toFixed(2) || '0.00'}</Text>
+              <Text style={styles.totalValue}>{formatEuro(vatValue)}</Text>
             </View>
             <View style={[styles.totalRow, styles.finalTotalRow]}>
               <Text style={styles.finalTotalLabel}>{STRINGS.totalValue}</Text>
-              <Text style={styles.finalTotalValue}>€{order?.finalValue?.toFixed(2) || '0.00'}</Text>
+              <Text style={styles.finalTotalValue}>{formatEuro(totalValue)}</Text>
             </View>
           </View>
         </View>
@@ -425,7 +576,10 @@ const SuperMarketOrderSummaryScreen = () => {
           disabled={loading}
         >
           {loading ? (
-            <ActivityIndicator size="small" color="#fff" />
+            <View style={styles.loadingContent}>
+              <ActivityIndicator size="small" color="#fff" />
+              <Text style={styles.exportButtonText}>{STRINGS.exporting}</Text>
+            </View>
           ) : (
             <>
               <Ionicons name="download-outline" size={20} color="#fff" />
@@ -449,6 +603,25 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 16,
     paddingBottom: 100,
+  },
+  quickNavRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginBottom: 12,
+  },
+  quickNavButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#e2e8f0',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  quickNavText: {
+    marginLeft: 6,
+    color: '#0f172a',
+    fontWeight: '600',
+    fontSize: 13,
   },
   section: {
     marginBottom: 24,
@@ -754,8 +927,11 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginLeft: 8,
   },
+  loadingContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 });
 
 export default SuperMarketOrderSummaryScreen;
-
-

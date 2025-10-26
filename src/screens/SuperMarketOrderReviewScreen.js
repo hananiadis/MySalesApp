@@ -1,5 +1,7 @@
+// src/screens/SuperMarketOrderReviewScreen.js
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  ActivityIndicator,
   Alert,
   Keyboard,
   KeyboardAvoidingView,
@@ -19,44 +21,60 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useOrder } from '../context/OrderContext';
 import { computeOrderTotals } from '../utils/orderTotals';
 import { normalizeBrandKey } from '../constants/brands';
+import { fetchSuperMarketListings } from '../services/supermarketData';
+import { getStoreInventory } from '../services/supermarketInventory';
 
 const STRINGS = {
-  title: 'Επισκόπηση Παραγγελίας SuperMarket',
-  backToProducts: 'Επιστροφή στα προϊόντα',
-  headerBack: 'Προϊόντα',
-  toggleTitle: 'Επιλεγμένα προϊόντα',
-  productsEmpty: 'Δεν υπάρχουν προϊόντα.',
-  quantity: 'Ποσότητα',
-  wholesale: 'Χονδρική',
-  retail: 'Λιανική',
-  totalsSection: 'Σύνολα',
-  net: 'Καθαρή αξία',
-  vat: 'ΦΠΑ 24%',
-  total: 'Συνολική αξία',
-  notes: 'Σημειώσεις',
-  notesPlaceholder: 'Προαιρετικές σημειώσεις για την παραγγελία...',
-  confirm: 'Επόμενο',
-  errorTitle: 'Σφάλμα',
-  errorMessage: 'Η παραγγελία πρέπει να περιέχει τουλάχιστον ένα προϊόν.',
-  removeProduct: 'Αφαίρεση προϊόντος',
-  stockInfo: 'Απόθεμα',
-  suggestedInfo: 'Προτεινόμενη',
-  srpInfo: 'Λιανική τιμή',
+  title: '\u0395\u03c0\u03b9\u03c3\u03ba\u03cc\u03c0\u03b7\u03c3\u03b7 \u03a0\u03b1\u03c1\u03b1\u03b3\u03b3\u03b5\u03bb\u03af\u03b1\u03c2 SuperMarket',
+  backToProducts: '\u0395\u03c0\u03b9\u03c3\u03c4\u03c1\u03bf\u03c6\u03ae \u03c3\u03c4\u03b1 \u03c0\u03c1\u03bf\u03ca\u03cc\u03bd\u03c4\u03b1',
+  headerBack: '\u03a0\u03c1\u03bf\u03ca\u03cc\u03bd\u03c4\u03b1',
+  toggleTitle: '\u0395\u03c0\u03b9\u03bb\u03b5\u03b3\u03bc\u03ad\u03bd\u03b1 \u03c0\u03c1\u03bf\u03ca\u03cc\u03bd\u03c4\u03b1',
+  productsEmpty: '\u0394\u03b5\u03bd \u03c5\u03c0\u03ac\u03c1\u03c7\u03bf\u03c5\u03bd \u03c0\u03c1\u03bf\u03ca\u03cc\u03bd\u03c4\u03b1.',
+  quantity: '\u03a0\u03bf\u03c3\u03cc\u03c4\u03b7\u03c4\u03b1',
+  wholesale: '\u03a7\u03bf\u03bd\u03b4\u03c1\u03b9\u03ba\u03ae',
+  retail: '\u039b\u03b9\u03b1\u03bd\u03b9\u03ba\u03ae',
+  totalsSection: '\u03a3\u03cd\u03bd\u03bf\u03bb\u03b1',
+  net: '\u039a\u03b1\u03b8\u03b1\u03c1\u03ae \u03b1\u03be\u03af\u03b1',
+  vat: '\u03a6\u03a0\u0391 24%',
+  total: '\u03a3\u03c5\u03bd\u03bf\u03bb\u03b9\u03ba\u03ae \u03b1\u03be\u03af\u03b1',
+  notes: '\u03a3\u03b7\u03bc\u03b5\u03b9\u03ce\u03c3\u03b5\u03b9\u03c2',
+  notesPlaceholder: '\u03a0\u03c1\u03bf\u03c3\u03b8\u03ad\u03c3\u03c4\u03b5 \u03c3\u03b7\u03bc\u03b5\u03b9\u03ce\u03c3\u03b5\u03b9\u03c2 \u03b3\u03b9\u03b1 \u03c4\u03b7\u03bd \u03c0\u03b1\u03c1\u03b1\u03b3\u03b3\u03b5\u03bb\u03af\u03b1...',
+  confirm: '\u0395\u03c0\u03cc\u03bc\u03b5\u03bd\u03bf',
+  loading: '\u0393\u03af\u03bd\u03b5\u03c4\u03b1\u03b9 \u03c0\u03c1\u03bf\u03b5\u03c4\u03bf\u03b9\u03bc\u03b1\u03c3\u03af\u03b1...',
+  errorTitle: '\u03a3\u03c6\u03ac\u03bb\u03bc\u03b1',
+  errorMessage: '\u0397 \u03c0\u03b1\u03c1\u03b1\u03b3\u03b3\u03b5\u03bb\u03af\u03b1 \u03c0\u03c1\u03ad\u03c0\u03b5\u03b9 \u03bd\u03b1 \u03c0\u03b5\u03c1\u03b9\u03ad\u03c7\u03b5\u03b9 \u03c4\u03bf\u03c5\u03bb\u03ac\u03c7\u03b9\u03c3\u03c4\u03bf\u03bd \u03ad\u03bd\u03b1 \u03c0\u03c1\u03bf\u03ca\u03cc\u03bd.',
+  removeProduct: '\u0391\u03c6\u03b1\u03af\u03c1\u03b5\u03c3\u03b7 \u03c0\u03c1\u03bf\u03ca\u03cc\u03bd\u03c4\u03bf\u03c2',
+  stockInfo: '\u0391\u03c0\u03cc\u03b8\u03b5\u03bc\u03b1',
+  suggestedInfo: '\u03a0\u03c1\u03bf\u03c4\u03b5\u03b9\u03bd\u03cc\u03bc\u03b5\u03bd\u03b7',
+  srpInfo: '\u039b\u03b9\u03b1\u03bd\u03b9\u03ba\u03ae \u03c4\u03b9\u03bc\u03ae',
+  packagingLabel: '\u03a3\u03c5\u03c3\u03ba\u03b5\u03c5\u03b1\u03c3\u03af\u03b1',
+  unitsSuffix: '\u0020\u03c4\u03b5\u03bc.',
+  storeInfoTitle: '\u03a3\u03c4\u03bf\u03b9\u03c7\u03b5\u03af\u03b1 \u03ba\u03b1\u03c4\u03b1\u03c3\u03c4\u03ae\u03bc\u03b1\u03c4\u03bf\u03c2',
+  toysCategoryLabel: '\u039a\u03b1\u03c4\u03b7\u03b3. \u03c0\u03b1\u03b9\u03c7\u03bd\u03b9\u03b4\u03b9\u03ce\u03bd',
+  summerCategoryLabel: '\u039a\u03b1\u03c4\u03b7\u03b3. \u03b5\u03c0\u03bf\u03c7\u03b9\u03ba\u03ce\u03bd',
+  companyLabel: '\u0395\u03c0\u03c9\u03bd\u03c5\u03bc\u03af\u03b1',
+  productCountSuffix: '\u0020\u03c0\u03c1\u03bf\u03ca\u03cc\u03bd\u03c4\u03b1',
+  newBadge: '\u039d\u0395\u039f',
+  listingsErrorTitle: '\u03a3\u03c6\u03ac\u03bb\u03bc\u03b1',
+  listingsErrorMessage: '\u0397 \u03b5\u03bd\u03b7\u03bc\u03ad\u03c1\u03c9\u03c3\u03b7 \u03c4\u03b7\u03c2 \u03bb\u03af\u03c3\u03c4\u03b1\u03c2 \u03b1\u03c0\u03ad\u03c4\u03c5\u03c7\u03b5. \u03a0\u03c1\u03bf\u03c3\u03c0\u03b1\u03b8\u03ae\u03c3\u03c4\u03b5 \u03be\u03b1\u03bd\u03ac.',
+  quickNavLabel: '\u0395\u03c0\u03b9\u03c3\u03c4\u03c1\u03bf\u03c6\u03ae \u03c3\u03c4\u03b7\u03bd \u03b5\u03c0\u03b9\u03bb\u03bf\u03b3\u03ae \u03c0\u03c1\u03bf\u03ca\u03cc\u03bd\u03c4\u03c9\u03bd',
 };
+
+const SYMBOLS = {
+  euro: '\u20ac',
+};
+
+
+const formatEuro = (value) => `${SYMBOLS.euro}${Number(value || 0).toFixed(2)}`;
 
 const calcSummary = (lines, brand, customer) => {
   const totals = computeOrderTotals({ lines, brand, paymentMethod: null, customer });
   const net = Number.isFinite(totals.net) ? totals.net : 0;
-  const discount = 0; // SuperMarket orders have no discount
+  const discount = 0;
   const vat = Number.isFinite(totals.vat) ? totals.vat : 0;
   const total = Number.isFinite(totals.total) ? totals.total : net + vat;
 
-  return {
-    net,
-    discount,
-    vat,
-    total,
-  };
+  return { net, discount, vat, total };
 };
 
 const SuperMarketOrderReviewScreen = () => {
@@ -76,6 +94,7 @@ const SuperMarketOrderReviewScreen = () => {
 
   const [collapsed, setCollapsed] = useState(false);
   const [keyboardPadding, setKeyboardPadding] = useState(0);
+  const [loadingListings, setLoadingListings] = useState(false);
 
   const fromOrders = Boolean(route?.params?.fromOrders);
   const routeBrand = route?.params?.brand ?? null;
@@ -96,6 +115,37 @@ const SuperMarketOrderReviewScreen = () => {
   const { net, discount, vat, total } = summary;
 
   const showBackToProducts = order?.status !== 'sent';
+  const storeSource = route?.params?.store ?? order?.store ?? order?.customer ?? {};
+  const storeNameDisplay =
+    storeSource.storeName ||
+    storeSource.name ||
+    order?.storeName ||
+    order?.customer?.name ||
+    '-';
+  const storeCodeDisplay =
+    storeSource.storeCode ||
+    storeSource.code ||
+    order?.storeCode ||
+    order?.customer?.customerCode ||
+    null;
+  const toysCategoryDisplay =
+    storeSource.hasToys ??
+    storeSource.storeCategory ??
+    order?.storeCategory ??
+    order?.customer?.storeCategory ??
+    '-';
+  const summerCategoryDisplay =
+    storeSource.hasSummerItems ??
+    storeSource.summerCategory ??
+    order?.storeSummerCategory ??
+    order?.customer?.storeSummerCategory ??
+    order?.customer?.summerCategory ??
+    '-';
+  const companyNameDisplay =
+    storeSource.companyName ||
+    order?.companyName ||
+    order?.customer?.companyName ||
+    null;
 
   const goToProducts = useCallback(() => {
     if (fromOrders) {
@@ -201,28 +251,50 @@ const SuperMarketOrderReviewScreen = () => {
     [setOrderLines]
   );
 
-  const handleConfirm = useCallback(() => {
+  // Load full listings and inventory snapshot for export
+  const handleConfirm = useCallback(async () => {
     if (!filteredLines.length) {
       Alert.alert(STRINGS.errorTitle, STRINGS.errorMessage);
       return;
     }
 
-    updateCurrentOrder({
-      paymentMethod: null, // SuperMarket orders have no payment method
-      paymentMethodLabel: null,
-      notes,
-      deliveryInfo: '', // SuperMarket orders have no delivery info
-      netValue: net,
-      discount: 0, // SuperMarket orders have no discount
-      vat,
-      finalValue: total,
-    });
+    console.log('[Review] Loading listings and inventory for export...');
+    setLoadingListings(true);
 
-    navigation.navigate('SuperMarketOrderSummary', {
-      store: route?.params?.store,
-      orderId: route?.params?.orderId,
-      brand: brandKey,
-    });
+    try {
+      // Fetch full listings for potential listing export
+      const allListings = await fetchSuperMarketListings(normalizedBrandKey);
+      console.log('[Review] Loaded listings:', allListings.length);
+
+      // Fetch current inventory snapshot
+      const storeCode = order?.storeCode || order?.customer?.storeCode;
+      const inventorySnapshot = storeCode ? await getStoreInventory(storeCode) : {};
+      console.log('[Review] Loaded inventory for store:', storeCode, 'items:', Object.keys(inventorySnapshot).length);
+
+      updateCurrentOrder({
+        paymentMethod: null,
+        paymentMethodLabel: null,
+        notes,
+        deliveryInfo: '',
+        netValue: net,
+        discount: 0,
+        vat,
+        finalValue: total,
+        supermarketListings: allListings,
+        inventorySnapshot,
+      });
+
+      navigation.navigate('SuperMarketOrderSummary', {
+        store: route?.params?.store,
+        orderId: route?.params?.orderId,
+        brand: brandKey,
+      });
+    } catch (error) {
+      console.error('[Review] Failed to load listings:', error);
+      Alert.alert(STRINGS.listingsErrorTitle, STRINGS.listingsErrorMessage);
+    } finally {
+      setLoadingListings(false);
+    }
   }, [
     filteredLines.length,
     navigation,
@@ -233,100 +305,131 @@ const SuperMarketOrderReviewScreen = () => {
     vat,
     route?.params,
     brandKey,
+    normalizedBrandKey,
+    order,
   ]);
 
-  const renderProductRow = useCallback(
-    ({ item: line }) => {
-      const stockLevel = line.currentStock || 0;
-      const stockColor = stockLevel > 10 ? '#10b981' : stockLevel > 0 ? '#f59e0b' : '#ef4444';
-      
-      return (
-        <View style={styles.productRow}>
-          <View style={styles.productImageContainer}>
-            {line.photoUrl ? (
-              <Image source={{ uri: line.photoUrl }} style={styles.productImage} />
-            ) : (
-              <View style={styles.productImagePlaceholder}>
-                <Ionicons name="image-outline" size={24} color="#9ca3af" />
-              </View>
-            )}
+const renderProductRow = useCallback(
+  ({ item: line }) => {
+    const stockLevel = Number(line.currentStock || 0);
+    const stockColor = stockLevel > 10 ? '#10b981' : stockLevel > 0 ? '#f59e0b' : '#ef4444';
+    const displayCode = line.displayProductCode || line.productCode;
+    const packagingLabel = (line.packaging || '').trim();
+    const wholesaleValue = Number(line.wholesalePrice ?? line.price ?? 0);
+    const formattedWholesale = formatEuro(wholesaleValue);
+    const srpValue = Number(line.srp ?? 0);
+    const formattedSrp = Number.isFinite(srpValue) && srpValue > 0 ? formatEuro(srpValue) : null;
+    const orderedQty = Number(line.quantity || 0);
+
+    return (
+      <View style={styles.productRow}>
+        {line.photoUrl ? (
+          <Image source={{ uri: line.photoUrl }} style={styles.productImage} />
+        ) : (
+          <View style={styles.productImagePlaceholder}>
+            <Ionicons name="image-outline" size={24} color="#9ca3af" />
           </View>
-          
-          <View style={styles.productInfo}>
-            <Text style={styles.productCode}>{line.productCode}</Text>
-            <Text style={styles.productDescription} numberOfLines={2}>
-              {line.description}
+        )}
+
+        <View style={styles.productContent}>
+          <View style={styles.productHeader}>
+            <Text style={styles.productCode} numberOfLines={1}>
+              {displayCode}
             </Text>
-            
-            <View style={styles.productDetails}>
-              <View style={styles.stockContainer}>
-                <View style={[styles.stockIndicator, { backgroundColor: stockColor }]} />
-                <Text style={styles.stockText}>
-                  {STRINGS.stockInfo}: {stockLevel} τεμ.
-                </Text>
-              </View>
-              
-              {line.suggestedQty > 0 && (
-                <Text style={styles.suggestedText}>
-                  {STRINGS.suggestedInfo}: {line.suggestedQty} τεμ.
-                </Text>
-              )}
-              
+            <View style={styles.headerChips}>
+              {packagingLabel ? (
+                <View style={styles.packagingChip}>
+                  <Text style={styles.packagingText}>{packagingLabel}</Text>
+                </View>
+              ) : null}
               {line.isNew && (
                 <View style={styles.newBadge}>
-                  <Text style={styles.newBadgeText}>ΝΕΟ</Text>
+                  <Text style={styles.newBadgeText}>{STRINGS.newBadge}</Text>
                 </View>
               )}
             </View>
-            
-            <View style={styles.priceRow}>
-              <Text style={styles.priceText}>
-                Τιμή: €{line.price?.toFixed(2) || '0.00'}
-              </Text>
-              {line.srp && (
-                <Text style={styles.srpText}>
-                  {STRINGS.srpInfo}: €{line.srp}
-                </Text>
-              )}
-            </View>
           </View>
-          
-          <View style={styles.quantityContainer}>
+
+          <Text style={styles.productDescription} numberOfLines={2}>
+            {line.description}
+          </Text>
+
+          <View style={styles.productMetaRow}>
+            <View style={styles.metaItem}>
+              <View style={[styles.stockDot, { backgroundColor: stockColor }]} />
+              <Text style={styles.metaLabel}>{STRINGS.stockInfo}</Text>
+              <Text style={styles.metaValue}>
+                {stockLevel}
+                {STRINGS.unitsSuffix}
+              </Text>
+            </View>
+            <View style={styles.metaDivider} />
+            <View style={styles.metaItem}>
+              <Text style={styles.metaLabel}>{STRINGS.quantity}</Text>
+              <Text style={styles.metaValue}>{orderedQty}</Text>
+            </View>
+            <View style={styles.metaDivider} />
+            <View style={styles.metaItem}>
+              <Text style={styles.metaLabel}>{STRINGS.wholesale}</Text>
+              <Text style={styles.metaValue}>{formattedWholesale}</Text>
+            </View>
+            {formattedSrp ? (
+              <>
+                <View style={styles.metaDivider} />
+                <View style={styles.metaItem}>
+                  <Text style={styles.metaLabel}>{STRINGS.srpInfo}</Text>
+                  <Text style={styles.metaValue}>{formattedSrp}</Text>
+                </View>
+              </>
+            ) : null}
+          </View>
+
+          {line.suggestedQty > 0 && (
+            <Text style={styles.suggestedText}>
+              {STRINGS.suggestedInfo}:{' '}
+              <Text style={styles.metaValue}>
+                {line.suggestedQty}
+                {STRINGS.unitsSuffix}
+              </Text>
+            </Text>
+          )}
+        </View>
+
+        <View style={styles.actionsColumn}>
+          <TouchableOpacity style={styles.removeButton} onPress={() => removeLine(line.productCode)}>
+            <Ionicons name="trash-outline" size={18} color="#ef4444" />
+          </TouchableOpacity>
+          <View style={styles.quantityControls}>
             <TouchableOpacity
-              style={styles.qtyButton}
+              style={[styles.qtyButton, orderedQty <= 0 && styles.qtyButtonDisabled]}
               onPress={() => adjustQuantity(line.productCode, -1)}
-              disabled={Number(line.quantity || 0) <= 0}
+              disabled={orderedQty <= 0}
             >
-              <Ionicons name="remove" size={16} color={Number(line.quantity || 0) > 0 ? "#374151" : "#9ca3af"} />
+              <Ionicons
+                name="remove"
+                size={18}
+                color={orderedQty > 0 ? '#0f172a' : '#9ca3af'}
+              />
             </TouchableOpacity>
-            
+
             <TextInput
               style={styles.qtyInput}
-              value={String(line.quantity || 0)}
+              value={String(orderedQty)}
               onChangeText={(text) => changeQuantity(line.productCode, text)}
               keyboardType="numeric"
               selectTextOnFocus
             />
-            
-            <TouchableOpacity
-              style={styles.qtyButton}
-              onPress={() => adjustQuantity(line.productCode, 1)}
-            >
-              <Ionicons name="add" size={16} color="#374151" />
+
+            <TouchableOpacity style={styles.qtyButton} onPress={() => adjustQuantity(line.productCode, 1)}>
+              <Ionicons name="add" size={18} color="#0f172a" />
             </TouchableOpacity>
           </View>
-          
-          <TouchableOpacity
-            style={styles.removeButton}
-            onPress={() => removeLine(line.productCode)}
-          >
-            <Ionicons name="trash-outline" size={18} color="#ef4444" />
-          </TouchableOpacity>
         </View>
-      );
-    },
-    [adjustQuantity, changeQuantity, removeLine]
-  );
+      </View>
+    );
+  },
+  [adjustQuantity, changeQuantity, removeLine]
+);
 
   return (
     <SafeAreaView style={styles.screen}>
@@ -339,15 +442,38 @@ const SuperMarketOrderReviewScreen = () => {
         >
           {/* Store Information */}
           <View style={styles.storeInfoSection}>
-            <Text style={styles.sectionTitle}>Πληροφορίες Καταστήματος</Text>
+            <Text style={styles.sectionTitle}>{STRINGS.storeInfoTitle}</Text>
             <View style={styles.storeInfoCard}>
-              <Text style={styles.storeName}>{order?.storeName || order?.customer?.name}</Text>
-              <Text style={styles.storeCode}>Κωδικός: {order?.storeCode || order?.customer?.customerCode}</Text>
-              <Text style={styles.storeCategory}>Κατηγορία: {order?.storeCategory || order?.customer?.storeCategory}</Text>
-              {order?.companyName && (
-                <Text style={styles.companyName}>Εταιρεία: {order.companyName}</Text>
-              )}
+              <View style={styles.storeInfoTopRow}>
+                <Text style={styles.storeName} numberOfLines={1}>{storeNameDisplay}</Text>
+                {storeCodeDisplay ? (
+                  <View style={styles.storeCodePill}>
+                    <Text style={styles.storeCodePillText}>{storeCodeDisplay}</Text>
+                  </View>
+                ) : null}
+              </View>
+              <View style={styles.storeMetaRow}>
+                <Text style={styles.storeMetaLabel}>{STRINGS.toysCategoryLabel}</Text>
+                <Text style={styles.storeMetaValue}>{toysCategoryDisplay || '-'}</Text>
+                <View style={styles.storeMetaDivider} />
+                <Text style={styles.storeMetaLabel}>{STRINGS.summerCategoryLabel}</Text>
+                <Text style={styles.storeMetaValue}>{summerCategoryDisplay || '-'}</Text>
+              </View>
+              {companyNameDisplay ? (
+                <Text style={styles.companyName} numberOfLines={1}>{STRINGS.companyLabel}: {companyNameDisplay}</Text>
+              ) : null}
             </View>
+          </View>
+
+          <View style={styles.quickNavRow}>
+            <TouchableOpacity
+              style={styles.quickNavButton}
+              onPress={goToProducts}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="cube-outline" size={16} color="#1f4f8f" />
+              <Text style={styles.quickNavText}>{STRINGS.quickNavLabel}</Text>
+            </TouchableOpacity>
           </View>
 
           {/* Products Section */}
@@ -359,7 +485,7 @@ const SuperMarketOrderReviewScreen = () => {
             >
               <Text style={styles.sectionTitle}>{STRINGS.toggleTitle}</Text>
               <View style={styles.sectionHeaderRight}>
-                <Text style={styles.productCount}>{filteredLines.length} προϊόντα</Text>
+                <Text style={styles.productCount}>{filteredLines.length}{STRINGS.productCountSuffix}</Text>
                 <Ionicons
                   name={collapsed ? 'chevron-down' : 'chevron-up'}
                   size={20}
@@ -394,23 +520,23 @@ const SuperMarketOrderReviewScreen = () => {
           </View>
 
           {/* Totals Section */}
-          <View style={styles.totalsSection}>
-            <Text style={styles.sectionTitle}>{STRINGS.totalsSection}</Text>
-            <View style={styles.totalsCard}>
-              <View style={styles.totalRow}>
-                <Text style={styles.totalLabel}>{STRINGS.net}</Text>
-                <Text style={styles.totalValue}>€{net.toFixed(2)}</Text>
-              </View>
-              <View style={styles.totalRow}>
-                <Text style={styles.totalLabel}>{STRINGS.vat}</Text>
-                <Text style={styles.totalValue}>€{vat.toFixed(2)}</Text>
-              </View>
-              <View style={[styles.totalRow, styles.finalTotalRow]}>
-                <Text style={styles.finalTotalLabel}>{STRINGS.total}</Text>
-                <Text style={styles.finalTotalValue}>€{total.toFixed(2)}</Text>
-              </View>
-            </View>
-          </View>
+<View style={styles.totalsSection}>
+  <Text style={styles.sectionTitle}>{STRINGS.totalsSection}</Text>
+  <View style={styles.totalsCard}>
+    <View style={styles.totalRow}>
+      <Text style={styles.totalLabel}>{STRINGS.net}</Text>
+      <Text style={styles.totalValue}>{formatEuro(net)}</Text>
+    </View>
+    <View style={styles.totalRow}>
+      <Text style={styles.totalLabel}>{STRINGS.vat}</Text>
+      <Text style={styles.totalValue}>{formatEuro(vat)}</Text>
+    </View>
+    <View style={[styles.totalRow, styles.finalTotalRow]}>
+      <Text style={styles.finalTotalLabel}>{STRINGS.total}</Text>
+      <Text style={styles.finalTotalValue}>{formatEuro(total)}</Text>
+    </View>
+  </View>
+</View>
 
           {/* Notes Section */}
           <View style={styles.notesSection}>
@@ -431,11 +557,18 @@ const SuperMarketOrderReviewScreen = () => {
           style={[styles.fab, { bottom: insets.bottom + 16 + keyboardPadding }]}
           onPress={handleConfirm}
           activeOpacity={0.9}
-          disabled={filteredLines.length === 0}
+          disabled={filteredLines.length === 0 || loadingListings}
         >
-          <Text style={[styles.fabText, filteredLines.length === 0 && styles.fabTextDisabled]}>
-            {STRINGS.confirm}
-          </Text>
+          {loadingListings ? (
+            <View style={styles.loadingContent}>
+              <ActivityIndicator size="small" color="#fff" />
+              <Text style={styles.loadingText}>{STRINGS.loading}</Text>
+            </View>
+          ) : (
+            <Text style={[styles.fabText, filteredLines.length === 0 && styles.fabTextDisabled]}>
+              {STRINGS.confirm}
+            </Text>
+                    )}
         </TouchableOpacity>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -478,28 +611,60 @@ const styles = StyleSheet.create({
   storeInfoCard: {
     backgroundColor: '#fff',
     borderRadius: 12,
-    padding: 16,
+    padding: 14,
     shadowColor: '#1f2937',
     shadowOpacity: 0.06,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 3 },
     elevation: 2,
   },
+  storeInfoTopRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 6,
+  },
   storeName: {
     fontSize: 16,
     fontWeight: '700',
     color: '#0f172a',
-    marginBottom: 4,
+    flex: 1,
+    marginRight: 12,
   },
-  storeCode: {
-    fontSize: 14,
-    color: '#6b7280',
-    marginBottom: 2,
+  storeCodePill: {
+    backgroundColor: '#e2e8f0',
+    borderRadius: 999,
+    paddingHorizontal: 10,
+    paddingVertical: 2,
   },
-  storeCategory: {
-    fontSize: 14,
-    color: '#6b7280',
-    marginBottom: 2,
+  storeCodePillText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#0f172a',
+  },
+  storeMetaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    marginBottom: 6,
+  },
+  storeMetaLabel: {
+    fontSize: 12,
+    color: '#64748b',
+    fontWeight: '600',
+    marginRight: 4,
+  },
+  storeMetaValue: {
+    fontSize: 12,
+    color: '#0f172a',
+    fontWeight: '600',
+    marginRight: 16,
+  },
+  storeMetaDivider: {
+    width: 1,
+    height: 12,
+    backgroundColor: '#cbd5f5',
+    marginRight: 12,
   },
   companyName: {
     fontSize: 14,
@@ -559,143 +724,199 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
   },
+  quickNavRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginBottom: 12,
+  },
+  quickNavButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#e2e8f0',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+  },
+  quickNavText: {
+    marginLeft: 6,
+    color: '#0f172a',
+    fontWeight: '600',
+    fontSize: 13,
+  },
   productsList: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    shadowColor: '#1f2937',
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 2,
+    paddingHorizontal: 4,
+    paddingBottom: 8,
   },
   productRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-  },
-  productImageContainer: {
-    width: 60,
-    height: 60,
-    marginRight: 12,
+    alignItems: 'flex-start',
+    backgroundColor: '#fff',
+    borderRadius: 14,
+    padding: 12,
+    marginHorizontal: 8,
+    marginVertical: 6,
+    shadowColor: '#0f172a',
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
   },
   productImage: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 8,
+    width: 52,
+    height: 52,
+    borderRadius: 10,
+    marginRight: 10,
+    backgroundColor: '#f3f4f6',
   },
   productImagePlaceholder: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 8,
+    width: 52,
+    height: 52,
+    borderRadius: 10,
     backgroundColor: '#f3f4f6',
     alignItems: 'center',
     justifyContent: 'center',
+    marginRight: 10,
   },
-  productInfo: {
+  productContent: {
     flex: 1,
-    marginRight: 12,
+    marginRight: 10,
+  },
+  productHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 2,
+  },
+  headerChips: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 8,
   },
   productCode: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '700',
     color: '#0f172a',
+    flexShrink: 1,
+  },
+  packagingChip: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 4,
+    backgroundColor: '#e2e8f0',
+    marginLeft: 6,
+  },
+  packagingText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#1f2937',
   },
   productDescription: {
-    fontSize: 13,
-    color: '#6b7280',
+    fontSize: 12.5,
+    color: '#475569',
     marginTop: 2,
-    lineHeight: 18,
+    lineHeight: 16,
   },
-  productDetails: {
+  productMetaRow: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 4,
     flexWrap: 'wrap',
+    alignItems: 'center',
+    marginTop: 6,
   },
-  stockContainer: {
+  metaItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 10,
+    marginTop: 4,
   },
-  stockIndicator: {
-    width: 8,
-    height: 8,
+  metaLabel: {
+    fontSize: 11,
+    color: '#64748b',
+    marginRight: 4,
+  },
+  metaValue: {
+    fontSize: 11,
+    color: '#0f172a',
+    fontWeight: '600',
+  },
+  metaDivider: {
+    width: 1,
+    height: 12,
+    backgroundColor: '#e5e7eb',
+    marginHorizontal: 6,
+    marginTop: 4,
+  },
+  stockDot: {
+    width: 7,
+    height: 7,
     borderRadius: 4,
     marginRight: 4,
   },
-  stockText: {
-    fontSize: 12,
-    color: '#6b7280',
-  },
   suggestedText: {
-    fontSize: 12,
-    color: '#10b981',
-    marginRight: 8,
+    marginTop: 6,
+    fontSize: 11,
+    color: '#64748b',
   },
   newBadge: {
     backgroundColor: '#ef4444',
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 4,
+    marginLeft: 6,
   },
   newBadgeText: {
     fontSize: 10,
     color: '#fff',
     fontWeight: '700',
   },
-  priceRow: {
+  actionsColumn: {
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+    marginLeft: 8,
+  },
+  quantityControls: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 4,
-  },
-  priceText: {
-    fontSize: 13,
-    color: '#0f172a',
-    fontWeight: '600',
-    marginRight: 12,
-  },
-  srpText: {
-    fontSize: 12,
-    color: '#6b7280',
-  },
-  quantityContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 12,
+    backgroundColor: '#eff6ff',
+    borderRadius: 18,
+    paddingVertical: 3,
+    paddingHorizontal: 6,
+    marginTop: 8,
   },
   qtyButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#f3f4f6',
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  qtyButtonDisabled: {
+    opacity: 0.4,
+  },
   qtyInput: {
-    width: 50,
-    height: 32,
+    width: 44,
+    height: 28,
     textAlign: 'center',
     fontSize: 14,
     fontWeight: '600',
     color: '#0f172a',
-    marginHorizontal: 8,
+    marginHorizontal: 6,
     borderWidth: 1,
     borderColor: '#d1d5db',
     borderRadius: 8,
     backgroundColor: '#fff',
+    paddingVertical: 2,
+    paddingHorizontal: 4,
   },
   removeButton: {
     width: 32,
     height: 32,
     borderRadius: 16,
-    backgroundColor: '#fef2f2',
+    backgroundColor: '#fee2e2',
     alignItems: 'center',
     justifyContent: 'center',
   },
   productSeparator: {
-    height: 1,
-    backgroundColor: '#f3f4f6',
-    marginHorizontal: 16,
+    height: 12,
   },
   totalsSection: {
     marginBottom: 24,
@@ -781,8 +1002,17 @@ const styles = StyleSheet.create({
   fabTextDisabled: {
     color: '#9ca3af',
   },
+  loadingContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginLeft: 8,
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
+  },
 });
 
 export default SuperMarketOrderReviewScreen;
-
 

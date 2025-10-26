@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   ActivityIndicator,
   FlatList,
+  Pressable,
   StyleSheet,
   Text,
   TextInput,
@@ -54,10 +55,23 @@ const translateCategoryCode = (value) => {
 const buildStorePayload = (doc) => {
   if (!doc) return null;
   const data = doc.data ? doc.data() : doc;
+
   const storeCategory =
     data.storeCategory ||
     data.storeCategoryCode ||
     translateCategoryCode(data.hasToys) ||
+    '';
+
+  // NEW: normalize toys and summer categories
+  const toysCategory =
+    data.hasToys ||
+    data.toysCategory ||
+    translateCategoryCode(data.storeCategoryToys) ||
+    '';
+  const summerCategory =
+    data.hasSummerItems ||
+    data.summerCategory ||
+    formatCategory(data.storeCategorySummer) ||
     '';
 
   return {
@@ -65,8 +79,11 @@ const buildStorePayload = (doc) => {
     refId: doc.id || data.id,
     ...data,
     storeCategory: storeCategory || translateCategoryCode(data.category),
+    toysCategory,
+    summerCategory,
   };
 };
+
 
 const SuperMarketStoreSelectScreen = ({ navigation, route }) => {
   const insets = useSafeAreaInsets();
@@ -87,6 +104,8 @@ const SuperMarketStoreSelectScreen = ({ navigation, route }) => {
   const [selectedHasToys, setSelectedHasToys] = useState('all');
   const [selectedHasSummerItems, setSelectedHasSummerItems] = useState('all');
   const [showFilters, setShowFilters] = useState(false);
+  const [expandedBrands, setExpandedBrands] = useState({});
+  const [expandedCategories, setExpandedCategories] = useState({});
 
   useEffect(() => {
     let mounted = true;
@@ -193,8 +212,121 @@ const SuperMarketStoreSelectScreen = ({ navigation, route }) => {
     });
   }, [searchValue, selectedCompany, selectedHasToys, selectedHasSummerItems, stores]);
 
+  const groupedStores = useMemo(() => {
+    const brands = new Map();
+    filteredStores.forEach((store) => {
+      const brandName = store.companyName || store.companySlug || 'SuperMarket';
+      const brandKey = normalize(brandName) || (store.companySlug || store.companyCode || store.id || 'brand');
+      let brandEntry = brands.get(brandKey);
+      if (!brandEntry) {
+        brandEntry = {
+          key: brandKey,
+          name: brandName,
+          categories: new Map(),
+        };
+        brands.set(brandKey, brandEntry);
+      }
+      const toyRaw = store.toysCategory || store.hasToys || '';
+      const toyLabel = toyRaw ? formatCategory(toyRaw) || toyRaw : 'Χωρίς κατηγορία';
+      const categoryKey = toyRaw || 'uncategorized';
+      let categoryEntry = brandEntry.categories.get(categoryKey);
+      if (!categoryEntry) {
+        categoryEntry = {
+          key: categoryKey,
+          label: toyLabel || 'Χωρίς κατηγορία',
+          stores: [],
+        };
+        brandEntry.categories.set(categoryKey, categoryEntry);
+      }
+      categoryEntry.stores.push(store);
+    });
+    return Array.from(brands.values())
+      .map((brandEntry) => ({
+        key: brandEntry.key || normalize(brandEntry.name) || 'brand',
+        name: brandEntry.name,
+        categories: Array.from(brandEntry.categories.values())
+          .map((categoryEntry) => ({
+            ...categoryEntry,
+            stores: categoryEntry.stores
+              .slice()
+              .sort((a, b) => normalize(a.storeName).localeCompare(normalize(b.storeName))),
+          }))
+          .sort((a, b) => normalize(a.label).localeCompare(normalize(b.label))),
+      }))
+      .sort((a, b) => normalize(a.name).localeCompare(normalize(b.name)));
+  }, [filteredStores]);
+
+  useEffect(() => {
+    setExpandedBrands((prev) => {
+      const next = { ...prev };
+      groupedStores.forEach((brand) => {
+        if (next[brand.key] === undefined) {
+          next[brand.key] = true;
+        }
+      });
+      return next;
+    });
+    setExpandedCategories((prev) => {
+      const next = { ...prev };
+      groupedStores.forEach((brand) => {
+        brand.categories.forEach((category) => {
+          const key = `${brand.key}::${category.key}`;
+          if (next[key] === undefined) {
+            next[key] = true;
+          }
+        });
+      });
+      return next;
+    });
+  }, [groupedStores]);
+
+  const toggleBrand = useCallback((brandKey) => {
+    setExpandedBrands((prev) => ({
+      ...prev,
+      [brandKey]: !prev[brandKey],
+    }));
+  }, []);
+
+  const toggleCategory = useCallback((brandKey, categoryKey) => {
+    const compound = `${brandKey}::${categoryKey}`;
+    setExpandedCategories((prev) => ({
+      ...prev,
+      [compound]: !prev[compound],
+    }));
+  }, []);
+
+  const expandAllGroups = useCallback(() => {
+    const nextBrands = {};
+    const nextCategories = {};
+    groupedStores.forEach((brand) => {
+      nextBrands[brand.key] = true;
+      brand.categories.forEach((category) => {
+        nextCategories[`${brand.key}::${category.key}`] = true;
+      });
+    });
+    setExpandedBrands(nextBrands);
+    setExpandedCategories(nextCategories);
+  }, [groupedStores]);
+
+  const collapseAllGroups = useCallback(() => {
+    const nextBrands = {};
+    const nextCategories = {};
+    groupedStores.forEach((brand) => {
+      nextBrands[brand.key] = false;
+      brand.categories.forEach((category) => {
+        nextCategories[`${brand.key}::${category.key}`] = false;
+      });
+    });
+    setExpandedBrands(nextBrands);
+    setExpandedCategories(nextCategories);
+  }, [groupedStores]);
+
   const handleBack = useCallback(() => {
     navigation.goBack();
+  }, [navigation]);
+
+  const goToJohn = useCallback(() => {
+    navigation.navigate('John');
   }, [navigation]);
 
   const handleSelectStore = useCallback(
@@ -219,6 +351,19 @@ const SuperMarketStoreSelectScreen = ({ navigation, route }) => {
       }
     },
     [navigation, startSuperMarketOrder, brand]
+  );
+
+  const handleViewDetails = useCallback(
+    (storeDetails) => {
+      if (!storeDetails) {
+        return;
+      }
+      navigation.navigate('SuperMarketStoreDetails', {
+        store: storeDetails,
+        brand,
+      });
+    },
+    [navigation, brand]
   );
 
   const renderFilters = () => {
@@ -291,39 +436,123 @@ const SuperMarketStoreSelectScreen = ({ navigation, route }) => {
     );
   };
 
-  const renderStoreRow = ({ item }) => {
-    const storeCategoryLabel = translateCategoryCode(item.storeCategory || item.hasToys);
-    return (
-      <TouchableOpacity
-        style={styles.card}
-        activeOpacity={0.85}
-        onPress={() => handleSelectStore(item)}
-      >
-        {/* Company Name with Store Code and Store Name */}
-        <View style={styles.cardHeader}>
-          <Text style={styles.companyTitle}>
-            {item.companyName || 'MASOUTIS'} - {item.storeCode || '-'} - {item.storeName || 'Κατάστημα'}
-          </Text>
+  const renderStoreCard = useCallback(
+    (store) => {
+      const storeCategoryLabel = formatCategory(store.storeCategory || store.category || '');
+      const toyCategoryDisplay = store.toysCategory || store.hasToys || '—';
+      const summerCategoryDisplay = store.hasSummerItems || store.summerCategory || '—';
+
+      return (
+        <Pressable
+          style={styles.card}
+          onPress={() => handleSelectStore(store)}
+        >
+          <View style={styles.cardHeader}>
+            <View style={styles.cardTitleContainer}>
+              <Text style={styles.companyTitle} numberOfLines={2}>
+                {store.companyName || 'SuperMarket'} · {store.storeCode || '-'} · {store.storeName || 'Κατάστημα'}
+              </Text>
+              <Text style={styles.cardSubtitle} numberOfLines={1}>
+                {store.city || '-'} · {store.region || '-'}
+              </Text>
+            </View>
+            <Pressable
+              style={styles.infoButton}
+              hitSlop={8}
+              onPress={(event) => {
+                event.stopPropagation?.();
+                handleViewDetails(store);
+              }}
+            >
+              <Ionicons name="information-circle-outline" size={20} color="#1f4f8f" />
+            </Pressable>
+          </View>
+
+          <View style={styles.cardDetailRow}>
+            <Text style={styles.cardLabel}>Κατηγορία:</Text>
+            <Text style={styles.cardValue}>{storeCategoryLabel || '—'}</Text>
+          </View>
+
+          <View style={styles.cardDetailRow}>
+            <Text style={styles.cardLabel}>Παιχνίδια:</Text>
+            <Text style={styles.cardValue}>{toyCategoryDisplay}</Text>
+            <View style={styles.cardMetaDivider} />
+            <Text style={styles.cardLabel}>Εποχικά:</Text>
+            <Text style={styles.cardValue}>{summerCategoryDisplay}</Text>
+          </View>
+        </Pressable>
+      );
+    },
+    [handleSelectStore, handleViewDetails]
+  );
+
+  const renderBrandSection = useCallback(
+    ({ item: brandGroup }) => {
+      const brandExpanded = expandedBrands[brandGroup.key] ?? true;
+      const totalStores = brandGroup.categories.reduce(
+        (sum, category) => sum + category.stores.length,
+        0
+      );
+
+      return (
+        <View style={styles.brandSection}>
+          <TouchableOpacity
+            style={styles.brandHeader}
+            onPress={() => toggleBrand(brandGroup.key)}
+            activeOpacity={0.8}
+          >
+            <Text style={styles.brandTitle}>
+              {brandGroup.name} ({totalStores})
+            </Text>
+            <Ionicons
+              name={brandExpanded ? 'chevron-up' : 'chevron-down'}
+              size={18}
+              color="#1f4f8f"
+            />
+          </TouchableOpacity>
+
+          {brandExpanded &&
+            brandGroup.categories.map((category) => {
+              const categoryKey = `${brandGroup.key}::${category.key}`;
+              const categoryExpanded = expandedCategories[categoryKey] ?? true;
+
+              return (
+                <View key={categoryKey} style={styles.categorySection}>
+                  <TouchableOpacity
+                    style={styles.categoryHeader}
+                    onPress={() => toggleCategory(brandGroup.key, category.key)}
+                    activeOpacity={0.8}
+                  >
+                    <Text style={styles.categoryTitle}>
+                      {category.label} ({category.stores.length})
+                    </Text>
+                    <Ionicons
+                      name={categoryExpanded ? 'chevron-up' : 'chevron-down'}
+                      size={16}
+                      color="#334155"
+                    />
+                  </TouchableOpacity>
+
+                  {categoryExpanded && (
+                    <View style={styles.categoryStores}>
+                      {category.stores.map((store) => (
+                        <View
+                          key={store.refId || store.id || store.storeCode}
+                          style={styles.storeCardWrapper}
+                        >
+                          {renderStoreCard(store)}
+                        </View>
+                      ))}
+                    </View>
+                  )}
+                </View>
+              );
+            })}
         </View>
-        
-        {/* Area and Region */}
-        <View style={styles.cardDetailRow}>
-          <Text style={styles.cardLabel}>Περιοχή:</Text>
-          <Text style={styles.cardValue}>
-            {item.area || '-'} - {item.region || '-'}
-          </Text>
-        </View>
-        
-        {/* Category, HasToys, HasSummerItems in single row */}
-        <View style={styles.cardDetailRow}>
-          <Text style={styles.cardLabel}>Τυπολογία:</Text>
-          <Text style={styles.cardValue}>
-            {formatCategory(item.category)} Παιχνίδια: {item.hasToys || '—'} Καλοκαιρινά: {item.hasSummerItems || '—'}
-          </Text>
-        </View>
-      </TouchableOpacity>
-    );
-  };
+      );
+    },
+    [expandedBrands, expandedCategories, renderStoreCard, toggleBrand, toggleCategory]
+  );
 
   return (
     <SafeAreaView style={[styles.container, { paddingBottom: Math.max(insets.bottom, 16) }]}>
@@ -332,7 +561,14 @@ const SuperMarketStoreSelectScreen = ({ navigation, route }) => {
           <Ionicons name="chevron-back" size={24} color="#0f172a" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Επιλογή Καταστήματος</Text>
-        <View style={styles.headerSpacer} />
+        <TouchableOpacity
+          style={styles.headerAction}
+          onPress={goToJohn}
+          activeOpacity={0.8}
+        >
+          <Ionicons name="person-circle-outline" size={20} color="#1f4f8f" />
+          <Text style={styles.headerActionText}>John</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.searchRow}>
@@ -378,12 +614,34 @@ const SuperMarketStoreSelectScreen = ({ navigation, route }) => {
             <Text style={styles.emptyHint}>Τροποποιήστε τα φίλτρα ή την αναζήτηση.</Text>
           </View>
         ) : (
-          <FlatList
-            data={filteredStores}
-            keyExtractor={(item) => item.refId || item.id || item.storeCode}
-            renderItem={renderStoreRow}
-            contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 32 }}
-          />
+          <>
+            {groupedStores.length > 0 && (
+              <View style={styles.groupControls}>
+                <TouchableOpacity
+                  style={[styles.groupControlButton, styles.groupControlButtonPrimary]}
+                  onPress={expandAllGroups}
+                  activeOpacity={0.8}
+                >
+                  <Ionicons name="chevron-down-circle-outline" size={18} color="#1f4f8f" />
+                  <Text style={styles.groupControlText}>Άνοιγμα όλων</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.groupControlButton, styles.groupControlButtonSecondary]}
+                  onPress={collapseAllGroups}
+                  activeOpacity={0.8}
+                >
+                  <Ionicons name="chevron-up-circle-outline" size={18} color="#1f4f8f" />
+                  <Text style={styles.groupControlText}>Κλείσιμο όλων</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+            <FlatList
+              data={groupedStores}
+              keyExtractor={(item) => item.key}
+              renderItem={renderBrandSection}
+              contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 32 }}
+            />
+          </>
         )}
       </View>
     </SafeAreaView>
@@ -417,9 +675,22 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: '#0f172a',
+    flex: 1,
+    textAlign: 'center',
   },
-  headerSpacer: {
-    width: 40,
+  headerAction: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#e2e8f0',
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 20,
+  },
+  headerActionText: {
+    marginLeft: 6,
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#1f4f8f',
   },
   searchRow: {
     flexDirection: 'row',
@@ -509,25 +780,22 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: '#fff',
-    borderRadius: 14,
-    padding: 16,
+    borderRadius: 16,
+    padding: 14,
     marginTop: 12,
     shadowColor: '#1f2937',
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 2,
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
   },
   cardHeader: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
-    marginBottom: 8,
+    marginBottom: 10,
   },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#0f172a',
+  cardTitleContainer: {
     flex: 1,
     marginRight: 12,
   },
@@ -535,34 +803,113 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '700',
     color: '#0f172a',
-    marginBottom: 8,
   },
-  categoryBadge: {
-    backgroundColor: '#111827',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
+  cardSubtitle: {
+    marginTop: 4,
+    fontSize: 13,
+    color: '#475569',
+  },
+  infoButton: {
+    padding: 4,
     borderRadius: 999,
-  },
-  categoryBadgeText: {
-    color: '#fff',
-    fontWeight: '700',
-    fontSize: 12,
+    backgroundColor: '#e2e8f0',
   },
   cardDetailRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 4,
+    marginTop: 6,
   },
   cardLabel: {
-    fontSize: 13,
-    color: '#6b7280',
-    width: 90,
+    fontSize: 12,
+    color: '#475569',
+    fontWeight: '600',
+    marginRight: 6,
   },
   cardValue: {
-    fontSize: 14,
-    color: '#1f2937',
-    flex: 1,
+    fontSize: 13,
+    color: '#0f172a',
     fontWeight: '500',
+  },
+  cardMetaDivider: {
+    width: 1,
+    height: 14,
+    backgroundColor: '#e2e8f0',
+    marginHorizontal: 12,
+  },
+  brandSection: {
+    backgroundColor: '#fff',
+    borderRadius: 18,
+    paddingBottom: 8,
+    marginTop: 12,
+    shadowColor: '#1f2937',
+    shadowOpacity: 0.05,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 1,
+  },
+  brandHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#e2e8f0',
+  },
+  brandTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#0f172a',
+  },
+  categorySection: {
+    paddingHorizontal: 12,
+    paddingTop: 8,
+    paddingBottom: 4,
+  },
+  categoryHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+  },
+  categoryTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#1f2937',
+  },
+  categoryStores: {
+    paddingBottom: 8,
+  },
+  storeCardWrapper: {
+    marginTop: 8,
+  },
+  groupControls: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    marginBottom: 8,
+    paddingHorizontal: 16,
+  },
+  groupControlButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#e2e8f0',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 18,
+  },
+  groupControlButtonPrimary: {
+    marginRight: 10,
+  },
+  groupControlButtonSecondary: {
+    marginLeft: 10,
+  },
+  groupControlText: {
+    marginLeft: 6,
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#1f4f8f',
   },
   emptyState: {
     flex: 1,

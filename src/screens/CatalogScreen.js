@@ -14,6 +14,7 @@ import SafeScreen from '../components/SafeScreen';
 
 const CatalogScreen = ({ navigation, route }) => {
   const { brand } = route.params || {};
+  const normalizedBrand = (brand || 'playmobil').toLowerCase();
 
   const playmobilCatalogs = [
     {
@@ -41,6 +42,24 @@ const CatalogScreen = ({ navigation, route }) => {
       url: 'https://online.fliphtml5.com/gtcjg/mdqr/',
       type: 'Online',
     },
+    {
+      title: 'Playmobil Sky Trails',
+      url: 'https://online.fliphtml5.com/gtcjg/cdbm/',
+      type: 'Online',
+    },
+  ];
+
+    const kivosCatalogs = [
+    {
+      title: 'ΚΑΤΑΛΟΓΟΣ ΣΧΟΛΙΚΩΝ ΠΡΟΪΟΝΤΩΝ',
+      url: 'https://online.fliphtml5.com/gtcjg/cbju/',
+      type: 'Online',
+    },
+    {
+      title: 'ΚΑΤΑΛΟΓΟΣ ΤΕΧΝΙΚΩΝ ΠΡΟΪΟΝΤΩΝ',
+      url: 'https://online.fliphtml5.com/gtcjg/xcod/',
+      type: 'Online',
+    },
   ];
 
   const johnCatalogs = [
@@ -61,8 +80,17 @@ const CatalogScreen = ({ navigation, route }) => {
     },
   ];
 
-  const catalogs = brand === 'playmobil' ? playmobilCatalogs : johnCatalogs;
-  const brandName = brand === 'playmobil' ? 'Playmobil' : 'John Hellas';
+  let catalogs = playmobilCatalogs;
+  let brandName = 'Playmobil';
+
+  if (normalizedBrand === 'john') {
+    catalogs = johnCatalogs;
+    brandName = 'John Hellas';
+  } else if (normalizedBrand === 'kivos') {
+    catalogs = kivosCatalogs;
+    brandName = 'Kivos';
+  }
+
 
   const handleOpenLink = async (url) => {
     try {

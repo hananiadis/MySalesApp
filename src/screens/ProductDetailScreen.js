@@ -284,6 +284,22 @@ const ProductDetailScreen = ({ route, navigation }) => {
       <Section title="Barcode">
         <DetailRow label="Barcode" value={product.barcode} />
       </Section>
+      {Array.isArray(product.activeSupermarketListings) && product.activeSupermarketListings.length > 0 ? (
+        <Section title="SuperMarket Listings">
+          {product.activeSupermarketListings.map((entry, index) => {
+            const storeLabel = entry?.storeName || entry?.storeCode || '\u0386\u03b3\u03bd\u03c9\u03c3\u03c4\u03bf';
+            const categoryLabel = entry?.category || '\u039a\u03b1\u03c4\u03b7\u03b3\u03bf\u03c1\u03af\u03b1';
+            const displayValue = `${storeLabel}${categoryLabel ? ' \u2022 ' + categoryLabel : ''}`;
+            return (
+              <DetailRow
+                key={`${entry?.storeCode || 'store'}-${entry?.category || 'category'}-${index}`}
+                label="\u039a\u03b1\u03c4\u03ac\u03c3\u03c4\u03b7\u03bc\u03b1"
+                value={displayValue}
+              />
+            );
+          })}
+        </Section>
+      ) : null}
     </>
   );
 

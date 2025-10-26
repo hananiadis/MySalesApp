@@ -10,9 +10,11 @@ import {
   Alert,
   SafeAreaView,
   ScrollView,
+  Platform,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import LottieView from 'lottie-react-native';
 
 import {
   saveProductsToLocal,
@@ -30,7 +32,12 @@ import {
   saveSuperMarketListingsToLocal,
   clearSuperMarketListingsLocal,
   getSuperMarketListingsLastAction,
+  // New: store last action for listing images (optional)
+  getSuperMarketListingImagesLastAction,
+  saveSuperMarketListingImagesLastAction,
+  saveImagesLastAction,
 } from '../utils/localData';
+
 import { downloadAndCacheImage } from '../utils/imageHelpers';
 import { cacheImmediateAvailabilityMap, lookupImmediateStockValue } from '../utils/stockAvailability';
 import {
@@ -41,22 +48,34 @@ import {
 } from '../constants/brands';
 import { fetchSuperMarketStores, fetchSuperMarketListings } from '../services/supermarketData';
 
-const fetchProductsFromFirestore = async (collectionName) => {
+const LOTTIE_PROGRESS = require('../../assets/lottie/sync.json'); // put a loader animation here
+
+const fetchProductsFromFirestore = async (collectionName, onProgress) => {
   const snapshot = await firestore().collection(collectionName).get();
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  const docs = snapshot.docs;
+  const out = [];
+  for (let i = 0; i < docs.length; i += 1) {
+    out.push({ id: docs[i].id, ...docs[i].data() });
+    if (typeof onProgress === 'function') onProgress(i + 1, docs.length);
+  }
+  return out;
 };
 
-const fetchCustomersFromFirestore = async (collectionName) => {
+const fetchCustomersFromFirestore = async (collectionName, onProgress) => {
   const snapshot = await firestore().collection(collectionName).get();
-  return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+  const docs = snapshot.docs;
+  const out = [];
+  for (let i = 0; i < docs.length; i += 1) {
+    out.push({ id: docs[i].id, ...docs[i].data() });
+    if (typeof onProgress === 'function') onProgress(i + 1, docs.length);
+  }
+  return out;
 };
 
 const STRINGS = {
   title: 'Συγχρονισμός δεδομένων Firestore',
   statusPlaceholder: 'Δεν υπάρχουν καταγεγραμμένες ενέργειες.',
-  nav: {
-    back: 'Πίσω',
-  },
+  nav: { back: 'Πίσω' },
   alerts: {
     success: 'Ολοκληρώθηκε',
     error: 'Σφάλμα',
@@ -94,7 +113,7 @@ const STRINGS = {
     },
     images: {
       title: 'Εικόνες προϊόντων',
-      downloadBtn: 'Λήψη εικόνων',
+      downloadBtn: 'Λήψη εικόνων (Προϊόντα & Listings)',
       clearBtn: 'Καθαρισμός cache εικόνων',
       downloadError: 'Η λήψη των εικόνων προϊόντων απέτυχε.',
       clearError: 'Ο καθαρισμός της cache εικόνων απέτυχε.',
@@ -114,13 +133,38 @@ const MESSAGES = {
   customersSaved: (count) => `Αποθηκεύτηκαν ${count} πελάτες.`,
   supermarketStoresSaved: (count) => `Αποθηκεύτηκαν ${count} καταστήματα SuperMarket.`,
   supermarketListingsSaved: (count) => `Αποθηκεύτηκαν ${count} listings SuperMarket.`,
-  imagesSummary: (success, failed) => `Λήφθηκαν: ${success}
-Απέτυχαν: ${failed}`,
+  imagesSummary: (success, failed, successListings, failedListings) =>
+    `Προϊόντα\n  Λήφθηκαν: ${success}\n  Απέτυχαν: ${failed}\n\nListings\n  Λήφθηκαν: ${successListings}\n  Απέτυχαν: ${failedListings}`,
 };
 
 const SUPER_MARKET_UNAVAILABLE_MSG = 'Μη διαθέσιμο για αυτή τη μάρκα.';
-
 const formatAction = (value) => value || STRINGS.statusPlaceholder;
+
+const ProgressRow = ({ active, label, current, total }) => {
+  if (!active) return null;
+  const haveTotal = Number.isFinite(total) && total > 0;
+  const pct = haveTotal ? Math.min(100, Math.round((current / total) * 100)) : 0;
+  return (
+    <View style={styles.progressRow}>
+      <View style={styles.progressLeft}>
+        <LottieView
+          source={LOTTIE_PROGRESS}
+          autoPlay
+          loop
+          style={{ width: 42, height: 42 }}
+        />
+      </View>
+      <View style={styles.progressRight}>
+        <Text style={styles.progressLabel}>
+          {label} {haveTotal ? `(${current}/${total})` : ''}
+        </Text>
+        <View style={styles.progressBarWrap}>
+          <View style={[styles.progressBarFill, { width: haveTotal ? `${pct}%` : '0%' }]} />
+        </View>
+      </View>
+    </View>
+  );
+};
 
 const DataScreen = () => {
   const navigation = useNavigation();
@@ -148,6 +192,19 @@ const DataScreen = () => {
     smListings: false,
     smListingsClear: false,
   });
+
+  // per-action progress
+  const [progress, setProgress] = useState({
+    products: { current: 0, total: 0, label: 'Λήψη προϊόντων' },
+    customers: { current: 0, total: 0, label: 'Λήψη πελατών' },
+    smStores: { current: 0, total: 0, label: 'Λήψη καταστημάτων' },
+    smListings: { current: 0, total: 0, label: 'Λήψη listings' },
+    imagesProducts: { current: 0, total: 0, label: 'Εικόνες (Προϊόντα)' },
+    imagesListings: { current: 0, total: 0, label: 'Εικόνες (Listings)' },
+  });
+
+  const updateProgress = (key, current, total) =>
+    setProgress((p) => ({ ...p, [key]: { ...p[key], current, total } }));
 
   const refreshActions = useCallback(async () => {
     const [productsLast, customersLast, imagesLast] = await Promise.all([
@@ -180,9 +237,13 @@ const DataScreen = () => {
   }, [brand, refreshActions]);
 
   const handleDownloadProducts = async () => {
-    setLoading((state) => ({ ...state, products: true }));
+    setLoading((s) => ({ ...s, products: true }));
+    updateProgress('products', 0, 0);
     try {
-      const products = await fetchProductsFromFirestore(productCollection);
+      const products = await fetchProductsFromFirestore(productCollection, (c, t) =>
+        updateProgress('products', c, t)
+      );
+
       let stockMap = null;
       try {
         stockMap = await cacheImmediateAvailabilityMap(true);
@@ -209,22 +270,25 @@ const DataScreen = () => {
       console.log('handleDownloadProducts error:', error);
       Alert.alert(STRINGS.alerts.error, STRINGS.sections.products.downloadError);
     } finally {
-      setLoading((state) => ({ ...state, products: false }));
+      setLoading((s) => ({ ...s, products: false }));
       refreshActions();
     }
   };
 
   const handleDownloadCustomers = async () => {
-    setLoading((state) => ({ ...state, customers: true }));
+    setLoading((s) => ({ ...s, customers: true }));
+    updateProgress('customers', 0, 0);
     try {
-      const customers = await fetchCustomersFromFirestore(customerCollection);
+      const customers = await fetchCustomersFromFirestore(customerCollection, (c, t) =>
+        updateProgress('customers', c, t)
+      );
       await saveCustomersToLocal(customers, brand);
       Alert.alert(STRINGS.alerts.success, MESSAGES.customersSaved(customers.length));
     } catch (error) {
       console.log('handleDownloadCustomers error:', error);
       Alert.alert(STRINGS.alerts.error, STRINGS.sections.customers.downloadError);
     } finally {
-      setLoading((state) => ({ ...state, customers: false }));
+      setLoading((s) => ({ ...s, customers: false }));
       refreshActions();
     }
   };
@@ -234,16 +298,19 @@ const DataScreen = () => {
       Alert.alert(STRINGS.alerts.error, SUPER_MARKET_UNAVAILABLE_MSG);
       return;
     }
-    setLoading((state) => ({ ...state, smStores: true }));
+    setLoading((s) => ({ ...s, smStores: true }));
+    updateProgress('smStores', 0, 0);
     try {
-      const stores = await fetchSuperMarketStores(brand);
+      const stores = await fetchSuperMarketStores(brand, (c, t) =>
+        updateProgress('smStores', c, t)
+      ); // fetch can ignore cb if not implemented; harmless
       await saveSuperMarketStoresToLocal(stores, brand);
       Alert.alert(STRINGS.alerts.success, MESSAGES.supermarketStoresSaved(stores.length));
     } catch (error) {
       console.log('handleDownloadSuperMarketStores error:', error);
       Alert.alert(STRINGS.alerts.error, STRINGS.sections.supermarketStores.downloadError);
     } finally {
-      setLoading((state) => ({ ...state, smStores: false }));
+      setLoading((s) => ({ ...s, smStores: false }));
       refreshActions();
     }
   };
@@ -253,7 +320,7 @@ const DataScreen = () => {
       Alert.alert(STRINGS.alerts.error, SUPER_MARKET_UNAVAILABLE_MSG);
       return;
     }
-    setLoading((state) => ({ ...state, smStoresClear: true }));
+    setLoading((s) => ({ ...s, smStoresClear: true }));
     try {
       await clearSuperMarketStoresLocal(brand);
       Alert.alert(STRINGS.alerts.cleared, STRINGS.clearedMessages.supermarketStores);
@@ -261,7 +328,7 @@ const DataScreen = () => {
       console.log('handleClearSuperMarketStores error:', error);
       Alert.alert(STRINGS.alerts.error, STRINGS.sections.supermarketStores.clearError);
     } finally {
-      setLoading((state) => ({ ...state, smStoresClear: false }));
+      setLoading((s) => ({ ...s, smStoresClear: false }));
       refreshActions();
     }
   };
@@ -271,16 +338,17 @@ const DataScreen = () => {
       Alert.alert(STRINGS.alerts.error, SUPER_MARKET_UNAVAILABLE_MSG);
       return;
     }
-    setLoading((state) => ({ ...state, smListings: true }));
+    setLoading((s) => ({ ...s, smListings: true }));
+    updateProgress('smListings', 0, 0);
     try {
-      const listings = await fetchSuperMarketListings(brand);
+      const listings = await fetchSuperMarketListings(brand, { onProgress: (c, t) => updateProgress('smListings', c, t) });
       await saveSuperMarketListingsToLocal(listings, brand);
       Alert.alert(STRINGS.alerts.success, MESSAGES.supermarketListingsSaved(listings.length));
     } catch (error) {
       console.log('handleDownloadSuperMarketListings error:', error);
       Alert.alert(STRINGS.alerts.error, STRINGS.sections.supermarketListings.downloadError);
     } finally {
-      setLoading((state) => ({ ...state, smListings: false }));
+      setLoading((s) => ({ ...s, smListings: false }));
       refreshActions();
     }
   };
@@ -290,7 +358,7 @@ const DataScreen = () => {
       Alert.alert(STRINGS.alerts.error, SUPER_MARKET_UNAVAILABLE_MSG);
       return;
     }
-    setLoading((state) => ({ ...state, smListingsClear: true }));
+    setLoading((s) => ({ ...s, smListingsClear: true }));
     try {
       await clearSuperMarketListingsLocal(brand);
       Alert.alert(STRINGS.alerts.cleared, STRINGS.clearedMessages.supermarketListings);
@@ -298,13 +366,13 @@ const DataScreen = () => {
       console.log('handleClearSuperMarketListings error:', error);
       Alert.alert(STRINGS.alerts.error, STRINGS.sections.supermarketListings.clearError);
     } finally {
-      setLoading((state) => ({ ...state, smListingsClear: false }));
+      setLoading((s) => ({ ...s, smListingsClear: false }));
       refreshActions();
     }
   };
 
   const handleClearProducts = async () => {
-    setLoading((state) => ({ ...state, prodClear: true }));
+    setLoading((s) => ({ ...s, prodClear: true }));
     try {
       await clearProductsLocal(brand);
       Alert.alert(STRINGS.alerts.cleared, STRINGS.clearedMessages.products);
@@ -312,13 +380,13 @@ const DataScreen = () => {
       console.log('handleClearProducts error:', error);
       Alert.alert(STRINGS.alerts.error, STRINGS.sections.products.clearError);
     } finally {
-      setLoading((state) => ({ ...state, prodClear: false }));
+      setLoading((s) => ({ ...s, prodClear: false }));
       refreshActions();
     }
   };
 
   const handleClearCustomers = async () => {
-    setLoading((state) => ({ ...state, custClear: true }));
+    setLoading((s) => ({ ...s, custClear: true }));
     try {
       await clearCustomersLocal(brand);
       Alert.alert(STRINGS.alerts.cleared, STRINGS.clearedMessages.customers);
@@ -326,38 +394,78 @@ const DataScreen = () => {
       console.log('handleClearCustomers error:', error);
       Alert.alert(STRINGS.alerts.error, STRINGS.sections.customers.clearError);
     } finally {
-      setLoading((state) => ({ ...state, custClear: false }));
+      setLoading((s) => ({ ...s, custClear: false }));
       refreshActions();
     }
   };
 
-  const handleDownloadImages = async () => {
-    setLoading((state) => ({ ...state, images: true }));
+  const safeDownload = async (code, url) => {
     try {
+      if (!url || !code) return false;
+      const cached = await downloadAndCacheImage(code, url);
+      return !!cached;
+    } catch {
+      return false;
+    }
+  };
+
+  const handleDownloadImages = async () => {
+    setLoading((s) => ({ ...s, images: true }));
+    updateProgress('imagesProducts', 0, 0);
+    updateProgress('imagesListings', 0, 0);
+    try {
+      // 1) products images
       const products = await getProductsFromLocal(brand);
+      const prodItems = Array.isArray(products) ? products.filter((p) => p?.productCode && p?.frontCover) : [];
+      updateProgress('imagesProducts', 0, prodItems.length);
+
       let success = 0;
       let failed = 0;
-
-      for (const product of products) {
-        if (product?.productCode && product?.frontCover) {
-          const cached = await downloadAndCacheImage(product.productCode, product.frontCover);
-          if (cached) success += 1;
-          else failed += 1;
-        }
+      for (let i = 0; i < prodItems.length; i += 1) {
+        const p = prodItems[i];
+        const ok = await safeDownload(p.productCode, p.frontCover);
+        if (ok) success += 1;
+        else failed += 1;
+        updateProgress('imagesProducts', i + 1, prodItems.length);
       }
 
-      Alert.alert(STRINGS.alerts.imageSummary, MESSAGES.imagesSummary(success, failed));
+      // 2) supermarket listings images (if brand supports)
+      let successListings = 0;
+      let failedListings = 0;
+      if (supportsSuperMarket) {
+        const listings = await fetchSuperMarketListings(brand);
+        const listItems = Array.isArray(listings)
+          ? listings.filter((l) => l?.productCode && l?.photoUrl)
+          : [];
+        updateProgress('imagesListings', 0, listItems.length);
+
+        for (let i = 0; i < listItems.length; i += 1) {
+          const l = listItems[i];
+          const ok = await safeDownload(l.productCode, l.photoUrl);
+          if (ok) successListings += 1;
+          else failedListings += 1;
+          updateProgress('imagesListings', i + 1, listItems.length);
+        }
+        await saveSuperMarketListingImagesLastAction?.(brand);
+      }
+
+      await saveImagesLastAction?.();
+
+      Alert.alert(
+        STRINGS.alerts.imageSummary,
+        MESSAGES.imagesSummary(success, failed, successListings, failedListings)
+      );
     } catch (error) {
       console.log('handleDownloadImages error:', error);
       Alert.alert(STRINGS.alerts.error, STRINGS.sections.images.downloadError);
     } finally {
-      setLoading((state) => ({ ...state, images: false }));
+      setLoading((s) => ({ ...s, images: false }));
       refreshActions();
     }
   };
 
   const handleClearImages = async () => {
-    setLoading((state) => ({ ...state, imgClear: true }));
+    setLoading((s) => ({ ...s, imgClear: true }));
     try {
       await clearProductImagesCache();
       Alert.alert(STRINGS.alerts.cleared, STRINGS.clearedMessages.images);
@@ -365,10 +473,17 @@ const DataScreen = () => {
       console.log('handleClearImages error:', error);
       Alert.alert(STRINGS.alerts.error, STRINGS.sections.images.clearError);
     } finally {
-      setLoading((state) => ({ ...state, imgClear: false }));
+      setLoading((s) => ({ ...s, imgClear: false }));
       refreshActions();
     }
   };
+
+  const Section = ({ title, children }) => (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>{title}</Text>
+      {children}
+    </View>
+  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -383,157 +498,163 @@ const DataScreen = () => {
           <Text style={styles.topBarText}>{STRINGS.nav.back}</Text>
         </TouchableOpacity>
       </View>
+
       <ScrollView contentContainerStyle={styles.content}>
         <Text style={styles.title}>{STRINGS.title}</Text>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{STRINGS.sections.products.title}</Text>
+        {/* Products */}
+        <Section title={STRINGS.sections.products.title}>
           <TouchableOpacity
             style={styles.primaryButton}
             onPress={handleDownloadProducts}
             disabled={loading.products}
           >
-            {loading.products ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>{STRINGS.sections.products.downloadBtn}</Text>
-            )}
+            {loading.products ? <ActivityIndicator color="#fff" /> :
+              <Text style={styles.buttonText}>{STRINGS.sections.products.downloadBtn}</Text>}
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.primaryButton, styles.dangerButton]}
             onPress={handleClearProducts}
             disabled={loading.prodClear}
           >
-            {loading.prodClear ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>{STRINGS.sections.products.clearBtn}</Text>
-            )}
+            {loading.prodClear ? <ActivityIndicator color="#fff" /> :
+              <Text style={styles.buttonText}>{STRINGS.sections.products.clearBtn}</Text>}
           </TouchableOpacity>
+          <ProgressRow
+            active={loading.products}
+            label={progress.products.label}
+            current={progress.products.current}
+            total={progress.products.total}
+          />
           <Text style={styles.status}>{formatAction(prodAction)}</Text>
-        </View>
+        </Section>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{STRINGS.sections.customers.title}</Text>
+        {/* Customers */}
+        <Section title={STRINGS.sections.customers.title}>
           <TouchableOpacity
             style={styles.primaryButton}
             onPress={handleDownloadCustomers}
             disabled={loading.customers}
           >
-            {loading.customers ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>{STRINGS.sections.customers.downloadBtn}</Text>
-            )}
+            {loading.customers ? <ActivityIndicator color="#fff" /> :
+              <Text style={styles.buttonText}>{STRINGS.sections.customers.downloadBtn}</Text>}
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.primaryButton, styles.dangerButton]}
             onPress={handleClearCustomers}
             disabled={loading.custClear}
           >
-            {loading.custClear ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>{STRINGS.sections.customers.clearBtn}</Text>
-            )}
+            {loading.custClear ? <ActivityIndicator color="#fff" /> :
+              <Text style={styles.buttonText}>{STRINGS.sections.customers.clearBtn}</Text>}
           </TouchableOpacity>
+          <ProgressRow
+            active={loading.customers}
+            label={progress.customers.label}
+            current={progress.customers.current}
+            total={progress.customers.total}
+          />
           <Text style={styles.status}>{formatAction(custAction)}</Text>
-        </View>
+        </Section>
 
+        {/* Supermarket sections */}
         {supportsSuperMarket && (
           <>
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>{STRINGS.sections.supermarketStores.title}</Text>
+            <Section title={STRINGS.sections.supermarketStores.title}>
               <TouchableOpacity
                 style={styles.primaryButton}
                 onPress={handleDownloadSuperMarketStores}
                 disabled={loading.smStores}
               >
-                {loading.smStores ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  <Text style={styles.buttonText}>{STRINGS.sections.supermarketStores.downloadBtn}</Text>
-                )}
+                {loading.smStores ? <ActivityIndicator color="#fff" /> :
+                  <Text style={styles.buttonText}>{STRINGS.sections.supermarketStores.downloadBtn}</Text>}
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.primaryButton, styles.dangerButton]}
                 onPress={handleClearSuperMarketStores}
                 disabled={loading.smStoresClear}
               >
-                {loading.smStoresClear ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  <Text style={styles.buttonText}>{STRINGS.sections.supermarketStores.clearBtn}</Text>
-                )}
+                {loading.smStoresClear ? <ActivityIndicator color="#fff" /> :
+                  <Text style={styles.buttonText}>{STRINGS.sections.supermarketStores.clearBtn}</Text>}
               </TouchableOpacity>
+              <ProgressRow
+                active={loading.smStores}
+                label={progress.smStores.label}
+                current={progress.smStores.current}
+                total={progress.smStores.total}
+              />
               <Text style={styles.status}>{formatAction(storeAction)}</Text>
-            </View>
+            </Section>
 
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>{STRINGS.sections.supermarketListings.title}</Text>
+            <Section title={STRINGS.sections.supermarketListings.title}>
               <TouchableOpacity
                 style={styles.primaryButton}
                 onPress={handleDownloadSuperMarketListings}
                 disabled={loading.smListings}
               >
-                {loading.smListings ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  <Text style={styles.buttonText}>{STRINGS.sections.supermarketListings.downloadBtn}</Text>
-                )}
+                {loading.smListings ? <ActivityIndicator color="#fff" /> :
+                  <Text style={styles.buttonText}>{STRINGS.sections.supermarketListings.downloadBtn}</Text>}
               </TouchableOpacity>
               <TouchableOpacity
                 style={[styles.primaryButton, styles.dangerButton]}
                 onPress={handleClearSuperMarketListings}
                 disabled={loading.smListingsClear}
               >
-                {loading.smListingsClear ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  <Text style={styles.buttonText}>{STRINGS.sections.supermarketListings.clearBtn}</Text>
-                )}
+                {loading.smListingsClear ? <ActivityIndicator color="#fff" /> :
+                  <Text style={styles.buttonText}>{STRINGS.sections.supermarketListings.clearBtn}</Text>}
               </TouchableOpacity>
+              <ProgressRow
+                active={loading.smListings}
+                label={progress.smListings.label}
+                current={progress.smListings.current}
+                total={progress.smListings.total}
+              />
               <Text style={styles.status}>{formatAction(listingAction)}</Text>
-            </View>
+            </Section>
           </>
         )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{STRINGS.sections.images.title}</Text>
+        {/* Images */}
+        <Section title={STRINGS.sections.images.title}>
           <TouchableOpacity
             style={styles.primaryButton}
             onPress={handleDownloadImages}
             disabled={loading.images}
           >
-            {loading.images ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>{STRINGS.sections.images.downloadBtn}</Text>
-            )}
+            {loading.images ? <ActivityIndicator color="#fff" /> :
+              <Text style={styles.buttonText}>{STRINGS.sections.images.downloadBtn}</Text>}
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.primaryButton, styles.dangerButton]}
             onPress={handleClearImages}
             disabled={loading.imgClear}
           >
-            {loading.imgClear ? (
-              <ActivityIndicator color="#fff" />
-            ) : (
-              <Text style={styles.buttonText}>{STRINGS.sections.images.clearBtn}</Text>
-            )}
+            {loading.imgClear ? <ActivityIndicator color="#fff" /> :
+              <Text style={styles.buttonText}>{STRINGS.sections.images.clearBtn}</Text>}
           </TouchableOpacity>
+
+          {/* Two separate progress rows for products & listings images */}
+          <ProgressRow
+            active={loading.images}
+            label={progress.imagesProducts.label}
+            current={progress.imagesProducts.current}
+            total={progress.imagesProducts.total}
+          />
+          <ProgressRow
+            active={loading.images}
+            label={progress.imagesListings.label}
+            current={progress.imagesListings.current}
+            total={progress.imagesListings.total}
+          />
+
           <Text style={styles.status}>{formatAction(imgAction)}</Text>
-        </View>
+        </Section>
       </ScrollView>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f4f6fb',
-  },
+  container: { flex: 1, backgroundColor: '#f4f6fb' },
   topBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -550,16 +671,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: '#e3f2fd',
   },
-  topBarText: {
-    marginLeft: 6,
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#1f4f8f',
-  },
-  content: {
-    padding: 20,
-    paddingBottom: 40,
-  },
+  topBarText: { marginLeft: 6, fontSize: 15, fontWeight: '600', color: '#1f4f8f' },
+  content: { padding: 20, paddingBottom: 40 },
   title: {
     fontSize: 26,
     fontWeight: '700',
@@ -579,12 +692,7 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     elevation: 2,
   },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#0f172a',
-    marginBottom: 12,
-  },
+  sectionTitle: { fontSize: 18, fontWeight: '600', color: '#0f172a', marginBottom: 12 },
   primaryButton: {
     backgroundColor: '#0d6efd',
     borderRadius: 10,
@@ -592,26 +700,35 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 10,
   },
-  dangerButton: {
-    backgroundColor: '#dc3545',
+  dangerButton: { backgroundColor: '#dc3545' },
+  buttonText: { color: '#fff', fontSize: 15, fontWeight: '600' },
+  status: { marginTop: 4, fontSize: 13, color: '#475569', fontStyle: 'italic' },
+
+  progressRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 6,
+    marginBottom: 6,
   },
-  buttonText: {
-    color: '#fff',
-    fontSize: 15,
-    fontWeight: '600',
+  progressLeft: {
+    width: 46,
+    height: 46,
+    marginRight: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  status: {
-    marginTop: 4,
-    fontSize: 13,
-    color: '#475569',
-    fontStyle: 'italic',
+  progressRight: { flex: 1 },
+  progressLabel: { fontSize: 13, color: '#0f172a', marginBottom: 6, fontWeight: '600' },
+  progressBarWrap: {
+    height: 8,
+    borderRadius: 6,
+    backgroundColor: '#e5efff',
+    overflow: 'hidden',
+  },
+  progressBarFill: {
+    height: 8,
+    backgroundColor: '#0d6efd',
   },
 });
 
 export default DataScreen;
-
-
-
-
-
-

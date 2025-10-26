@@ -1,4 +1,5 @@
-﻿import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+﻿// src/screens/SuperMarketProductSelectionScreen.js
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -7,838 +8,923 @@ import {
   TouchableOpacity,
   TextInput,
   SafeAreaView,
-  Platform,
-  KeyboardAvoidingView,
   ActivityIndicator,
   Keyboard,
   Image,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import { useOrder } from '../context/OrderContext';
-import { fetchSuperMarketListings } from '../services/supermarketData';
-import { getStoreInventory } from '../services/supermarketInventory';
-import { normalizeBrandKey } from '../constants/brands';
+  Alert,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import firestore from "@react-native-firebase/firestore";
+import { useOrder } from "../context/OrderContext";
+import { fetchSuperMarketListings, fetchBrandProductsByCodes } from "../services/supermarketData";
+import { getStoreInventory } from "../services/supermarketInventory";
+import { normalizeBrandKey } from "../constants/brands";
+import {
+  getProductByCode,
+  getStockByCode,
+  toNumberSafe,
+  canonicalCode,
+} from "../utils/codeNormalization";
 
-const SuperMarketProductSelectionScreen = ({ navigation, route }) => {
+const STORE_LOGOS = {
+  masoutis: require("../../assets/masoutis_logo.png"),
+  sklavenitis: require("../../assets/sklavenitis_logo.png"),
+};
+
+const detectStoreKey = (store) => {
+  const name = (store?.companyName || store?.storeName || "").toLowerCase();
+  if (name.includes("μασουτ") || name.includes("masout")) return "masoutis";
+  if (name.includes("σκλαβεν") || name.includes("sklavenit")) return "sklavenitis";
+  return null;
+};
+
+// ✅ Normalize Greek category codes
+const normalizeCategory = (value) => {
+  if (!value) return "";
+  return String(value).trim().toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+};
+
+const normalizeSearchText = (value) => {
+  if (value === null || value === undefined) return "";
+  return String(value)
+    .trim()
+    .toUpperCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+};
+
+export default function SuperMarketProductSelectionScreen({ navigation, route }) {
   const insets = useSafeAreaInsets();
   const listRef = useRef(null);
-  
-  const orderCtx = useOrder() || {};
+
+  const orderCtx = useOrder();
   const orderLines = Array.isArray(orderCtx.orderLines) ? orderCtx.orderLines : [];
-  const setOrderLines = typeof orderCtx.setOrderLines === 'function' ? orderCtx.setOrderLines : () => {};
-  
-  const { store, orderId, brand } = route?.params || {};
-  const normalizedBrand = useMemo(() => normalizeBrandKey(brand || 'john'), [brand]);
-  
+  const setOrderLines = orderCtx.setOrderLines || (() => {});
+
+  const { store, brand } = route?.params || {};
+  const normalizedBrand = useMemo(() => normalizeBrandKey(brand || "john"), [brand]);
+
   const [loading, setLoading] = useState(true);
   const [listings, setListings] = useState([]);
   const [inventory, setInventory] = useState({});
-  const [searchValue, setSearchValue] = useState('');
+  const [categoryOrder, setCategoryOrder] = useState([]);
+  const [searchValue, setSearchValue] = useState("");
   const [expandedCategories, setExpandedCategories] = useState({});
   const [error, setError] = useState(null);
   const [kbPad, setKbPad] = useState(0);
+  const [noListingsMessage, setNoListingsMessage] = useState(null);
 
-  // Load data on mount
+  const storeKey = detectStoreKey(store);
+
+  // Fetch data
   useEffect(() => {
     let mounted = true;
     const loadData = async () => {
-      if (!store?.storeCategory) {
-        setError('Store category not found');
-        setLoading(false);
-        return;
-      }
-
       try {
         setLoading(true);
-        setError(null);
-
-        console.log('Loading SuperMarket data for store:', store);
-        console.log('Store category:', store.storeCategory);
-        console.log('Store code:', store.storeCode);
-        console.log('Brand:', normalizedBrand);
-
-        // Load listings for the store category
-        const rawListings = await fetchSuperMarketListings(normalizedBrand, { onlyActive: true });
-        console.log('Raw listings loaded:', rawListings.length);
+        console.log("🔍 [SuperMarket Selection] ========== START ==========");
+        console.log("📦 Store Raw Data:", JSON.stringify(store, null, 2));
+        console.log("🏷️  Brand:", normalizedBrand);
         
-        // Filter by store category (Α, Β, Γ, Δ)
-        const categoryListings = rawListings.filter(listing => {
-          const storeCategory = store.storeCategory?.toUpperCase();
-          console.log('Checking listing:', listing.productCode, 'against store category:', storeCategory);
-          console.log('Listing flags:', { isAActive: listing.isAActive, isBActive: listing.isBActive, isCActive: listing.isCActive });
+        const rawListings = await fetchSuperMarketListings(normalizedBrand);
+        console.log("📋 Total listings fetched:", rawListings.length);
+
+        if (rawListings.length) {
+          const sampleListing = rawListings[0];
+          console.log("📝 Listing sample:", {
+            productCode: sampleListing?.productCode,
+            masterCode: sampleListing?.masterCode,
+            storeCode: store.storeCode,
+          });
+        } else {
+          console.log("⚠️ No listings returned for brand:", normalizedBrand);
+        }
+
+        // ✅ Normalize store categories
+        const storeCat = normalizeCategory(store?.storeCategory || store?.hasToys || store?.category || "");
+        const summerType = normalizeCategory(store?.hasSummerItems || "");
+        const isSummerStore = !!summerType;
+
+        console.log("🏪 Store Category (normalized):", storeCat);
+        console.log("☀️  Summer Type (normalized):", summerType);
+        console.log("🌞 Is Summer Store:", isSummerStore);
+
+        // ✅ Toy category matching (Α, Β, Γ, Δ)
+        const matchesToys = (p) => {
+          console.log(`  🧸 Checking toy match for ${p.productCode}:`, {
+            storeCat,
+            isAActive: p.isAActive,
+            isBActive: p.isBActive,
+            isCActive: p.isCActive,
+            isActive: p.isActive,
+          });
+
+          if (storeCat === "Α" || storeCat === "A") return p.isAActive === true;
+          if (storeCat === "Β" || storeCat === "B") return p.isBActive === true;
+          if (storeCat === "Γ" || storeCat === "C" || storeCat === "G") return p.isCActive === true;
+          if (/^[ΔDEEZ]/.test(storeCat)) return p.isActive === true;
+          return false;
+        };
+
+        // ✅ Summer category matching
+        const matchesSummer = (p) => {
+          if (!isSummerStore) return false;
+
+          console.log(`  ☀️ Checking summer match for ${p.productCode}:`, {
+            summerType,
+            isSummerActiveGrand: p.isSummerActiveGrand,
+            isSummerActiveMegalaPlus: p.isSummerActiveMegalaPlus,
+            isSummerActiveMegala: p.isSummerActiveMegala,
+            isSummerActiveMesaia: p.isSummerActiveMesaia,
+            isSummerActiveMikra: p.isSummerActiveMikra,
+          });
+
+          if (summerType.includes("GRAND")) return p.isSummerActiveGrand === true;
+          if (summerType.includes("PLUS")) return p.isSummerActiveMegalaPlus === true;
+          if (summerType.includes("ΜΕΓΑΛΑ") || summerType.includes("ΜΕΓΑΛ")) return p.isSummerActiveMegala === true;
+          if (summerType.includes("ΜΕΣΑΙΑ") || summerType.includes("ΜΕΣ")) return p.isSummerActiveMesaia === true;
+          if (summerType.includes("ΜΙΚΡΑ") || summerType.includes("ΜΙΚΡ")) return p.isSummerActiveMikra === true;
+          return false;
+        };
+
+        const filtered = rawListings.filter((p) => {
+          const toyMatch = matchesToys(p);
+          const summerMatch = matchesSummer(p);
+          const matches = toyMatch || summerMatch;
           
-          if (storeCategory === 'Α' || storeCategory === 'A') return listing.isAActive;
-          if (storeCategory === 'Β' || storeCategory === 'B') return listing.isBActive;
-          if (storeCategory === 'Γ' || storeCategory === 'C') return listing.isCActive;
-          if (storeCategory === 'Δ' || storeCategory === 'D') return listing.isCActive; // Assuming Δ maps to C for now
-          return listing.isActive; // fallback
+          if (matches) {
+            console.log(`✅ Product ${p.productCode} matches! (toy: ${toyMatch}, summer: ${summerMatch})`);
+          }
+          
+          return matches;
         });
 
-        console.log('Category listings after filter:', categoryListings.length);
+        console.log("✅ Filtered listings count:", filtered.length);
+        
+        const listingSummaryFor = (listing) => ({
+          storeCode: store?.storeCode || null,
+          storeName: store?.storeName || null,
+          category: listing?.productCategory || null,
+          listingId: listing?.id || `${store?.storeCode || 'store'}_${listing?.productCode || 'code'}`,
+          packaging: listing?.packaging || null,
+          price: toNumberSafe(listing?.price, null),
+          isNew: Boolean(listing?.isNew),
+          brand: normalizedBrand,
+        });
 
-        // Load inventory for the specific store
-        const storeInventory = await getStoreInventory(store.storeCode);
-        console.log('Store inventory loaded:', Object.keys(storeInventory).length, 'items');
+        const findBaseProduct = (listing, productMap) => {
+          if (!listing || !productMap || productMap.size === 0) {
+            return null;
+          }
+          const candidates = [
+            listing.productCode,
+            listing.masterCode,
+            listing.displayProductCode,
+            listing.code,
+          ];
+          for (const candidate of candidates) {
+            if (!candidate) continue;
+            const raw = String(candidate).trim();
+            if (!raw) continue;
+            const upper = raw.toUpperCase();
+            if (productMap.has(upper)) {
+              return productMap.get(upper);
+            }
+            const canon = canonicalCode(raw);
+            if (canon && productMap.has(canon)) {
+              return productMap.get(canon);
+            }
+          }
+          return null;
+        };
+
+        let enrichedListings = filtered;
+
+        if (filtered.length && normalizedBrand === "john") {
+          try {
+            const lookupCodes = Array.from(
+              new Set(
+                filtered
+                  .flatMap((item) => [
+                    item?.productCode,
+                    item?.masterCode,
+                    item?.displayProductCode,
+                  ])
+                  .filter((code) => typeof code === "string" && code.trim().length > 0)
+              )
+            );
+
+            const productMap = await fetchBrandProductsByCodes(normalizedBrand, lookupCodes);
+
+            enrichedListings = filtered.map((listing) => {
+              const baseProduct = findBaseProduct(listing, productMap);
+              const summary = listingSummaryFor(listing);
+
+              const baseListingsRaw = baseProduct
+                ? [
+                    ...(Array.isArray(baseProduct.activeSupermarketListings)
+                      ? baseProduct.activeSupermarketListings
+                      : []),
+                    ...(Array.isArray(baseProduct.supermarketListings)
+                      ? baseProduct.supermarketListings
+                      : []),
+                  ]
+                : [];
+
+              const combinedListings = [...baseListingsRaw, summary];
+              const dedupedListings = [];
+              const seen = new Set();
+              combinedListings.forEach((entry) => {
+                if (!entry) return;
+                const key = [
+                  entry.storeCode || "",
+                  entry.category || "",
+                  entry.listingId || entry.productCode || entry.code || "",
+                ].join("|");
+                if (seen.has(key)) {
+                  return;
+                }
+                seen.add(key);
+                dedupedListings.push(entry);
+              });
+
+              if (!baseProduct) {
+                return {
+                  ...listing,
+                  srp: toNumberSafe(
+                    listing?.srp ??
+                      (listing?.price != null ? listing.price * 1.24 : 0),
+                    0
+                  ),
+                  activeSupermarketListings: dedupedListings,
+                  baseProduct: null,
+                };
+              }
+
+              const mergedWholesale = toNumberSafe(
+                baseProduct.wholesalePrice ??
+                  listing.price ??
+                  baseProduct.price,
+                toNumberSafe(listing.price, 0)
+              );
+
+              const mergedPrice = toNumberSafe(
+                listing.price ?? baseProduct.wholesalePrice ?? baseProduct.price,
+                mergedWholesale
+              );
+
+              const mergedSrp = toNumberSafe(
+                baseProduct.srp ??
+                  listing.srp ??
+                  (listing.price != null ? listing.price * 1.24 : 0),
+                0
+              );
+
+              return {
+                ...baseProduct,
+                ...listing,
+                description: baseProduct.description || listing.description,
+                wholesalePrice: mergedWholesale,
+                price: mergedPrice,
+                srp: mergedSrp,
+                packaging: listing.packaging || baseProduct.packaging,
+                barcode: listing.barcode || baseProduct.barcode,
+                photoUrl:
+                  listing.photoUrl ||
+                  baseProduct.photoUrl ||
+                  baseProduct.imageUrl,
+                baseProduct,
+                activeSupermarketListings: dedupedListings,
+              };
+            });
+          } catch (mergeError) {
+            console.warn("[SuperMarket] Failed to merge base product info:", mergeError);
+            enrichedListings = filtered.map((listing) => ({
+              ...listing,
+              srp: toNumberSafe(
+                listing?.srp ??
+                  (listing?.price != null ? listing.price * 1.24 : 0),
+                0
+              ),
+              activeSupermarketListings: [listingSummaryFor(listing)],
+              baseProduct: null,
+            }));
+          }
+        } else {
+          enrichedListings = filtered.map((listing) => ({
+            ...listing,
+            srp: toNumberSafe(
+              listing?.srp ?? (listing?.price != null ? listing.price * 1.24 : 0),
+              0
+            ),
+            activeSupermarketListings: [listingSummaryFor(listing)],
+            baseProduct: null,
+          }));
+        }
+
+        if (enrichedListings.length > 0) {
+          console.log(
+            "📄 First 3 matching products:",
+            enrichedListings.slice(0, 3).map((p) => ({
+              code: p.productCode,
+              desc: p.description,
+              category: p.productCategory,
+              merged: Boolean(p.baseProduct),
+            }))
+          );
+        }
+
+        let msg = null;
+        if (!enrichedListings.length) {
+          const toyLabelRaw = store?.hasToys ?? store?.storeCategory ?? "?";
+          const summerLabelRaw = store?.hasSummerItems ?? "";
+          const toyLabel = String(toyLabelRaw ?? "-").trim() || "-";
+          const summerLabel = String(summerLabelRaw ?? "-").trim() || "-";
+          msg = `Το κατάστημα ${store?.storeCode || ""} ${store?.storeName || ""} με κατηγορία παιχνιδιών ${toyLabel} και κατηγορία καλοκαιρινών ${summerLabel} δεν έχει ενεργά προϊόντα στη λίστα του.`.trim();
+          console.warn(msg);
+          console.log("⚠️ Debug: Sample listing flags:", rawListings[0]);
+        }
+
+        console.log("📦 Loading inventory for store:", store.storeCode);
+        const inv = await getStoreInventory(store.storeCode);
+        const inventoryKeys = Object.keys(inv);
+        console.log("📦 Inventory loaded:", inventoryKeys.length, "items");
+        
+        if (inventoryKeys.length === 0) {
+          console.log("⚠️ Inventory empty for store:", store.storeCode, "brand:", normalizedBrand);
+        } else {
+          const sampleKey = inventoryKeys[0];
+          console.log("📦 Sample inventory entry:", { key: sampleKey, entry: inv[sampleKey] });
+        }
+        
+        const orderDoc = await firestore()
+          .collection("supermarket_meta")
+          .doc("category_order")
+          .get();
 
         if (mounted) {
-          setListings(categoryListings);
-          setInventory(storeInventory);
+          setListings(enrichedListings);
+          setInventory(inv);
+          setCategoryOrder(orderDoc.exists ? orderDoc.data().order || [] : []);
+          const expand = {};
+          enrichedListings.forEach((p) => (expand[p.productCategory || "Άλλα"] = true));
+          setExpandedCategories(expand);
+          setNoListingsMessage(msg);
         }
+
+        console.log("🔍 [SuperMarket Selection] ========== END ==========", {
+          storeCode: store.storeCode,
+          listings: filtered.length,
+          inventory: inventoryKeys.length,
+        });
       } catch (err) {
-        console.error('Failed to load SuperMarket data', err);
-        if (mounted) {
-          setError(`Αδυναμία φόρτωσης των προϊόντων: ${err.message}`);
-          setListings([]);
-          setInventory({});
-        }
+        console.error("❌ [SuperMarket] loadData error:", err);
+        console.error("Stack:", err.stack);
+        if (mounted) setError("Αδυναμία φόρτωσης δεδομένων");
       } finally {
-        if (mounted) {
-          setLoading(false);
-        }
+        if (mounted) setLoading(false);
       }
     };
-
     loadData();
-    return () => { mounted = false; };
+    return () => (mounted = false);
   }, [store, normalizedBrand]);
 
-  // Keyboard handling
+  // Keyboard adjust
   useEffect(() => {
-    const show = Keyboard.addListener('keyboardDidShow', (e) => {
-      const h = e?.endCoordinates?.height || 0;
-      setKbPad(h > 0 ? h : 0);
-    });
-    const hide = Keyboard.addListener('keyboardDidHide', () => setKbPad(0));
-    return () => { show.remove(); hide.remove(); };
+    const show = Keyboard.addListener("keyboardDidShow", (e) =>
+      setKbPad(e?.endCoordinates?.height || 0)
+    );
+    const hide = Keyboard.addListener("keyboardDidHide", () => setKbPad(0));
+    return () => {
+      show.remove();
+      hide.remove();
+    };
   }, []);
 
-  // Group products by category
+  const filteredListings = useMemo(() => {
+    if (!searchValue) return listings;
+    const query = normalizeSearchText(searchValue);
+    if (!query) return listings;
+
+    const tokens = query.split(/\s+/).filter(Boolean);
+    if (!tokens.length) return listings;
+
+    return listings.filter((item) => {
+      const searchPool = [
+        item.displayProductCode,
+        item.productCode,
+        item.masterCode,
+        item.description,
+        item.productCategory,
+        item.category,
+        item.categoryPath,
+        item.brand,
+        item.subBrand,
+        item.packaging,
+        item.barcode,
+        item.supplierCode,
+        item.supplier,
+      ];
+
+      if (Array.isArray(item.tags)) {
+        searchPool.push(item.tags.join(" "));
+      }
+      if (Array.isArray(item.keywords)) {
+        searchPool.push(item.keywords.join(" "));
+      }
+      if (item.attributes && typeof item.attributes === "object") {
+        Object.values(item.attributes).forEach((val) => {
+          if (val) searchPool.push(val);
+        });
+      }
+
+      const combined = searchPool
+        .filter(Boolean)
+        .map((val) => normalizeSearchText(val))
+        .join(" ");
+
+      if (!combined) return false;
+      return tokens.every((token) => combined.includes(token));
+    });
+  }, [listings, searchValue]);
+  // Group products
   const groupedProducts = useMemo(() => {
     const groups = {};
-    
-    listings.forEach(listing => {
-      const category = listing.productCategory || listing.category || 'Άλλα';
-      if (!groups[category]) {
-        groups[category] = [];
-      }
-      
-      const currentStock = inventory[listing.productCode] || 0;
-      const suggestedQty = listing.suggestedQty || 0;
-      
-      groups[category].push({
-        ...listing,
-        currentStock: Number(currentStock),
-        suggestedQty: Number(suggestedQty),
-        srp: listing.price ? (listing.price * 1.24).toFixed(2) : null,
+    filteredListings.forEach((l) => {
+      const cat = l.productCategory || "Άλλα";
+      if (!groups[cat]) groups[cat] = [];
+      groups[cat].push({
+        ...l,
+        currentStock: getStockByCode(l.productCode, inventory),
+        srp: toNumberSafe(
+          l.srp ?? (l.price != null ? l.price * 1.24 : 0),
+          0
+        ),
       });
     });
-
-    // Sort categories and products within categories
-    const sortedGroups = {};
-    Object.keys(groups).sort().forEach(category => {
-      sortedGroups[category] = groups[category].sort((a, b) => 
-        (a.description || '').localeCompare(b.description || '')
-      );
+    const sorted = {};
+    const order = categoryOrder.length ? categoryOrder : Object.keys(groups).sort();
+    order.forEach((c) => {
+      if (groups[c]) sorted[c] = groups[c];
     });
+    console.log("📊 Grouped products:", Object.keys(sorted).map(k => `${k}: ${sorted[k].length}`).join(", "));
+    return sorted;
+  }, [filteredListings, inventory, categoryOrder]);
 
-    return sortedGroups;
-  }, [listings, inventory]);
-
-  // Filter products based on search
-  const filteredProducts = useMemo(() => {
-    if (!searchValue.trim()) return groupedProducts;
-    
-    const query = searchValue.toLowerCase().trim();
-    const filtered = {};
-    
-    Object.keys(groupedProducts).forEach(category => {
-      const categoryProducts = groupedProducts[category].filter(product => 
-        (product.productCode || '').toLowerCase().includes(query) ||
-        (product.description || '').toLowerCase().includes(query) ||
-        (product.barcode || '').toLowerCase().includes(query)
-      );
-      
-      if (categoryProducts.length > 0) {
-        filtered[category] = categoryProducts;
-      }
-    });
-    
-    return filtered;
-  }, [groupedProducts, searchValue]);
-
-  // Get quantity for a product
   const qtyFor = useMemo(() => {
     const map = new Map();
-    orderLines.forEach(line => {
-      if (line?.productCode) {
-        map.set(line.productCode, Number(line.quantity || 0));
-      }
-    });
+    orderLines.forEach((l) => map.set(l.productCode, toNumberSafe(l.quantity, 0)));
     return map;
   }, [orderLines]);
 
-  // Calculate totals
-  const totals = useMemo(() => {
-    let totalItems = 0;
-    let totalValue = 0;
+  const updateQuantity = (code, newQty) => {
+    const quantity = Math.max(0, toNumberSafe(newQty, 0));
+    console.log(`📝 Update quantity: ${code} -> ${quantity}`);
     
-    orderLines.forEach(line => {
-      const qty = Number(line.quantity || 0);
-      const price = Number(line.price || 0);
-      totalItems += qty;
-      totalValue += qty * price;
-    });
-    
-    return { totalItems, totalValue };
-  }, [orderLines]);
-
-  // Toggle category expansion
-  const toggleCategory = useCallback((category) => {
-    setExpandedCategories(prev => ({
-      ...prev,
-      [category]: !prev[category]
-    }));
-  }, []);
-
-  // Update product quantity
-  const updateQuantity = useCallback((productCode, newQty) => {
-    const quantity = Math.max(0, Number(newQty) || 0);
-    
-    setOrderLines(prevLines => {
-      const existingIndex = prevLines.findIndex(line => line.productCode === productCode);
+    setOrderLines((prev) => {
+      const idx = prev.findIndex((l) => l.productCode === code);
+      if (quantity === 0) return idx >= 0 ? prev.filter((_, i) => i !== idx) : prev;
       
-      if (quantity === 0) {
-        // Remove from order if quantity is 0
-        if (existingIndex >= 0) {
-          return prevLines.filter((_, index) => index !== existingIndex);
-        }
-        return prevLines;
+      const product = getProductByCode(code, listings);
+      if (!product) {
+        console.warn(`⚠️ Product not found: ${code}`);
+        return prev;
       }
       
-      const product = listings.find(p => p.productCode === productCode);
-      if (!product) return prevLines;
-      
-      const inventoryItem = inventory[productCode];
+      const wholesale = toNumberSafe(product.price, 0);
       const newLine = {
-        productCode,
+        productCode: code,
+        displayProductCode: product.displayProductCode || product.productCode || code,
         description: product.description,
-        barcode: product.barcode,
-        price: Number(product.price || 0),
+        price: wholesale,
+        wholesalePrice: wholesale,
         quantity,
         packaging: product.packaging,
-        srp: product.srp,
+        currentStock: getStockByCode(code, inventory),
+        photoUrl: product.photoUrl,
+        barcode: product.barcode,
+        suggestedQty: product.suggestedQty,
         isNew: product.isNew,
-        currentStock: inventoryItem?.stockQty || 0,
-        suggestedQty: product.suggestedQty || 0,
-        masterCode: inventoryItem?.masterCode,
+        srp: wholesale * 1.24,
       };
       
-      if (existingIndex >= 0) {
-        // Update existing line
-        const updated = [...prevLines];
-        updated[existingIndex] = newLine;
-        return updated;
-      } else {
-        // Add new line
-        return [...prevLines, newLine];
+      if (idx >= 0) {
+        const up = [...prev];
+        up[idx] = newLine;
+        return up;
       }
+      return [...prev, newLine];
     });
-  }, [listings, inventory, setOrderLines]);
+  };
 
-  // Add all suggested products
-  const addAllSuggested = useCallback(() => {
-    const suggestedProducts = Object.values(filteredProducts)
-      .flat()
-      .filter(product => product.suggestedQty > 0);
-    
-    suggestedProducts.forEach(product => {
-      const currentQty = qtyFor.get(product.productCode) || 0;
-      if (currentQty === 0) {
-        updateQuantity(product.productCode, product.suggestedQty);
-      }
-    });
-  }, [filteredProducts, qtyFor, updateQuantity]);
+  const handleExpandAll = () => {
+    const map = {};
+    Object.keys(groupedProducts).forEach((cat) => (map[cat] = true));
+    setExpandedCategories(map);
+  };
+  
+  const handleCollapseAll = () => {
+    const map = {};
+    Object.keys(groupedProducts).forEach((cat) => (map[cat] = false));
+    setExpandedCategories(map);
+  };
 
-  // Navigation handlers
-  const handleBack = useCallback(() => {
-    navigation.goBack();
-  }, [navigation]);
+  const handleContinue = () => {
+    if (orderLines.length === 0) {
+      Alert.alert(
+        "Κενή παραγγελία",
+        "Δεν έχετε επιλέξει κανένα προϊόν. Θέλετε να συνεχίσετε;",
+        [
+          { text: "Όχι", style: "cancel" },
+          { 
+            text: "Ναι", 
+            onPress: () => {
+              navigation.navigate("SuperMarketOrderReview", {
+                store,
+                orderId: route?.params?.orderId,
+                brand: normalizedBrand,
+              });
+            }
+          },
+        ]
+      );
+      return;
+    }
 
-  const handleNext = useCallback(() => {
-    navigation.navigate('SuperMarketOrderReview', {
+    navigation.navigate("SuperMarketOrderReview", {
       store,
-      orderId,
+      orderId: route?.params?.orderId,
       brand: normalizedBrand,
     });
-  }, [navigation, store, orderId, normalizedBrand]);
+  };
 
-  // Render category header
-  const renderCategoryHeader = useCallback(({ item: category }) => {
-    const isExpanded = expandedCategories[category];
-    const products = filteredProducts[category] || [];
-    const categoryTotal = products.reduce((sum, product) => {
-      const qty = qtyFor.get(product.productCode) || 0;
-      return sum + qty;
-    }, 0);
+  const goToStoreSelection = useCallback(() => {
+    navigation.navigate("SuperMarketOrderFlow", { brand: normalizedBrand });
+  }, [navigation, normalizedBrand]);
 
+  const renderProduct = ({ item }) => {
+    const q = qtyFor.get(item.productCode) || 0;
+    const displayCode = item.displayProductCode || item.productCode;
     return (
       <TouchableOpacity
-        style={styles.categoryHeader}
-        onPress={() => toggleCategory(category)}
-        activeOpacity={0.7}
+        style={styles.card}
+        activeOpacity={0.85}
+        onPress={() => {
+          console.log("🔗 Navigate to ProductDetail:", item.productCode);
+          navigation.push("ProductDetail", {
+            product: item,
+            brand: normalizedBrand,
+            fromListing: true,
+            fromOrderFlow: true,
+          });
+        }}
       >
-        <View style={styles.categoryHeaderContent}>
-          <Text style={styles.categoryTitle}>{category}</Text>
-          <View style={styles.categoryBadge}>
-            <Text style={styles.categoryBadgeText}>
-              {products.length} προϊόντα
-              {categoryTotal > 0 && ` • ${categoryTotal} τεμ.`}
-            </Text>
-          </View>
-        </View>
-        <Ionicons
-          name={isExpanded ? 'chevron-up' : 'chevron-down'}
-          size={20}
-          color="#6b7280"
+        <Image
+          source={{ uri: item.photoUrl }}
+          style={styles.productImage}
+          resizeMode="contain"
         />
-      </TouchableOpacity>
-    );
-  }, [expandedCategories, filteredProducts, qtyFor, toggleCategory]);
-
-  // Render product row
-  const renderProductRow = useCallback(({ item: product }) => {
-    const currentQty = qtyFor.get(product.productCode) || 0;
-    const stockLevel = product.currentStock;
-    const stockColor = stockLevel > 10 ? '#10b981' : stockLevel > 0 ? '#f59e0b' : '#ef4444';
-    const inventoryItem = inventory[product.productCode];
-    
-    return (
-      <View style={styles.productRow}>
-        <View style={styles.productImageContainer}>
-          {product.photoUrl ? (
-            <Image source={{ uri: product.photoUrl }} style={styles.productImage} />
-          ) : (
-            <View style={styles.productImagePlaceholder}>
-              <Ionicons name="image-outline" size={24} color="#9ca3af" />
-            </View>
-          )}
-        </View>
-        
-        <View style={styles.productInfo}>
-          <Text style={styles.productCode}>{product.productCode}</Text>
-          {inventoryItem?.masterCode && (
-            <Text style={styles.masterCode}>Κωδ. SuperMarket: {inventoryItem.masterCode}</Text>
-          )}
-          <Text style={styles.productDescription} numberOfLines={2}>
-            {product.description}
+        <View style={styles.productCenter}>
+          <Text style={styles.productTitle} numberOfLines={1}>
+            {displayCode} – {item.description}
           </Text>
-          
-          <View style={styles.productDetails}>
-            <View style={styles.stockContainer}>
-              <View style={[styles.stockIndicator, { backgroundColor: stockColor }]} />
-              <Text style={styles.stockText}>
-                Απόθεμα: {stockLevel} τεμ.
-              </Text>
-            </View>
-            
-            {product.suggestedQty > 0 && (
-              <Text style={styles.suggestedText}>
-                Προτεινόμενη: {product.suggestedQty} τεμ.
-              </Text>
-            )}
-            
-            {product.isNew && (
-              <View style={styles.newBadge}>
-                <Text style={styles.newBadgeText}>ΝΕΟ</Text>
-              </View>
-            )}
-          </View>
-          
-          <View style={styles.priceRow}>
-            <Text style={styles.priceText}>
-              Τιμή: €{product.price?.toFixed(2) || '0.00'}
-            </Text>
-            {product.srp && (
-              <Text style={styles.srpText}>
-                Λιανική: €{product.srp}
-              </Text>
-            )}
-          </View>
+          <Text style={styles.subInfo}>
+            Απόθεμα: <Text style={styles.bold}>{item.currentStock ?? "n/a"}</Text> | Π.Λ.Τ.:{" "}
+            <Text style={styles.bold}>{item.srp.toFixed(2)}€</Text> | Συσκ:{" "}
+            <Text style={styles.bold}>{item.packaging || "-"}</Text>
+          </Text>
         </View>
-        
-        <View style={styles.quantityContainer}>
+        <View style={styles.qtyBox}>
           <TouchableOpacity
-            style={styles.qtyButton}
-            onPress={() => updateQuantity(product.productCode, currentQty - 1)}
-            disabled={currentQty <= 0}
+            onPress={() => updateQuantity(item.productCode, q - 1)}
+            style={styles.qtyBtn}
           >
-            <Ionicons name="remove" size={16} color={currentQty > 0 ? "#374151" : "#9ca3af"} />
+            <Text style={styles.qtyBtnText}>−</Text>
           </TouchableOpacity>
-          
           <TextInput
             style={styles.qtyInput}
-            value={currentQty.toString()}
-            onChangeText={(text) => updateQuantity(product.productCode, text)}
             keyboardType="numeric"
+            value={String(q)}
             selectTextOnFocus
+            onChangeText={(v) => updateQuantity(item.productCode, v)}
           />
-          
           <TouchableOpacity
-            style={styles.qtyButton}
-            onPress={() => updateQuantity(product.productCode, currentQty + 1)}
+            onPress={() => updateQuantity(item.productCode, q + 1)}
+            style={styles.qtyBtn}
           >
-            <Ionicons name="add" size={16} color="#374151" />
+            <Text style={styles.qtyBtnText}>+</Text>
           </TouchableOpacity>
         </View>
+      </TouchableOpacity>
+    );
+  };
+
+  const renderGroup = ({ item }) => {
+    const expanded = expandedCategories[item.category] ?? true;
+    const items = groupedProducts[item.category] || [];
+    return (
+      <View>
+        <TouchableOpacity
+          onPress={() =>
+            setExpandedCategories((p) => ({ ...p, [item.category]: !expanded }))
+          }
+          style={styles.groupHeader}
+        >
+          <Text style={styles.groupTitle}>
+            {item.category} ({items.length})
+          </Text>
+          <Ionicons
+            name={expanded ? "chevron-up" : "chevron-down"}
+            size={18}
+            color="#fff"
+          />
+        </TouchableOpacity>
+        {expanded && (
+          <FlatList
+            data={items}
+            keyExtractor={(it) => it.productCode}
+            renderItem={renderProduct}
+          />
+        )}
       </View>
     );
-  }, [qtyFor, updateQuantity]);
+  };
 
-  // Render list item
-  const renderListItem = useCallback(({ item }) => {
-    if (item.type === 'category') {
-      return renderCategoryHeader({ item: item.category });
-    }
-    
-    if (item.type === 'product') {
-      return renderProductRow({ item: item.product });
-    }
-    
-    return null;
-  }, [renderCategoryHeader, renderProductRow]);
-
-  // Build flat list data
-  const listData = useMemo(() => {
-    const data = [];
-    
-    Object.keys(filteredProducts).forEach(category => {
-      data.push({ type: 'category', category });
-      
-      if (expandedCategories[category]) {
-        const products = filteredProducts[category];
-        products.forEach(product => {
-          data.push({ type: 'product', product });
-        });
-      }
-    });
-    
-    return data;
-  }, [filteredProducts, expandedCategories]);
-
-  if (loading) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-            <Ionicons name="chevron-back" size={24} color="#0f172a" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Επιλογή Προϊόντων</Text>
-          <View style={styles.headerSpacer} />
-        </View>
-        <ActivityIndicator size="large" color="#1976d2" style={{ marginTop: 40 }} />
-      </SafeAreaView>
-    );
-  }
-
-  if (error) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.header}>
-          <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-            <Ionicons name="chevron-back" size={24} color="#0f172a" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Επιλογή Προϊόντων</Text>
-          <View style={styles.headerSpacer} />
-        </View>
-        <View style={styles.errorContainer}>
-          <Ionicons name="alert-circle-outline" size={48} color="#ef4444" />
-          <Text style={styles.errorText}>{error}</Text>
-          <TouchableOpacity style={styles.retryButton} onPress={() => navigation.goBack()}>
-            <Text style={styles.retryButtonText}>Πίσω</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    );
-  }
+  const categories = Object.keys(groupedProducts).map((category) => ({ category }));
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { paddingTop: insets.top }]}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-          <Ionicons name="chevron-back" size={24} color="#0f172a" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Επιλογή Προϊόντων</Text>
-        <View style={styles.headerSpacer} />
-      </View>
-
-      <View style={styles.storeInfo}>
-        <Text style={styles.storeName}>{store?.storeName}</Text>
-        <Text style={styles.storeCode}>Κωδικός: {store?.storeCode}</Text>
-        <Text style={styles.storeCategory}>Κατηγορία: {store?.storeCategory}</Text>
-      </View>
-
-      <View style={styles.searchRow}>
-        <Ionicons name="search" size={18} color="#6b7280" style={{ marginRight: 6 }} />
-        <TextInput
-          value={searchValue}
-          onChangeText={setSearchValue}
-          placeholder="Αναζήτηση προϊόντων..."
-          placeholderTextColor="#9ca3af"
-          style={styles.searchInput}
-        />
-      </View>
-
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <FlatList
-          ref={listRef}
-          data={listData}
-          keyExtractor={(item, index) => `${item.type}-${index}`}
-          renderItem={renderListItem}
-          contentContainerStyle={{ paddingBottom: 160 + (Platform.OS === 'android' ? kbPad : 0) }}
-          keyboardShouldPersistTaps="handled"
-          keyboardDismissMode="on-drag"
-          ListEmptyComponent={
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyText}>
-                {searchValue ? 'Δεν βρέθηκαν προϊόντα' : 'Δεν υπάρχουν διαθέσιμα προϊόντα'}
-              </Text>
-            </View>
-          }
-        />
-
-        <View style={styles.actionButtons}>
-          <TouchableOpacity
-            style={styles.addAllButton}
-            onPress={addAllSuggested}
-            disabled={Object.values(filteredProducts).flat().filter(p => p.suggestedQty > 0).length === 0}
-          >
-            <Text style={styles.addAllButtonText}>Προσθήκη Όλων</Text>
-          </TouchableOpacity>
-        </View>
-
-        <View style={[styles.fabWrap, { bottom: Math.max(insets.bottom + 16, 16) + (Platform.OS === 'android' ? kbPad : 0) }]}>
-          <TouchableOpacity
-            disabled={totals.totalItems <= 0}
-            onPress={handleNext}
-            activeOpacity={0.9}
-            style={[styles.fab, totals.totalItems <= 0 && styles.fabDisabled]}
-          >
-            <Text style={styles.fabText}>
-              Σύνολο | {totals.totalItems} τεμ. | €{totals.totalValue.toFixed(2)}
+        <View style={styles.headerTopRow}>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.storeLine}>
+              {store.storeCode} – {store.storeName}
             </Text>
+            <Text style={styles.storeSubLine}>
+              Κατ: {store.category || "-"} | Παιχνίδια: {store.hasToys || "-"} | Καλοκαιρινά: {store.hasSummerItems || "-"}
+            </Text>
+          </View>
+          {storeKey && (
+            <Image source={STORE_LOGOS[storeKey]} style={styles.logo} resizeMode="contain" />
+          )}
+        </View>
+      </View>
+
+      <View style={styles.quickNavRow}>
+        <TouchableOpacity
+          style={styles.quickNavButton}
+          onPress={goToStoreSelection}
+          activeOpacity={0.8}
+        >
+          <Ionicons name="storefront-outline" size={18} color="#1f4f8f" />
+          <Text style={styles.quickNavText}>Επιστροφή στην επιλογή καταστήματος</Text>
+        </TouchableOpacity>
+      </View>
+
+      {loading ? (
+        <ActivityIndicator size="large" color="#1976d2" style={{ marginTop: 24 }} />
+      ) : error ? (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>❌ {error}</Text>
+        </View>
+      ) : noListingsMessage ? (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorText}>{noListingsMessage}</Text>
+          <TouchableOpacity 
+            style={styles.continueAnywayBtn}
+            onPress={handleContinue}
+          >
+            <Text style={styles.continueAnywayText}>Συνέχεια χωρίς προϊόντα</Text>
           </TouchableOpacity>
         </View>
-      </KeyboardAvoidingView>
+      ) : (
+        <>
+          <View style={styles.controlsRow}>
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Αναζήτηση προϊόντων..."
+              value={searchValue}
+              onChangeText={setSearchValue}
+            />
+            <TouchableOpacity style={styles.ctrlBtn} onPress={handleExpandAll}>
+              <Text style={styles.ctrlBtnText}>+ Όλα</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.ctrlBtn} onPress={handleCollapseAll}>
+              <Text style={styles.ctrlBtnText}>− Όλα</Text>
+            </TouchableOpacity>
+          </View>
+
+          <FlatList
+            data={categories}
+            keyExtractor={(i) => i.category}
+            renderItem={renderGroup}
+            contentContainerStyle={{ paddingBottom: 100 + kbPad }}
+            ListEmptyComponent={
+              searchValue ? (
+                <View style={styles.emptySearchContainer}>
+                  <Text style={styles.emptySearchText}>
+                    {`Δεν βρέθηκαν προϊόντα για "${(searchValue || "").trim()}".`}
+                  </Text>
+                </View>
+              ) : null
+            }
+          />
+
+          {/* Floating Continue Button */}
+          <TouchableOpacity
+            style={[styles.continueBtn, { bottom: insets.bottom + 16 + kbPad }]}
+            onPress={handleContinue}
+          >
+            <Text style={styles.continueBtnText}>
+              Συνέχεια ({orderLines.length} προϊόντα)
+            </Text>
+            <Ionicons name="arrow-forward" size={20} color="#fff" />
+          </TouchableOpacity>
+        </>
+      )}
     </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f9fafb',
-  },
+  container: { flex: 1, backgroundColor: "#f7f9fb" },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#fff',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#e5e7eb',
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#f3f4f6',
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#0f172a',
-  },
-  headerSpacer: {
-    width: 40,
-  },
-  storeInfo: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#e5e7eb',
-  },
-  storeName: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#0f172a',
-  },
-  storeCode: {
-    fontSize: 14,
-    color: '#6b7280',
-    marginTop: 2,
-  },
-  storeCategory: {
-    fontSize: 14,
-    color: '#6b7280',
-    marginTop: 2,
-  },
-  searchRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginHorizontal: 16,
-    marginTop: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#dbe1f1',
-    backgroundColor: '#fff',
+    backgroundColor: "#1976d2",
     paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderColor: "#1565c0",
+  },
+  headerTopRow: { flexDirection: "row", alignItems: "center" },
+  quickNavRow: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    paddingHorizontal: 12,
+    marginTop: 8,
+    marginBottom: 8,
+  },
+  quickNavButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#e2e8f0",
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 18,
+  },
+  quickNavText: {
+    marginLeft: 6,
+    color: "#1f4f8f",
+    fontWeight: "600",
+    fontSize: 13,
+  },
+  storeLine: { color: "#fff", fontWeight: "bold", fontSize: 16 },
+  storeSubLine: { color: "#e3f2fd", fontSize: 13, marginTop: 2 },
+  logo: { width: 60, height: 40, marginLeft: 8 },
+  controlsRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding: 8,
+    backgroundColor: "#e3f2fd",
   },
   searchInput: {
     flex: 1,
-    color: '#111827',
-    fontSize: 15,
-    paddingVertical: 0,
+    backgroundColor: "#fff",
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    height: 36,
+    fontSize: 14,
   },
-  categoryHeader: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#e5e7eb',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  categoryHeaderContent: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  categoryTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#0f172a',
-    marginRight: 12,
-  },
-  categoryBadge: {
-    backgroundColor: '#f3f4f6',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  categoryBadgeText: {
-    fontSize: 12,
-    color: '#6b7280',
-    fontWeight: '500',
-  },
-  productRow: {
-    backgroundColor: '#fff',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#f3f4f6',
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  productImageContainer: {
-    width: 60,
-    height: 60,
-    marginRight: 12,
-  },
-  productImage: {
-    width: '100%',
-    height: '100%',
+  ctrlBtn: {
+    marginLeft: 6,
+    backgroundColor: "#1976d2",
+    paddingHorizontal: 10,
+    paddingVertical: 8,
     borderRadius: 8,
   },
-  productImagePlaceholder: {
-    width: '100%',
-    height: '100%',
+  ctrlBtnText: { color: "#fff", fontWeight: "700", fontSize: 13 },
+  groupHeader: {
+    backgroundColor: "#1976d2",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 8,
+  },
+  groupTitle: { color: "#fff", fontSize: 15, fontWeight: "bold" },
+  card: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#fff",
     borderRadius: 8,
-    backgroundColor: '#f3f4f6',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  productInfo: {
-    flex: 1,
-    marginRight: 12,
-  },
-  productCode: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#0f172a',
-    marginBottom: 2,
-  },
-  masterCode: {
-    fontSize: 12,
-    fontWeight: '500',
-    color: '#6b7280',
-    marginBottom: 2,
-  },
-  productDescription: {
-    fontSize: 13,
-    color: '#6b7280',
-    marginTop: 2,
-    lineHeight: 18,
-  },
-  productDetails: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 4,
-    flexWrap: 'wrap',
-  },
-  stockContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginRight: 12,
-  },
-  stockIndicator: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    marginRight: 4,
-  },
-  stockText: {
-    fontSize: 12,
-    color: '#6b7280',
-  },
-  suggestedText: {
-    fontSize: 12,
-    color: '#10b981',
-    marginRight: 8,
-  },
-  newBadge: {
-    backgroundColor: '#ef4444',
-    paddingHorizontal: 6,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  newBadgeText: {
-    fontSize: 10,
-    color: '#fff',
-    fontWeight: '700',
-  },
-  priceRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 4,
-  },
-  priceText: {
-    fontSize: 13,
-    color: '#0f172a',
-    fontWeight: '600',
-    marginRight: 12,
-  },
-  srpText: {
-    fontSize: 12,
-    color: '#6b7280',
-  },
-  quantityContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  qtyButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#f3f4f6',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  qtyInput: {
-    width: 50,
-    height: 32,
-    textAlign: 'center',
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#0f172a',
     marginHorizontal: 8,
-    borderWidth: 1,
-    borderColor: '#d1d5db',
+    marginVertical: 4,
+    padding: 8,
+    elevation: 2,
+  },
+  productImage: { width: 60, height: 60, marginRight: 8, borderRadius: 6 },
+  productCenter: { flex: 1 },
+  productTitle: { fontWeight: "bold", color: "#1565c0", fontSize: 13 },
+  subInfo: { color: "#444", fontSize: 12, marginTop: 2 },
+  bold: { fontWeight: "bold" },
+  qtyBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1.2,
+    borderColor: "#1976d2",
     borderRadius: 8,
-    backgroundColor: '#fff',
+    overflow: "hidden",
   },
-  actionButtons: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#fff',
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#e5e7eb',
-  },
-  addAllButton: {
-    backgroundColor: '#10b981',
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  addAllButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  fabWrap: {
-    position: 'absolute',
-    left: 16,
-    right: 16,
-  },
-  fab: {
-    backgroundColor: '#1976d2',
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    shadowColor: '#1f2937',
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 4,
-  },
-  fabDisabled: {
-    backgroundColor: '#9ca3af',
-  },
-  fabText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '700',
+  qtyBtn: { paddingHorizontal: 6, paddingVertical: 2 },
+  qtyBtnText: { color: "#1976d2", fontSize: 20, fontWeight: "bold" },
+  qtyInput: {
+    width: 36,
+    textAlign: "center",
+    color: "#000",
+    fontSize: 14,
+    fontWeight: "bold",
+    paddingVertical: 0,
   },
   errorContainer: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 32,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
   },
   errorText: {
     fontSize: 16,
-    color: '#ef4444',
-    textAlign: 'center',
-    marginTop: 16,
-    marginBottom: 24,
+    color: "#ef4444",
+    textAlign: "center",
+    marginBottom: 16,
   },
-  retryButton: {
-    backgroundColor: '#1976d2',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
+  emptySearchContainer: {
+    padding: 24,
+    alignItems: "center",
+  },
+  emptySearchText: {
+    color: "#475569",
+    fontSize: 14,
+    textAlign: "center",
+  },
+  continueAnywayBtn: {
+    backgroundColor: "#64748b",
+    paddingHorizontal: 20,
+    paddingVertical: 10,
     borderRadius: 8,
   },
-  retryButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
+  continueAnywayText: {
+    color: "#fff",
+    fontSize: 14,
+    fontWeight: "600",
   },
-  emptyState: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 40,
+  continueBtn: {
+    position: "absolute",
+    left: 16,
+    right: 16,
+    backgroundColor: "#1976d2",
+    paddingVertical: 16,
+    borderRadius: 12,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 6,
   },
-  emptyText: {
+  continueBtnText: {
+    color: "#fff",
     fontSize: 16,
-    color: '#6b7280',
-    textAlign: 'center',
+    fontWeight: "700",
+    marginRight: 8,
   },
 });
 
-export default SuperMarketProductSelectionScreen;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

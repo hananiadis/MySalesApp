@@ -50,6 +50,10 @@ export async function generateOrderXLSX(order, options = {}) {
 
   const { mode = 'order', includeImages = false } = options;
 
+  let imageColumnIndex = -1;
+  const imageRowIndices = [];
+  const imageLinks = [];
+
   const rows = [];
   const isSuperMarket = order?.orderType === 'supermarket';
   const isKivosBrand = normalizedBrand === 'kivos';
@@ -117,6 +121,7 @@ export async function generateOrderXLSX(order, options = {}) {
     ];
     headerLength = headerRow.length;
     rows.push(headerRow);
+    imageColumnIndex = includeImages ? 1 : -1;
 
     listingSource.forEach((item) => {
       const sourceLine = allowListingExport ? orderLineMap.get(item?.productCode || item?.code || '') : item;
@@ -147,14 +152,11 @@ export async function generateOrderXLSX(order, options = {}) {
       const inventoryStockValue = snapshotEntry?.stockQty ?? sourceLine?.currentStock ?? '';
       const price = Number.isFinite(priceRaw) ? priceRaw : '';
       const srp = Number.isFinite(srpRaw) ? srpRaw : '';
+      const hasPhoto = typeof photoUrl === 'string' && photoUrl.length > 0;
       const row = [
         productCode,
         ...(includeImages
-          ? [
-              photoUrl
-                ? `=IMAGE("${photoUrl}")`
-                : '',
-            ]
+          ? [hasPhoto ? 'Άνοιγμα εικόνας' : '']
           : []),
         descriptionValue || '',
         barcodeValue || '',
@@ -167,6 +169,10 @@ export async function generateOrderXLSX(order, options = {}) {
         inventoryStockValue,
       ];
       rows.push(row);
+      if (includeImages) {
+        imageRowIndices.push(rows.length - 1);
+        imageLinks.push(hasPhoto ? photoUrl : '');
+      }
     });
   } else {
     rows.push(['Order Number', order?.number || order?.id || '']);
@@ -271,6 +277,22 @@ export async function generateOrderXLSX(order, options = {}) {
 
   const worksheetName = isSuperMarket ? 'SuperMarket' : 'Orders';
   const worksheet = XLSX.utils.aoa_to_sheet(rows);
+  if (imageColumnIndex >= 0 && imageLinks.length) {
+    imageRowIndices.forEach((rowIndex, idx) => {
+      const photoUrl = imageLinks[idx];
+      const cellAddress = XLSX.utils.encode_cell({ r: rowIndex, c: imageColumnIndex });
+      const currentCell = worksheet[cellAddress] || { t: 's', v: '' };
+      if (photoUrl) {
+        currentCell.t = 's';
+        currentCell.v = currentCell.v || 'Άνοιγμα εικόνας';
+        currentCell.l = { Target: photoUrl };
+      } else if (currentCell) {
+        if (currentCell.l) delete currentCell.l;
+        currentCell.v = currentCell.v || '';
+      }
+      worksheet[cellAddress] = currentCell;
+    });
+  }
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, worksheetName);
 
