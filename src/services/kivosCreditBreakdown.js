@@ -1,112 +1,67 @@
-const SPREADSHEET_ID = '1JJtzoDJjwwfIm-bBcPAX_aaeNHkGSGzPBo0blFTHfSc';
-const SHEET_GID = '0';
+// /src/services/kivosCreditBreakdown.js
+import { loadSpreadsheet } from './spreadsheetCache';
 
-const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
-
-const COLUMN_KEYS = [
-  'code',           // A - Κωδικός
-  'name',           // B - Επωνυμία
-  'days30',         // C - 001-030 Ημέρες
-  'days60',         // D - 031-060 Ημέρες
-  'days90',         // E - 061-090 Ημέρες
-  'days90plus',     // F - 90+ Ημέρες
-];
-
-const cache = new Map();
-
-const buildQueryUrl = (customerCode) => {
-  const escapedCode = String(customerCode).replace(/'/g, "''");
-  const selectClause = 'select A,B,C,D,E,F';
-  const whereClause = ` where A='${escapedCode}'`;
-  const query = `${selectClause}${whereClause}`;
-
-  const params = [
-    'tqx=out:json',
-    'headers=1',
-    `gid=${encodeURIComponent(SHEET_GID)}`,
-    `tq=${encodeURIComponent(query)}`,
-  ].join('&');
-
-  return `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?${params}`;
-};
-
-const parseGvizResponse = (payload) => {
-  if (!payload || !payload.table || !Array.isArray(payload.table.rows)) {
-    return null;
-  }
-
-  const [row] = payload.table.rows;
-  if (!row || !Array.isArray(row.c)) {
-    return null;
-  }
-
-  const record = {};
-  COLUMN_KEYS.forEach((key, index) => {
-    const cell = row.c[index];
-    record[key] = cell && cell.v != null ? String(cell.v).trim() : null;
-  });
-
-  return record.code ? record : null;
-};
-
-const extractPayload = (rawText) => {
-  if (typeof rawText !== 'string') {
-    throw new Error('Unexpected response format from spreadsheet');
-  }
-
-  const match = rawText.match(/google\.visualization\.Query\.setResponse\((.*)\);?/s);
-  if (!match || !match[1]) {
-    throw new Error('Unable to parse spreadsheet response payload');
-  }
-
-  return JSON.parse(match[1]);
-};
-
-async function fetchRow(customerCode, forceRefresh = false) {
-  if (!customerCode) {
-    return null;
-  }
-
-  const code = String(customerCode).trim();
-  if (!code) {
-    return null;
-  }
-
-  if (!forceRefresh && cache.has(code)) {
-    const cached = cache.get(code);
-    if (Date.now() - cached.timestamp < CACHE_TTL_MS) {
-      return cached.data;
-    }
-  }
-
-  const response = await fetch(buildQueryUrl(code));
-  if (!response.ok) {
-    throw new Error(`Failed to query credit breakdown spreadsheet (HTTP ${response.status})`);
-  }
-
-  const text = await response.text();
-  const payload = extractPayload(text);
-  const record = parseGvizResponse(payload);
-
-  const entry = { data: record, timestamp: Date.now() };
-  cache.set(code, entry);
-
-  return record;
+// ✅ Converts European-formatted numbers (e.g. "1.234,56") into proper floats
+function toNumber(value) {
+  if (value == null || value === '') return 0;
+  const cleaned = String(value)
+    .replace(/\./g, '')   // remove thousand separators
+    .replace(',', '.');   // convert decimal comma to dot
+  const num = parseFloat(cleaned);
+  return isNaN(num) ? 0 : num;
 }
 
-export async function getKivosCreditBreakdown(customerCode, options = {}) {
+// ✅ Normalizes customer codes (removes leading zeros, spaces, uppercase)
+function normalizeCode(value) {
+  return String(value || '').trim().replace(/^0+/, '').toUpperCase();
+}
+
+/**
+ * Fetch a customer's credit breakdown (GViz sheet)
+ * Reads from "kivosCredit" config key in spreadsheets.js
+ * Returns credit buckets (days30 / days60 / days90 / days90plus)
+ */
+export async function getKivosCreditBreakdown(customerCode) {
   try {
-    return await fetchRow(customerCode, options.forceRefresh === true);
-  } catch (error) {
-    console.error('getKivosCreditBreakdown failed', error);
-    throw error;
+    const rawText = await loadSpreadsheet('kivosCredit', { force: false });
+    if (!rawText) return null;
+
+    // Parse the GViz JSON payload
+    const match = rawText.match(/google\.visualization\.Query\.setResponse\((.*)\);?/s);
+    if (!match) {
+      console.warn('[getKivosCreditBreakdown] GViz parse failed');
+      return null;
+    }
+
+    const payload = JSON.parse(match[1]);
+    const rows = payload.table?.rows ?? [];
+    if (!rows.length) return null;
+
+    const normalizedTarget = normalizeCode(customerCode);
+
+    for (const row of rows) {
+      const sheetCode = normalizeCode(row.c[0]?.v);
+      if (sheetCode === normalizedTarget) {
+        const record = {
+          code: sheetCode,
+          days30: toNumber(row.c[1]?.v),
+          days60: toNumber(row.c[2]?.v),
+          days90: toNumber(row.c[3]?.v),
+          days90plus: toNumber(row.c[4]?.v),
+        };
+
+        // ✅ Optionally include a total field for convenience
+        record.total =
+          record.days30 + record.days60 + record.days90 + record.days90plus;
+
+        return record;
+      }
+    }
+
+    console.warn('[getKivosCreditBreakdown] No match for', customerCode);
+    return null;
+  } catch (err) {
+    console.warn('[getKivosCreditBreakdown] failed:', err.message);
+    return null;
   }
 }
-
-export function clearKivosCreditBreakdownCache() {
-  cache.clear();
-}
-
-
-
-

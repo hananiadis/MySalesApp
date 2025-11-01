@@ -1,9 +1,9 @@
-// src/screens/JohnScreen.js
+// src/screens/JohnHomeScreen.js
 import React, { useMemo } from 'react';
 
 import BrandTabsNavigator from '../navigation/BrandTabsNavigator';
 
-const JohnScreen = ({ navigation, route }) => {
+const JohnHomeScreen = ({ navigation, route }) => {
   const mergedRoute = useMemo(
     () => ({
       ...route,
@@ -15,4 +15,4 @@ const JohnScreen = ({ navigation, route }) => {
   return <BrandTabsNavigator navigation={navigation} route={mergedRoute} />;
 };
 
-export default JohnScreen;
+export default JohnHomeScreen;

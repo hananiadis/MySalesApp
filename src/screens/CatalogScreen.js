@@ -1,96 +1,89 @@
 import React from 'react';
 import {
+  Alert,
   Linking,
   ScrollView,
+  Share,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-  Share,
-  Alert,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+
 import SafeScreen from '../components/SafeScreen';
+import { BRAND_LABEL } from '../constants/brands';
+
+const BRAND_CATALOGS = {
+  playmobil: {
+    label: BRAND_LABEL.playmobil || 'Playmobil',
+    description: 'Ενημερωθείτε για τους πιο πρόσφατους καταλόγους προϊόντων Playmobil.',
+    catalogs: [
+      {
+        title: 'Playmobil Κατάλογος 2025 (Excel)',
+        url: 'https://www.dropbox.com/scl/fi/r1nw149vzgzlll69kr76d/2025_.xlsx?rlkey=hhe57zlsayw65ha5a9ee6p8dd&st=m02z5lzu&dl=0',
+        type: 'Excel',
+      },
+      {
+        title: 'Playmobil Βασικός Κατάλογος 2025 (PDF)',
+        url: 'https://playmobil.a.bigcontent.io/v1/static/85684_CC_25-2_GR_Web-250623',
+        type: 'PDF',
+      },
+      {
+        title: 'Playmobil Exclusives 2025 (Online)',
+        url: 'https://online.fliphtml5.com/gtcjg/vtzx/',
+        type: 'Online',
+      },
+      {
+        title: 'Playmobil Junior (PDF)',
+        url: 'https://playmobil.a.bigcontent.io/v1/static/FINAL_WEB_GR_Junior_Katalog_2024_ONLINE_mit_Tinti_1',
+        type: 'PDF',
+      },
+    ],
+  },
+  kivos: {
+    label: BRAND_LABEL.kivos || 'Kivos',
+    description: 'Κατάλογοι "Ανανιάδου Αναστασία κ ΣΙΑ ΟΕ"',
+    catalogs: [
+      {
+        title: 'Logo Κατάλογος Σχολικών Ειδών (Online)',
+        url: 'https://online.fliphtml5.com/gtcjg/cbju/',
+        type: 'Online',
+      },
+      {
+        title: 'Logo Κατάλογος Τεχνικών & Επαγγελματικών Προϊόντων (Online)',
+        url: 'https://online.fliphtml5.com/gtcjg/xcod/',
+        type: 'Online',
+      },
+    ],
+  },
+  john: {
+    label: BRAND_LABEL.john || 'John Hellas',
+    description: 'Κατάλογοι John Hellas και συνεργαζόμενων brands (Ravensburger, κ.ά.).',
+    catalogs: [
+      {
+        title: 'John Hellas 2025 (PDF)',
+        url: 'https://johnhellas.gr/show_pdf/?file=https://johnhellas.gr/download_catalogue?download_id=69',
+        type: 'PDF',
+      },
+      {
+        title: 'Ravensburger 2025 (PDF)',
+        url: 'https://johnhellas.gr/show_pdf/?file=https://johnhellas.gr/download_catalogue?download_id=70',
+        type: 'PDF',
+      },
+      {
+        title: 'John Hellas Excel Κατάλογος',
+        url: 'https://www.dropbox.com/scl/fi/7pfg0zsgokiq4ugosft0p/John-Hellas.xlsm?rlkey=76kkhtv01782zsmhqjjy73vk0&st=17et37pp&dl=0',
+        type: 'Excel',
+      },
+    ],
+  },
+};
 
 const CatalogScreen = ({ navigation, route }) => {
-  const { brand } = route.params || {};
-  const normalizedBrand = (brand || 'playmobil').toLowerCase();
-
-  const playmobilCatalogs = [
-    {
-      title: 'Δελτίο Παραγγελίας 2025 Β\' Εξάμηνο',
-      url: 'https://www.dropbox.com/scl/fi/r1nw149vzgzlll69kr76d/2025_.xlsx?rlkey=hhe57zlsayw65ha5a9ee6p8dd&st=m02z5lzu&dl=0',
-      type: 'Excel',
-    },
-    {
-      title: 'Κατάλογος 2025 Β\' Εξάμηνο',
-      url: 'https://playmobil.a.bigcontent.io/v1/static/85684_CC_25-2_GR_Web-250623',
-      type: 'PDF',
-    },
-    {
-      title: 'Exclusives 2025 Β\' εξάμηνο (κωδικοί χωρίς απεικόνιση)',
-      url: 'https://online.fliphtml5.com/gtcjg/vtzx/',
-      type: 'Online',
-    },
-    {
-      title: 'Κατάλογος Playmobil Junior',
-      url: 'https://playmobil.a.bigcontent.io/v1/static/FINAL_WEB_GR_Junior_Katalog_2024_ONLINE_mit_Tinti_1',
-      type: 'PDF',
-    },
-    {
-      title: 'Διαφημιζόμενα TV',
-      url: 'https://online.fliphtml5.com/gtcjg/mdqr/',
-      type: 'Online',
-    },
-    {
-      title: 'Playmobil Sky Trails',
-      url: 'https://online.fliphtml5.com/gtcjg/cdbm/',
-      type: 'Online',
-    },
-  ];
-
-    const kivosCatalogs = [
-    {
-      title: 'ΚΑΤΑΛΟΓΟΣ ΣΧΟΛΙΚΩΝ ΠΡΟΪΟΝΤΩΝ',
-      url: 'https://online.fliphtml5.com/gtcjg/cbju/',
-      type: 'Online',
-    },
-    {
-      title: 'ΚΑΤΑΛΟΓΟΣ ΤΕΧΝΙΚΩΝ ΠΡΟΪΟΝΤΩΝ',
-      url: 'https://online.fliphtml5.com/gtcjg/xcod/',
-      type: 'Online',
-    },
-  ];
-
-  const johnCatalogs = [
-    {
-      title: 'John Hellas 2025',
-      url: 'https://johnhellas.gr/show_pdf/?file=https://johnhellas.gr/download_catalogue?download_id=69',
-      type: 'PDF',
-    },
-    {
-      title: 'Ravensburger 2025',
-      url: 'https://johnhellas.gr/show_pdf/?file=https://johnhellas.gr/download_catalogue?download_id=70',
-      type: 'PDF',
-    },
-    {
-      title: 'Αρχείο Ειδών 2025',
-      url: 'https://www.dropbox.com/scl/fi/7pfg0zsgokiq4ugosft0p/John-Hellas.xlsm?rlkey=76kkhtv01782zsmhqjjy73vk0&st=17et37pp&dl=0',
-      type: 'Excel',
-    },
-  ];
-
-  let catalogs = playmobilCatalogs;
-  let brandName = 'Playmobil';
-
-  if (normalizedBrand === 'john') {
-    catalogs = johnCatalogs;
-    brandName = 'John Hellas';
-  } else if (normalizedBrand === 'kivos') {
-    catalogs = kivosCatalogs;
-    brandName = 'Kivos';
-  }
-
+  const brandParam = (route?.params?.brand || 'playmobil').toLowerCase();
+  const brandData = BRAND_CATALOGS[brandParam] || BRAND_CATALOGS.playmobil;
+  const { label: brandName, description, catalogs } = brandData;
 
   const handleOpenLink = async (url) => {
     try {
@@ -98,22 +91,18 @@ const CatalogScreen = ({ navigation, route }) => {
       if (supported) {
         await Linking.openURL(url);
       } else {
-        Alert.alert('Σφάλμα', 'Δεν είναι δυνατό το άνοιγμα αυτού του συνδέσμου.');
+        Alert.alert('Σφάλμα', 'Δεν ήταν δυνατή η πρόσβαση στον σύνδεσμο.');
       }
     } catch (error) {
-      Alert.alert('Σφάλμα', 'Παρουσιάστηκε σφάλμα κατά το άνοιγμα του συνδέσμου.');
+      Alert.alert('Σφάλμα', 'Δεν ήταν δυνατή η πρόσβαση στον σύνδεσμο.');
     }
   };
 
   const handleShareLink = async (title, url) => {
     try {
-      await Share.share({
-        message: `${title}\n\n${url}`,
-        url: url,
-        title: title,
-      });
+      await Share.share({ message: `${title}\n${url}`, url, title });
     } catch (error) {
-      Alert.alert('Σφάλμα', 'Παρουσιάστηκε σφάλμα κατά την κοινοποίηση.');
+      Alert.alert('Σφάλμα', 'Η κοινοποίηση απέτυχε.');
     }
   };
 
@@ -144,190 +133,177 @@ const CatalogScreen = ({ navigation, route }) => {
   };
 
   return (
-    <SafeScreen>
-      <View style={styles.container}>
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => navigation.goBack()}
-            accessibilityLabel="Επιστροφή"
-          >
-            <Ionicons name="arrow-back" size={24} color="#1f4f8f" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Κατάλογοι {brandName}</Text>
-          <View style={styles.headerSpacer} />
+    <SafeScreen
+      title={`Κατάλογοι ${brandName}`}
+      bodyStyle={styles.body}
+      contentContainerStyle={styles.content}
+      scroll
+    >
+      <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.navigate('BrandHome', { brand: brandParam })}
+          accessibilityLabel="Επιστροφή στο brand"
+        >
+          <Ionicons name="arrow-back" size={24} color="#1f4f8f" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>{`Κατάλογοι ${brandName}`}</Text>
+        <View style={styles.headerSpacer} />
+      </View>
+
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.introSection}>
+          <Ionicons name="library-outline" size={48} color="#1f4f8f" />
+          <Text style={styles.introTitle}>{`Κατάλογοι ${brandName}`}</Text>
+          <Text style={styles.introText}>{description}</Text>
         </View>
 
-        {/* Content */}
-        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-          <View style={styles.introSection}>
-            <Ionicons name="library-outline" size={48} color="#1f4f8f" />
-            <Text style={styles.introTitle}>Κατάλογοι {brandName}</Text>
-            <Text style={styles.introText}>
-              Επιλέξτε έναν κατάλογο για να τον προβάλετε στον browser σας
-            </Text>
-          </View>
-
-          <View style={styles.catalogList}>
-            {catalogs.map((catalog, index) => (
-              <View key={index} style={styles.catalogItem}>
-                <View style={styles.catalogInfo}>
-                  <View style={styles.catalogHeader}>
-                    <Ionicons
-                      name={getTypeIcon(catalog.type)}
-                      size={20}
-                      color={getTypeColor(catalog.type)}
-                    />
-                    <Text style={styles.catalogType}>{catalog.type}</Text>
-                  </View>
-                  <Text style={styles.catalogTitle}>{catalog.title}</Text>
+        <View style={styles.catalogList}>
+          {catalogs.map((catalog) => (
+            <View key={catalog.title} style={styles.catalogItem}>
+              <View style={styles.catalogInfo}>
+                <View style={styles.catalogHeader}>
+                  <Ionicons
+                    name={getTypeIcon(catalog.type)}
+                    size={20}
+                    color={getTypeColor(catalog.type)}
+                  />
+                  <Text style={styles.catalogType}>{catalog.type}</Text>
                 </View>
-                
-                <View style={styles.catalogActions}>
-                  <TouchableOpacity
-                    style={styles.actionButton}
-                    onPress={() => handleOpenLink(catalog.url)}
-                    accessibilityLabel={`Άνοιγμα ${catalog.title}`}
-                  >
-                    <Ionicons name="open-outline" size={20} color="#1f4f8f" />
-                  </TouchableOpacity>
-                  
-                  <TouchableOpacity
-                    style={styles.actionButton}
-                    onPress={() => handleShareLink(catalog.title, catalog.url)}
-                    accessibilityLabel={`Κοινοποίηση ${catalog.title}`}
-                  >
-                    <Ionicons name="share-outline" size={20} color="#1f4f8f" />
-                  </TouchableOpacity>
-                </View>
+                <Text style={styles.catalogTitle}>{catalog.title}</Text>
               </View>
-            ))}
-          </View>
 
-          <View style={styles.bottomSpacer} />
-        </ScrollView>
-      </View>
+              <View style={styles.catalogActions}>
+                <TouchableOpacity
+                  style={styles.actionButton}
+                  onPress={() => handleOpenLink(catalog.url)}
+                  accessibilityLabel="Άνοιγμα συνδέσμου"
+                >
+                  <Ionicons name="open-outline" size={20} color="#1f4f8f" />
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.actionButton}
+                  onPress={() => handleShareLink(catalog.title, catalog.url)}
+                  accessibilityLabel="Κοινοποίηση συνδέσμου"
+                >
+                  <Ionicons name="share-social-outline" size={20} color="#1f4f8f" />
+                </TouchableOpacity>
+              </View>
+            </View>
+          ))}
+        </View>
+        <View style={styles.bottomSpacer} />
+      </ScrollView>
     </SafeScreen>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  body: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    paddingHorizontal: 20,
+  },
+  content: {
+    paddingBottom: 24,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    backgroundColor: '#fff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#e2e8f0',
+    justifyContent: 'space-between',
+    marginBottom: 16,
   },
   backButton: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#f1f5f9',
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
+    backgroundColor: '#e8f1fb',
   },
   headerTitle: {
     flex: 1,
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1f2937',
-    textAlign: 'center',
     marginHorizontal: 16,
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1f4f8f',
+    textAlign: 'center',
   },
   headerSpacer: {
     width: 40,
   },
-  content: {
-    flex: 1,
-    paddingHorizontal: 16,
-  },
   introSection: {
     alignItems: 'center',
-    paddingVertical: 32,
-    paddingHorizontal: 20,
+    backgroundColor: '#f1f5ff',
+    paddingVertical: 24,
+    paddingHorizontal: 16,
+    borderRadius: 20,
+    marginBottom: 20,
   },
   introTitle: {
-    fontSize: 24,
+    marginTop: 12,
+    fontSize: 18,
     fontWeight: '700',
-    color: '#1f2937',
-    marginTop: 16,
-    marginBottom: 8,
+    color: '#103a7d',
   },
   introText: {
-    fontSize: 16,
-    color: '#64748b',
+    marginTop: 8,
+    fontSize: 14,
+    color: '#42526e',
     textAlign: 'center',
-    lineHeight: 22,
+    lineHeight: 20,
   },
   catalogList: {
-    gap: 12,
+    gap: 16,
   },
   catalogItem: {
     backgroundColor: '#fff',
-    borderRadius: 12,
+    borderRadius: 18,
     padding: 16,
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 8,
+    elevation: 2,
   },
   catalogInfo: {
     flex: 1,
-    marginRight: 12,
+    paddingRight: 12,
   },
   catalogHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 8,
+    gap: 6,
   },
   catalogType: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#64748b',
-    marginLeft: 6,
-    backgroundColor: '#f1f5f9',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    color: '#1f4f8f',
   },
   catalogTitle: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
-    color: '#1f2937',
-    lineHeight: 20,
+    color: '#0f172a',
   },
   catalogActions: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 10,
   },
   actionButton: {
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: '#f1f5f9',
+    borderRadius: 12,
+    backgroundColor: '#e8f1fb',
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
   },
   bottomSpacer: {
-    height: 30,
+    height: 32,
   },
 });
 
 export default CatalogScreen;
-
-
-
-

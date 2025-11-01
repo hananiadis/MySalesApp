@@ -1,4 +1,4 @@
-// src/screens/CustomersScreen.js
+﻿// src/screens/CustomersScreen.js
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
   View,
@@ -25,14 +25,23 @@ const CUSTOMER_PLACEHOLDERS = {
   john: require('../../assets/john_hellas_logo.png'),
 };
 
+// Which roles can see all customers (not only their own)
 const MANAGEMENT_ROLES = [ROLES.OWNER, ROLES.ADMIN, ROLES.DEVELOPER];
 
+// UI text (shared by all brands)
+const UI_TEXT = {
+  title: 'Πελάτες',
+  searchPlaceholder: 'Αναζήτηση πελάτη...',
+  empty: 'Δεν βρέθηκαν πελάτες.',
+};
 
+// Detail screen route names per brand
 const DETAIL_ROUTES = {
   playmobil: 'CustomerDetail',
   kivos: 'KivosCustomerDetail',
   john: 'JohnCustomerDetail',
 };
+
 
 const normalizeBrand = (rawBrand) => normalizeBrandKey(rawBrand);
 
@@ -70,19 +79,19 @@ export default function CustomersScreen() {
 
   const accessibleCustomers = useMemo(() => {
     if (canManageAll) {
-      console.log(`🔓 Admin access: showing all ${customers.length} customers for brand ${brand}`);
+      console.log(`🔍 Admin access: showing all ${customers.length} customers for brand ${brand}`);
       return customers;
     }
     
     // If user has no linked salesmen, show no customers
     if (!userMerchIds.length) {
-      console.log(`🚫 No linked salesmen: showing 0 customers for brand ${brand}`);
+      console.log(`ðŸš« No linked salesmen: showing 0 customers for brand ${brand}`);
       return [];
     }
     
     // Filter customers based on user's linked salesmen (brand filtering already done by getCustomersFromLocal)
     const filtered = filterCustomersBySalesman(customers, userMerchIds, null);
-    console.log(`👥 User filtering: ${filtered.length}/${customers.length} customers for brand ${brand}`, {
+    console.log(`ðŸ‘¥ User filtering: ${filtered.length}/${customers.length} customers for brand ${brand}`, {
       userMerchIds,
       brand,
       totalCustomers: customers.length,
@@ -92,8 +101,8 @@ export default function CustomersScreen() {
   }, [customers, userMerchIds, brand, canManageAll]);
 
   const handleGoBack = useCallback(() => {
-    navigation.goBack();
-  }, [navigation]);
+    navigation.navigate('BrandHome', { brand });
+  }, [navigation, brand]);
 
   const headerLeft = useMemo(
     () => (
@@ -195,11 +204,11 @@ export default function CustomersScreen() {
   );
 
   return (
-    <SafeScreen title="Πελάτες" headerLeft={headerLeft} bodyStyle={styles.body}>
+    <SafeScreen title={UI_TEXT.title} headerLeft={headerLeft} bodyStyle={styles.body}>
       <View style={styles.searchSection}>
         <TextInput
           style={styles.searchInput}
-          placeholder="Αναζήτηση επωνυμίας, ΑΦΜ ή κωδικού"
+          placeholder={UI_TEXT.searchPlaceholder}
           value={search}
           onChangeText={setSearch}
           autoCorrect={false}
@@ -218,7 +227,7 @@ export default function CustomersScreen() {
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={styles.listContent}
           ListEmptyComponent={
-            <Text style={styles.emptyText}>Δεν βρέθηκαν πελάτες</Text>
+            <Text style={styles.emptyText}>{UI_TEXT.empty}</Text>
           }
         />
       )}
@@ -282,3 +291,5 @@ const styles = StyleSheet.create({
     backgroundColor: '#e8f1fb',
   },
 });
+
+

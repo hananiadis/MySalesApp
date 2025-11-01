@@ -1,13 +1,13 @@
-// src/screens/JohnScreen.js
+// src/screens/PlaymobilHomeScreen.js
 import React, { useMemo } from 'react';
 
 import BrandTabsNavigator from '../navigation/BrandTabsNavigator';
 
-const JohnScreen = ({ navigation, route }) => {
+const PlaymobilHomeScreen = ({ navigation, route }) => {
   const mergedRoute = useMemo(
     () => ({
       ...route,
-      params: { ...(route?.params || {}), brand: 'john' },
+      params: { ...(route?.params || {}), brand: 'playmobil' },
     }),
     [route]
   );
@@ -15,4 +15,4 @@ const JohnScreen = ({ navigation, route }) => {
   return <BrandTabsNavigator navigation={navigation} route={mergedRoute} />;
 };
 
-export default JohnScreen;
+export default PlaymobilHomeScreen;

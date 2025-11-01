@@ -1,31 +1,17 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as FileSystem from 'expo-file-system';
 import RNFS from 'react-native-fs';
-import { AVAILABLE_BRANDS, normalizeBrandKey } from '../constants/brands';
 
-// Choose ONE and use everywhere: DocumentDirectoryPath for long-term, CachesDirectoryPath for temp
-export const IMAGES_DIR = `${RNFS.DocumentDirectoryPath}/product_images/`;
+import { DEFAULT_BRAND, normalizeBrandKey } from '../constants/brands';
 
-// Format date for user-friendly logs
-const formatNow = () => {
-  const now = new Date();
-  const pad = (n) => String(n).padStart(2, '0');
-  return (
-    pad(now.getDate()) + '/' +
-    pad(now.getMonth() + 1) + '/' +
-    now.getFullYear() + ' ' +
-    pad(now.getHours()) + ':' +
-    pad(now.getMinutes())
-  );
-};
-
-const DEFAULT_BRAND = 'playmobil';
-const isKnownBrand = (brand) => AVAILABLE_BRANDS.includes(brand);
-const resolveBrandKey = (brand) => {
-  const normalized = normalizeBrandKey(brand);
-  return isKnownBrand(normalized) ? normalized : DEFAULT_BRAND;
-};
-const dataKey = (base, brand) => `${base}:${resolveBrandKey(brand)}`;
-const actionKey = (base, brand) => `${base}_last_action:${resolveBrandKey(brand)}`;
+const formatNow = () =>
+  new Date().toLocaleString('el-GR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 
 const LEGACY_KEYS = {
   products: 'products',
@@ -33,260 +19,425 @@ const LEGACY_KEYS = {
   customers: 'customers',
   customersAction: 'customers_last_action',
 };
-const SUPERMARKET_STORE_KEY = 'supermarket_stores';
-const SUPERMARKET_LISTING_KEY = 'supermarket_listings';
 
-// --- PRODUCTS ---
-export const saveProductsToLocal = async (products, brand) => {
-  const resolvedBrand = resolveBrandKey(brand);
+const FILE_POINTER_PREFIX = '@@file:';
+const LARGE_PAYLOAD_THRESHOLD = 120_000; // ~120 KB JSON string
+
+const resolveBrandKey = (brand) => normalizeBrandKey(brand ?? DEFAULT_BRAND);
+const dataKey = (type, brand) => `${type}:${brand}`;
+const actionKey = (type, brand) => `${type}_last_action:${brand}`;
+
+const STORAGE_ROOT = (() => {
+  const root = FileSystem.documentDirectory || FileSystem.cacheDirectory;
+  if (!root) {
+    return null;
+  }
+  return `${root.replace(/\/?$/, '/') }local-data/`;
+})();
+
+const ensureDirAsync = async (dir) => {
+  if (!dir) return;
   try {
-    const key = dataKey('products', resolvedBrand);
-    await AsyncStorage.setItem(key, JSON.stringify(products));
-    await AsyncStorage.setItem(actionKey('products', resolvedBrand), `updated on ${formatNow()}`);
-    if (resolvedBrand === DEFAULT_BRAND) {
-      await AsyncStorage.setItem(LEGACY_KEYS.products, JSON.stringify(products));
-      await AsyncStorage.setItem(LEGACY_KEYS.productsAction, `updated on ${formatNow()}`);
+    const info = await FileSystem.getInfoAsync(dir);
+    if (info.exists && info.isDirectory) {
+      return;
     }
-  } catch (e) {
-    console.error('Saving products failed', e);
+  } catch (error) {
+    // ignore
+  }
+  try {
+    await FileSystem.makeDirectoryAsync(dir, { intermediates: true });
+  } catch (error) {
+    // ignore
   }
 };
 
-export const clearProductsLocal = async (brand) => {
-  const resolvedBrand = resolveBrandKey(brand);
+const filePathFor = (type, brand) => {
+  if (!STORAGE_ROOT) {
+    return null;
+  }
+  return `${STORAGE_ROOT}${type}/${brand}.json`;
+};
+
+const writeJsonFile = async (type, brand, json) => {
+  const path = filePathFor(type, brand);
+  if (!path) return null;
+  const dir = path.slice(0, path.lastIndexOf('/') + 1);
+  await ensureDirAsync(dir);
+  await FileSystem.writeAsStringAsync(path, json, { encoding: FileSystem.EncodingType.UTF8 });
+  return path;
+};
+
+const readJsonFile = async (type, brand, overridePath) => {
+  const path = overridePath || filePathFor(type, brand);
+  if (!path) return null;
   try {
-    await AsyncStorage.removeItem(dataKey('products', resolvedBrand));
-    await AsyncStorage.setItem(actionKey('products', resolvedBrand), `deleted on ${formatNow()}`);
-    if (resolvedBrand === DEFAULT_BRAND) {
-      await AsyncStorage.removeItem(LEGACY_KEYS.products);
-      await AsyncStorage.setItem(LEGACY_KEYS.productsAction, `deleted on ${formatNow()}`);
-    }
-  } catch (e) {
-    console.error('Clearing products failed', e);
+    const info = await FileSystem.getInfoAsync(path);
+    if (!info.exists) return null;
+    return await FileSystem.readAsStringAsync(path, { encoding: FileSystem.EncodingType.UTF8 });
+  } catch (error) {
+    return null;
   }
 };
 
-export const getProductsFromLocal = async (brand) => {
-  const resolvedBrand = resolveBrandKey(brand);
+const removeJsonFile = async (type, brand, overridePath) => {
+  const path = overridePath || filePathFor(type, brand);
+  if (!path) return;
   try {
-    const json = await AsyncStorage.getItem(dataKey('products', resolvedBrand));
-    if (json != null) return JSON.parse(json);
-    if (resolvedBrand === DEFAULT_BRAND) {
-      const legacy = await AsyncStorage.getItem(LEGACY_KEYS.products);
-      return legacy != null ? JSON.parse(legacy) : [];
+    const info = await FileSystem.getInfoAsync(path);
+    if (info.exists) {
+      await FileSystem.deleteAsync(path, { idempotent: true });
     }
-    return [];
-  } catch (e) {
-    console.error('Reading products failed', e);
-    return [];
+  } catch (error) {
+    // ignore
   }
 };
 
-export const getProductsLastAction = async (brand) => {
-  const resolvedBrand = resolveBrandKey(brand);
+const clearItemOnly = async (key) => {
   try {
-    const scoped = await AsyncStorage.getItem(actionKey('products', resolvedBrand));
+    await AsyncStorage.removeItem(key);
+  } catch (error) {
+    // ignore
+  }
+};
+
+const pruneExisting = async (key, type, brand) => {
+  try {
+    const current = await AsyncStorage.getItem(key);
+    if (current && current.startsWith(FILE_POINTER_PREFIX)) {
+      const pointer = current.slice(FILE_POINTER_PREFIX.length);
+      await removeJsonFile(type, brand, pointer);
+    }
+  } catch (error) {
+    // ignore
+  }
+  await clearItemOnly(key);
+};
+
+const storePointerReference = async (key, pointerPath) => {
+  if (!pointerPath) return;
+  try {
+    await clearItemOnly(key);
+    await AsyncStorage.setItem(key, `${FILE_POINTER_PREFIX}${pointerPath}`);
+  } catch (error) {
+    // ignore
+  }
+};
+
+const storePayload = async (key, type, brand, payload) => {
+  const safePayload = Array.isArray(payload) ? payload : [];
+  const json = JSON.stringify(safePayload);
+
+  const writeAsFile = async () => {
+    if (!STORAGE_ROOT) return null;
+    await pruneExisting(key, type, brand);
+    const filePath = await writeJsonFile(type, brand, json);
+    if (!filePath) return null;
+    await AsyncStorage.setItem(key, `${FILE_POINTER_PREFIX}${filePath}`);
+    return { strategy: 'file', pointer: filePath };
+  };
+
+  if (json.length > LARGE_PAYLOAD_THRESHOLD && STORAGE_ROOT) {
+    try {
+      const fileResult = await writeAsFile();
+      if (fileResult) {
+        return fileResult;
+      }
+    } catch (error) {
+      // fall back to inline storage attempt
+    }
+  }
+
+  await pruneExisting(key, type, brand);
+
+  try {
+    await AsyncStorage.setItem(key, json);
+    await removeJsonFile(type, brand);
+    return { strategy: 'inline' };
+  } catch (error) {
+    try {
+      const fallback = await writeAsFile();
+      if (fallback) {
+        return fallback;
+      }
+    } catch (err) {
+      // ignore and rethrow original error
+    }
+    throw error;
+  }
+};
+
+const readPayload = async (key, type, brand) => {
+  const raw = await AsyncStorage.getItem(key);
+  let json = null;
+
+  if (raw && raw.startsWith(FILE_POINTER_PREFIX)) {
+    json = await readJsonFile(type, brand, raw.slice(FILE_POINTER_PREFIX.length));
+  } else if (raw) {
+    json = raw;
+  } else {
+    json = await readJsonFile(type, brand);
+  }
+
+  if (!json) return null;
+
+  try {
+    return JSON.parse(json);
+  } catch (error) {
+    return null;
+  }
+};
+
+const clearPayload = async (key, type, brand) => {
+  await pruneExisting(key, type, brand);
+};
+
+const setActionState = async (type, brand, state) => {
+  await AsyncStorage.setItem(actionKey(type, brand), `${state} on ${formatNow()}`);
+};
+
+const legacySetAction = async (key) => {
+  await AsyncStorage.setItem(key, `updated on ${formatNow()}`);
+};
+
+const readActionState = async (type, brand, legacyKey) => {
+  try {
+    const scoped = await AsyncStorage.getItem(actionKey(type, brand));
     if (scoped) return scoped;
-    if (resolvedBrand === DEFAULT_BRAND) {
-      const legacy = await AsyncStorage.getItem(LEGACY_KEYS.productsAction);
-      return legacy || 'No actions yet';
+    if (brand === DEFAULT_BRAND && legacyKey) {
+      const legacy = await AsyncStorage.getItem(legacyKey);
+      if (legacy) return legacy;
     }
-    return 'No actions yet';
-  } catch {
-    return 'No actions yet';
+  } catch (error) {
+    // ignore
   }
+  return 'No actions yet';
 };
 
-// --- CUSTOMERS ---
-export const saveCustomersToLocal = async (customers, brand) => {
+export async function saveProductsToLocal(products, brand) {
   const resolvedBrand = resolveBrandKey(brand);
-  try {
-    await AsyncStorage.setItem(dataKey('customers', resolvedBrand), JSON.stringify(customers));
-    await AsyncStorage.setItem(actionKey('customers', resolvedBrand), `updated on ${formatNow()}`);
-    if (resolvedBrand === DEFAULT_BRAND) {
-      await AsyncStorage.setItem(LEGACY_KEYS.customers, JSON.stringify(customers));
-      await AsyncStorage.setItem(LEGACY_KEYS.customersAction, `updated on ${formatNow()}`);
-    }
-  } catch (e) {
-    console.error('Saving customers failed', e);
-  }
-};
+  const key = dataKey('products', resolvedBrand);
+  const result = await storePayload(key, 'products', resolvedBrand, products);
+  await setActionState('products', resolvedBrand, 'updated');
 
-export const clearCustomersLocal = async (brand) => {
+  if (resolvedBrand === DEFAULT_BRAND) {
+    if (result?.strategy === 'file' && result.pointer) {
+      await storePointerReference(LEGACY_KEYS.products, result.pointer);
+    } else {
+      await storePayload(LEGACY_KEYS.products, 'legacy_products', resolvedBrand, products);
+    }
+    await legacySetAction(LEGACY_KEYS.productsAction);
+  }
+}
+
+export async function getProductsFromLocal(brand) {
   const resolvedBrand = resolveBrandKey(brand);
-  try {
-    await AsyncStorage.removeItem(dataKey('customers', resolvedBrand));
-    await AsyncStorage.setItem(actionKey('customers', resolvedBrand), `deleted on ${formatNow()}`);
-    if (resolvedBrand === DEFAULT_BRAND) {
-      await AsyncStorage.removeItem(LEGACY_KEYS.customers);
-      await AsyncStorage.setItem(LEGACY_KEYS.customersAction, `deleted on ${formatNow()}`);
-    }
-  } catch (e) {
-    console.error('Clearing customers failed', e);
-  }
-};
+  const payload = await readPayload(dataKey('products', resolvedBrand), 'products', resolvedBrand);
+  if (payload) return payload;
 
-export const getCustomersFromLocal = async (brand) => {
+  if (resolvedBrand === DEFAULT_BRAND) {
+    const legacy = await readPayload(LEGACY_KEYS.products, 'legacy_products', resolvedBrand);
+    return legacy || [];
+  }
+  return [];
+}
+
+export async function clearProductsLocal(brand) {
   const resolvedBrand = resolveBrandKey(brand);
-  try {
-    const json = await AsyncStorage.getItem(dataKey('customers', resolvedBrand));
-    if (json != null) return JSON.parse(json);
-    if (resolvedBrand === DEFAULT_BRAND) {
-      const legacy = await AsyncStorage.getItem(LEGACY_KEYS.customers);
-      return legacy != null ? JSON.parse(legacy) : [];
-    }
-    return [];
-  } catch (e) {
-    console.error('Reading customers failed', e);
-    return [];
-  }
-};
+  const key = dataKey('products', resolvedBrand);
+  await clearPayload(key, 'products', resolvedBrand);
+  await setActionState('products', resolvedBrand, 'deleted');
 
-export const getCustomersLastAction = async (brand) => {
+  if (resolvedBrand === DEFAULT_BRAND) {
+    await clearPayload(LEGACY_KEYS.products, 'legacy_products', resolvedBrand);
+    await AsyncStorage.setItem(LEGACY_KEYS.productsAction, `deleted on ${formatNow()}`);
+  }
+}
+
+export async function getProductsLastAction(brand) {
   const resolvedBrand = resolveBrandKey(brand);
-  try {
-    const scoped = await AsyncStorage.getItem(actionKey('customers', resolvedBrand));
-    if (scoped) return scoped;
-    if (resolvedBrand === DEFAULT_BRAND) {
-      const legacy = await AsyncStorage.getItem(LEGACY_KEYS.customersAction);
-      return legacy || 'No actions yet';
-    }
-    return 'No actions yet';
-  } catch {
-    return 'No actions yet';
-  }
-};
+  return readActionState('products', resolvedBrand, LEGACY_KEYS.productsAction);
+}
 
-// --- IMAGE CACHING (with RNFS) ---
-export async function setImagesLastAction(val) {
-  await AsyncStorage.setItem('images_last_action', val);
+export async function saveCustomersToLocal(customers, brand) {
+  const resolvedBrand = resolveBrandKey(brand);
+  const key = dataKey('customers', resolvedBrand);
+  const result = await storePayload(key, 'customers', resolvedBrand, customers);
+  await setActionState('customers', resolvedBrand, 'updated');
+
+  if (resolvedBrand === DEFAULT_BRAND) {
+    if (result?.strategy === 'file' && result.pointer) {
+      await storePointerReference(LEGACY_KEYS.customers, result.pointer);
+    } else {
+      await storePayload(LEGACY_KEYS.customers, 'legacy_customers', resolvedBrand, customers);
+    }
+    await legacySetAction(LEGACY_KEYS.customersAction);
+  }
+}
+
+export async function getCustomersFromLocal(brand) {
+  const resolvedBrand = resolveBrandKey(brand);
+  const payload = await readPayload(dataKey('customers', resolvedBrand), 'customers', resolvedBrand);
+  if (payload) return payload;
+
+  if (resolvedBrand === DEFAULT_BRAND) {
+    const legacy = await readPayload(LEGACY_KEYS.customers, 'legacy_customers', resolvedBrand);
+    return legacy || [];
+  }
+  return [];
+}
+
+export async function clearCustomersLocal(brand) {
+  const resolvedBrand = resolveBrandKey(brand);
+  const key = dataKey('customers', resolvedBrand);
+  await clearPayload(key, 'customers', resolvedBrand);
+  await setActionState('customers', resolvedBrand, 'deleted');
+
+  if (resolvedBrand === DEFAULT_BRAND) {
+    await clearPayload(LEGACY_KEYS.customers, 'legacy_customers', resolvedBrand);
+    await AsyncStorage.setItem(LEGACY_KEYS.customersAction, `deleted on ${formatNow()}`);
+  }
+}
+
+export async function getCustomersLastAction(brand) {
+  const resolvedBrand = resolveBrandKey(brand);
+  return readActionState('customers', resolvedBrand, LEGACY_KEYS.customersAction);
+}
+
+export async function saveSuperMarketStoresToLocal(stores, brand) {
+  const resolvedBrand = resolveBrandKey(brand);
+  await storePayload(dataKey('supermarket_stores', resolvedBrand), 'supermarket_stores', resolvedBrand, stores);
+  await setActionState('supermarket_stores', resolvedBrand, 'updated');
+}
+
+export async function getSuperMarketStoresFromLocal(brand) {
+  const resolvedBrand = resolveBrandKey(brand);
+  const payload = await readPayload(dataKey('supermarket_stores', resolvedBrand), 'supermarket_stores', resolvedBrand);
+  return payload || [];
+}
+
+export async function clearSuperMarketStoresLocal(brand) {
+  const resolvedBrand = resolveBrandKey(brand);
+  await clearPayload(dataKey('supermarket_stores', resolvedBrand), 'supermarket_stores', resolvedBrand);
+  await setActionState('supermarket_stores', resolvedBrand, 'deleted');
+}
+
+export async function getSuperMarketStoresLastAction(brand) {
+  const resolvedBrand = resolveBrandKey(brand);
+  return readActionState('supermarket_stores', resolvedBrand);
+}
+
+export async function saveSuperMarketListingsToLocal(listings, brand) {
+  const resolvedBrand = resolveBrandKey(brand);
+  await storePayload(dataKey('supermarket_listings', resolvedBrand), 'supermarket_listings', resolvedBrand, listings);
+  await setActionState('supermarket_listings', resolvedBrand, 'updated');
+}
+
+export async function getSuperMarketListingsFromLocal(brand) {
+  const resolvedBrand = resolveBrandKey(brand);
+  const payload = await readPayload(dataKey('supermarket_listings', resolvedBrand), 'supermarket_listings', resolvedBrand);
+  return payload || [];
+}
+
+export async function clearSuperMarketListingsLocal(brand) {
+  const resolvedBrand = resolveBrandKey(brand);
+  await clearPayload(dataKey('supermarket_listings', resolvedBrand), 'supermarket_listings', resolvedBrand);
+  await setActionState('supermarket_listings', resolvedBrand, 'deleted');
+}
+
+export async function getSuperMarketListingsLastAction(brand) {
+  const resolvedBrand = resolveBrandKey(brand);
+  return readActionState('supermarket_listings', resolvedBrand);
+}
+
+export async function saveSuperMarketListingImagesLastAction(brand) {
+  const resolvedBrand = resolveBrandKey(brand);
+  await setActionState('supermarket_listing_images', resolvedBrand, 'updated');
+}
+
+export async function getSuperMarketListingImagesLastAction(brand) {
+  const resolvedBrand = resolveBrandKey(brand);
+  return readActionState('supermarket_listing_images', resolvedBrand);
+}
+
+export async function saveImagesLastAction() {
+  await AsyncStorage.setItem('images_last_action', `updated on ${formatNow()}`);
 }
 
 export async function getImagesLastAction() {
   try {
     const val = await AsyncStorage.getItem('images_last_action');
     return val || 'No actions yet';
-  } catch {
+  } catch (error) {
     return 'No actions yet';
   }
 }
 
-// Ensure directory exists (can be imported from imageHelpers.js to avoid duplication)
-const ensureDirExists = async () => {
+export const IMAGES_DIR = `${RNFS.DocumentDirectoryPath}/product_images/`;
+
+const ensureImagesDir = async () => {
   try {
     const exists = await RNFS.exists(IMAGES_DIR);
-    if (!exists) await RNFS.mkdir(IMAGES_DIR);
-  } catch (e) {
-    // Optional: log error
+    if (!exists) {
+      await RNFS.mkdir(IMAGES_DIR);
+    }
+  } catch (error) {
+    // ignore
   }
 };
 
-// Save/download product images locally (from array of products)
 export async function cacheProductImages(products) {
-  await ensureDirExists();
+  await ensureImagesDir();
   let count = 0;
-  for (const prod of products) {
-    if (prod.frontCover && prod.productCode) {
-      const imgUri = prod.frontCover;
+  for (const prod of products || []) {
+    if (prod?.frontCover && prod?.productCode) {
       const fileName = `${prod.productCode}.jpg`;
-      const filePath = IMAGES_DIR + fileName;
+      const filePath = `${IMAGES_DIR}${fileName}`;
       try {
-        // Always overwrite for freshness
-        if (await RNFS.exists(filePath)) await RNFS.unlink(filePath);
-        const downloadResult = await RNFS.downloadFile({ fromUrl: imgUri, toFile: filePath }).promise;
-        if (downloadResult.statusCode === 200) count++;
-      } catch (e) {
-        // Could not download, ignore/log if you want
-        // console.warn(`Image failed for ${prod.productCode}:`, e);
+        if (await RNFS.exists(filePath)) {
+          await RNFS.unlink(filePath);
+        }
+        const result = await RNFS.downloadFile({ fromUrl: prod.frontCover, toFile: filePath }).promise;
+        if (result.statusCode === 200) {
+          count += 1;
+        }
+      } catch (error) {
+        // ignore download failures
       }
     }
   }
-  await setImagesLastAction(`updated on ${formatNow()}`);
+  await AsyncStorage.setItem('images_last_action', `updated on ${formatNow()}`);
   return count;
 }
 
-// Delete all cached product images
 export async function clearProductImagesCache() {
   try {
     const exists = await RNFS.exists(IMAGES_DIR);
-    if (exists) await RNFS.unlink(IMAGES_DIR);
-  } catch (e) {
+    if (exists) {
+      await RNFS.unlink(IMAGES_DIR);
+    }
+  } catch (error) {
     // ignore
   }
-  await setImagesLastAction(`deleted on ${formatNow()}`);
+  await AsyncStorage.setItem('images_last_action', `deleted on ${formatNow()}`);
 }
 
-// Helper to get a local image file path (use for <Image source={{uri: ...}}/>)
 export function getLocalProductImage(productCode) {
   return `file://${IMAGES_DIR}${productCode}.jpg`;
 }
 
-// --- SUPERMARKET STORES ---
-export const saveSuperMarketStoresToLocal = async (stores, brand) => {
-  const resolvedBrand = resolveBrandKey(brand);
-  const key = dataKey(`${SUPERMARKET_STORE_KEY}`, resolvedBrand);
-  const lastActionKey = actionKey(`${SUPERMARKET_STORE_KEY}`, resolvedBrand);
-  try {
-    await AsyncStorage.setItem(key, JSON.stringify(stores));
-    await AsyncStorage.setItem(lastActionKey, `updated on ${formatNow()}`);
-  } catch (e) {
-    console.error('Saving supermarket stores failed', e);
+export async function clearAllLocalData() {
+  await AsyncStorage.clear();
+  if (STORAGE_ROOT) {
+    try {
+      await FileSystem.deleteAsync(STORAGE_ROOT, { idempotent: true });
+    } catch (error) {
+      // ignore
+    }
   }
-};
+}
 
-export const clearSuperMarketStoresLocal = async (brand) => {
-  const resolvedBrand = resolveBrandKey(brand);
-  const key = dataKey(`${SUPERMARKET_STORE_KEY}`, resolvedBrand);
-  const lastActionKey = actionKey(`${SUPERMARKET_STORE_KEY}`, resolvedBrand);
-  try {
-    await AsyncStorage.removeItem(key);
-    await AsyncStorage.setItem(lastActionKey, `deleted on ${formatNow()}`);
-  } catch (e) {
-    console.error('Clearing supermarket stores failed', e);
-  }
-};
-
-export const getSuperMarketStoresLastAction = async (brand) => {
-  const resolvedBrand = resolveBrandKey(brand);
-  try {
-    const scoped = await AsyncStorage.getItem(actionKey(`${SUPERMARKET_STORE_KEY}`, resolvedBrand));
-    return scoped || 'No actions yet';
-  } catch {
-    return 'No actions yet';
-  }
-};
-
-// --- SUPERMARKET LISTINGS ---
-export const saveSuperMarketListingsToLocal = async (listings, brand) => {
-  const resolvedBrand = resolveBrandKey(brand);
-  const key = dataKey(`${SUPERMARKET_LISTING_KEY}`, resolvedBrand);
-  const lastActionKey = actionKey(`${SUPERMARKET_LISTING_KEY}`, resolvedBrand);
-  try {
-    await AsyncStorage.setItem(key, JSON.stringify(listings));
-    await AsyncStorage.setItem(lastActionKey, `updated on ${formatNow()}`);
-  } catch (e) {
-    console.error('Saving supermarket listings failed', e);
-  }
-};
-
-export const clearSuperMarketListingsLocal = async (brand) => {
-  const resolvedBrand = resolveBrandKey(brand);
-  const key = dataKey(`${SUPERMARKET_LISTING_KEY}`, resolvedBrand);
-  const lastActionKey = actionKey(`${SUPERMARKET_LISTING_KEY}`, resolvedBrand);
-  try {
-    await AsyncStorage.removeItem(key);
-    await AsyncStorage.setItem(lastActionKey, `deleted on ${formatNow()}`);
-  } catch (e) {
-    console.error('Clearing supermarket listings failed', e);
-  }
-};
-
-export const getSuperMarketListingsLastAction = async (brand) => {
-  const resolvedBrand = resolveBrandKey(brand);
-  try {
-    const scoped = await AsyncStorage.getItem(actionKey(`${SUPERMARKET_LISTING_KEY}`, resolvedBrand));
-    return scoped || 'No actions yet';
-  } catch {
-    return 'No actions yet';
-  }
-};
+export async function dumpLocalKeys() {
+  const keys = await AsyncStorage.getAllKeys();
+  console.log('local data keys:', keys);
+}

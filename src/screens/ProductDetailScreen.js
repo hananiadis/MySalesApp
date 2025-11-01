@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Linking } 
 import { useLocalOrRemoteImage } from '../utils/imageHelpers';
 import { getImmediateStockValue } from '../utils/stockAvailability';
 import { normalizeBrandKey } from '../constants/brands';
+import BarcodeText from '../components/BarcodeText';
+import { isValidBarcode } from '../utils/barcodeValidation';
 
 const PRODUCT_PLACEHOLDERS = {
   playmobil: require('../../assets/playmobil_product_placeholder.png'),
@@ -145,6 +147,28 @@ const openExternalLink = async (url) => {
   }
 };
 
+/**
+ * BarcodeSection - Displays scannable barcode if available
+ * @param {string} barcode - Barcode value
+ * @param {string} label - Section label (optional)
+ */
+const BarcodeSection = ({ barcode, label = "Barcode" }) => {
+  if (!isValidBarcode(barcode)) {
+    return null;
+  }
+  
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>{label}</Text>
+      <BarcodeText 
+        barcode={barcode} 
+        fontSize={50} 
+        showValue={true} 
+      />
+    </View>
+  );
+};
+
 const ProductDetailScreen = ({ route, navigation }) => {
   const productParam = route?.params?.product || {};
   const routeBrand = route?.params?.brand;
@@ -209,98 +233,104 @@ const ProductDetailScreen = ({ route, navigation }) => {
 
   const renderPlaymobilDetails = () => (
     <>
-      <Section title="Πληροφορίες Προϊόντος">
-        <DetailRow label="Barcode" value={product.barcode} />
-        <DetailRow label="Θεματική" value={product.playingTheme} />
-        <DetailRow label="Συσκευασία" value={product.package} />
-        <DetailRow label="Χονδρική Τιμή" value={formatCurrency(product.wholesalePrice)} />
-        <DetailRow label="Λιανική Τιμή" value={formatCurrency(product.srp)} />
-      </Section>
-      <Section title="Κατάλογος & Διαθεσιμότητα">
-        <DetailRow label="Σελίδα Καταλόγου" value={product.cataloguePage} />
-        <DetailRow label="Προτεινόμενη Ηλικία" value={product.suggestedAge} />
-        <DetailRow label="Φύλο" value={formatGender(product.gender)} />
-        <DetailRow label="Ενεργό" value={product.isActive ? 'Ναι' : 'Όχι'} />
-        <DetailRow label="Ημερομηνία Κυκλοφορίας" value={formatDate(product.launchDate)} />
-      </Section>
-    </>
+    <BarcodeSection barcode={product.barcode} />
+    
+    <Section title="Πληροφορίες Προϊόντος">
+      <DetailRow label="Barcode" value={product.barcode} />
+      <DetailRow label="Θεματική" value={product.playingTheme} />
+      <DetailRow label="Συσκευασία" value={product.package} />
+      <DetailRow label="Χονδρική Τιμή" value={formatCurrency(product.wholesalePrice)} />
+      <DetailRow label="Λιανική Τιμή" value={formatCurrency(product.srp)} />
+    </Section>
+    <Section title="Κατάλογος & Διαθεσιμότητα">
+      <DetailRow label="Σελίδα Καταλόγου" value={product.cataloguePage} />
+      <DetailRow label="Προτεινόμενη Ηλικία" value={product.suggestedAge} />
+      <DetailRow label="Φύλο" value={formatGender(product.gender)} />
+      <DetailRow label="Ενεργό" value={product.isActive ? 'Ναι' : 'Όχι'} />
+      <DetailRow label="Ημερομηνία Κυκλοφορίας" value={formatDate(product.launchDate)} />
+    </Section>
+  </>
   );
 
   const renderKivosDetails = () => (
     <>
-      <Section title="Βασικά Στοιχεία">
-        <DetailRow label="Περιγραφή" value={product.description} />
-        <DetailRow label="Αναλυτική Περιγραφή" value={product.descriptionFull} />
-        <DetailRow label="Brand Προμηθευτή" value={product.supplierBrand} />
-        <DetailRow label="Κατηγορία" value={product.category} />
-        <DetailRow label="MM" value={product.mm} />
-      </Section>
-      <Section title="Συσκευασία">
-        <DetailRow label="Τύπος Συσκευασίας" value={product.packaging} />
-        <DetailRow label="Τεμάχια ανά Συσκευασία" value={product.piecesPerPack} />
-        <DetailRow label="Τεμάχια ανά Κιβώτιο" value={product.piecesPerBox} />
-        <DetailRow label="Τεμάχια ανά Χαρτοκιβώτιο" value={product.piecesPerCarton} />
-      </Section>
-      <Section title="Τιμές & Προσφορές">
-        <DetailRow label="Χονδρική Τιμή" value={formatCurrency(product.wholesalePrice)} />
-        <DetailRow label="Τιμή Προσφοράς" value={formatCurrency(product.offerPrice)} />
-        <DetailRow label="Έκπτωση" value={formatDiscount(product.discount)} />
-        <DetailRow label="Λήξη Έκπτωσης" value={product.discountEndsAt} />
-      </Section>
-      <Section title="Barcodes">
-        <DetailRow label="Unit" value={product.barcodeUnit} />
-        <DetailRow label="Κιβώτιο" value={product.barcodeBox} />
-        <DetailRow label="Χαρτοκιβώτιο" value={product.barcodeCarton} />
-      </Section>
-      <Section title="Σύνδεσμος">
-        <DetailRow
-          label="Product URL"
-          value={product.productUrl}
-          isLink
-          onPress={handleOpenProductUrl}
-        />
-      </Section>
-    </>
+    <BarcodeSection barcode={product.barcodeUnit} label="Barcode Unit" />
+    
+    <Section title="Βασικά Στοιχεία">
+      <DetailRow label="Περιγραφή" value={product.description} />
+      <DetailRow label="Αναλυτική Περιγραφή" value={product.descriptionFull} />
+      <DetailRow label="Brand Προμηθευτή" value={product.supplierBrand} />
+      <DetailRow label="Κατηγορία" value={product.category} />
+      <DetailRow label="MM" value={product.mm} />
+    </Section>
+    <Section title="Συσκευασία">
+      <DetailRow label="Τύπος Συσκευασίας" value={product.packaging} />
+      <DetailRow label="Τεμάχια ανά Συσκευασία" value={product.piecesPerPack} />
+      <DetailRow label="Τεμάχια ανά Κιβώτιο" value={product.piecesPerBox} />
+      <DetailRow label="Τεμάχια ανά Χαρτοκιβώτιο" value={product.piecesPerCarton} />
+    </Section>
+    <Section title="Τιμές & Προσφορές">
+      <DetailRow label="Χονδρική Τιμή" value={formatCurrency(product.wholesalePrice)} />
+      <DetailRow label="Τιμή Προσφοράς" value={formatCurrency(product.offerPrice)} />
+      <DetailRow label="Έκπτωση" value={formatDiscount(product.discount)} />
+      <DetailRow label="Λήξη Έκπτωσης" value={product.discountEndsAt} />
+    </Section>
+    <Section title="Barcodes">
+      <DetailRow label="Unit" value={product.barcodeUnit} />
+      <DetailRow label="Κιβώτιο" value={product.barcodeBox} />
+      <DetailRow label="Χαρτοκιβώτιο" value={product.barcodeCarton} />
+    </Section>
+    <Section title="Σύνδεσμος">
+      <DetailRow
+        label="Product URL"
+        value={product.productUrl}
+        isLink
+        onPress={handleOpenProductUrl}
+      />
+    </Section>
+  </>
   );
 
   const renderJohnDetails = () => (
     <>
-      <Section title="Βασικά Στοιχεία">
-        <DetailRow label="Περιγραφή" value={product.description} />
-        <DetailRow label="Κύρια Κατηγορία" value={product.generalCategory} />
-        <DetailRow label="Υποκατηγορία" value={product.subCategory} />
-        <DetailRow label="Φύλλο Σχήματος" value={product.sheetCategory} />
+    <BarcodeSection barcode={product.barcode} />
+    
+    <Section title="Βασικά Στοιχεία">
+      <DetailRow label="Περιγραφή" value={product.description} />
+      <DetailRow label="Κύρια Κατηγορία" value={product.generalCategory} />
+      <DetailRow label="Υποκατηγορία" value={product.subCategory} />
+      <DetailRow label="Φύλλο Σχήματος" value={product.sheetCategory} />
+    </Section>
+    <Section title="Τιμοκατάλογος">
+      <DetailRow label="Price List" value={formatCurrency(product.priceList)} />
+      <DetailRow label="Χονδρική Τιμή" value={formatCurrency(product.wholesalePrice)} />
+      <DetailRow label="Λιανική Τιμή" value={formatCurrency(product.srp)} />
+    </Section>
+    <Section title="Συσκευασία & Διαστάσεις">
+      <DetailRow label="Συσκευασία" value={product.packaging} />
+      <DetailRow label="Διαστάσεις Προϊόντος" value={product.productDimensions} />
+      <DetailRow label="Διαστάσεις Συσκευασίας" value={product.packageDimensions} />
+    </Section>
+    <Section title="Barcode">
+      <DetailRow label="Barcode" value={product.barcode} />
+    </Section>
+    {Array.isArray(product.activeSupermarketListings) && product.activeSupermarketListings.length > 0 ? (
+      <Section title="SuperMarket Listings">
+        {product.activeSupermarketListings.map((entry, index) => {
+          const storeLabel = entry?.storeName || entry?.storeCode || 'Άγνωστο';
+          const categoryLabel = entry?.category || 'Κατηγορία';
+          const displayValue = `${storeLabel}${categoryLabel ? ' • ' + categoryLabel : ''}`;
+          return (
+            <DetailRow
+              key={`${entry?.storeCode || 'store'}-${entry?.category || 'category'}-${index}`}
+              label="Κατάστημα"
+              value={displayValue}
+            />
+          );
+        })}
       </Section>
-      <Section title="Τιμοκατάλογος">
-        <DetailRow label="Price List" value={formatCurrency(product.priceList)} />
-        <DetailRow label="Χονδρική Τιμή" value={formatCurrency(product.wholesalePrice)} />
-        <DetailRow label="Λιανική Τιμή" value={formatCurrency(product.srp)} />
-      </Section>
-      <Section title="Συσκευασία & Διαστάσεις">
-        <DetailRow label="Συσκευασία" value={product.packaging} />
-        <DetailRow label="Διαστάσεις Προϊόντος" value={product.productDimensions} />
-        <DetailRow label="Διαστάσεις Συσκευασίας" value={product.packageDimensions} />
-      </Section>
-      <Section title="Barcode">
-        <DetailRow label="Barcode" value={product.barcode} />
-      </Section>
-      {Array.isArray(product.activeSupermarketListings) && product.activeSupermarketListings.length > 0 ? (
-        <Section title="SuperMarket Listings">
-          {product.activeSupermarketListings.map((entry, index) => {
-            const storeLabel = entry?.storeName || entry?.storeCode || '\u0386\u03b3\u03bd\u03c9\u03c3\u03c4\u03bf';
-            const categoryLabel = entry?.category || '\u039a\u03b1\u03c4\u03b7\u03b3\u03bf\u03c1\u03af\u03b1';
-            const displayValue = `${storeLabel}${categoryLabel ? ' \u2022 ' + categoryLabel : ''}`;
-            return (
-              <DetailRow
-                key={`${entry?.storeCode || 'store'}-${entry?.category || 'category'}-${index}`}
-                label="\u039a\u03b1\u03c4\u03ac\u03c3\u03c4\u03b7\u03bc\u03b1"
-                value={displayValue}
-              />
-            );
-          })}
-        </Section>
-      ) : null}
-    </>
+    ) : null}
+  </>
   );
 
   const renderBrandSections = () => {

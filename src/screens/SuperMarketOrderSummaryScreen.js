@@ -21,59 +21,62 @@ import { exportSupermarketXLSX } from '../utils/exportSupermarketXLSX';
 import { canonicalCode } from '../utils/codeNormalization';
 
 const STRINGS = {
-  screenTitle: '\u03a3\u03cd\u03bd\u03bf\u03c8\u03b7 \u03a0\u03b1\u03c1\u03b1\u03b3\u03b3\u03b5\u03bb\u03af\u03b1\u03c2 SuperMarket',
-  storeInfo: '\u03a3\u03c4\u03bf\u03b9\u03c7\u03b5\u03af\u03b1 \u03ba\u03b1\u03c4\u03b1\u03c3\u03c4\u03ae\u03bc\u03b1\u03c4\u03bf\u03c2',
-  orderInfo: '\u03a3\u03c4\u03bf\u03b9\u03c7\u03b5\u03af\u03b1 \u03c0\u03b1\u03c1\u03b1\u03b3\u03b3\u03b5\u03bb\u03af\u03b1\u03c2',
-  productsInfo: '\u03a0\u03bb\u03b7\u03c1\u03bf\u03c6\u03bf\u03c1\u03af\u03b5\u03c2 \u03c0\u03c1\u03bf\u03ca\u03cc\u03bd\u03c4\u03c9\u03bd',
-  totalsInfo: '\u03a3\u03cd\u03bd\u03bf\u03bb\u03b1',
-  exportOptions: '\u0395\u03c0\u03b9\u03bb\u03bf\u03b3\u03ad\u03c2 \u03b5\u03be\u03b1\u03b3\u03c9\u03b3\u03ae\u03c2',
-  exportOrderOnly: '\u0395\u03be\u03b1\u03b3\u03c9\u03b3\u03ae \u03bc\u03cc\u03bd\u03bf \u03c0\u03b1\u03c1\u03b1\u03b3\u03b3\u03b5\u03bb\u03af\u03b1\u03c2',
-  exportFullListing: '\u0395\u03be\u03b1\u03b3\u03c9\u03b3\u03ae \u03c0\u03bb\u03ae\u03c1\u03bf\u03c5\u03c2 listing',
-  exportOrderOnlyDesc: '\u0394\u03b7\u03bc\u03b9\u03bf\u03c5\u03c1\u03b3\u03b5\u03af \u03b1\u03c1\u03c7\u03b5\u03af\u03bf \u03bc\u03cc\u03bd\u03bf \u03bc\u03b5 \u03c4\u03b1 \u03c0\u03c1\u03bf\u03ca\u03cc\u03bd\u03c4\u03b1 \u03c4\u03b7\u03c2 \u03c0\u03b1\u03c1\u03b1\u03b3\u03b3\u03b5\u03bb\u03af\u03b1\u03c2.',
-  exportFullListingDesc: '\u0394\u03b7\u03bc\u03b9\u03bf\u03c5\u03c1\u03b3\u03b5\u03af \u03b1\u03c1\u03c7\u03b5\u03af\u03bf \u03bc\u03b5 \u03cc\u03bb\u03b7 \u03c4\u03b7 \u03bb\u03af\u03c3\u03c4\u03b1 \u03c0\u03c1\u03bf\u03ca\u03cc\u03bd\u03c4\u03c9\u03bd \u03ba\u03b1\u03b9 \u03c4\u03b1 \u03c3\u03c4\u03bf\u03b9\u03c7\u03b5\u03af\u03b1 \u03b1\u03c0\u03bf\u03b8\u03ad\u03bc\u03b1\u03c4\u03bf\u03c2.',
-  netValue: '\u039a\u03b1\u03b8\u03b1\u03c1\u03ae \u03b1\u03be\u03af\u03b1',
-  vat: '\u03a6\u03a0\u0391 24%',
-  totalValue: '\u03a3\u03c5\u03bd\u03bf\u03bb\u03b9\u03ba\u03ae \u03b1\u03be\u03af\u03b1',
-  confirmOrder: '\u039f\u03c1\u03b9\u03c3\u03c4\u03b9\u03ba\u03bf\u03c0\u03bf\u03af\u03b7\u03c3\u03b7 \u03c0\u03b1\u03c1\u03b1\u03b3\u03b3\u03b5\u03bb\u03af\u03b1\u03c2',
-  exportOrder: '\u0395\u03be\u03b1\u03b3\u03c9\u03b3\u03ae \u03c0\u03b1\u03c1\u03b1\u03b3\u03b3\u03b5\u03bb\u03af\u03b1\u03c2',
-  cancelOrder: '\u0391\u03ba\u03cd\u03c1\u03c9\u03c3\u03b7',
-  error: '\u03a3\u03c6\u03ac\u03bb\u03bc\u03b1',
-  exportFailed: '\u0397 \u03b5\u03be\u03b1\u03b3\u03c9\u03b3\u03ae \u03b1\u03c0\u03ad\u03c4\u03c5\u03c7\u03b5. \u03a0\u03c1\u03bf\u03c3\u03c0\u03b1\u03b8\u03ae\u03c3\u03c4\u03b5 \u03be\u03b1\u03bd\u03ac.',
-  confirmCancel: '\u0395\u03c0\u03b9\u03b2\u03b5\u03b2\u03b1\u03af\u03c9\u03c3\u03b7 \u03b1\u03ba\u03cd\u03c1\u03c9\u03c3\u03b7\u03c2',
-  cancelMessage: '\u0398\u03ad\u03bb\u03b5\u03c4\u03b5 \u03c3\u03af\u03b3\u03bf\u03c5\u03c1\u03b1 \u03bd\u03b1 \u03b1\u03ba\u03c5\u03c1\u03ce\u03c3\u03b5\u03c4\u03b5 \u03c4\u03b7\u03bd \u03c0\u03b1\u03c1\u03b1\u03b3\u03b3\u03b5\u03bb\u03af\u03b1;',
-  noProductsError: '\u0394\u03b5\u03bd \u03c5\u03c0\u03ac\u03c1\u03c7\u03bf\u03c5\u03bd \u03c0\u03c1\u03bf\u03ca\u03cc\u03bd\u03c4\u03b1 \u03b3\u03b9\u03b1 \u03b5\u03be\u03b1\u03b3\u03c9\u03b3\u03ae.',
-  cancelFailed: '\u0397 \u03b1\u03ba\u03cd\u03c1\u03c9\u03c3\u03b7 \u03b4\u03b5\u03bd \u03bf\u03bb\u03bf\u03ba\u03bb\u03b7\u03c1\u03ce\u03b8\u03b7\u03ba\u03b5. \u03a0\u03c1\u03bf\u03c3\u03c0\u03b1\u03b8\u03ae\u03c3\u03c4\u03b5 \u03be\u03b1\u03bd\u03ac.',
-  yes: '\u039d\u03b1\u03b9',
-  no: '\u038c\u03c7\u03b9',
-  orderNumber: '\u0391\u03c1\u03b9\u03b8\u03bc\u03cc\u03c2 \u03c0\u03b1\u03c1\u03b1\u03b3\u03b3\u03b5\u03bb\u03af\u03b1\u03c2',
-  createdAt: '\u0397\u03bc\u03b5\u03c1\u03bf\u03bc\u03b7\u03bd\u03af\u03b1 \u03b4\u03b7\u03bc\u03b9\u03bf\u03c5\u03c1\u03b3\u03af\u03b1\u03c2',
-  storeName: '\u038c\u03bd\u03bf\u03bc\u03b1 \u03ba\u03b1\u03c4\u03b1\u03c3\u03c4\u03ae\u03bc\u03b1\u03c4\u03bf\u03c2',
-  storeCode: '\u039a\u03c9\u03b4\u03b9\u03ba\u03cc\u03c2 \u03ba\u03b1\u03c4\u03b1\u03c3\u03c4\u03ae\u03bc\u03b1\u03c4\u03bf\u03c2',
-  storeCategory: '\u039a\u03b1\u03c4\u03b7\u03b3\u03bf\u03c1\u03af\u03b1 \u03ba\u03b1\u03c4\u03b1\u03c3\u03c4\u03ae\u03bc\u03b1\u03c4\u03bf\u03c2',
-  companyName: '\u0395\u03c0\u03c9\u03bd\u03c5\u03bc\u03af\u03b1',
-  totalProducts: '\u03a3\u03cd\u03bd\u03bf\u03bb\u03bf \u03c0\u03c1\u03bf\u03ca\u03cc\u03bd\u03c4\u03c9\u03bd',
-  totalQuantity: '\u03a3\u03c5\u03bd\u03bf\u03bb\u03b9\u03ba\u03ae \u03c0\u03bf\u03c3\u03cc\u03c4\u03b7\u03c4\u03b1',
-  notes: '\u03a3\u03b7\u03bc\u03b5\u03b9\u03ce\u03c3\u03b5\u03b9\u03c2',
-  noNotes: '\u0394\u03b5\u03bd \u03c5\u03c0\u03ac\u03c1\u03c7\u03bf\u03c5\u03bd \u03c3\u03b7\u03bc\u03b5\u03b9\u03ce\u03c3\u03b5\u03b9\u03c2.',
-  packagingLabel: '\u03a3\u03c5\u03c3\u03ba\u03b5\u03c5\u03b1\u03c3\u03af\u03b1',
-  unitsSuffix: ' \u03c4\u03b5\u03bc.',
-  newBadge: '\u039d\u0395\u039f',
-  srpInfo: '\u039b\u03b9\u03b1\u03bd\u03b9\u03ba\u03ae \u03c4\u03b9\u03bc\u03ae',
-  stockInfo: '\u0391\u03c0\u03cc\u03b8\u03b5\u03bc\u03b1',
-  suggestedInfo: '\u03a0\u03c1\u03bf\u03c4\u03b5\u03b9\u03bd\u03cc\u03bc\u03b5\u03bd\u03b7',
-  quantityLabel: '\u03a0\u03bf\u03c3\u03cc\u03c4\u03b7\u03c4\u03b1:',
-  wholesaleLabel: '\u03a7\u03bf\u03bd\u03b4\u03c1\u03b9\u03ba\u03ae:',
-  postExportTitle: '\u0397 \u03b5\u03be\u03b1\u03b3\u03c9\u03b3\u03ae \u03bf\u03bb\u03bf\u03ba\u03bb\u03b7\u03c1\u03ce\u03b8\u03b7\u03ba\u03b5',
-  postExportMessage: '\u03a4\u03b9 \u03b8\u03ad\u03bb\u03b5\u03c4\u03b5 \u03bd\u03b1 \u03ba\u03ac\u03bd\u03b5\u03c4\u03b5 \u03c3\u03c4\u03b7 \u03c3\u03c5\u03bd\u03ad\u03c7\u03b5\u03b9\u03b1;',
-  newOrderOption: '\u039d\u03ad\u03b1 \u03c0\u03b1\u03c1\u03b1\u03b3\u03b3\u03b5\u03bb\u03af\u03b1 SuperMarket',
-  backToJohnOption: '\u0395\u03c0\u03b9\u03c3\u03c4\u03c1\u03bf\u03c6\u03ae \u03c3\u03c4\u03b7\u03bd \u03bf\u03b8\u03cc\u03bd\u03b7 John',
-  cancelOption: '\u0391\u03ba\u03cd\u03c1\u03c9\u03c3\u03b7',
-  productCountSuffix: ' \u03c0\u03c1\u03bf\u03ca\u03cc\u03bd\u03c4\u03b1',
+  screenTitle: 'Σύνοψη Παραγγελίας SuperMarket',
+  storeInfo: 'Στοιχεία καταστήματος',
+  orderInfo: 'Στοιχεία παραγγελίας',
+  productsInfo: 'Πληροφορίες προϊόντων',
+  totalsInfo: 'Σύνολα',
+  exportOptions: 'Επιλογές εξαγωγής',
+  exportOrderOnly: 'Εξαγωγή μόνο παραγγελίας',
+  exportFullListing: 'Εξαγωγή πλήρους listing',
+  exportOrderOnlyDesc: 'Δημιουργεί αρχείο μόνο με τα προϊόντα της παραγγελίας.',
+  exportFullListingDesc: 'Δημιουργεί αρχείο με όλη τη λίστα προϊόντων και τα στοιχεία αποθέματος.',
+  includeImages: 'Συμπερίληψη εικόνων',
+  includeImagesDesc: 'Προσθέτει εικόνες προϊόντων στο αρχείο (αυξάνει το μέγεθος)',
+  netValue: 'Καθαρή αξία',
+  vat: 'ΦΠΑ 24%',
+  totalValue: 'Συνολική αξία',
+  confirmOrder: 'Οριστικοποίηση παραγγελίας',
+  exportOrder: 'Εξαγωγή παραγγελίας',
+  cancelOrder: 'Ακύρωση',
+  error: 'Σφάλμα',
+  exportFailed: 'Η εξαγωγή απέτυχε. Προσπαθήστε ξανά.',
+  confirmCancel: 'Επιβεβαίωση ακύρωσης',
+  cancelMessage: 'Θέλετε σίγουρα να ακυρώσετε την παραγγελία;',
+  noProductsError: 'Δεν υπάρχουν προϊόντα για εξαγωγή.',
+  cancelFailed: 'Η ακύρωση δεν ολοκληρώθηκε. Προσπαθήστε ξανά.',
+  yes: 'Ναι',
+  no: 'Όχι',
+  orderNumber: 'Αριθμός παραγγελίας',
+  createdAt: 'Ημερομηνία δημιουργίας',
+  storeName: 'Όνομα καταστήματος',
+  storeCode: 'Κωδικός καταστήματος',
+  storeCategory: 'Κατηγορία καταστήματος',
+  companyName: 'Επωνυμία',
+  totalProducts: 'Σύνολο προϊόντων',
+  totalQuantity: 'Συνολική ποσότητα',
+  notes: 'Σημειώσεις',
+  noNotes: 'Δεν υπάρχουν σημειώσεις.',
+  packagingLabel: 'Συσκευασία',
+  unitsSuffix: ' τεμ.',
+  newBadge: 'ΝΕΟ',
+  srpInfo: 'Λιανική τιμή',
+  stockInfo: 'Απόθεμα',
+  suggestedInfo: 'Προτεινόμενη',
+  quantityLabel: 'Ποσότητα:',
+  wholesaleLabel: 'Χονδρική:',
+  postExportTitle: 'Η εξαγωγή ολοκληρώθηκε',
+  postExportMessage: 'Τι θέλετε να κάνετε στη συνέχεια;',
+  newOrderOption: 'Νέα παραγγελία SuperMarket',
+  backToJohnOption: 'Επιστροφή στην οθόνη John',
+  cancelOption: 'Ακύρωση',
+  productCountSuffix: ' προϊόντα',
   exporting: 'Γίνεται εξαγωγή...',
+  reviewShortcut: 'Επιστροφή στην ανασκόπηση',
 };
 
 const SYMBOLS = {
-  euro: '\u20ac',
+  euro: '€',
 };
 
 const formatEuro = (value) => `${SYMBOLS.euro}${Number(value || 0).toFixed(2)}`;
@@ -96,6 +99,7 @@ const SuperMarketOrderSummaryScreen = () => {
   const [loading, setLoading] = useState(false);
   const [showProducts, setShowProducts] = useState(true);
   const [exportMode, setExportMode] = useState('order'); // 'order' or 'listing'
+  const [includeImages, setIncludeImages] = useState(true); // NEW: default to TRUE for images
 
   const linesData = Array.isArray(order?.lines) ? order.lines : [];
   const hasProducts = linesData.length > 0;
@@ -243,7 +247,8 @@ const SuperMarketOrderSummaryScreen = () => {
           };
         });
 
-        await exportSupermarketXLSX(normalizedProducts, exportPayload, fullList);
+        // Pass includeImages as 4th parameter
+        await exportSupermarketXLSX(normalizedProducts, exportPayload, fullList, includeImages);
         setTimeout(() => {
           if (isMounted.current) showPostExportDialog();
         }, 200);
@@ -254,7 +259,7 @@ const SuperMarketOrderSummaryScreen = () => {
         if (isMounted.current) setLoading(false);
       }
     },
-    [allListings, linesData, createExportPayload, showPostExportDialog]
+    [allListings, linesData, includeImages, createExportPayload, showPostExportDialog]
   );
 
   const handleExport = useCallback(async () => {
@@ -313,7 +318,7 @@ const SuperMarketOrderSummaryScreen = () => {
               await cancelOrder();
               navigation.reset({
                 index: 0,
-                routes: [{ name: 'HomeScreen' }],
+                routes: [{ name: 'Home' }],
               });
             } catch (error) {
               Alert.alert(STRINGS.error, STRINGS.cancelFailed);
@@ -556,6 +561,25 @@ const SuperMarketOrderSummaryScreen = () => {
               </Text>
             </View>
             <Text style={styles.exportOptionDesc}>{STRINGS.exportFullListingDesc}</Text>
+          </TouchableOpacity>
+
+          {/* Image inclusion option */}
+          <TouchableOpacity
+            style={[styles.exportOption, includeImages && styles.exportOptionSelected]}
+            onPress={() => setIncludeImages(!includeImages)}
+            activeOpacity={0.7}
+          >
+            <View style={styles.exportOptionHeader}>
+              <Ionicons 
+                name={includeImages ? 'checkbox' : 'square-outline'} 
+                size={20} 
+                color={includeImages ? '#1976d2' : '#9ca3af'} 
+              />
+              <Text style={[styles.exportOptionTitle, includeImages && styles.exportOptionTitleSelected]}>
+                {STRINGS.includeImages}
+              </Text>
+            </View>
+            <Text style={styles.exportOptionDesc}>{STRINGS.includeImagesDesc}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

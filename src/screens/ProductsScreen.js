@@ -24,6 +24,14 @@ const FILTERS = [
   { label: 'Ενεργά', value: 'active' },
 ];
 
+const UI_TEXT = {
+  title: 'Προϊόντα',
+  empty: 'Δεν βρέθηκαν προϊόντα.',
+  searchPlaceholder: 'Αναζήτηση προϊόντος...',
+  expandAll: 'Άνοιγμα όλων',
+  collapseAll: 'Κλείσιμο όλων',
+};
+
 const PRODUCT_PLACEHOLDERS = {
   playmobil: require('../../assets/playmobil_product_placeholder.png'),
   kivos: require('../../assets/Kivos_placeholder.png'),
@@ -151,8 +159,8 @@ const ProductsScreen = ({ navigation }) => {
   const [expandedNodes, setExpandedNodes] = useState({}); // Start with all collapsed
   const searchInputRef = useRef(null);
   const handleGoBack = useCallback(() => {
-    navigation.goBack();
-  }, [navigation]);
+    navigation.navigate('BrandHome', { brand });
+  }, [navigation, brand]);
   const headerLeft = useMemo(
     () => (
       <TouchableOpacity
@@ -516,11 +524,11 @@ const ProductsScreen = ({ navigation }) => {
         style={styles.emptyImage}
         resizeMode="contain"
       />
-      <Text style={styles.emptyText}>Δεν εντοπίστηκαν προϊόντα.</Text>
+      <Text style={styles.emptyText}>{UI_TEXT.empty}</Text>
     </View>
   );
   return (
-    <SafeScreen title="Προϊόντα" headerLeft={headerLeft} bodyStyle={styles.body}>
+    <SafeScreen title={UI_TEXT.title} headerLeft={headerLeft} bodyStyle={styles.body}>
       <View style={styles.content}>
         <View style={styles.stickyHeader}>
           <FiltersBar />
@@ -531,7 +539,7 @@ const ProductsScreen = ({ navigation }) => {
             <TextInput
               ref={searchInputRef}
               style={styles.searchInput}
-              placeholder="Αναζήτηση προϊόντος..."
+              placeholder={UI_TEXT.searchPlaceholder}
               placeholderTextColor="#4169e1"
               value={search}
               onChangeText={setSearch}
@@ -551,7 +559,7 @@ const ProductsScreen = ({ navigation }) => {
                 setExpandedNodes(allNodeIds);
               }}
             >
-              <Text style={styles.headerBtnText}>Άνοιξε όλα</Text>
+              <Text style={styles.headerBtnText}>{UI_TEXT.expandAll}</Text>
             </TouchableOpacity>
             <TouchableOpacity 
               style={styles.filterIconButton} 
@@ -560,7 +568,7 @@ const ProductsScreen = ({ navigation }) => {
                 setExpandedNodes({});
               }}
             >
-              <Text style={styles.headerBtnText}>Κλείσε όλα</Text>
+              <Text style={styles.headerBtnText}>{UI_TEXT.collapseAll}</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -821,4 +829,13 @@ const styles = StyleSheet.create({
 });
 
 export default ProductsScreen;
+
+
+
+
+
+
+
+
+
 

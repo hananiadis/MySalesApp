@@ -249,41 +249,89 @@ async function importKivosProducts() {
 }
 
 // ---------------------------------------------------------------------------
-// JOHN IMPORTS
+// JOHN IMPORTS (final structure-aligned version)
 // ---------------------------------------------------------------------------
 async function importJohnProducts() {
   console.log('\n📦 Importing John products...');
+
   const wb = await fetchXlsxWorkbook('18IFOPzzFvzXEgGOXNN0X1_mfZcxk2LlT_mRQj3Fqsv8');
-  const rows = [];
-  wb.SheetNames.forEach((s) =>
-    rows.push(...XLSX.utils.sheet_to_json(wb.Sheets[s], { defval: null }))
-  );
+
+  const allRows = [];
+  wb.SheetNames.forEach((sheetName) => {
+    const sheet = wb.Sheets[sheetName];
+    const rows = XLSX.utils.sheet_to_json(sheet, { defval: null });
+    console.log(`📄 Loaded sheet "${sheetName}" with ${rows.length} rows`);
+    rows.forEach((r) => allRows.push({ ...r, __sheetName: sheetName }));
+  });
+
+  console.log(`📊 Total rows read from workbook: ${allRows.length}`);
+  if (allRows[0]) console.log('🔑 Header keys sample:', Object.keys(allRows[0]));
+
   const batchSize = 400;
   let processed = 0;
-  for (let i = 0; i < rows.length; i += batchSize) {
+  let skipped = 0;
+
+  for (let i = 0; i < allRows.length; i += batchSize) {
     const batch = db.batch();
-    const chunk = rows.slice(i, i + batchSize);
-    chunk.forEach((row) => {
-      const code = sanitizeText(row['ΚΩΔ.'] || row['Product Code']);
-      if (!code) return;
+    const chunk = allRows.slice(i, i + batchSize);
+
+    chunk.forEach((row, idx) => {
+      // --- tolerant product code field names ---
+      const codeRaw =
+        row['ΚΩΔ.'] ||
+        row['Κωδ.'] ||
+        row['ΚΩΔΙΚΟΣ'] ||
+        row['ΚΩΔΙΚΟΣ ΠΡΟΪΟΝΤΟΣ'] ||
+        row['ΚΩΔ'] ||
+        row['Κωδικός'] ||
+        row['Product Code'] ||
+        row['Code'];
+      const code = sanitizeText(codeRaw);
+      if (!code) {
+        skipped++;
+        console.log(`⚠️ [Row ${i + idx + 1}] Skipped - no valid code`);
+        return;
+      }
+
       const ref = db.collection('products_john').doc(code);
+
+      // --- field mappings based on your actual sheet headers ---
       const data = {
         productCode: code,
-        description: sanitizeText(row['Περιγραφή'] || row['Description']),
-        category: sanitizeText(row['Κατηγορία'] || row['Category']),
-        wholesalePrice: roundCurrency(normalizeDecimal(row['Χονδρική Τιμή'])),
-        srp: roundCurrency(normalizeDecimal(row['SRP'])),
+        barcode: sanitizeText(row['Κωδ.Barcode']),
         brand: 'john',
+        generalCategory: sanitizeText(row['ΓΕΝΙΚΗ ΚΑΤΗΓΟΡΙΑ']),
+        subCategory: sanitizeText(row['ΥΠΟΚΑΤΗΓΟΡΙΑ']),
+        description: sanitizeText(row['Ελληνική Περιγραφή']),
+        packaging: sanitizeText(row['Συσκευασία']),
+        priceList: roundCurrency(normalizeDecimal(row['Τιμή τιμοκαταλόγου'])),
+        wholesalePrice: roundCurrency(normalizeDecimal(row['Χονδρική Τιμή'])),
+        srp: roundCurrency(
+          normalizeDecimal(
+            row['Προτεινόμενη Λιανική Τιμή'] ||
+              row['Λιανική Τιμή'] ||
+              row['SRP']
+          )
+        ),
+        frontCover: sanitizeText(row['Cloudinary Url']),
+        sheetCategory: sanitizeText(row.__sheetName),
         lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
       };
+
+      // only add non-empty values
+      Object.keys(data).forEach((k) => {
+        if (data[k] === '' || data[k] === 'N/A' || data[k] == null) delete data[k];
+      });
+
       batch.set(ref, data, { merge: true });
       processed++;
     });
+
     await batch.commit();
-    printProgress(processed, rows.length, 'John');
+    printProgress(processed, allRows.length, 'John');
   }
-  process.stdout.write('\n');
-  console.log('✅ John products import done.');
+
+  console.log(`\n✅ John products import done. Processed ${processed}, skipped ${skipped}`);
 }
 // ---------------------------------------------------------------------------
 // CUSTOMER IMPORTS

@@ -1,837 +1,336 @@
-// src/screens/CustomerSalesSummary.js
+// /src/screens/CustomerSalesSummary.js
 import React, { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  ActivityIndicator,
+  TouchableOpacity,
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import SafeScreen from '../components/SafeScreen';
-import { getKivosSpreadsheetRow } from '../services/kivosSpreadsheet';
+import { loadSpreadsheet } from '../services/spreadsheetCache';
+import colors from '../theme/colors';
 
-const SHEET_URL =
-  'https://docs.google.com/spreadsheets/d/1_HxZwIyB3Rhv3ZO4DgH-uIgr3uvr97vw-W3VM0GswFA/export?format=csv&gid=499925136';
-
-const CUSTOMER_CODE_COLUMN = 4; // Column E / "Bill-to" in the sheet
-
-const COMPARABLE_FIELDS = [
-  {
-    key: 'total-invoiced',
-    previous: { index: 8, label: 'Συνολικές Τιμολογημένες Πωλήσεις 2024' },
-    current: { index: 15, label: 'Τιμολογημένες Πωλήσεις 2025' },
-    showDelta: true,
-  },
-  {
-    key: 'net-sales',
-    previous: { index: 9, label: 'Συνολικές Καθαρές Πωλήσεις 2024' },
-    current: { index: 16, label: 'Καθαρές Πωλήσεις 2025' },
-    showDelta: true,
-  },
-  {
-    key: 'invoiced-to-date',
-    previous: { index: 10, label: 'Τιμολογημένο έως Σήμερα 2024' },
-    current: { index: 12, label: 'Τιμολογημένες Πωλήσεις Οκτώβριος 2025' },
-    showDelta: true,
-  },
-  {
-    key: 'invoiced-oct-total',
-    previous: { index: 11, label: 'Τιμολογημένες Πωλήσεις έως Οκτώβριο 2024' },
-    current: { index: 13, label: 'Συνολικός Προϋπολογισμός 2025' },
-    showDelta: false,
-  },
-];
-
-const COLUMN_TRANSLATIONS = {
-  12: 'Τιμολογημένες Πωλήσεις Οκτώβριος 2025',
-  13: 'Συνολικός Προϋπολογισμός 2025',
-  14: 'Μηνιαίος Προϋπολογισμός 2025 (Ιαν-Οκτ)',
-  15: 'Τιμολογημένες Πωλήσεις 2025',
-  16: 'Καθαρές Πωλήσεις 2025',
-  17: '% Τιμολογήσεων / Συνολικός Προϋπολογισμός 2025',
-  18: 'Μεταβολή σε σχέση με Πέρυσι (%)',
-  19: 'Ανοιχτές Παραγγελίες',
-  20: 'Ανοιχτές Παραδόσεις',
-  21: 'Συνολικές Παραγγελίες 2025',
-  22: '% Backlog Παραγγελιών',
-  23: 'Υπόλοιπο Πελάτη',
+// -------------------- CONFIG --------------------
+const STATUS = { IDLE: 'idle', LOADING: 'loading', READY: 'ready', ERROR: 'error' };
+const sanitize = (v) => (!v || String(v).trim() === '' ? 'N/A' : String(v).trim());
+const toNumber = (v) => {
+  if (v == null || v === '') return 0;
+  const cleaned = String(v).replace(/\./g, '').replace(',', '.');
+  const n = parseFloat(cleaned);
+  return isNaN(n) ? 0 : n;
 };
 
-const FALLBACK_COLUMN_LABELS = (() => {
-  const labels = { ...COLUMN_TRANSLATIONS };
-  COMPARABLE_FIELDS.forEach(({ previous, current }) => {
-    labels[previous.index] = previous.label;
-    if (current?.index != null) {
-      labels[current.index] = current.label;
-    }
-  });
-  return labels;
-})();
-
-const PRIMARY_METRIC_CONFIG = [
-  { key: 'col-8-13', previous: 8, current: 13, percent: 17 },
-  { key: 'col-9-16', previous: 9, current: 16 },
-  { key: 'col-10-15', previous: 10, current: 15, percent: 18 },
-  { key: 'col-11-12', previous: 11, current: 12 },
-];
-
-const SECONDARY_METRIC_CONFIG = [
-  { key: 'col-19-20', previous: 19, current: 20 },
-  { key: 'col-21-22', previous: 21, current: 22 },
-];
-
-const STANDALONE_METRIC_COLUMNS = [23];
-
-const STATUS = {
-  IDLE: 'idle',
-  LOADING: 'loading',
-  READY: 'ready',
-  ERROR: 'error',
-};
-
-const parseCsv = (text) => {
-  const rows = [];
-  let current = [];
-  let value = '';
-  let inQuotes = false;
-
-  for (let i = 0; i < text.length; i += 1) {
-    const char = text[i];
-
-    if (inQuotes) {
-      if (char === '"') {
-        if (text[i + 1] === '"') {
-          value += '"';
-          i += 1;
-        } else {
-          inQuotes = false;
-        }
-      } else {
-        value += char;
-      }
-    } else if (char === '"') {
-      inQuotes = true;
-    } else if (char === ',') {
-      current.push(value);
-      value = '';
-    } else if (char === '\r') {
-      // ignore carriage returns
-    } else if (char === '\n') {
-      current.push(value);
-      rows.push(current);
-      current = [];
-      value = '';
-    } else {
-      value += char;
-    }
-  }
-
-  if (value.length > 0 || current.length > 0) {
-    current.push(value);
-    rows.push(current);
-  }
-
-  return rows;
-};
-
-const sanitizeCell = (cell) => {
-  if (cell == null) {
-    return 'N/A';
-  }
-  const trimmed = String(cell).trim();
-  return trimmed === '' ? 'N/A' : trimmed;
-};
-
-const KIVOS_YEAR_FIELDS = [
-  { key: 'sales2022', label: 'Τζίρος 2022' },
-  { key: 'sales2023', label: 'Τζίρος 2023' },
-  { key: 'sales2024', label: 'Τζίρος 2024' },
-  { key: 'sales2025', label: 'Τζίρος 2025' },
-];
-
-const formatSheetValue = (value) => {
-  if (value == null) {
-    return '—';
-  }
-  const text = String(value).trim();
-  return text ? text : '—';
-};
-
-const KivosSalesSummary = ({ customerId }) => {
-  const [status, setStatus] = useState(STATUS.LOADING);
-  const [error, setError] = useState('');
-  const [row, setRow] = useState(null);
-
-  useEffect(() => {
-    let active = true;
-
-    const load = async () => {
-      if (!customerId) {
-        setError('Δεν βρέθηκε κωδικός πελάτη.');
-        setStatus(STATUS.ERROR);
-        return;
-      }
-
-      setStatus(STATUS.LOADING);
-      setError('');
-
-      try {
-        const sheetRow = await getKivosSpreadsheetRow(customerId);
-
-        if (!active) {
-          return;
-        }
-
-        if (!sheetRow) {
-          setError('Ο πελάτης δεν εντοπίστηκε στο spreadsheet των Kivos.');
-          setRow(null);
-          setStatus(STATUS.ERROR);
-          return;
-        }
-
-        setRow(sheetRow);
-        setStatus(STATUS.READY);
-      } catch (err) {
-        if (!active) {
-          return;
-        }
-        console.error('Failed to load Kivos spreadsheet data', err);
-        setError('Δεν ήταν δυνατή η φόρτωση των στοιχείων από το spreadsheet.');
-        setRow(null);
-        setStatus(STATUS.ERROR);
-      }
-    };
-
-    load();
-
-    return () => {
-      active = false;
-    };
-  }, [customerId]);
-
-  if (status === STATUS.LOADING) {
-    return (
-      <SafeScreen style={styles.container}>
-        <View style={styles.centeredBlock}>
-          <ActivityIndicator size="large" color="#1f4f8f" />
-          <Text style={styles.statusText}>Φόρτωση πωλήσεων από το spreadsheet…</Text>
-        </View>
-      </SafeScreen>
-    );
-  }
-
-  if (status === STATUS.ERROR) {
-    return (
-      <SafeScreen style={styles.container}>
-        <View style={styles.centeredBlock}>
-          <Text style={styles.errorText}>{error || 'Δεν υπάρχουν διαθέσιμα δεδομένα.'}</Text>
-          {customerId ? (
-            <Text style={styles.helperText}>Πελάτης: {customerId}</Text>
-          ) : null}
-        </View>
-      </SafeScreen>
-    );
-  }
-
-  return (
-    <SafeScreen style={styles.container}>
-      <View style={styles.kivosWrapper}>
-        <Text style={styles.kivosHeader}>{row?.code || customerId}</Text>
-        {row?.name ? <Text style={styles.kivosSubheader}>{row.name}</Text> : null}
-
-        <View style={styles.kivosCardGrid}>
-          {KIVOS_YEAR_FIELDS.map(({ key, label }) => (
-            <View key={key} style={styles.kivosCard}>
-              <Text style={styles.kivosYear}>{label}</Text>
-              <Text style={styles.kivosValue}>{formatSheetValue(row?.[key])}</Text>
-            </View>
-          ))}
-        </View>
-
-        {row?.balance ? (
-          <View style={styles.kivosBalanceCard}>
-            <Text style={styles.kivosBalanceLabel}>Υπόλοιπο</Text>
-            <Text style={styles.kivosBalanceValue}>{formatSheetValue(row.balance)}</Text>
-          </View>
-        ) : null}
-
-        <View style={styles.kivosSourceBox}>
-          <Text style={styles.kivosSourceTitle}>Πηγή δεδομένων</Text>
-          <Text style={styles.kivosSourceText}>
-            Οι αριθμοί αντλούνται απευθείας από το Google Spreadsheet των πελατών Kivos.
-          </Text>
-        </View>
-      </View>
-    </SafeScreen>
-  );
-};
-
-const JohnSalesSummaryPlaceholder = ({ customerId }) => (
-  <SafeScreen style={styles.container}>
-    <View style={styles.centeredBlock}>
-      <Text style={styles.placeholderTitle}>Δεν υπάρχουν δεδομένα πωλήσεων ακόμη</Text>
-      <Text style={styles.placeholderText}>
-        Οι αναλυτικές πωλήσεις για τους πελάτες John θα προστεθούν σύντομα.
-      </Text>
-      {customerId ? (
-        <Text style={styles.placeholderCode}>Πελάτης: {customerId}</Text>
-      ) : null}
-    </View>
-  </SafeScreen>
-);
-
-const CustomerSalesSummary = ({ route }) => {
+// -------------------- MAIN --------------------
+export default function CustomerSalesSummary({ route, navigation }) {
   const customerId = route?.params?.customerId;
   const brand = route?.params?.brand || 'playmobil';
 
-  if (brand === 'kivos') {
-    return <KivosSalesSummary customerId={customerId} />;
-  }
+  if (brand === 'kivos') return <KivosSalesSummary customerId={customerId} />;
+  if (brand === 'john')
+    return (
+      <SafeScreen>
+        <View style={styles.center}>
+          <Text>John Hellas sales summary coming soon</Text>
+        </View>
+      </SafeScreen>
+    );
 
-  if (brand === 'john') {
-    return <JohnSalesSummaryPlaceholder customerId={customerId} />;
-  }
-
-  const [customerStatus, setCustomerStatus] = useState(STATUS.LOADING);
-  const [customerError, setCustomerError] = useState('');
+  // -------------------- PLAYMOBIL --------------------
   const [customer, setCustomer] = useState(null);
+  const [rows, setRows] = useState([]);
+  const [status, setStatus] = useState(STATUS.LOADING);
 
-  const [salesStatus, setSalesStatus] = useState(STATUS.IDLE);
-  const [salesError, setSalesError] = useState('');
-  const [metrics, setMetrics] = useState({ primaryPairs: [], secondaryPairs: [], standalone: [] });
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const previousYear = currentYear - 1;
+  const currentMonthName = now.toLocaleString('el-GR', { month: 'long' });
 
   useEffect(() => {
-    let active = true;
-
-    const loadCustomer = async () => {
-      if (!customerId) {
-        setCustomerError('No customer context provided.');
-        setCustomerStatus(STATUS.ERROR);
-        return;
-      }
-
-      setCustomerStatus(STATUS.LOADING);
-      setCustomerError('');
-
+    (async () => {
       try {
         const json = await AsyncStorage.getItem('customers');
         const list = json ? JSON.parse(json) : [];
-        const found = list.find((entry) => entry.id === customerId);
+        const found = list.find((c) => c.id === customerId);
+        setCustomer(found);
 
-        if (!active) {
-          return;
-        }
-
-        if (found) {
-          setCustomer(found);
-          setCustomerStatus(STATUS.READY);
-        } else {
-          setCustomer(null);
-          setCustomerError('Customer details not found in local storage.');
-          setCustomerStatus(STATUS.ERROR);
-        }
-      } catch (err) {
-        if (!active) {
-          return;
-        }
-        setCustomer(null);
-        setCustomerError('Unable to read cached customer data.');
-        setCustomerStatus(STATUS.ERROR);
+        const rows = await loadSpreadsheet('playmobilSales', { force: false });
+        setRows(rows);
+        setStatus(STATUS.READY);
+      } catch (e) {
+        console.warn(e);
+        setStatus(STATUS.ERROR);
       }
-    };
-
-    loadCustomer();
-
-    return () => {
-      active = false;
-    };
+    })();
   }, [customerId]);
 
-  useEffect(() => {
-    let active = true;
-    const code = customer?.customerCode ? String(customer.customerCode).trim() : '';
+  const renderPlaymobil = useMemo(() => {
+    if (status === STATUS.LOADING)
+      return <ActivityIndicator size="large" color={colors.primary} />;
+    if (status === STATUS.ERROR)
+      return <Text style={styles.error}>Αποτυχία φόρτωσης δεδομένων</Text>;
+    if (!rows.length)
+      return <Text style={styles.error}>Δεν υπάρχουν δεδομένα πωλήσεων</Text>;
 
-    if (!code) {
-      setMetrics({ primaryPairs: [], secondaryPairs: [], standalone: [] });
-      setSalesStatus(customerStatus === STATUS.READY ? STATUS.ERROR : STATUS.IDLE);
-      setSalesError(customerStatus === STATUS.READY ? 'Customer code is missing.' : '');
-      return () => {
-        active = false;
-      };
-    }
+    const headerIndex = rows.findIndex((r) => String(r[4]).trim() === 'Bill-to');
+    const dataRows = headerIndex !== -1 ? rows.slice(headerIndex + 1) : rows;
+    const customerCode = String(customer?.customerCode || '').trim();
+    const row = dataRows.find((r) => String(r[4]).trim() === customerCode);
 
-    const loadSales = async () => {
-      setSalesStatus(STATUS.LOADING);
-      setSalesError('');
-
-      try {
-        const response = await fetch(SHEET_URL);
-        if (!response.ok) {
-          throw new Error(`Sheet request failed (${response.status})`);
-        }
-
-        const text = await response.text();
-        const rows = parseCsv(text);
-        const headerIndex = rows.findIndex((row) => sanitizeCell(row?.[CUSTOMER_CODE_COLUMN]) === 'Bill-to');
-
-        if (headerIndex === -1) {
-          throw new Error('Unable to locate column headers in the sheet.');
-        }
-
-        const dataRows = rows.slice(headerIndex + 1).filter((row) => row?.length);
-        const entry = dataRows.find((row) => sanitizeCell(row[CUSTOMER_CODE_COLUMN]) === code);
-
-        if (!entry) {
-          throw new Error('No sales data found for the selected customer.');
-        }
-
-        const headerRow = rows[headerIndex] || [];
-        const labelFor = (index) => {
-          const raw = headerRow?.[index];
-          if (raw == null) {
-            return FALLBACK_COLUMN_LABELS[index] || `Column ${index + 1}`;
-          }
-          const trimmed = String(raw).trim();
-          if (trimmed) {
-            return trimmed;
-          }
-          return FALLBACK_COLUMN_LABELS[index] || `Column ${index + 1}`;
-        };
-
-        const primaryPairs = PRIMARY_METRIC_CONFIG.map((config) => {
-          const previousValue = sanitizeCell(entry[config.previous]);
-          const currentValue = sanitizeCell(entry[config.current]);
-          const percentRaw = config.percent != null ? sanitizeCell(entry[config.percent]) : null;
-          const percentValue = percentRaw && percentRaw !== 'N/A' ? percentRaw : null;
-
-          if (previousValue === 'N/A' && currentValue === 'N/A' && !percentValue) {
-            return null;
-          }
-
-          return {
-            key: config.key,
-            previous: {
-              label: labelFor(config.previous),
-              value: previousValue,
-            },
-            current: {
-              label: labelFor(config.current),
-              value: currentValue,
-            },
-            percent:
-              config.percent != null
-                ? {
-                    label: labelFor(config.percent),
-                    value: percentValue,
-                  }
-                : null,
-          };
-        }).filter(Boolean);
-
-        const secondaryPairs = SECONDARY_METRIC_CONFIG.map((config) => {
-          const previousValue = sanitizeCell(entry[config.previous]);
-          const currentValue = sanitizeCell(entry[config.current]);
-
-          if (previousValue === 'N/A' && currentValue === 'N/A') {
-            return null;
-          }
-
-          return {
-            key: config.key,
-            previous: {
-              label: labelFor(config.previous),
-              value: previousValue,
-            },
-            current: {
-              label: labelFor(config.current),
-              value: currentValue,
-            },
-          };
-        }).filter(Boolean);
-
-        const standalone = STANDALONE_METRIC_COLUMNS.map((index) => {
-          const value = sanitizeCell(entry[index]);
-          if (value === 'N/A') {
-            return null;
-          }
-          return {
-            key: `col-${index}`,
-            label: labelFor(index),
-            value,
-          };
-        }).filter(Boolean);
-
-        if (!active) {
-          return;
-        }
-
-        setMetrics({ primaryPairs, secondaryPairs, standalone });
-        setSalesStatus(STATUS.READY);
-      } catch (err) {
-        if (!active) {
-          return;
-        }
-        setMetrics({ primaryPairs: [], secondaryPairs: [], standalone: [] });
-        setSalesError(err?.message || 'Unable to load sales data.');
-        setSalesStatus(STATUS.ERROR);
-      }
-    };
-
-    loadSales();
-
-    return () => {
-      active = false;
-    };
-  }, [customer, customerStatus]);
-
-  const renderSalesContent = useMemo(() => {
-    if (salesStatus === STATUS.LOADING) {
+    if (!row)
       return (
-        <View style={styles.centeredBlock}>
-          <ActivityIndicator size="large" color="#1976d2" />
-          <Text style={styles.statusText}>Fetching Google Sheets data...</Text>
-        </View>
+        <Text style={styles.error}>
+          Δεν βρέθηκαν δεδομένα για τον πελάτη {customer?.name}
+        </Text>
       );
-    }
 
-    if (salesStatus === STATUS.ERROR) {
-      return (
-        <View style={styles.centeredBlock}>
-          <Text style={styles.errorText}>{salesError}</Text>
-          <Text style={styles.helperText}>Verify the customer code exists in the sheet (column E).</Text>
-        </View>
-      );
-    }
+    const vInvoicesPrev = toNumber(row[8]);
+    const vBudgetCurr = toNumber(row[13]);
+    const vYtdPrev = toNumber(row[10]);
+    const vInvoicedCurr = toNumber(row[15]);
+    const vMonthPrev = toNumber(row[11]);
+    const vMonthCurr = toNumber(row[12]);
+    const vOpenOrders = toNumber(row[19]);
+    const vOpenDlv = toNumber(row[20]);
+    const vTotalOrders = toNumber(row[21]);
+    const vOB = sanitize(row[22]);
+    const vBalance = toNumber(row[23]);
 
-    const hasMetrics =
-      metrics.primaryPairs.length > 0 ||
-      metrics.secondaryPairs.length > 0 ||
-      metrics.standalone.length > 0;
-
-    if (salesStatus === STATUS.READY && !hasMetrics) {
-      return (
-        <View style={styles.centeredBlock}>
-          <Text style={styles.helperText}>No metrics available for this customer (columns I-X were empty).</Text>
-        </View>
-      );
-    }
-
-    const shouldShowDivider =
-      metrics.primaryPairs.length > 0 &&
-      (metrics.secondaryPairs.length > 0 || metrics.standalone.length > 0);
+    const pctYtd = vYtdPrev ? ((vInvoicedCurr - vYtdPrev) / vYtdPrev) * 100 : null;
+    const pctMonth = vMonthPrev ? ((vMonthCurr - vMonthPrev) / vMonthPrev) * 100 : null;
 
     return (
-      <View style={styles.metricsSection}>
-        <View style={styles.metricsCard}>
-          {metrics.primaryPairs.map((item) => (
-            <View key={item.key} style={styles.metricRow}>
-              <View style={styles.metricColumn}>
-                <Text style={styles.metricLabel}>{item.previous.label}</Text>
-                <Text style={styles.metricValue}>{item.previous.value}</Text>
-              </View>
-              <Text style={styles.metricArrow}>{'->'}</Text>
-              <View style={styles.metricColumn}>
-                <Text style={styles.metricLabel}>{item.current.label}</Text>
-                <View style={styles.metricValueGroup}>
-                  <Text style={styles.metricValue}>{item.current.value}</Text>
-                  {item.percent?.value ? (
-                    <Text style={styles.metricPercent}>
-                      ({item.percent.label}: {item.percent.value})
-                    </Text>
-                  ) : null}
-                </View>
-              </View>
-            </View>
-          ))}
-
-          {shouldShowDivider ? <View style={styles.metricsDivider} /> : null}
-
-          {metrics.secondaryPairs.map((item) => (
-            <View key={item.key} style={styles.metricRow}>
-              <View style={styles.metricColumn}>
-                <Text style={styles.metricLabel}>{item.previous.label}</Text>
-                <Text style={styles.metricValue}>{item.previous.value}</Text>
-              </View>
-              <Text style={styles.metricArrow}>{'->'}</Text>
-              <View style={styles.metricColumn}>
-                <Text style={styles.metricLabel}>{item.current.label}</Text>
-                <Text style={styles.metricValue}>{item.current.value}</Text>
-              </View>
-            </View>
-          ))}
-
-          {metrics.standalone.map((item) => (
-            <View key={item.key} style={styles.standaloneRow}>
-              <Text style={styles.metricLabel}>{item.label}</Text>
-              <Text style={styles.metricValue}>{item.value}</Text>
-            </View>
-          ))}
-        </View>
-      </View>
-    );
-  }, [metrics, salesError, salesStatus]);
-
-  return (
-    <SafeScreen title="Sales Summary" scroll showUserMenu={false} contentContainerStyle={styles.contentInset}>
-      <View style={styles.container}>
-        <View style={[styles.customerCard, styles.sectionSpacing]}>
-          {customerStatus === STATUS.LOADING && (
-            <View style={styles.centeredBlock}>
-              <ActivityIndicator size="large" color="#1976d2" />
-              <Text style={styles.statusText}>Loading customer details...</Text>
-            </View>
-          )}
-
-          {customerStatus === STATUS.ERROR && (
-            <View>
-              <Text style={styles.errorText}>{customerError}</Text>
-              <Text style={styles.helperText}>Navigate through the customer list and retry.</Text>
-            </View>
-          )}
-
-          {customerStatus === STATUS.READY && customer && (
-            <>
-              <Text style={styles.customerTitle}>
-                {customer.customerCode} - {customer.name}
-              </Text>
-              {customer.name3 ? <Text style={styles.customerSubtitle}>{customer.name3}</Text> : null}
-              {customer.salesInfo?.description ? (
-                <Text style={styles.customerMeta}>{customer.salesInfo.description}</Text>
-              ) : null}
-              {customer.region?.name ? (
-                <Text style={styles.customerMeta}>Region: {customer.region.name}</Text>
-              ) : null}
-            </>
-          )}
+      <>
+        <View style={styles.sectionHeaderRow}>
+          <Text style={styles.sectionHeader}>Πωλήσεις</Text>
+          <TouchableOpacity
+            style={styles.testButton}
+            onPress={() => navigation.navigate('CustomerSalesSummaryTest')}
+          >
+            <Text style={styles.testButtonText}>TEST</Text>
+          </TouchableOpacity>
         </View>
 
-        <View style={styles.sectionSpacing}>{renderSalesContent}</View>
+        <Metric3Cols
+          labelLeft={`Τιμολογήσεις ${previousYear}`}
+          labelRight={`Budget ${currentYear}`}
+          leftValue={vInvoicesPrev.toLocaleString('el-GR', { style: 'currency', currency: 'EUR' })}
+          rightValue={vBudgetCurr.toLocaleString('el-GR', { style: 'currency', currency: 'EUR' })}
+        />
 
-        <View style={[styles.sheetSource, styles.sectionSpacing]}>
-          <Text style={styles.sheetSourceTitle}>Sheet Source</Text>
-          <Text style={styles.sheetSourceText}>
-            Data is pulled from the Google Sheet (columns I to X) using the customer code in column E.
+        <Metric3Cols
+          labelLeft={`Τιμολογημένα YTD ${previousYear}`}
+          labelRight={`Τιμολογημένα ${currentYear}`}
+          leftValue={vYtdPrev.toLocaleString('el-GR', { style: 'currency', currency: 'EUR' })}
+          rightValue={vInvoicedCurr.toLocaleString('el-GR', { style: 'currency', currency: 'EUR' })}
+          percent={pctYtd != null ? `${pctYtd.toFixed(1)}%` : '-'}
+        />
+
+        <Metric3Cols
+          labelLeft={`Τιμολογημένα ${currentMonthName} ${previousYear}`}
+          labelRight={`Τιμολογημένα ${currentMonthName} ${currentYear}`}
+          leftValue={vMonthPrev.toLocaleString('el-GR', { style: 'currency', currency: 'EUR' })}
+          rightValue={vMonthCurr.toLocaleString('el-GR', { style: 'currency', currency: 'EUR' })}
+          percent={pctMonth != null ? `${pctMonth.toFixed(1)}%` : '-'}
+        />
+
+        <Text style={styles.sectionHeader}>Παραγγελίες</Text>
+        <View style={styles.ordersRow}>
+          <View style={styles.orderBox}>
+            <Text style={styles.label}>Εκκρεμείς Παραγγελίες</Text>
+            <Text style={styles.value}>
+              {vOpenOrders.toLocaleString('el-GR', { style: 'currency', currency: 'EUR' })}
+            </Text>
+            <Text style={[styles.label, { marginTop: 8 }]}>Παραγγελίες σε Αποθήκη</Text>
+            <Text style={styles.value}>
+              {vOpenDlv.toLocaleString('el-GR', { style: 'currency', currency: 'EUR' })}
+            </Text>
+          </View>
+
+          <View style={styles.orderBox}>
+            <Text style={styles.label}>Συνολικές Παραγγελίες</Text>
+            <Text style={styles.value}>
+              {vTotalOrders.toLocaleString('el-GR', { style: 'currency', currency: 'EUR' })}
+            </Text>
+            <Text style={[styles.label, { marginTop: 8 }]}>% O/B</Text>
+            <Text style={styles.value}>{vOB}</Text>
+          </View>
+        </View>
+
+        <Text style={styles.sectionHeader}>Υπόλοιπο</Text>
+        <View style={styles.balanceBox}>
+          <Text style={styles.value}>
+            {vBalance.toLocaleString('el-GR', { style: 'currency', currency: 'EUR' })}
           </Text>
         </View>
-      </View>
+      </>
+    );
+  }, [rows, status]);
+
+  return (
+    <SafeScreen title="Σύνοψη Πωλήσεων" scroll>
+      <ScrollView contentContainerStyle={styles.container}>{renderPlaymobil}</ScrollView>
     </SafeScreen>
   );
-};
+}
 
+// -------------------- KIVOS SALES SUMMARY --------------------
+function KivosSalesSummary({ customerId }) {
+  const [customer, setCustomer] = useState(null);
+  const [sheetData, setSheetData] = useState(null);
+  const [status, setStatus] = useState(STATUS.LOADING);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const json = await AsyncStorage.getItem('customers');
+        const list = json ? JSON.parse(json) : [];
+        const found = list.find((c) => c.id === customerId);
+        setCustomer(found);
+
+        const rows = await loadSpreadsheet('kivosCustomers', { force: false });
+        setSheetData(rows);
+        setStatus(STATUS.READY);
+      } catch (e) {
+        console.warn(e);
+        setStatus(STATUS.ERROR);
+      }
+    })();
+  }, [customerId]);
+
+  if (status === STATUS.LOADING)
+    return (
+      <SafeScreen>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </SafeScreen>
+    );
+
+  const firestore = customer || {};
+
+  const row = sheetData?.find(
+    (r) =>
+      String(r[0] || '').trim().replace(/^0+/, '') ===
+      String(firestore.customerCode || '').trim().replace(/^0+/, '')
+  );
+
+  console.log('[Kivos customer]', firestore);
+  console.log('[Kivos row]', row);
+  console.log('[Kivos row length]', row?.length);
+
+  const v22 = toNumber(firestore.InvSales2022);
+  const v23 = toNumber(firestore.InvSales2023);
+  const v24 = toNumber(firestore.InvSales2024);
+  const v25 = row ? toNumber(row[16]) : 0;
+
+  const arr = [
+    { year: 2022, value: v22 },
+    { year: 2023, value: v23 },
+    { year: 2024, value: v24 },
+    { year: 2025, value: v25 },
+  ];
+
+  return (
+    <SafeScreen title="Σύνοψη Πωλήσεων">
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.sectionHeader}>Τζίρος</Text>
+        <View style={styles.kivosRow}>
+          {arr.map((item, i) => {
+            const prev = i > 0 ? arr[i - 1].value : null;
+            const delta = prev && prev !== 0 ? ((item.value - prev) / prev) * 100 : null;
+            const color = delta == null ? colors.textPrimary : delta >= 0 ? 'green' : 'red';
+            return (
+              <View key={item.year} style={styles.kivosBox}>
+                <Text style={styles.kivosLabel}>Τζίρος {item.year}</Text>
+                <Text style={styles.kivosValue}>
+                  {item.value.toLocaleString('el-GR', { style: 'currency', currency: 'EUR' })}
+                </Text>
+                {delta != null && (
+                  <Text style={[styles.kivosDelta, { color }]}>{delta.toFixed(1)}%</Text>
+                )}
+              </View>
+            );
+          })}
+        </View>
+      </ScrollView>
+    </SafeScreen>
+  );
+}
+
+// -------------------- SMALL COMPONENT --------------------
+function Metric3Cols({ labelLeft, labelRight, leftValue, rightValue, percent }) {
+  return (
+    <View style={styles.metric3}>
+      <View style={styles.metricBlock}>
+        <Text style={styles.label}>{labelLeft}</Text>
+        <Text style={styles.value}>{leftValue}</Text>
+      </View>
+      <View style={styles.metricBlock}>
+        <Text style={styles.label}>{labelRight}</Text>
+        <Text style={styles.value}>{rightValue}</Text>
+      </View>
+      {percent && (
+        <View style={[styles.metricBlock, styles.metricSmall]}>
+          <Text style={styles.label}>Δ%</Text>
+          <Text style={styles.value}>{percent}</Text>
+        </View>
+      )}
+    </View>
+  );
+}
+
+// -------------------- STYLES --------------------
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  contentInset: { paddingHorizontal: 18, paddingBottom: 24 },
-  kivosWrapper: {
-    flex: 1,
-    paddingHorizontal: 20,
-    paddingVertical: 24,
-    backgroundColor: '#f5f8ff',
-  },
-  kivosHeader: {
-    fontSize: 22,
-    fontWeight: '700',
-    color: '#1f4f8f',
-    marginBottom: 2,
-  },
-  kivosSubheader: {
-    fontSize: 16,
-    color: '#102a43',
-    fontWeight: '500',
-    marginBottom: 18,
-  },
-  kivosCardGrid: {
-    marginBottom: 16,
-  },
-  kivosCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    marginBottom: 12,
-    shadowColor: '#091e4240',
-    shadowOpacity: 0.12,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 3,
-  },
-  kivosYear: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#3e4c59',
-    marginBottom: 6,
-  },
-  kivosValue: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#1a1f36',
-  },
-  kivosBalanceCard: {
-    backgroundColor: '#edf2ff',
-    borderRadius: 12,
-    paddingVertical: 16,
-    paddingHorizontal: 18,
-    marginBottom: 18,
-  },
-  kivosBalanceLabel: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#3957a5',
-    marginBottom: 6,
-  },
-  kivosBalanceValue: {
-    fontSize: 21,
-    fontWeight: '700',
-    color: '#1a237e',
-  },
-  kivosSourceBox: {
-    backgroundColor: '#e8f1fe',
-    borderRadius: 12,
-    padding: 16,
-  },
-  kivosSourceTitle: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#1a73e8',
-    marginBottom: 6,
-  },
-  kivosSourceText: {
-    fontSize: 14,
-    color: '#1f2933',
-    lineHeight: 20,
-  },
-  placeholderTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1f4f8f',
-    marginBottom: 10,
-    textAlign: 'center',
-  },
-  placeholderText: {
-    fontSize: 14,
-    color: '#52606d',
-    lineHeight: 20,
-    textAlign: 'center',
-  },
-  placeholderCode: {
-    marginTop: 12,
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#1f2933',
-  },
-  sectionSpacing: { marginBottom: 18 },
-  customerCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 18,
-    shadowColor: '#091e4240',
-    shadowOpacity: 0.18,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 4,
-  },
-  customerTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#1a73e8',
-    marginBottom: 4,
-  },
-  customerSubtitle: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#1f2933',
-    marginBottom: 6,
-  },
-  customerMeta: { fontSize: 14, color: '#52606d', marginBottom: 2 },
-  sheetSource: {
-    backgroundColor: '#e8f1fe',
-    borderRadius: 12,
-    padding: 16,
-  },
-  sheetSourceTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1a73e8',
-    marginBottom: 4,
-  },
-  sheetSourceText: {
-    fontSize: 14,
-    color: '#1f2933',
-    lineHeight: 20,
-  },
-  centeredBlock: {
+  container: { flexGrow: 1, padding: 16 },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  error: { textAlign: 'center', color: 'red' },
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 20,
   },
-  statusText: {
-    marginTop: 10,
-    fontSize: 14,
-    color: '#52606d',
-  },
-  errorText: {
-    fontSize: 15,
-    fontWeight: '600',
-    color: '#c62828',
-    marginBottom: 6,
-    textAlign: 'center',
-  },
-  helperText: {
-    fontSize: 13,
-    color: '#52606d',
-    textAlign: 'center',
-    lineHeight: 18,
-  },
-  metricsSection: {},
-  metricsCard: {
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 18,
-    shadowColor: '#091e4240',
-    shadowOpacity: 0.12,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 3,
-  },
-  metricRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 16,
-  },
-  metricColumn: {
-    flex: 1,
-  },
-  metricArrow: {
-    marginHorizontal: 12,
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#1a73e8',
-    alignSelf: 'center',
-  },
-  metricValueGroup: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    flexWrap: 'wrap',
-  },
-  metricPercent: {
-    marginLeft: 8,
-    fontSize: 13,
-    color: '#52606d',
-  },
-  metricsDivider: {
-    height: StyleSheet.hairlineWidth,
-    backgroundColor: '#e0e6ed',
-    marginVertical: 12,
-  },
-  standaloneRow: {
-    marginTop: 12,
-  },
-  metricLabel: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#3e4c59',
-    marginBottom: 6,
-  },
-  metricValue: {
+  sectionHeader: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1a1f36',
+    color: colors.primary,
+    marginTop: 12,
+    marginBottom: 6,
   },
+  metric3: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  metricBlock: { flex: 1, backgroundColor: '#E3F2FD', margin: 4, padding: 8, borderRadius: 10 },
+  metricSmall: { flex: 0.6 },
+  label: { fontSize: 13, color: colors.textSecondary },
+  value: { fontSize: 15, fontWeight: '700', color: colors.textPrimary },
+  ordersRow: { flexDirection: 'row', marginTop: 6 },
+  orderBox: {
+    flex: 1,
+    backgroundColor: '#E3F2FD',
+    margin: 4,
+    padding: 10,
+    borderRadius: 10,
+  },
+  balanceBox: { backgroundColor: '#E3F2FD', margin: 4, padding: 12, borderRadius: 10 },
+  kivosRow: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' },
+  kivosBox: {
+    width: '48%',
+    backgroundColor: '#E3F2FD',
+    padding: 12,
+    borderRadius: 10,
+    marginTop: 8,
+  },
+  kivosLabel: { fontSize: 14, fontWeight: '600', color: colors.textSecondary },
+  kivosValue: { fontSize: 15, fontWeight: '700', color: colors.textPrimary },
+  kivosDelta: { marginTop: 4, fontSize: 13, fontWeight: '600' },
+  testButton: {
+    backgroundColor: '#1976d2',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 8,
+  },
+  testButtonText: { color: '#fff', fontSize: 13 },
 });
-
-export default CustomerSalesSummary;
-
