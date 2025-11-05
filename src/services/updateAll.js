@@ -180,6 +180,7 @@ async function fetchFullCollection(collectionName) {
 // ---------------------------------------------
 async function incrementalFetchMultiField(collectionName, lastSyncISO) {
   const fallbackFull = async (reason) => {
+    console.log('[updateAll] fallback full sync', { collection: collectionName, reason });
     const docs = await fetchFullCollection(collectionName);
     return {
       mode: 'full',
@@ -227,9 +228,10 @@ async function incrementalFetchMultiField(collectionName, lastSyncISO) {
 
         if (snap.size < LIMIT) break;
       }
+
+      console.log('[updateAll] incremental fetch', { collection: collectionName, field, count: results.length });
     } catch (e) {
-      // If query fails (e.g., missing index or field absent on most docs), skip this field
-      // console.warn(`[incremental] Skipping field ${field} for ${collectionName}:`, e?.message);
+      console.warn('[updateAll] incremental fetch failed', { collection: collectionName, field, message: e?.message });
       results = [];
     }
 
@@ -237,11 +239,11 @@ async function incrementalFetchMultiField(collectionName, lastSyncISO) {
   };
 
   // Execute sequentially to avoid hammering indexes (can parallelize if you prefer)
-  let unionMap = new Map();
+  const unionMap = new Map();
   for (const field of SUPPORTED_TS_FIELDS) {
     const batch = await perFieldFetch(field);
-    for (const doc of batch) {
-      unionMap.set(doc.id, doc);
+    if (batch.length) {
+      console.log('[updateAll] incremental field batch', { collection: collectionName, field, batch: batch.length });
     }
     for (const doc of batch) {
       unionMap.set(doc.id, doc);
@@ -250,6 +252,7 @@ async function incrementalFetchMultiField(collectionName, lastSyncISO) {
 
   const unionDocs = Array.from(unionMap.values());
   if (unionDocs.length) {
+    console.log('[updateAll] incremental union result', { collection: collectionName, count: unionDocs.length });
     return {
       mode: 'incremental',
       reason: 'delta',
@@ -258,6 +261,7 @@ async function incrementalFetchMultiField(collectionName, lastSyncISO) {
     };
   }
 
+  console.log('[updateAll] incremental fetch empty, falling back', { collection: collectionName, lastSyncISO });
   return fallbackFull('empty_delta');
 }
 
@@ -269,6 +273,7 @@ async function updateBrand(brandKey, { supportsSuperMarketBrand }) {
   const productCollection = PRODUCT_COLLECTIONS[safeBrand] || PRODUCT_COLLECTIONS.playmobil;
   const customerCollection = CUSTOMER_COLLECTIONS[safeBrand] || CUSTOMER_COLLECTIONS.playmobil;
 
+  console.log('[updateAll] brand sync start', { brand: safeBrand, productCollection, customerCollection });
   const brandSummary = {
     brand: safeBrand,
     label: BRAND_LABEL[safeBrand] || safeBrand.toUpperCase(),
@@ -281,9 +286,11 @@ async function updateBrand(brandKey, { supportsSuperMarketBrand }) {
 
   // PRODUCTS
   try {
+    console.log('[updateAll] product sync start', { brand: safeBrand, collection: productCollection });
     const lastISO = await getLastSyncISO(safeBrand, productCollection);
     const fetchResult = await incrementalFetchMultiField(productCollection, lastISO);
     const changed = fetchResult.docs.length;
+    console.log('[updateAll] product sync storing docs', { brand: safeBrand, totalDocs: changed, mode: fetchResult.mode });
     let total = 0;
 
     if (fetchResult.mode === 'incremental') {
@@ -311,7 +318,9 @@ async function updateBrand(brandKey, { supportsSuperMarketBrand }) {
       changed,
       total,
     };
+    console.log('[updateAll] product sync complete', { brand: safeBrand, mode: fetchResult.mode, changed, total });
   } catch (error) {
+    console.error('[updateAll] product sync failed', { brand: safeBrand, message: error?.message });
     brandSummary.products = {
       status: 'error',
       message: error?.message || 'Unknown error',
@@ -320,9 +329,11 @@ async function updateBrand(brandKey, { supportsSuperMarketBrand }) {
 
   // CUSTOMERS
   try {
+    console.log('[updateAll] customer sync start', { brand: safeBrand, collection: customerCollection });
     const lastISO = await getLastSyncISO(safeBrand, customerCollection);
     const fetchResult = await incrementalFetchMultiField(customerCollection, lastISO);
     const changed = fetchResult.docs.length;
+    console.log('[updateAll] customer sync storing docs', { brand: safeBrand, totalDocs: changed, mode: fetchResult.mode });
     let total = 0;
 
     if (fetchResult.mode === 'incremental') {
@@ -338,6 +349,7 @@ async function updateBrand(brandKey, { supportsSuperMarketBrand }) {
         total = currentLocal.length;
       }
     }
+    console.log('[updateAll] customer sync saved total', { brand: safeBrand, total });
 
     if (fetchResult.newestISO) {
       await setLastSyncISO(safeBrand, customerCollection, fetchResult.newestISO);
@@ -350,7 +362,9 @@ async function updateBrand(brandKey, { supportsSuperMarketBrand }) {
       changed,
       total,
     };
+    console.log('[updateAll] customer sync complete', { brand: safeBrand, mode: fetchResult.mode, changed, total });
   } catch (error) {
+    console.error('[updateAll] customer sync failed', { brand: safeBrand, message: error?.message });
     brandSummary.customers = {
       status: 'error',
       message: error?.message || 'Unknown error',
@@ -488,6 +502,7 @@ export async function updateAllDataForUser({
         label,
         error: error?.message || 'Unknown error',
       };
+      console.error('[updateAll] brand sync failed', { brand, message: fail.error });
       summary.brands.push(fail);
       summary.errors.push({ brand, step: 'updateBrand', message: fail.error });
     }

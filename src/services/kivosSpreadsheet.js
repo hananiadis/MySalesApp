@@ -1,62 +1,92 @@
-// /src/services/kivosSpreadsheet.js
 import { loadSpreadsheet } from './spreadsheetCache';
+import { parseLocaleNumber } from '../utils/numberFormat';
 
-// Define column order based on the sheet
 const COLUMN_KEYS = [
-  'code', 'name', 'street', 'postalCode', 'city', 'telephone1', 'telephone2', 'fax',
-  'email', 'profession', 'vat', 'taxOffice', 'salesman',
-  'sales2022', 'sales2023', 'sales2024', 'sales2025', 'balance',
+  'code',
+  'name',
+  'street',
+  'postalCode',
+  'city',
+  'telephone1',
+  'telephone2',
+  'fax',
+  'email',
+  'profession',
+  'vat',
+  'taxOffice',
+  'salesman',
+  'sales2022',
+  'sales2023',
+  'sales2024',
+  'sales2025',
+  'balance',
+  'isActive',
+  'channel',
 ];
 
-// In-memory cache to reduce re-parsing
+const NUMERIC_FIELDS = new Set(['sales2022', 'sales2023', 'sales2024', 'sales2025', 'balance']);
+const CACHE_TTL_MS = 60 * 60 * 1000;
+
 const cache = new Map();
 
-/**
- * Fetch a customer's row from the Kivos customers spreadsheet (GViz format)
- * @param {string} customerCode - The customer code (as stored in Firestore)
- * @param {object} options - { forceRefresh?: boolean }
- * @returns {object|null} Customer record or null
- */
-export async function getKivosSpreadsheetRow(customerCode, options = {}) {
-  const code = String(customerCode || '').trim();
-  if (!code) return null;
+const normalizeCode = (value) => String(value || '').trim().toUpperCase();
 
-  // ✅ Check in-memory cache (1 hour)
-  if (!options.forceRefresh && cache.has(code)) {
-    const cached = cache.get(code);
-    if (Date.now() - cached.timestamp < 60 * 60 * 1000) return cached.data;
-  }
-
-  // ✅ Fetch cached GViz payload
-  const rawText = await loadSpreadsheet('kivosCustomers', { force: options.forceRefresh });
-  if (!rawText) return null;
-
-  // Parse the GViz payload
+const extractRows = (rawText) => {
+  if (!rawText) return [];
   const match = rawText.match(/google\.visualization\.Query\.setResponse\((.*)\);?/s);
-  if (!match) return null;
+  if (!match) return [];
 
-  const payload = JSON.parse(match[1]);
-  const rows = payload.table?.rows ?? [];
-  if (!rows.length) return null;
+  try {
+    const payload = JSON.parse(match[1]);
+    return Array.isArray(payload?.table?.rows) ? payload.table.rows : [];
+  } catch (error) {
+    console.warn('[kivosSpreadsheet] Failed to parse GViz payload', error);
+    return [];
+  }
+};
 
-  // ✅ Convert all rows to JS objects
-  const parsed = rows.map((row) => {
-    const record = {};
-    COLUMN_KEYS.forEach((key, i) => {
-      const cell = row.c[i];
-      record[key] = cell && cell.v != null ? String(cell.v).trim() : null;
-    });
-    return record;
+const mapRowToRecord = (row) => {
+  const record = {};
+
+  COLUMN_KEYS.forEach((key, index) => {
+    const cell = row?.c?.[index];
+    const value = cell?.v ?? null;
+
+    if (NUMERIC_FIELDS.has(key)) {
+      const numeric = parseLocaleNumber(value, { defaultValue: NaN });
+      record[key] = Number.isFinite(numeric) ? numeric : null;
+    } else if (typeof value === 'string') {
+      record[key] = value.trim();
+    } else {
+      record[key] = value;
+    }
   });
 
-  // ✅ Find customer by code (case-insensitive)
-  const record = parsed.find(
-    (r) => String(r.code || '').trim().toUpperCase() === code.toUpperCase()
-  );
+  return record;
+};
 
+/**
+ * Fetch a customer's record from the cached Kivos spreadsheet.
+ * Includes sales figures, balance, active flag, and sales channel.
+ */
+export async function getKivosSpreadsheetRow(customerCode, options = {}) {
+  const code = normalizeCode(customerCode);
+  if (!code) return null;
+
+  if (!options.forceRefresh && cache.has(code)) {
+    const cached = cache.get(code);
+    if (Date.now() - cached.timestamp < CACHE_TTL_MS) {
+      return cached.data;
+    }
+  }
+
+  const rawText = await loadSpreadsheet('kivosCustomers', { force: Boolean(options.forceRefresh) });
+  const rows = extractRows(rawText);
+  if (!rows.length) return null;
+
+  const record = rows.map(mapRowToRecord).find((item) => normalizeCode(item.code) === code);
   if (!record) return null;
 
-  // ✅ Cache & return
   cache.set(code, { data: record, timestamp: Date.now() });
   return record;
 }

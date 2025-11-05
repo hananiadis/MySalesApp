@@ -22,13 +22,14 @@ export const getCollectionName = (brand, orderType = null) => {
 export async function createOrder(order) {
   if (!order || !order.userId) throw new Error('Order object or userId missing!');
   const collectionName = getCollectionName(order.brand, order.orderType);
-  const docRef = await firestore()
-    .collection(collectionName)
-    .add({
-      ...order,
-      firestoreCreatedAt: firestore.FieldValue.serverTimestamp(),
-    });
-  return docRef.id;
+  const collectionRef = firestore().collection(collectionName);
+  const docId = order?.id ? String(order.id) : collectionRef.doc().id;
+  await collectionRef.doc(docId).set({
+    ...order,
+    id: docId,
+    firestoreCreatedAt: firestore.FieldValue.serverTimestamp(),
+  });
+  return docId;
 }
 
 // UPSERT an order by document ID (merge = true)

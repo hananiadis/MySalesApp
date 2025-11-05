@@ -1,35 +1,25 @@
 ﻿// App.js
+// -------------------------------------------------------------
 import React, { useEffect, useState } from 'react';
 import { StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-import { AuthProvider, useAuth } from './src/context/AuthProvider';
-import AuthStack from './src/navigation/AuthStack';
-// Providers
-import { OnlineStatusProvider } from './src/utils/OnlineStatusContext';
-import OnlineStatusBanner from './src/utils/OnlineStatusBanner';
-import { OrderProvider } from './src/context/OrderContext';
-import colors from './src/theme/colors';
-
 import * as Font from 'expo-font';
 
-// ✅ Wrap font loading inside a safe async function
-const loadFonts = async () => {
-  try {
-    await Font.loadAsync({
-      'LibreBarcode128Text-Regular': require('./assets/fonts/LibreBarcode128Text-Regular.ttf'),
-      'LibreBarcode39Text-Regular': require('./assets/fonts/LibreBarcode39Text-Regular.ttf'),
-    });
-  } catch (error) {
-    console.warn('Font load failed:', error);
-    throw error;
-  }
-};
+// Providers
+import { AuthProvider, useAuth } from './src/context/AuthProvider';
+import { OnlineStatusProvider } from './src/utils/OnlineStatusContext';
+import { OrderProvider } from './src/context/OrderContext';
+
+// Components
+import OnlineStatusBanner from './src/utils/OnlineStatusBanner';
+import colors from './src/theme/colors';
+import AuthStack from './src/navigation/AuthStack';
+import MainTabsNavigator from './src/navigation/MainTabsNavigator';
 
 // Screens
-import MainTabsNavigator from './src/navigation/MainTabsNavigator';
 import PlaymobilScreen from './src/screens/PlaymobilScreen';
 import KivosScreen from './src/screens/KivosScreen';
 import JohnScreen from './src/screens/JohnScreen';
@@ -60,25 +50,43 @@ import SuperMarketOrderReviewScreen from './src/screens/SuperMarketOrderReviewSc
 import SuperMarketOrderSummaryScreen from './src/screens/SuperMarketOrderSummaryScreen';
 import SuperMarketStoreDetailsScreen from './src/screens/SuperMarketStoreDetailsScreen';
 import CustomerSalesSummaryTest from './src/screens/CustomerSalesSummaryTest';
+import TestKPI from './src/screens/TestKPI';
 
+// -------------------------------------------------------------
 const Stack = createNativeStackNavigator();
 
+const loadFonts = async () => {
+  console.log('🔤 [App] Loading custom fonts...');
+  try {
+    await Font.loadAsync({
+      'LibreBarcode128Text-Regular': require('./assets/fonts/LibreBarcode128Text-Regular.ttf'),
+      'LibreBarcode39Text-Regular': require('./assets/fonts/LibreBarcode39Text-Regular.ttf'),
+    });
+    console.log('✅ [App] Fonts loaded successfully');
+  } catch (error) {
+    console.warn('⚠️ [App] Font load failed:', error);
+  }
+};
+
+// -------------------------------------------------------------
 function AppNavigator() {
   const { init, user, loadingProfile } = useAuth();
 
   if (init || loadingProfile) {
+    console.log('⏳ [AppNavigator] Waiting for auth initialization...');
     return null;
   }
 
   if (!user) {
+    console.log('🔒 [AppNavigator] No user detected → showing AuthStack');
     return <AuthStack />;
   }
 
+  console.log('✅ [AppNavigator] User authenticated → loading main app...');
   return (
     <>
       <OnlineStatusBanner />
       <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {/* Main */}
         <Stack.Screen name="Home" component={MainTabsNavigator} />
         <Stack.Screen name="Playmobil" component={PlaymobilScreen} />
         <Stack.Screen name="Kivos" component={KivosScreen} />
@@ -92,14 +100,6 @@ function AppNavigator() {
         <Stack.Screen name="CustomerSalesSummary" component={CustomerSalesSummary} />
         <Stack.Screen name="CustomerSalesDetail" component={CustomerSalesDetail} />
         <Stack.Screen name="OrdersManagement" component={OrdersManagementScreen} />
-        <Stack.Screen name="OrderDetail" component={OrderDetailScreen} />
-        <Stack.Screen name="Settings" component={SettingsScreen} />
-        <Stack.Screen name="UserManagement" component={UserManagementScreen} />
-        <Stack.Screen name="SalesmanManagement" component={SalesmanManagementScreen} />
-        <Stack.Screen name="Catalog" component={CataloguesScreen} />
-        <Stack.Screen name="CustomerSalesSummaryTest" component={CustomerSalesSummaryTest} />
-
-        {/* Order flow */}
         <Stack.Screen name="OrderCustomerSelectScreen" component={OrderCustomerSelectScreen} />
         <Stack.Screen name="OrderProductSelectionScreen" component={OrderProductSelectionScreen} />
         <Stack.Screen name="OrderReviewScreen" component={OrderReviewScreen} />
@@ -111,38 +111,40 @@ function AppNavigator() {
         <Stack.Screen name="SuperMarketOrderSummary" component={SuperMarketOrderSummaryScreen} />
         <Stack.Screen name="SuperMarketStoreDetails" component={SuperMarketStoreDetailsScreen} />
         <Stack.Screen name="Profile" component={ProfileScreen} />
+        <Stack.Screen name="Settings" component={SettingsScreen} />
+        <Stack.Screen name="UserManagement" component={UserManagementScreen} />
+        <Stack.Screen name="SalesmanManagement" component={SalesmanManagementScreen} />
+        <Stack.Screen name="Catalog" component={CataloguesScreen} />
+        <Stack.Screen name="CustomerSalesSummaryTest" component={CustomerSalesSummaryTest} />
+        <Stack.Screen name="TestKPI" component={TestKPI} />
       </Stack.Navigator>
     </>
   );
 }
 
+// -------------------------------------------------------------
 export default function App() {
   const [fontsReady, setFontsReady] = useState(false);
 
   useEffect(() => {
+    console.log('🚀 [App] Mounting...');
     let mounted = true;
-
     (async () => {
-      try {
-        await loadFonts();
-      } catch {
-        // Font failure should not block boot; continue without custom fonts.
-      } finally {
-        if (mounted) {
-          setFontsReady(true);
-        }
-      }
+      await loadFonts();
+      if (mounted) setFontsReady(true);
     })();
-
     return () => {
+      console.log('🧹 [App] Unmounting...');
       mounted = false;
     };
   }, []);
 
   if (!fontsReady) {
+    console.log('⏳ [App] Waiting for fonts...');
     return null;
   }
 
+  console.log('✅ [App] Starting navigation tree');
   return (
     <SafeAreaProvider>
       <AuthProvider>

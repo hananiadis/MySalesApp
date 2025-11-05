@@ -26,7 +26,8 @@ const STRINGS = {
 const EXIT_STRINGS = { exit: '\u0388\u03be\u03bf\u03b4\u03bf\u03c2' };
 
 export default function LoginScreen({ navigation }) {
-  const { signIn } = useAuth();
+  const auth = useAuth();
+  const signIn = auth?.signIn;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [busy, setBusy] = useState(false);
@@ -34,6 +35,10 @@ export default function LoginScreen({ navigation }) {
 
   const onLogin = async () => {
     setErr('');
+    if (!signIn) {
+      setErr(STRINGS.genericError);
+      return;
+    }
     setBusy(true);
     try {
       await signIn(email, password);

@@ -20,35 +20,98 @@ const LEGACY_KEYS = {
   customersAction: 'customers_last_action',
 };
 
+const SQLITE_FULL_CODE = 'SQLITE_FULL';
+
+const freeAsyncStorageSpace = async () => {
+  try {
+    const keys = await AsyncStorage.getAllKeys();
+    const sheetKeys = keys.filter((key) => key.startsWith('sheetcache:'));
+    if (sheetKeys.length) {
+      console.warn('[localData] freeing sheet caches to recover space', sheetKeys.length);
+      await AsyncStorage.multiRemove(sheetKeys);
+    }
+  } catch (error) {
+    console.error('[localData] failed to free AsyncStorage space', error?.message || error);
+  }
+};
+
 const FILE_POINTER_PREFIX = '@@file:';
-const LARGE_PAYLOAD_THRESHOLD = 120_000; // ~120 KB JSON string
+const LARGE_PAYLOAD_THRESHOLD = 80_000; // ~80 KB JSON string to prefer file storage
 
 const resolveBrandKey = (brand) => normalizeBrandKey(brand ?? DEFAULT_BRAND);
 const dataKey = (type, brand) => `${type}:${brand}`;
 const actionKey = (type, brand) => `${type}_last_action:${brand}`;
 
+const ensureTrailingSlash = (value) => {
+  if (!value) return value;
+  return value.endsWith('/') ? value : `${value}/`;
+};
+
+const toFileUri = (rawPath) => {
+  if (!rawPath) return null;
+  const normalized = rawPath.replace(/\\/g, '/');
+  if (normalized.startsWith('file://')) {
+    return ensureTrailingSlash(normalized);
+  }
+  const withLeadingSlash = normalized.startsWith('/') ? normalized : `/${normalized}`;
+  return ensureTrailingSlash(`file://${withLeadingSlash}`);
+};
+
+const stripFileUri = (value) => {
+  if (!value) return null;
+  const withoutScheme = value.replace(/^file:\/\//, '');
+  const normalized = withoutScheme.replace(/\\/g, '/');
+  return normalized.startsWith('/') ? normalized : `/${normalized}`;
+};
+
 const STORAGE_ROOT = (() => {
-  const root = FileSystem.documentDirectory || FileSystem.cacheDirectory;
-  if (!root) {
+  const candidates = [
+    FileSystem.documentDirectory,
+    FileSystem.cacheDirectory,
+    RNFS.DocumentDirectoryPath ? toFileUri(RNFS.DocumentDirectoryPath) : null,
+    RNFS.CachesDirectoryPath ? toFileUri(RNFS.CachesDirectoryPath) : null,
+  ].filter(Boolean);
+
+  const base = candidates.find(Boolean);
+  if (!base) {
+    console.warn(
+      '[localData] no filesystem storage root available; falling back to inline AsyncStorage only'
+    );
     return null;
   }
-  return `${root.replace(/\/?$/, '/') }local-data/`;
+
+  return `${ensureTrailingSlash(base)}local-data/`;
 })();
 
 const ensureDirAsync = async (dir) => {
   if (!dir) return;
+
   try {
     const info = await FileSystem.getInfoAsync(dir);
     if (info.exists && info.isDirectory) {
       return;
     }
   } catch (error) {
-    // ignore
+    // ignore - we'll attempt to create the directory
   }
+
   try {
     await FileSystem.makeDirectoryAsync(dir, { intermediates: true });
+    return;
   } catch (error) {
-    // ignore
+    // fall back to RNFS below
+  }
+
+  const fsPath = stripFileUri(dir);
+  if (!fsPath) return;
+
+  try {
+    await RNFS.mkdir(fsPath);
+  } catch (error) {
+    console.warn('[localData] failed to ensure directory', {
+      dir,
+      message: error?.message || error,
+    });
   }
 };
 
@@ -62,34 +125,80 @@ const filePathFor = (type, brand) => {
 const writeJsonFile = async (type, brand, json) => {
   const path = filePathFor(type, brand);
   if (!path) return null;
+
   const dir = path.slice(0, path.lastIndexOf('/') + 1);
   await ensureDirAsync(dir);
-  await FileSystem.writeAsStringAsync(path, json, { encoding: FileSystem.EncodingType.UTF8 });
-  return path;
+
+  try {
+    await FileSystem.writeAsStringAsync(path, json, { encoding: FileSystem.EncodingType.UTF8 });
+    return path;
+  } catch (error) {
+    const fsPath = stripFileUri(path);
+    if (!fsPath) throw error;
+
+    try {
+      await RNFS.writeFile(fsPath, json, 'utf8');
+      return path;
+    } catch (fallbackError) {
+      console.error(
+        '[localData] writeJsonFile fallback failed',
+        fallbackError?.message || fallbackError
+      );
+      throw error;
+    }
+  }
 };
 
 const readJsonFile = async (type, brand, overridePath) => {
   const path = overridePath || filePathFor(type, brand);
   if (!path) return null;
+
   try {
     const info = await FileSystem.getInfoAsync(path);
     if (!info.exists) return null;
     return await FileSystem.readAsStringAsync(path, { encoding: FileSystem.EncodingType.UTF8 });
   } catch (error) {
-    return null;
+    const fsPath = stripFileUri(path);
+    if (!fsPath) return null;
+
+    try {
+      const exists = await RNFS.exists(fsPath);
+      if (!exists) return null;
+      return await RNFS.readFile(fsPath, 'utf8');
+    } catch (fallbackError) {
+      console.error(
+        '[localData] readJsonFile fallback failed',
+        fallbackError?.message || fallbackError
+      );
+      return null;
+    }
   }
 };
 
 const removeJsonFile = async (type, brand, overridePath) => {
   const path = overridePath || filePathFor(type, brand);
   if (!path) return;
+
   try {
     const info = await FileSystem.getInfoAsync(path);
     if (info.exists) {
       await FileSystem.deleteAsync(path, { idempotent: true });
+      return;
     }
   } catch (error) {
-    // ignore
+    // fall back to RNFS below
+  }
+
+  const fsPath = stripFileUri(path);
+  if (!fsPath) return;
+
+  try {
+    const exists = await RNFS.exists(fsPath);
+    if (exists) {
+      await RNFS.unlink(fsPath);
+    }
+  } catch (error) {
+    // ignore delete failures
   }
 };
 
@@ -120,12 +229,32 @@ const storePointerReference = async (key, pointerPath) => {
     await clearItemOnly(key);
     await AsyncStorage.setItem(key, `${FILE_POINTER_PREFIX}${pointerPath}`);
   } catch (error) {
-    // ignore
+    console.warn('[localData] failed to store pointer reference', {
+      key,
+      pointerPath,
+      message: error?.message || error,
+    });
+    if (String(error?.message || '').includes(SQLITE_FULL_CODE)) {
+      await freeAsyncStorageSpace();
+      try {
+        await AsyncStorage.setItem(key, `${FILE_POINTER_PREFIX}${pointerPath}`);
+        console.log('[localData] pointer reference retry succeeded', key);
+        return;
+      } catch (retryError) {
+        console.error(
+          '[localData] pointer reference retry failed',
+          retryError?.message || retryError
+        );
+      }
+    }
   }
 };
 
-const storePayload = async (key, type, brand, payload) => {
+const storePayload = async (key, type, brand, payload, options = {}) => {
   const safePayload = Array.isArray(payload) ? payload : [];
+  const { forceFile = false } = options;
+  const shouldForceFile = forceFile || type === 'customers' || type === 'legacy_customers';
+
   const json = JSON.stringify(safePayload);
 
   const writeAsFile = async () => {
@@ -133,11 +262,45 @@ const storePayload = async (key, type, brand, payload) => {
     await pruneExisting(key, type, brand);
     const filePath = await writeJsonFile(type, brand, json);
     if (!filePath) return null;
-    await AsyncStorage.setItem(key, `${FILE_POINTER_PREFIX}${filePath}`);
+    try {
+      await AsyncStorage.setItem(key, `${FILE_POINTER_PREFIX}${filePath}`);
+      console.log(`[localData] stored ${type} for ${brand} as file pointer`, filePath);
+    } catch (error) {
+      console.error(
+        '[localData] failed to store pointer for',
+        type,
+        brand,
+        error?.message || error
+      );
+      if (String(error?.message || '').includes(SQLITE_FULL_CODE)) {
+        await freeAsyncStorageSpace();
+        try {
+          await AsyncStorage.setItem(key, `${FILE_POINTER_PREFIX}${filePath}`);
+          console.log(
+            `[localData] stored ${type} for ${brand} as file pointer (retry)`,
+            filePath
+          );
+          return { strategy: 'file', pointer: filePath };
+        } catch (retryError) {
+          console.error('[localData] pointer retry failed', retryError?.message || retryError);
+        }
+      }
+      await removeJsonFile(type, brand, filePath);
+      throw error;
+    }
     return { strategy: 'file', pointer: filePath };
   };
 
+  if (shouldForceFile && STORAGE_ROOT) {
+    await freeAsyncStorageSpace();
+    const result = await writeAsFile();
+    if (result) {
+      return result;
+    }
+  }
+
   if (json.length > LARGE_PAYLOAD_THRESHOLD && STORAGE_ROOT) {
+    await freeAsyncStorageSpace();
     try {
       const fileResult = await writeAsFile();
       if (fileResult) {
@@ -151,10 +314,15 @@ const storePayload = async (key, type, brand, payload) => {
   await pruneExisting(key, type, brand);
 
   try {
+    console.log(`[localData] stored ${type} for ${brand} inline (size ${json.length} bytes)`);
     await AsyncStorage.setItem(key, json);
     await removeJsonFile(type, brand);
     return { strategy: 'inline' };
   } catch (error) {
+    console.warn('[localData] inline store failed', { type, brand, size: json.length, message: error?.message || error });
+    if (String(error?.message || '').includes(SQLITE_FULL_CODE)) {
+      await freeAsyncStorageSpace();
+    }
     try {
       const fallback = await writeAsFile();
       if (fallback) {
@@ -172,7 +340,9 @@ const readPayload = async (key, type, brand) => {
   let json = null;
 
   if (raw && raw.startsWith(FILE_POINTER_PREFIX)) {
-    json = await readJsonFile(type, brand, raw.slice(FILE_POINTER_PREFIX.length));
+    const pointer = raw.slice(FILE_POINTER_PREFIX.length);
+    console.log(`[localData] reading ${type} for ${brand} from file pointer`, pointer);
+    json = await readJsonFile(type, brand, pointer);
   } else if (raw) {
     json = raw;
   } else {
@@ -262,14 +432,22 @@ export async function getProductsLastAction(brand) {
 export async function saveCustomersToLocal(customers, brand) {
   const resolvedBrand = resolveBrandKey(brand);
   const key = dataKey('customers', resolvedBrand);
-  const result = await storePayload(key, 'customers', resolvedBrand, customers);
+  const result = await storePayload(key, 'customers', resolvedBrand, customers, {
+    forceFile: true,
+  });
   await setActionState('customers', resolvedBrand, 'updated');
 
   if (resolvedBrand === DEFAULT_BRAND) {
     if (result?.strategy === 'file' && result.pointer) {
       await storePointerReference(LEGACY_KEYS.customers, result.pointer);
     } else {
-      await storePayload(LEGACY_KEYS.customers, 'legacy_customers', resolvedBrand, customers);
+      await storePayload(
+        LEGACY_KEYS.customers,
+        'legacy_customers',
+        resolvedBrand,
+        customers,
+        { forceFile: true }
+      );
     }
     await legacySetAction(LEGACY_KEYS.customersAction);
   }

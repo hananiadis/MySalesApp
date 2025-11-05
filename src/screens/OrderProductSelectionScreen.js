@@ -1,5 +1,6 @@
 // src/screens/OrderProductSelectionScreen.js
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   View,
   Text,
@@ -81,19 +82,27 @@ export default function OrderProductSelectionScreen({ navigation, route }) {
   }, []);
 
   const handleGoBack = useCallback(() => {
-    if (navigation.canGoBack()) {
-      navigation.goBack();
-    } else {
-      navigation.navigate('OrderCustomerSelectScreen', { brand });
-    }
+    navigation.navigate('OrderCustomerSelectScreen', { brand });
   }, [brand, navigation]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const unsubscribe = navigation.addListener('beforeRemove', (event) => {
+        if (event.data.action?.type === 'GO_BACK') {
+          event.preventDefault();
+          handleGoBack();
+        }
+      });
+      return () => unsubscribe();
+    }, [handleGoBack, navigation])
+  );
 
   const [expandedNodes, setExpandedNodes] = useState({});
   const [searchCollapsed, setSearchCollapsed] = useState({});
 
-  
   const codeOf = (p) => p?.productCode ?? p?.code ?? p?.sku ?? p?.ProductCode ?? String(p?.id ?? '');
   const descOf = (p) => p?.description ?? p?.desc ?? p?.name ?? p?.productDescription ?? '';
+  
   const parseNumeric = (value) => {
     if (value == null) return null;
     if (typeof value === 'number') {
@@ -110,6 +119,7 @@ export default function OrderProductSelectionScreen({ navigation, route }) {
     const parsed = Number(normalized);
     return Number.isFinite(parsed) ? parsed : null;
   };
+
   const roundCurrency = (value) => {
     if (value === null || value === undefined) {
       return null;
@@ -140,6 +150,7 @@ export default function OrderProductSelectionScreen({ navigation, route }) {
     }
     return 0;
   };
+
   const srpOf = (p) => {
     const candidates = [p?.srp, p?.SRP, p?.retailPrice, p?.Retail];
     for (const candidate of candidates) {
@@ -153,6 +164,7 @@ export default function OrderProductSelectionScreen({ navigation, route }) {
     }
     return null;
   };
+
   const offerOf = (p) => {
     const candidates = [p?.offerPrice, p?.offer_price, p?.offer];
     for (const candidate of candidates) {
@@ -166,6 +178,7 @@ export default function OrderProductSelectionScreen({ navigation, route }) {
     }
     return null;
   };
+
   const barcodeOf = (p) => {
     const candidates = [
       p?.barcodeUnit,
@@ -182,36 +195,43 @@ export default function OrderProductSelectionScreen({ navigation, route }) {
     }
     return '';
   };
+
   const playingThemeOf = (p) => {
     const theme = p?.playingTheme ?? p?.PlayingTheme ?? p?.playing_theme ?? p?.theme ?? '';
     const normalized = String(theme || '').trim();
-    return normalized || '????��? ?����???';
+    return normalized || 'Χωρίς θέμα';
   };
+
   const sheetCategoryOf = (p) => {
     const value = p?.sheetCategory ?? p?.SheetCategory ?? '';
     const normalized = String(value || '').trim();
-    return normalized || '????? F????';
+    return normalized || 'Χωρίς Φύλλο';
   };
+
   const generalCategoryOf = (p) => {
     const value = p?.generalCategory ?? p?.GeneralCategory ?? '';
     const normalized = String(value || '').trim();
-    return normalized || '????? ????a ?at?????a';
+    return normalized || 'Χωρίς Γενική Κατηγορία';
   };
+
   const subCategoryOf = (p) => {
     const value = p?.subCategory ?? p?.SubCategory ?? '';
     const normalized = String(value || '').trim();
-    return normalized || '????? ?p??at?????a';
+    return normalized || 'Χωρίς Υποκατηγορία';
   };
+
   const supplierBrandOf = (p) => {
     const value = p?.supplierBrand ?? p?.SupplierBrand ?? p?.brand ?? '';
     const normalized = String(value || '').trim();
-    return normalized || '????? Brand ???�??e?t?';
+    return normalized || 'Άγνωστο brand';
   };
+
   const kivosCategoryOf = (p) => {
     const value = p?.category ?? p?.Category ?? p?.generalCategory ?? '';
     const normalized = String(value || '').trim();
-    return normalized || '????? ?at?????a';
+    return normalized || 'Χωρίς Κατηγορία';
   };
+
   const makeNodeKey = useCallback(
     (...parts) =>
       `${brand}::${parts
@@ -219,6 +239,7 @@ export default function OrderProductSelectionScreen({ navigation, route }) {
         .join('>')}`,
     [brand]
   );
+
   const parsePackageCount = (raw) => {
     if (raw == null) {
       return null;
@@ -238,6 +259,7 @@ export default function OrderProductSelectionScreen({ navigation, route }) {
     const parsed = Number(match[1].replace(',', '.'));
     return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
   };
+
   const packageSizeOf = (product, fallbackSize = null) => {
     const candidates = [
       fallbackSize,
@@ -263,6 +285,7 @@ export default function OrderProductSelectionScreen({ navigation, route }) {
     }
     return 1;
   };
+
   const packageLabelOf = (product, resolvedSize = 1) => {
     const candidates = [
       product?.packageLabel,
@@ -278,10 +301,11 @@ export default function OrderProductSelectionScreen({ navigation, route }) {
       }
     }
     if (resolvedSize && resolvedSize > 1) {
-      return `${resolvedSize} t�?`;
+      return `${resolvedSize} τεμ.`;
     }
     return '';
   };
+
   const cataloguePageOf = (p) => {
     const raw = p?.cataloguePage ?? p?.CataloguePage ?? p?.catalogPage ?? p?.CatalogPage ?? p?.catalogue_page ?? p?.catalog_page ?? null;
     if (raw == null) return Number.POSITIVE_INFINITY;
@@ -289,6 +313,7 @@ export default function OrderProductSelectionScreen({ navigation, route }) {
     const match = String(raw).match(/\d+/);
     return match ? Number(match[0]) : Number.POSITIVE_INFINITY;
   };
+
   const getImmediateStock = (code) => lookupImmediateStockValue(immediateStockMap, code);
 
   const stockOf = (p) => {
@@ -355,11 +380,9 @@ export default function OrderProductSelectionScreen({ navigation, route }) {
     }
     return map;
   }, [orderLines, brand]);
+
   const getQty = (code) => qtyFor.get(code) || 0;
 
-
-
-  
   const setQty = (product, qty) => {
     const code = codeOf(product);
     const description = descOf(product);
@@ -932,7 +955,6 @@ export default function OrderProductSelectionScreen({ navigation, route }) {
             value={search}
             onChangeText={(v) => {
               setSearch(v);
-              // ?ta? a????e? t? query, ?a????se ta "manual collapses" t?? a?a??t?s??
               setSearchCollapsed({});
             }}
             placeholder="Αναζήτηση..."
@@ -1028,8 +1050,3 @@ const styles = StyleSheet.create({
   fabDisabled: { opacity: 0.5 },
   fabText: { color: '#fff', fontWeight: '800', fontSize: 15.5 },
 });
-
-
-
-
-

@@ -13,59 +13,153 @@ const ensureFileSystemSetup = () => {
 
 // Logo asset mappings
 const COMPANY_LOGOS = {
-  masoutis: require('../../assets/masoutis_logo.png'),
-  sklavenitis: require('../../assets/sklavenitis_logo.png'),
+  masoutis: {
+    remote: 'https://res.cloudinary.com/db9yukggu/image/upload/v1762274820/masoutis_logo_bil5wp.png',
+    local: require('../../assets/masoutis_logo.png'),
+  },
+  sklavenitis: {
+    remote: 'https://res.cloudinary.com/db9yukggu/image/upload/v1762274754/sklavenitis_logo_kaoenr.png',
+    local: require('../../assets/sklavenitis_logo.png'),
+  },
 };
 
 const BRAND_LOGOS = {
-  john: require('../../assets/john_hellas_logo.png'),
-  playmobil: require('../../assets/playmobil_logo.png'),
-  kivos: require('../../assets/kivos_logo.png'),
+  john: {
+    remote: 'https://res.cloudinary.com/db9yukggu/image/upload/v1762274784/john_hellas_logo_pysypf.png',
+    local: require('../../assets/john_hellas_logo.png'),
+  },
+  playmobil: {
+    remote: 'https://res.cloudinary.com/db9yukggu/image/upload/v1762274820/playmobil_logo_vmhpck.png',
+    local: require('../../assets/playmobil_logo.png'),
+  },
+  kivos: {
+    local: require('../../assets/kivos_logo.png'),
+  },
 };
 
 // Normalize company/brand names to find logo
+const GREEK_TO_LATIN = {
+  '\u03b1': 'a',
+  '\u03b2': 'v',
+  '\u03b3': 'g',
+  '\u03b4': 'd',
+  '\u03b5': 'e',
+  '\u03b6': 'z',
+  '\u03b7': 'i',
+  '\u03b8': 'th',
+  '\u03b9': 'i',
+  '\u03ba': 'k',
+  '\u03bb': 'l',
+  '\u03bc': 'm',
+  '\u03bd': 'n',
+  '\u03be': 'x',
+  '\u03bf': 'o',
+  '\u03c0': 'p',
+  '\u03c1': 'r',
+  '\u03c3': 's',
+  '\u03c2': 's',
+  '\u03c4': 't',
+  '\u03c5': 'u',
+  '\u03c6': 'f',
+  '\u03c7': 'ch',
+  '\u03c8': 'ps',
+  '\u03c9': 'o',
+  '\u0391': 'a',
+  '\u0392': 'v',
+  '\u0393': 'g',
+  '\u0394': 'd',
+  '\u0395': 'e',
+  '\u0396': 'z',
+  '\u0397': 'i',
+  '\u0398': 'th',
+  '\u0399': 'i',
+  '\u039a': 'k',
+  '\u039b': 'l',
+  '\u039c': 'm',
+  '\u039d': 'n',
+  '\u039e': 'x',
+  '\u039f': 'o',
+  '\u03a0': 'p',
+  '\u03a1': 'r',
+  '\u03a3': 's',
+  '\u03a4': 't',
+  '\u03a5': 'u',
+  '\u03a6': 'f',
+  '\u03a7': 'ch',
+  '\u03a8': 'ps',
+  '\u03a9': 'o',
+};
+
 const normalizeForLogo = (name) => {
   if (!name) return '';
-  return String(name)
+  const base = String(name)
     .toLowerCase()
     .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
-    .replace(/\s+/g, '')
-    .replace(/\./g, '')
-    .trim();
+    .replace(/[\u0300-\u036f]/g, ''); // Remove diacritics
+  const transliterated = base.replace(
+    /[\u0370-\u03ff]/g,
+    (char) => GREEK_TO_LATIN[char] || char
+  );
+  return transliterated.replace(/[^a-z0-9]/g, '').trim();
+};
+
+const COMPANY_NAME_ALIASES = {
+  masoutis: ['masoutis', 'masouti', 'masutis', 'masout'],
+  sklavenitis: ['sklavenitis', 'sklavenit', 'sklavenith', 'sklaveniti', 'sklaventis'],
+};
+
+const BRAND_NAME_ALIASES = {
+  john: ['john', 'johnhellas', 'johns', 'johnhell'],
+  playmobil: ['playmobil', 'playmo'],
+  kivos: ['kivos'],
 };
 
 // Map company name variations to logo keys
 const getCompanyLogoKey = (companyName) => {
   const normalized = normalizeForLogo(companyName);
-  
-  // Sklavenitis variations
-  if (normalized.includes('σκλαβενιτ') || normalized.includes('sklavenit') || 
-      normalized.includes('ευσ') || normalized.includes('eys')) {
-    return 'sklavenitis';
+  if (!normalized) return null;
+
+  for (const [key, aliases] of Object.entries(COMPANY_NAME_ALIASES)) {
+    if (aliases.some((alias) => normalized.includes(alias))) {
+      return key;
+    }
   }
-  
-  // Masoutis variations
-  if (normalized.includes('μασουτ') || normalized.includes('masout')) {
-    return 'masoutis';
-  }
-  
+
   return null;
 };
 
 // Map brand variations to logo keys
 const getBrandLogoKey = (brand) => {
   const normalized = normalizeForLogo(brand);
-  
-  if (normalized === 'john' || normalized.includes('johnhell')) return 'john';
-  if (normalized === 'playmobil') return 'playmobil';
-  if (normalized === 'kivos') return 'kivos';
-  
+  if (!normalized) return null;
+
+  for (const [key, aliases] of Object.entries(BRAND_NAME_ALIASES)) {
+    if (aliases.some((alias) => normalized.includes(alias))) {
+      return key;
+    }
+  }
+
   return null;
 };
 
 // Load logo from assets
-const loadLogoAsBase64 = async (logoAsset) => {
+const LOGO_CACHE = new Map();
+const LOGO_CACHE_DIR =
+  (FileSystem.cacheDirectory || FileSystem.documentDirectory || '') + 'sheet-logos/';
+
+const ensureDirAsync = async (dirUri) => {
+  if (!dirUri) return;
+  try {
+    const dirInfo = await FileSystem.getInfoAsync(dirUri);
+    if (!dirInfo.exists) {
+      await FileSystem.makeDirectoryAsync(dirUri, { intermediates: true });
+    }
+  } catch (error) {
+    console.log('📁 Failed to ensure directory:', dirUri, error?.message || error);
+  }
+};
+
+const loadLogoFromAsset = async (logoAsset) => {
   try {
     if (!logoAsset) return null;
     
@@ -85,6 +179,52 @@ const loadLogoAsBase64 = async (logoAsset) => {
   }
 };
 
+const downloadRemoteLogo = async (remoteUri, cacheKey) => {
+  try {
+    if (!remoteUri) return null;
+    await ensureDirAsync(LOGO_CACHE_DIR);
+    const extension = getImageExtension(remoteUri);
+    const targetPath = `${LOGO_CACHE_DIR}${cacheKey}.${extension}`;
+    const existing = await FileSystem.getInfoAsync(targetPath);
+    if (!existing.exists) {
+      await FileSystem.downloadAsync(remoteUri, targetPath);
+    }
+    return targetPath;
+  } catch (error) {
+    console.log('🌐 Failed to download logo:', remoteUri, error?.message || error);
+    return null;
+  }
+};
+
+const loadLogoAsBase64 = async (cacheKey, source = {}) => {
+  if (!cacheKey || !source) return null;
+  if (LOGO_CACHE.has(cacheKey)) {
+    return LOGO_CACHE.get(cacheKey);
+  }
+
+  let base64 = null;
+
+  if (source.remote) {
+    const localPath = await downloadRemoteLogo(source.remote, cacheKey);
+    if (localPath) {
+      try {
+        base64 = await FileSystem.readAsStringAsync(localPath, {
+          encoding: FileSystem.EncodingType.Base64,
+        });
+      } catch (error) {
+        console.log('📄 Failed to read downloaded logo:', localPath, error?.message || error);
+      }
+    }
+  }
+
+  if (!base64 && source.local) {
+    base64 = await loadLogoFromAsset(source.local);
+  }
+
+  LOGO_CACHE.set(cacheKey, base64);
+  return base64;
+};
+
 const getHeaderConfig = (includeImages = false) => {
   const baseConfig = [
     { header: 'Α/Α', key: 'rowNumber', width: 5 },
@@ -92,7 +232,7 @@ const getHeaderConfig = (includeImages = false) => {
   ];
 
   if (includeImages) {
-    baseConfig.push({ header: 'Εικόνα', key: 'image', width: 10 });
+    baseConfig.push({ header: 'Εικόνα', key: 'image', width: 15.5 });
   }
 
   baseConfig.push(
@@ -268,12 +408,16 @@ const addHeaderWithLogos = async (workbook, sheet, order = {}) => {
   const brandLogoKey = getBrandLogoKey(brand);
   
   // Load logos
-  const companyLogoBase64 = companyLogoKey ? await loadLogoAsBase64(COMPANY_LOGOS[companyLogoKey]) : null;
-  const brandLogoBase64 = brandLogoKey ? await loadLogoAsBase64(BRAND_LOGOS[brandLogoKey]) : null;
+  const companyLogoBase64 = companyLogoKey
+    ? await loadLogoAsBase64(`company-${companyLogoKey}`, COMPANY_LOGOS[companyLogoKey])
+    : null;
+  const brandLogoBase64 = brandLogoKey
+    ? await loadLogoAsBase64(`brand-${brandLogoKey}`, BRAND_LOGOS[brandLogoKey])
+    : null;
   
   // Row 1: Title row with logos
   const titleRow = sheet.getRow(1);
-  titleRow.height = 60;
+  titleRow.height = 110;
   
   // Add company logo (left)
   if (companyLogoBase64) {
@@ -284,7 +428,7 @@ const addHeaderWithLogos = async (workbook, sheet, order = {}) => {
       });
       sheet.addImage(companyImageId, {
         tl: { col: 0, row: 0 },
-        ext: { width: 100, height: 50 },
+        ext: { width: 160, height: 90 },
         editAs: 'oneCell',
       });
     } catch (error) {
@@ -293,9 +437,9 @@ const addHeaderWithLogos = async (workbook, sheet, order = {}) => {
   }
   
   // Center title
-  sheet.mergeCells('C1:F1');
+  sheet.mergeCells('C1:G1');
   const titleCell = sheet.getCell('C1');
-  titleCell.value = 'ΠΑΡΑΓΓΕΛΙΑ SUPERMARKET';
+  titleCell.value = 'Supermarket Order';
   titleCell.font = { size: 18, bold: true, color: { argb: 'FF1F4F8F' } };
   titleCell.alignment = { vertical: 'middle', horizontal: 'center' };
   
@@ -308,7 +452,7 @@ const addHeaderWithLogos = async (workbook, sheet, order = {}) => {
       });
       sheet.addImage(brandImageId, {
         tl: { col: 7, row: 0 },
-        ext: { width: 100, height: 50 },
+        ext: { width: 150, height: 90 },
         editAs: 'oneCell',
       });
     } catch (error) {
@@ -320,13 +464,15 @@ const addHeaderWithLogos = async (workbook, sheet, order = {}) => {
   const storeRow = sheet.getRow(2);
   sheet.mergeCells('A2:I2');
   const storeCell = sheet.getCell('A2');
-  storeCell.value = `${storeName} - Κωδ. ${storeCode}`;
+  const storeLabel = storeName ? String(storeName) : 'Store';
+  const codeLabel = storeCode ? String(storeCode) : '-';
+  storeCell.value = `${storeLabel} - Code: ${codeLabel}`;
   storeCell.font = { size: 14, bold: true, color: { argb: 'FF1565C0' } };
   storeCell.alignment = { vertical: 'middle', horizontal: 'center' };
-  storeRow.height = 25;
+  storeRow.height = 16;
   
   // Row 3: Empty spacing
-  sheet.getRow(3).height = 10;
+  sheet.getRow(3).height = 12;
   
   // Fallback text if logos not found
   if (!companyLogoBase64 && companyName) {
@@ -401,7 +547,7 @@ const addStoreInfoSection = async (sheet, order = {}) => {
     row.getCell(6).value = value2;
     sheet.mergeCells(currentRow, 6, currentRow, 7);
     
-    row.height = 18;
+    row.height = 14;
     currentRow++;
   };
   
@@ -414,7 +560,7 @@ const addStoreInfoSection = async (sheet, order = {}) => {
   addInfoRow('Ημερομηνία:', storeInfo.createdAt, 'Αρ. Παραγγελίας:', storeInfo.orderNumber);
   
   // Add spacing
-  sheet.getRow(currentRow).height = 15;
+  sheet.getRow(currentRow).height = 14;
   
   return currentRow + 1; // Return next available row
 };
@@ -482,7 +628,7 @@ export async function exportSupermarketXLSX(products = [], order = {}, fullList 
   headerRow.font = HEADER_FONT;
   headerRow.fill = HEADER_FILL;
   headerRow.alignment = HEADER_ALIGNMENT;
-  headerRow.height = 20;
+  headerRow.height = 14;
   
   // Set column widths
   HEADER_CONFIG.forEach((col, index) => {
@@ -514,7 +660,7 @@ export async function exportSupermarketXLSX(products = [], order = {}, fullList 
         product.wholesale ??
         0
     );
-    const srpValue = wholesaleValue * 1.24;
+    const srpValue = Number((wholesaleValue * 1.24).toFixed(2));
 
     const rowValues = [
       i + 1, // Α/Α (row number)
@@ -536,7 +682,11 @@ export async function exportSupermarketXLSX(products = [], order = {}, fullList 
 
     row.values = rowValues;
     row.alignment = { vertical: 'middle' };
-    row.height = includeImages ? 80 : 15;
+    if (includeImages) {
+      row.height = 94;
+    } else if (row.height) {
+      delete row.height;
+    }
 
     // Only process images if includeImages is true
     if (includeImages && imageCount < IMAGE_LIMIT) {
@@ -555,7 +705,7 @@ export async function exportSupermarketXLSX(products = [], order = {}, fullList 
           const imageColIndex = 2; // Column C (after Α/Α and Κωδικός)
           sheet.addImage(imageId, {
             tl: { col: imageColIndex, row: currentRowIndex - 1 },
-            ext: { width: 80, height: 80 },
+            ext: { width: 110, height: 110 },
             editAs: 'oneCell',
           });
           imageCount += 1;

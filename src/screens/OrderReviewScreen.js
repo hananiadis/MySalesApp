@@ -153,6 +153,18 @@ const OrderReviewScreen = () => {
     }
   }, [brandKey, fromOrders, navigation]);
 
+  useFocusEffect(
+    useCallback(() => {
+      const intercept = navigation.addListener('beforeRemove', (event) => {
+        if (event.data.action?.type === 'GO_BACK') {
+          event.preventDefault();
+          goToProducts();
+        }
+      });
+      return () => intercept();
+    }, [goToProducts, navigation])
+  );
+
   useEffect(() => {
     const showSub = Keyboard.addListener('keyboardDidShow', (event) => {
       const height = event?.endCoordinates?.height || 0;

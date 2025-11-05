@@ -1,17 +1,32 @@
 // src/utils/OnlineStatusContext.js
+// -------------------------------------------------------------
+// Handles online/offline status across the app
+// -------------------------------------------------------------
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import NetInfo from '@react-native-community/netinfo';
 
 const OnlineStatusContext = createContext({ isConnected: true });
+export const useOnlineStatus = () => useContext(OnlineStatusContext);
 
-export function OnlineStatusProvider({ children }) {
+export const OnlineStatusProvider = ({ children }) => {
+  console.log('🌐 [OnlineStatusProvider] Mounting...');
+
   const [isConnected, setIsConnected] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = NetInfo.addEventListener(state => {
+    console.log('🌍 [OnlineStatusProvider] Subscribing to NetInfo listener...');
+    const unsubscribe = NetInfo.addEventListener((state) => {
+      console.log(
+        '📶 [OnlineStatusProvider] Connection changed:',
+        state.isConnected
+      );
       setIsConnected(!!state.isConnected);
     });
-    return () => unsubscribe();
+
+    return () => {
+      console.log('🧹 [OnlineStatusProvider] Cleaning up NetInfo listener');
+      unsubscribe();
+    };
   }, []);
 
   return (
@@ -19,8 +34,4 @@ export function OnlineStatusProvider({ children }) {
       {children}
     </OnlineStatusContext.Provider>
   );
-}
-
-export function useOnlineStatus() {
-  return useContext(OnlineStatusContext);
-}
+};

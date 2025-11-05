@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, Text, TouchableOpacity, FlatList, StyleSheet, ActivityIndicator, Alert, ScrollView, Modal, TextInput } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import firestore from '@react-native-firebase/firestore';
@@ -8,7 +8,7 @@ import firestore from '@react-native-firebase/firestore';
 import { getOrders, deleteOrder, deleteMany } from '../utils/localOrders';
 import { useOrder } from '../context/OrderContext';
 import { normalizeBrandKey } from '../constants/brands';
-import { useAuth } from '../context/AuthProvider';
+import { useAuth, ROLES as ROLE_DEFAULTS } from '../context/AuthProvider';
 
 const STRINGS = {
   title: 'Διαχείριση Παραγγελιών',
@@ -115,7 +115,13 @@ export default function OrdersManagement() {
   const navigation = useNavigation();
   const route = useRoute();
   const { loadOrder, startOrder, setOrderLines } = useOrder();
-  const { hasRole, profile, ROLES } = useAuth();
+  const auth = useAuth() || {};
+  const {
+    hasRole = () => false,
+    profile = null,
+    ROLES: contextRoles = ROLE_DEFAULTS,
+  } = auth;
+  const ROLES = contextRoles || ROLE_DEFAULTS;
 
   const [orders, setOrders] = useState([]);
   const [firestoreOrders, setFirestoreOrders] = useState([]);
@@ -140,6 +146,23 @@ export default function OrdersManagement() {
   const brand = useMemo(
     () => (rawBrand ? normalizeBrandKey(rawBrand) : null),
     [rawBrand]
+  );
+
+  const handleBackToBrandHome = useCallback(() => {
+    const targetBrand = brand || 'playmobil';
+    navigation.navigate('BrandHome', { brand: targetBrand });
+  }, [brand, navigation]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const unsubscribe = navigation.addListener('beforeRemove', (event) => {
+        if (event.data.action?.type === 'GO_BACK') {
+          event.preventDefault();
+          handleBackToBrandHome();
+        }
+      });
+      return () => unsubscribe();
+    }, [handleBackToBrandHome, navigation])
   );
 
   // Check if user can filter orders by salesman

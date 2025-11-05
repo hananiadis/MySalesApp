@@ -1,4 +1,4 @@
-﻿// src/screens/SuperMarketProductSelectionScreen.js
+// src/screens/SuperMarketProductSelectionScreen.js
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   View,
@@ -13,6 +13,7 @@ import {
   Image,
   Alert,
 } from "react-native";
+import { useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import firestore from "@react-native-firebase/firestore";
@@ -64,6 +65,26 @@ export default function SuperMarketProductSelectionScreen({ navigation, route })
 
   const { store, brand } = route?.params || {};
   const normalizedBrand = useMemo(() => normalizeBrandKey(brand || "john"), [brand]);
+
+  const handleBackToStoreSelect = useCallback(() => {
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      navigation.navigate('SuperMarketStoreSelect', { brand: normalizedBrand });
+    }
+  }, [navigation, normalizedBrand]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const unsubscribe = navigation.addListener('beforeRemove', (event) => {
+        if (event.data.action?.type === 'GO_BACK') {
+          event.preventDefault();
+          handleBackToStoreSelect();
+        }
+      });
+      return () => unsubscribe();
+    }, [handleBackToStoreSelect, navigation])
+  );
 
   const [loading, setLoading] = useState(true);
   const [listings, setListings] = useState([]);

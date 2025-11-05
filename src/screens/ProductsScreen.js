@@ -159,21 +159,36 @@ const ProductsScreen = ({ navigation }) => {
   const [expandedNodes, setExpandedNodes] = useState({}); // Start with all collapsed
   const searchInputRef = useRef(null);
   const handleGoBack = useCallback(() => {
-    navigation.navigate('BrandHome', { brand });
-  }, [navigation, brand]);
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      navigation.navigate('BrandHome', { brand });
+    }
+  }, [brand, navigation]);
   const headerLeft = useMemo(
     () => (
       <TouchableOpacity
         style={styles.backButton}
         onPress={handleGoBack}
         accessibilityRole="button"
-        accessibilityLabel="Πίσω"
+        accessibilityLabel="Επιστροφή"
       >
         <Ionicons name="arrow-back" size={22} color="#1f4f8f" />
       </TouchableOpacity>
     ),
     [handleGoBack],
   );
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('beforeRemove', (event) => {
+      if (event.data.action?.type === 'GO_BACK') {
+        event.preventDefault();
+        handleGoBack();
+      }
+    });
+    return unsubscribe;
+  }, [navigation, handleGoBack]);
+
   useEffect(() => {
     const debouncer = debounce((text) => setDebouncedSearch(text), 300);
     debouncer(search);

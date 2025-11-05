@@ -19,6 +19,7 @@ import firestore from '@react-native-firebase/firestore';
 
 import SafeScreen from '../components/SafeScreen';
 import { useAuth, ROLES } from '../context/AuthProvider';
+import { ROLE_ORDER, getRoleLabel } from '../constants/roles';
 
 const MANAGEMENT_ROLES = [ROLES.OWNER, ROLES.ADMIN, ROLES.DEVELOPER];
 const AVAILABLE_BRANDS = ['playmobil', 'john', 'kivos'];
@@ -28,25 +29,7 @@ const BRAND_LABEL = {
   kivos: 'Kivos',
 };
 
-const ROLE_LABEL = {
-  [ROLES.OWNER]: 'Ιδιοκτήτης',
-  [ROLES.ADMIN]: 'Διαχειριστής',
-  [ROLES.DEVELOPER]: 'Προγραμματιστής',
-  [ROLES.SALES_MANAGER]: 'Υπεύθυνος Πωλήσεων',
-  [ROLES.SALESMAN]: 'Πωλητής',
-  [ROLES.WAREHOUSE_MANAGER]: 'Αποθηκάριος',
-  [ROLES.CUSTOMER]: 'Πελάτης',
-};
-
-const ROLE_ORDER = [
-  ROLES.OWNER,
-  ROLES.ADMIN,
-  ROLES.DEVELOPER,
-  ROLES.SALES_MANAGER,
-  ROLES.SALESMAN,
-  ROLES.WAREHOUSE_MANAGER,
-  ROLES.CUSTOMER,
-];
+// Role labels/order now centralized in constants/roles.js
 
 const EMAIL_REGEX = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
@@ -208,7 +191,7 @@ const UserManagementScreen = ({ navigation }) => {
   const sections = useMemo(() => {
     const buckets = ROLE_ORDER.map((role) => ({
       role,
-      title: ROLE_LABEL[role] || role,
+      title: getRoleLabel(role, 'el'),
       data: [],
     }));
 
@@ -336,6 +319,32 @@ const UserManagementScreen = ({ navigation }) => {
       setSaving(false);
     }
   }, [closeEditor, draftBrands, draftEmail, draftFirstName, draftLastName, draftRole, draftMerchIds, manageableBrandSet, selectedUser, users]);
+
+  useEffect(() => {
+    if (!selectedUser) return;
+    const latest = users.find((user) => user.uid === selectedUser.uid);
+    if (!latest) return;
+    const nextMerch = Array.isArray(latest.merchIds) ? latest.merchIds.filter(Boolean) : [];
+    const currentMerch = Array.isArray(draftMerchIds) ? draftMerchIds.filter(Boolean) : [];
+    if (nextMerch.length === currentMerch.length) {
+      const currentSet = new Set(currentMerch);
+      const nextSet = new Set(nextMerch);
+      let differs = currentSet.size !== nextSet.size;
+      if (!differs) {
+        for (const id of nextSet) {
+          if (!currentSet.has(id)) {
+            differs = true;
+            break;
+          }
+        }
+      }
+      if (!differs) {
+        return;
+      }
+    }
+    setDraftMerchIds(nextMerch);
+    setSelectedUser((prev) => (prev ? { ...prev, merchIds: nextMerch } : latest));
+  }, [users, selectedUser?.uid, draftMerchIds]);
 
   const toggleSection = useCallback((role) => {
     setExpanded((prev) => ({ ...prev, [role]: !prev[role] }));
@@ -504,7 +513,7 @@ const UserManagementScreen = ({ navigation }) => {
                     </Text>
                     <View style={styles.roleBadgeSm}>
                       <Text style={styles.roleBadgeSmText}>
-                        {ROLE_LABEL[user.role] || user.role}
+                        {getRoleLabel(user.role, 'el')}
                       </Text>
                     </View>
                   </View>
@@ -661,7 +670,7 @@ const UserManagementScreen = ({ navigation }) => {
                         draftRole === role && styles.rolePillTextActive,
                       ]}
                     >
-                      {ROLE_LABEL[role] || role}
+                      {getRoleLabel(role, 'el')}
                     </Text>
                   </TouchableOpacity>
                 ))}

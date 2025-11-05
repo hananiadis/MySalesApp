@@ -1,5 +1,5 @@
 ﻿// src/screens/DataScreen.js
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import firestore from '@react-native-firebase/firestore';
 import {
   View,
@@ -36,7 +36,7 @@ import {
   saveSuperMarketListingImagesLastAction,
   saveImagesLastAction,
 } from '../utils/localData';
-
+import { trimOldCaches, trimLargeCaches, clearAllSheetCaches } from '../services/googleSheetsCache';
 import { downloadAndCacheImage } from '../utils/imageHelpers';
 import { cacheImmediateAvailabilityMap, lookupImmediateStockValue } from '../utils/stockAvailability';
 import {
@@ -47,7 +47,7 @@ import {
 } from '../constants/brands';
 import { fetchSuperMarketStores, fetchSuperMarketListings } from '../services/supermarketData';
 
-const LOTTIE_PROGRESS = require('../../assets/lottie/sync.json'); // put a loader animation here
+const LOTTIE_PROGRESS = require('../../assets/lottie/sync.json');
 
 const fetchProductsFromFirestore = async (collectionName, onProgress) => {
   console.log(`[DataScreen] fetchProductsFromFirestore start collection=${collectionName}`);
@@ -63,6 +63,7 @@ const fetchProductsFromFirestore = async (collectionName, onProgress) => {
   );
   return out;
 };
+
 
 const fetchCustomersFromFirestore = async (collectionName, onProgress) => {
   console.log(`[DataScreen] fetchCustomersFromFirestore start collection=${collectionName}`);
@@ -83,7 +84,7 @@ const BRAND_ORDER = ['playmobil', 'john', 'kivos'];
 const BRAND_CONFIG = {
   playmobil: { showStores: true, showListings: true, showImages: true },
   john: { showStores: true, showListings: true, showImages: true },
-  kivos: { showStores: true, showListings: false, showImages: false },
+  kivos: { showStores: true, showListings: false, showImages: true },
 };
 
 const STRINGS = {
@@ -146,6 +147,31 @@ const STRINGS = {
   notAvailable: 'Μη διαθέσιμο για αυτή τη μάρκα.',
 };
 
+const PRODUCT_IMAGE_FIELDS = ['frontCover', 'photoUrl', 'imageUrl', 'image', 'Front Cover'];
+
+const resolveProductImageUrl = (product) => {
+  if (!product || typeof product !== 'object') {
+    return null;
+  }
+
+  for (const field of PRODUCT_IMAGE_FIELDS) {
+    const raw = product?.[field];
+    if (typeof raw === 'string') {
+      const trimmed = raw.trim();
+      if (trimmed) {
+        return trimmed;
+      }
+    }
+  }
+
+  return null;
+};
+
+const PROGRESS_STATUS = {
+  active: 'Σε εξέλιξη...',
+  idle: 'Τελευταία λήψη',
+};
+
 const MESSAGES = {
   productsSaved: (count) => `Αποθηκεύτηκαν ${count} προϊόντα.`,
   customersSaved: (count) => `Αποθηκεύτηκαν ${count} πελάτες.`,
@@ -165,26 +191,59 @@ const SUPER_MARKET_UNAVAILABLE_MSG = 'Μη διαθέσιμο για αυτή τ
 const formatAction = (value) => value || STRINGS.statusPlaceholder;
 
 const ProgressRow = ({ active, label, current, total }) => {
-  if (!active) return null;
-  const haveTotal = Number.isFinite(total) && total > 0;
-  const pct = haveTotal ? Math.min(100, Math.round((current / total) * 100)) : 0;
+  const animationRef = useRef(null);
+  const safeCurrent = Number.isFinite(current) && current > 0 ? current : 0;
+  const safeTotal = Number.isFinite(total) && total > 0 ? total : 0;
+  const hasTotal = safeTotal > 0;
+  const cappedCurrent = hasTotal ? Math.min(safeCurrent, safeTotal) : safeCurrent;
+  const pct = hasTotal
+    ? Math.min(100, Math.round((cappedCurrent / safeTotal) * 100))
+    : safeCurrent > 0
+      ? 100
+      : 0;
+  const progressText = hasTotal
+    ? `${cappedCurrent}/${safeTotal}`
+    : safeCurrent > 0
+      ? `${safeCurrent}`
+      : '';
+
+  useEffect(() => {
+    const anim = animationRef.current;
+    if (!anim) return;
+    if (active) {
+      anim.play?.();
+    } else {
+      anim.reset?.();
+    }
+  }, [active]);
+
   return (
-    <View style={styles.progressRow}>
+    <View style={[styles.progressRow, !active && styles.progressRowInactive]}>
       <View style={styles.progressLeft}>
         <LottieView
+          ref={animationRef}
           source={LOTTIE_PROGRESS}
-          autoPlay
+          autoPlay={false}
           loop
           style={styles.progressAnimation}
         />
       </View>
       <View style={styles.progressRight}>
         <Text style={styles.progressLabel}>
-          {label} {haveTotal ? `(${current}/${total})` : ''}
+          {label}
+          {progressText ? ` (${progressText})` : ''}
         </Text>
         <View style={styles.progressBarWrap}>
-          <View style={[styles.progressBarFill, { width: haveTotal ? `${pct}%` : '0%' }]} />
+          <View
+            style={[
+              styles.progressBarFill,
+              { width: `${pct}%`, opacity: pct ? 1 : 0 },
+            ]}
+          />
         </View>
+        <Text style={styles.progressStatusText}>
+          {active ? PROGRESS_STATUS.active : PROGRESS_STATUS.idle}
+        </Text>
       </View>
     </View>
   );
@@ -194,6 +253,61 @@ const DataScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { profile } = useAuth();
+  
+  const [cacheLoading, setCacheLoading] = useState(null);
+
+  const handleTrimOld = async () => {
+    try {
+      setCacheLoading('old');
+      await trimOldCaches(['2024', '2025']);
+      Alert.alert('🧹 Εκκαθάριση', 'Παλαιά cache (πριν το 2024) διαγράφηκαν με επιτυχία.');
+    } catch (err) {
+      console.error('trimOldCaches error:', err);
+      Alert.alert('Σφάλμα', 'Αποτυχία καθαρισμού παλαιών cache.');
+    } finally {
+      setCacheLoading(null);
+    }
+  };
+
+  const handleTrimLarge = async () => {
+    try {
+      setCacheLoading('large');
+      await trimLargeCaches(1_000_000);
+      Alert.alert('⚖️ Εκκαθάριση', 'Μεγάλες cache (>1 MB) διαγράφηκαν με επιτυχία.');
+    } catch (err) {
+      console.error('trimLargeCaches error:', err);
+      Alert.alert('Σφάλμα', 'Αποτυχία εκκαθάρισης μεγάλων cache.');
+    } finally {
+      setCacheLoading(null);
+    }
+  };
+
+  const handleClearAll = async () => {
+    Alert.alert(
+      'Προσοχή',
+      'Αυτή η ενέργεια θα διαγράψει όλα τα αποθηκευμένα CSV δεδομένα (Playmobil KPI). Θέλετε να συνεχίσετε;',
+      [
+        { text: 'Άκυρο', style: 'cancel' },
+        {
+          text: 'Διαγραφή',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setCacheLoading('all');
+              await clearAllSheetCaches();
+              Alert.alert('✅ Ολοκληρώθηκε', 'Όλες οι cache διαγράφηκαν επιτυχώς.');
+            } catch (err) {
+              console.error('clearAllSheetCaches error:', err);
+              Alert.alert('Σφάλμα', 'Αποτυχία εκκαθάρισης όλων των cache.');
+            } finally {
+              setCacheLoading(null);
+            }
+          },
+        },
+      ]
+    );
+  };
+
 
   const userBrands = useMemo(() => {
     const raw = Array.isArray(profile?.brands) && profile.brands.length ? profile.brands : BRAND_ORDER;
@@ -559,17 +673,24 @@ const DataScreen = () => {
     try {
       // 1) products images
       const products = await getProductsFromLocal(brand);
-      const prodItems = Array.isArray(products) ? products.filter((p) => p?.productCode && p?.frontCover) : [];
-      updateProgress('imagesProducts', 0, prodItems.length);
+      const productImageItems = Array.isArray(products)
+        ? products
+            .map((p) => ({
+              productCode: p?.productCode,
+              imageUrl: resolveProductImageUrl(p),
+            }))
+            .filter((item) => item.productCode && item.imageUrl)
+        : [];
+      updateProgress('imagesProducts', 0, productImageItems.length);
 
       let success = 0;
       let failed = 0;
-      for (let i = 0; i < prodItems.length; i += 1) {
-        const p = prodItems[i];
-        const ok = await safeDownload(p.productCode, p.frontCover);
+      for (let i = 0; i < productImageItems.length; i += 1) {
+        const item = productImageItems[i];
+        const ok = await safeDownload(item.productCode, item.imageUrl);
         if (ok) success += 1;
         else failed += 1;
-        updateProgress('imagesProducts', i + 1, prodItems.length);
+        updateProgress('imagesProducts', i + 1, productImageItems.length);
       }
 
       // 2) supermarket listings images (if brand supports)
@@ -594,7 +715,7 @@ const DataScreen = () => {
 
       await saveImagesLastAction?.();
 
-      const productTotal = prodItems.length;
+      const productTotal = productImageItems.length;
       const listingTotal = successListings + failedListings;
       const listingsSummary = showListings
         ? `${successListings}/${listingTotal || 0}`
@@ -636,6 +757,8 @@ const DataScreen = () => {
       console.log('[DataScreen] handleClearImages end');
     }
   };
+  
+  
 
   const Section = ({ title, children }) => (
     <View style={styles.section}>
@@ -848,11 +971,61 @@ const DataScreen = () => {
             <Text style={styles.status}>{formatAction(imgAction)}</Text>
           </Section>
         )}
+		<View style={styles.section}>
+          <Text style={styles.sectionTitle}>Offline Cache</Text>
+
+          <TouchableOpacity
+            style={[
+              styles.primaryButton,
+              cacheLoading === 'old' && styles.disabledButton,
+            ]}
+            onPress={handleTrimOld}
+            disabled={cacheLoading !== null}
+          >
+            {cacheLoading === 'old' ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>🧹 Καθαρισμός παλαιών cache</Text>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.primaryButton,
+              cacheLoading === 'large' && styles.disabledButton,
+            ]}
+            onPress={handleTrimLarge}
+            disabled={cacheLoading !== null}
+          >
+            {cacheLoading === 'large' ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>⚖️ Διαγραφή μεγάλων cache</Text>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[
+              styles.primaryButton,
+              styles.dangerButton,
+              cacheLoading === 'all' && styles.disabledButton,
+            ]}
+            onPress={handleClearAll}
+            disabled={cacheLoading !== null}
+          >
+            {cacheLoading === 'all' ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>❌ Διαγραφή όλων των cache</Text>
+            )}
+          </TouchableOpacity>
+        </View>
 
       </ScrollView>
     </SafeAreaView>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f4f6fb' },
@@ -863,6 +1036,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 10,
     backgroundColor: '#f4f6fb',
+  },
+  disabledButton: {
+    opacity: 0.6,
   },
   topBarButton: {
     flexDirection: 'row',
@@ -956,6 +1132,9 @@ const styles = StyleSheet.create({
     marginTop: 6,
     marginBottom: 6,
   },
+  progressRowInactive: {
+    opacity: 0.6,
+  },
   progressLeft: {
     width: 46,
     height: 46,
@@ -978,6 +1157,11 @@ const styles = StyleSheet.create({
   progressBarFill: {
     height: 8,
     backgroundColor: '#1976d2',
+  },
+  progressStatusText: {
+    marginTop: 4,
+    fontSize: 12,
+    color: '#64748b',
   },
 });
 

@@ -17,7 +17,7 @@ import {
   ScrollView,
   Switch,
 } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import firestore from '@react-native-firebase/firestore';
@@ -31,64 +31,64 @@ import { filterCustomersBySalesman } from '../utils/customerFiltering';
 const MANAGEMENT_ROLES = [ROLES.OWNER, ROLES.ADMIN, ROLES.DEVELOPER];
 
 const STRINGS = {
-  title: '\u0395\u03c0\u03b9\u03bb\u03bf\u03b3\u03ae \u03c0\u03b5\u03bb\u03ac\u03c4\u03b7',
-  searchPlaceholder: '\u0391\u03bd\u03b1\u03b6\u03ae\u03c4\u03b7\u03c3\u03b7 \u03bc\u03b5 \u03cc\u03bd\u03bf\u03bc\u03b1, \u0391\u03a6\u039c \u03ae \u03ba\u03c9\u03b4\u03b9\u03ba\u03cc',
-  backLabel: '\u03a0\u03af\u03c3\u03c9',
-  listEmpty: '\u0394\u03b5\u03bd \u03b2\u03c1\u03ad\u03b8\u03b7\u03ba\u03b1\u03bd \u03c0\u03b5\u03bb\u03ac\u03c4\u03b5\u03c2.',
-  addButtonLabel: '\u039d\u03ad\u03bf\u03c2 \u03c0\u03b5\u03bb\u03ac\u03c4\u03b7\u03c2',
+  title: 'Επιλογή πελάτη',
+  searchPlaceholder: 'Αναζήτηση με όνομα, ΑΦΜ ή κωδικό',
+  backLabel: 'Πίσω',
+  listEmpty: 'Δεν βρέθηκαν πελάτες.',
+  addButtonLabel: 'Νέος πελάτης',
   addCustomer: {
-    title: '\u039d\u03ad\u03bf\u03c2 \u03c0\u03b5\u03bb\u03ac\u03c4\u03b7\u03c2',
-    subtitle: '\u03a3\u03c5\u03bc\u03c0\u03bb\u03b7\u03c1\u03ce\u03c3\u03c4\u03b5 \u03c4\u03b1 \u03c3\u03c4\u03bf\u03b9\u03c7\u03b5\u03af\u03b1 \u03b3\u03b9\u03b1 \u03bd\u03b1 \u03b1\u03c0\u03bf\u03b8\u03b7\u03ba\u03b5\u03c5\u03c4\u03bf\u03cd\u03bd \u03c3\u03c4\u03bf Firestore.',
-    brandsHeading: '\u039c\u03ac\u03c1\u03ba\u03b5\u03c2',
-    salesmenHeading: '\u0391\u03bd\u03ac\u03b8\u03b5\u03c3\u03b7 \u03c0\u03c9\u03bb\u03b7\u03c4\u03ce\u03bd',
-    salesmenEmpty: '\u0394\u03b5\u03bd \u03b2\u03c1\u03ad\u03b8\u03b7\u03ba\u03b1\u03bd \u03b4\u03b9\u03b1\u03b8\u03ad\u03c3\u03b9\u03bc\u03bf\u03b9 \u03c0\u03c9\u03bb\u03b7\u03c4\u03ad\u03c2 \u03b3\u03b9\u03b1 \u03c4\u03b9\u03c2 \u03b5\u03c0\u03b9\u03bb\u03b5\u03b3\u03bc\u03ad\u03bd\u03b5\u03c2 \u03bc\u03ac\u03c1\u03ba\u03b5\u03c2.',
+    title: 'Νέος πελάτης',
+    subtitle: 'Συμπληρώστε τα στοιχεία για να αποθηκευτούν στο Firestore.',
+    brandsHeading: 'Μάρκες',
+    salesmenHeading: 'Ανάθεση πωλητών',
+    salesmenEmpty: 'Δεν βρέθηκαν διαθέσιμοι πωλητές για τις επιλεγμένες μάρκες.',
     fields: {
-      code: '\u039a\u03c9\u03b4\u03b9\u03ba\u03cc\u03c2',
-      name: '\u0395\u03c0\u03c9\u03bd\u03c5\u03bc\u03af\u03b1',
-      vat: '\u0391.\u03a6.\u039c.',
-      taxOffice: '\u0394.\u039f.\u03a5.',
-      profession: '\u0395\u03c0\u03ac\u03b3\u03b3\u03b5\u03bb\u03bc\u03b1',
-      street: '\u0394\u03b9\u03b5\u03cd\u03b8\u03c5\u03bd\u03c3\u03b7',
-      postalCode: '\u03a4.\u039a.',
-      city: '\u03a0\u03cc\u03bb\u03b7',
-      phone1: '\u03a4\u03b7\u03bb. 1',
-      phone2: '\u03a4\u03b7\u03bb. 2',
+      code: 'Κωδικός',
+      name: 'Επωνυμία',
+      vat: 'Α.Φ.Μ.',
+      taxOffice: 'Δ.Ο.Υ.',
+      profession: 'Επάγγελμα',
+      street: 'Διεύθυνση',
+      postalCode: 'Τ.Κ.',
+      city: 'Πόλη',
+      phone1: 'Τηλ. 1',
+      phone2: 'Τηλ. 2',
       fax: 'Fax',
       email: 'Email',
-      salesmanName: '\u03a0\u03c9\u03bb\u03b7\u03c4\u03ae\u03c2',
-      turnover2022: '\u03a4\u03b6\u03af\u03c1\u03bf\u03c2 \u03a7\u03c1\u03ae\u03c3\u03b7 2022',
-      turnover2023: '\u03a4\u03b6\u03af\u03c1\u03bf\u03c2 \u03a7\u03c1\u03ae\u03c3\u03b7 2023',
-      turnover2024: '\u03a4\u03b6\u03af\u03c1\u03bf\u03c2 \u03a7\u03c1\u03ae\u03c3\u03b7 2024',
-      turnover2025: '\u03a4\u03b6\u03af\u03c1\u03bf\u03c2 \u03a7\u03c1\u03ae\u03c3\u03b7 2025',
-      balance: '\u03a5\u03c0\u03cc\u03bb\u03bf\u03b9\u03c0\u03bf',
-      channel: '\u039a\u03b1\u03bd\u03ac\u03bb\u03b9',
+      salesmanName: 'Πωλητής',
+      turnover2022: 'Τζίρος Χρήση 2022',
+      turnover2023: 'Τζίρος Χρήση 2023',
+      turnover2024: 'Τζίρος Χρήση 2024',
+      turnover2025: 'Τζίρος Χρήση 2025',
+      balance: 'Υπόλοιπο',
+      channel: 'Κανάλι',
     },
-    activeLabel: '\u0395\u03bd\u03b5\u03c1\u03b3\u03cc\u03c2 \u03c0\u03b5\u03bb\u03ac\u03c4\u03b7\u03c2',
-    cancel: '\u0386\u03ba\u03c5\u03c1\u03bf',
-    save: '\u0391\u03c0\u03bf\u03b8\u03ae\u03ba\u03b5\u03c5\u03c3\u03b7',
+    activeLabel: 'Ενεργός πελάτης',
+    cancel: 'Άκυρο',
+    save: 'Αποθήκευση',
     errors: {
-      name: '\u03a3\u03c5\u03bc\u03c0\u03bb\u03b7\u03c1\u03ce\u03c3\u03c4\u03b5 \u03b5\u03c0\u03c9\u03bd\u03c5\u03bc\u03af\u03b1.',
-      vat: '\u03a3\u03c5\u03bc\u03c0\u03bb\u03b7\u03c1\u03ce\u03c3\u03c4\u03b5 \u0391.\u03a6.\u039c.',
-      brands: '\u0395\u03c0\u03b9\u03bb\u03ad\u03be\u03c4\u03b5 \u03c4\u03bf\u03c5\u03bb\u03ac\u03c7\u03b9\u03c3\u03c4\u03bf\u03bd \u03bc\u03af\u03b1 \u03bc\u03ac\u03c1\u03ba\u03b1.',
+      name: 'Συμπληρώστε επωνυμία.',
+      vat: 'Συμπληρώστε Α.Φ.Μ.',
+      brands: 'Επιλέξτε τουλάχιστον μία μάρκα.',
     },
-    successTitle: '\u039f \u03c0\u03b5\u03bb\u03ac\u03c4\u03b7\u03c2 \u03b4\u03b7\u03bc\u03b9\u03bf\u03c5\u03c1\u03b3\u03ae\u03b8\u03b7\u03ba\u03b5',
-    successMessage: '\u039f \u03bd\u03ad\u03bf\u03c2 \u03c0\u03b5\u03bb\u03ac\u03c4\u03b7\u03c2 \u03b5\u03af\u03bd\u03b1\u03b9 \u03b4\u03b9\u03b1\u03b8\u03ad\u03c3\u03b9\u03bc\u03bf\u03c2.',
-    warningTitle: '\u039c\u03b7 \u03ad\u03b3\u03ba\u03c5\u03c1\u03bf \u0391.\u03a6.\u039c.',
-    warningMessage: '\u03a4\u03bf \u0391.\u03a6.\u039c. \u03c6\u03b1\u03af\u03bd\u03b5\u03c4\u03b1\u03b9 \u03bc\u03b7 \u03ad\u03b3\u03ba\u03c5\u03c1\u03bf. \u0395\u03bb\u03ad\u03b3\u03be\u03c4\u03b5 \u03c0\u03c1\u03b9\u03bd \u03c4\u03b7\u03bd \u03b1\u03c0\u03bf\u03b8\u03ae\u03ba\u03b5\u03c5\u03c3\u03b7.',
-    inlineVatWarning: '\u03a4\u03bf \u0391.\u03a6.\u039c. \u03c6\u03b1\u03af\u03bd\u03b5\u03c4\u03b1\u03b9 \u03bc\u03b7 \u03ad\u03b3\u03ba\u03c5\u03c1\u03bf. \u03a0\u03b1\u03c1\u03b1\u03ba\u03b1\u03bb\u03ce \u03b5\u03bb\u03ad\u03b3\u03be\u03c4\u03b5.',
-    errorTitle: '\u0395\u03bb\u03bb\u03b9\u03c0\u03ae \u03c3\u03c4\u03bf\u03b9\u03c7\u03b5\u03af\u03b1',
-    submitErrorTitle: '\u0391\u03c0\u03bf\u03c4\u03c5\u03c7\u03af\u03b1 \u03b1\u03c0\u03bf\u03b8\u03ae\u03ba\u03b5\u03c5\u03c3\u03b7\u03c2',
+    successTitle: 'Ο πελάτης δημιουργήθηκε',
+    successMessage: 'Ο νέος πελάτης είναι διαθέσιμος.',
+    warningTitle: 'Μη έγκυρο Α.Φ.Μ.',
+    warningMessage: 'Το Α.Φ.Μ. φαίνεται μη έγκυρο. Ελέγξτε πριν την αποθήκευση.',
+    inlineVatWarning: 'Το Α.Φ.Μ. φαίνεται μη έγκυρο. Παρακαλώ ελέγξτε.',
+    errorTitle: 'Ελλιπή στοιχεία',
+    submitErrorTitle: 'Αποτυχία αποθήκευσης',
   },
   alerts: {
-    missingTitle: '\u0395\u03bb\u03bb\u03b9\u03c0\u03ae \u03c3\u03c4\u03bf\u03b9\u03c7\u03b5\u03af\u03b1',
-    missingMessage: '\u03a3\u03c5\u03bc\u03c0\u03bb\u03b7\u03c1\u03ce\u03c3\u03c4\u03b5 \u03c4\u03b1 \u03b1\u03c0\u03b1\u03c1\u03b1\u03af\u03c4\u03b7\u03c4\u03b1 \u03c0\u03b5\u03b4\u03af\u03b1 \u03b3\u03b9\u03b1 \u03bd\u03b1 \u03c3\u03c5\u03bd\u03b5\u03c7\u03af\u03c3\u03b5\u03c4\u03b5.',
-    errorTitle: '\u03a3\u03c6\u03ac\u03bb\u03bc\u03b1',
-    errorMessage: '\u039a\u03ac\u03c4\u03b9 \u03c0\u03ae\u03b3\u03b5 \u03c3\u03c4\u03c1\u03b1\u03b2\u03ac. \u03a0\u03c1\u03bf\u03c3\u03c0\u03b1\u03b8\u03ae\u03c3\u03c4\u03b5 \u03be\u03b1\u03bd\u03ac.',
+    missingTitle: 'Ελλιπή στοιχεία',
+    missingMessage: 'Συμπληρώστε τα απαραίτητα πεδία για να συνεχίσετε.',
+    errorTitle: 'Σφάλμα',
+    errorMessage: 'Κάτι πήγε στραβά. Προσπαθήστε ξανά.',
   },
   row: {
     codeFallback: '--',
-    nameFallback: '\u03a7\u03c9\u03c1\u03af\u03c2 \u03cc\u03bd\u03bf\u03bc\u03b1',
-    vatLabel: '\u0391.\u03a6.\u039c.',
+    nameFallback: 'Χωρίς όνομα',
+    vatLabel: 'Α.Φ.Μ.',
     vatFallback: '-',
   },
 };
@@ -143,28 +143,28 @@ export default function OrderCustomerSelectScreen() {
   });
   const [showAddModal, setShowAddModal] = useState(false);
   const [savingCustomer, setSavingCustomer] = useState(false);
-const [newCustomerFields, setNewCustomerFields] = useState({
-  code: '',
-  name: '',
-  vat: '',
-  taxOffice: '',
-  profession: '',
-  street: '',
-  postalCode: '',
-  city: '',
-  phone1: '',
-  phone2: '',
-  fax: '',
-  email: '',
-  salesmanName: '',
-  turnover2022: '',
-  turnover2023: '',
-  turnover2024: '',
-  turnover2025: '',
-  balance: '',
-  channel: '',
-  active: true,
-});
+  const [newCustomerFields, setNewCustomerFields] = useState({
+    code: '',
+    name: '',
+    vat: '',
+    taxOffice: '',
+    profession: '',
+    street: '',
+    postalCode: '',
+    city: '',
+    phone1: '',
+    phone2: '',
+    fax: '',
+    email: '',
+    salesmanName: '',
+    turnover2022: '',
+    turnover2023: '',
+    turnover2024: '',
+    turnover2025: '',
+    balance: '',
+    channel: '',
+    active: true,
+  });
   const [showVatWarning, setShowVatWarning] = useState(false);
 
   const brandCustomers = useMemo(() => {
@@ -176,12 +176,10 @@ const [newCustomerFields, setNewCustomerFields] = useState({
       return brandCustomers;
     }
     
-    // If user has no linked salesmen, show no customers
     if (!userMerchIds.length) {
       return [];
     }
     
-    // Filter customers based on user's linked salesmen (brand filtering already done by getCustomersFromLocal)
     return filterCustomersBySalesman(brandCustomers, userMerchIds, null);
   }, [brandCustomers, userMerchIds, canManageAll]);
 
@@ -384,7 +382,10 @@ const [newCustomerFields, setNewCustomerFields] = useState({
           cleanupRef.current = result.cleanup;
         }
 
-        navigation.replace('OrderProductSelectionScreen', { brand });
+        navigation.navigate('OrderProductSelectionScreen', {
+          brand,
+          fromCustomerSelect: true,
+        });
       } catch (error) {
         console.log('startOrder/select crash:', error);
         Alert.alert(STRINGS.alerts.errorTitle, STRINGS.alerts.errorMessage);
@@ -394,8 +395,20 @@ const [newCustomerFields, setNewCustomerFields] = useState({
   );
 
   const handleGoBack = useCallback(() => {
-    navigation.goBack();
-  }, [navigation]);
+    navigation.navigate('BrandHome', { brand });
+  }, [brand, navigation]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const unsubscribe = navigation.addListener('beforeRemove', (event) => {
+        if (event.data.action?.type === 'GO_BACK') {
+          event.preventDefault();
+          handleGoBack();
+        }
+      });
+      return () => unsubscribe();
+    }, [handleGoBack, navigation])
+  );
 
   const handleSaveCustomer = useCallback(async () => {
     const trimmedName = newCustomerFields.name.trim();
@@ -1141,10 +1154,3 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
 });
-
-
-
-
-
-
-

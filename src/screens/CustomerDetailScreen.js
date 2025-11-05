@@ -2,9 +2,9 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking, ActivityIndicator, Image } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 // import firestore from '@react-native-firebase/firestore'; // Uncomment for Firestore
 import SafeScreen from '../components/SafeScreen';
+import { getCustomersFromLocal } from '../utils/localData';
 
 const openTel = (tel) => {
   if (tel) Linking.openURL(`tel:${tel}`);
@@ -32,20 +32,38 @@ const CustomerDetailScreen = ({ route, navigation }) => {
 
   // -- Option 1: Load from AsyncStorage
   useEffect(() => {
+    let cancelled = false;
+
     const fetchCustomer = async () => {
       setLoading(true);
       try {
-        const json = await AsyncStorage.getItem('customers');
-        const arr = json ? JSON.parse(json) : [];
-        const found = arr.find((c) => c.id === customerId);
-        setCustomer(found || null);
-      } catch (e) {
-        setCustomer(null);
+        const list = await getCustomersFromLocal(brand);
+        const found = Array.isArray(list) ? list.find((c) => c.id === customerId) : null;
+        if (!cancelled) {
+          setCustomer(found || null);
+        }
+      } catch (error) {
+        console.warn('[CustomerDetailScreen] failed to load customer', {
+          brand,
+          customerId,
+          message: error?.message || error,
+        });
+        if (!cancelled) {
+          setCustomer(null);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoading(false);
+        }
       }
-      setLoading(false);
     };
+
     fetchCustomer();
-  }, [customerId]);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [brand, customerId]);
 
   // -- Option 2: Live from Firestore
   // useEffect(() => {

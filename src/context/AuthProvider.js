@@ -1,222 +1,313 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import firestoreModule from '@react-native-firebase/firestore';
-import { auth, firestore } from '../services/firebase';
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
+
+import { ROLES } from '../constants/roles';
+
+export { ROLES } from '../constants/roles';
 
 const AuthContext = createContext(null);
 
-export const ROLES = {
-  OWNER: 'owner',
-  ADMIN: 'admin',
-  DEVELOPER: 'developer',
-  CUSTOMER: 'customer',
-  SALES_MANAGER: 'sales_manager',
-  SALESMAN: 'salesman',
-  WAREHOUSE_MANAGER: 'warehouse_manager',
-};
-
-const PERMISSIONS_BY_ROLE = {
-  [ROLES.OWNER]: ['*'],
-  [ROLES.ADMIN]: ['*'],
-  [ROLES.DEVELOPER]: ['*', 'debug'],
-  [ROLES.CUSTOMER]: ['products.view'],
-  [ROLES.SALES_MANAGER]: ['products.view', 'orders.view.all', 'warehouse.view'],
-  [ROLES.SALESMAN]: ['products.view', 'orders.view.mine', 'orders.edit.mine', 'cache.manage'],
-  [ROLES.WAREHOUSE_MANAGER]: ['warehouse.view', 'warehouse.edit'],
-};
-
-const splitDisplayName = (displayName) => {
-  if (!displayName) {
-    return { firstName: '', lastName: '' };
-  }
-
+const splitDisplayName = (displayName = '') => {
   const parts = displayName.trim().split(/\s+/).filter(Boolean);
-  if (parts.length === 0) {
-    return { firstName: '', lastName: '' };
-  }
-
-  const firstName = parts[0];
-  const lastName = parts.slice(1).join(' ');
+  const firstName = parts[0] ?? '';
+  const lastName = parts.slice(1).join(' ') || '';
   return { firstName, lastName };
 };
 
-export function AuthProvider({ children }) {
+const normaliseArray = (value) => (Array.isArray(value) ? value : []);
+
+const basePermissions = {
+  [ROLES.OWNER]: ['*'],
+  [ROLES.ADMIN]: ['*'],
+  [ROLES.DEVELOPER]: ['*', 'debug'],
+  [ROLES.SALES_MANAGER]: [
+    'products.view',
+    'orders.view.all',
+    'warehouse.view',
+  ],
+  [ROLES.SALESMAN]: [
+    'products.view',
+    'orders.view.mine',
+    'orders.edit.mine',
+    'cache.manage',
+  ],
+  [ROLES.WAREHOUSE_MANAGER]: ['warehouse.view', 'warehouse.edit'],
+  [ROLES.CUSTOMER]: ['products.view'],
+};
+
+const createDefaultProfilePayload = (firebaseUser) => {
+  const email = firebaseUser?.email || '';
+  const { firstName, lastName } = splitDisplayName(firebaseUser?.displayName);
+  const fallbackName =
+    firebaseUser?.displayName ||
+    [firstName, lastName].filter(Boolean).join(' ') ||
+    email;
+
+  return {
+    firestore: {
+      firstName,
+      lastName,
+      name: fallbackName,
+      email,
+      role: ROLES.CUSTOMER,
+      brands: [],
+      merchIds: [],
+      isActive: true,
+      createdAt: firestore.FieldValue.serverTimestamp(),
+      updatedAt: firestore.FieldValue.serverTimestamp(),
+    },
+    state: {
+      uid: firebaseUser?.uid || null,
+      firstName,
+      lastName,
+      name: fallbackName,
+      email,
+      role: ROLES.CUSTOMER,
+      brands: [],
+      merchIds: [],
+      isActive: true,
+    },
+  };
+};
+
+export const AuthProvider = ({ children }) => {
   const [init, setInit] = useState(true);
+  const [authReady, setAuthReady] = useState(false);
   const [user, setUser] = useState(null);
   const [profile, setProfile] = useState(null);
-  const [loadingProfile, setLoadingProfile] = useState(true);
+  const [loadingProfile, setLoadingProfile] = useState(false);
 
   useEffect(() => {
     const unsubscribe = auth().onAuthStateChanged((firebaseUser) => {
       setUser(firebaseUser);
+      setAuthReady(true);
     });
-    return () => unsubscribe();
+    return unsubscribe;
   }, []);
 
   useEffect(() => {
-    let unsubscribeProfile;
+    if (!authReady) {
+      return undefined;
+    }
+
     let active = true;
+    let unsubscribeProfile = null;
 
-    const loadProfile = async () => {
-      if (!user) {
-        if (!active) return;
-        setProfile(null);
-        setLoadingProfile(false);
-        setInit(false);
-        return;
-      }
+    if (!user || !user.uid) {
+      setProfile(null);
+      setLoadingProfile(false);
+      setInit(false);
+      return undefined;
+    }
 
-      setLoadingProfile(true);
-      const ref = firestore().collection('users').doc(user.uid);
+    setLoadingProfile(true);
+    const ref = firestore().collection('users').doc(user.uid);
 
-      unsubscribeProfile = ref.onSnapshot(
-        async (snapshot) => {
-          if (!active) return;
+    unsubscribeProfile = ref.onSnapshot(
+      async (snapshot) => {
+        if (!active) {
+          return;
+        }
+
+        if (!snapshot.exists) {
           try {
-            if (!snapshot.exists) {
-              const { firstName, lastName } = splitDisplayName(user.displayName || '');
-              const fallbackName = [firstName, lastName].filter(Boolean).join(' ') || user.displayName || '';
-              const data = {
-                uid: user.uid,
-                firstName,
-                lastName,
-                name: fallbackName,
-                email: user.email || '',
-                role: ROLES.CUSTOMER,
-                brands: [],
-                merchIds: [],
-                createdAt: firestoreModule.FieldValue.serverTimestamp(),
-                updatedAt: firestoreModule.FieldValue.serverTimestamp(),
-              };
-              await ref.set(data, { merge: true });
-              if (!active) return;
-              setProfile({ ...data });
-            } else {
-              setProfile({ uid: user.uid, ...snapshot.data() });
+            const { firestore: payload, state } = createDefaultProfilePayload(
+              user
+            );
+            await ref.set(payload, { merge: true });
+            if (active) {
+              setProfile(state);
             }
           } catch (error) {
-            console.error('AuthProvider subscribe error:', error);
+            console.error('[AuthProvider] Failed to create profile:', error);
+            if (active) {
+              setProfile(createDefaultProfilePayload(user).state);
+            }
           } finally {
-            if (!active) return;
-            setLoadingProfile(false);
-            setInit(false);
+            if (active) {
+              setLoadingProfile(false);
+              setInit(false);
+            }
           }
-        },
-        (error) => {
-          console.error('AuthProvider subscribe error:', error);
-          if (!active) return;
+          return;
+        }
+
+        const data = snapshot.data() || {};
+        const fallback = createDefaultProfilePayload(user).state;
+        setProfile({
+          ...fallback,
+          ...data,
+          uid: user.uid,
+          email: data.email || user.email || fallback.email,
+          role: data.role || fallback.role,
+          brands: normaliseArray(data.brands),
+          merchIds: normaliseArray(data.merchIds),
+        });
+        setLoadingProfile(false);
+        setInit(false);
+      },
+      (error) => {
+        console.error('[AuthProvider] Failed to load profile:', error);
+        if (active) {
+          setProfile(null);
           setLoadingProfile(false);
           setInit(false);
         }
-      );
-    };
-
-    loadProfile();
+      }
+    );
 
     return () => {
       active = false;
-      if (typeof unsubscribeProfile === 'function') {
+      if (unsubscribeProfile) {
         unsubscribeProfile();
       }
     };
-  }, [user]);
+  }, [authReady, user]);
 
-  const signIn = async (email, password) => {
-    return auth().signInWithEmailAndPassword(email.trim(), password);
-  };
-
-  const signUp = async (firstName, lastName, email, password) => {
-    const trimmedFirst = (firstName || '').trim();
-    const trimmedLast = (lastName || '').trim();
+  const signIn = useCallback(async (email, password) => {
     const trimmedEmail = (email || '').trim();
-    const fullName = [trimmedFirst, trimmedLast].filter(Boolean).join(' ');
+    const trimmedPassword = password || '';
+    return auth().signInWithEmailAndPassword(trimmedEmail, trimmedPassword);
+  }, []);
 
-    const credential = await auth().createUserWithEmailAndPassword(trimmedEmail, password);
+  const signUp = useCallback(
+    async (firstName, lastName, email, password) => {
+      const trimmedEmail = (email || '').trim();
+      const trimmedFirst = (firstName || '').trim();
+      const trimmedLast = (lastName || '').trim();
+      const displayName = [trimmedFirst, trimmedLast]
+        .filter(Boolean)
+        .join(' ')
+        .trim();
 
-    if (fullName) {
-      await credential.user.updateProfile({ displayName: fullName });
-    }
+      const credential = await auth().createUserWithEmailAndPassword(
+        trimmedEmail,
+        password
+      );
 
-    const ref = firestore().collection('users').doc(credential.user.uid);
-    await ref.set(
-      {
-        uid: credential.user.uid,
-        firstName: trimmedFirst,
-        lastName: trimmedLast,
-        name: fullName || trimmedFirst || trimmedLast || credential.user.email || '',
-        email: credential.user.email,
-        role: ROLES.CUSTOMER,
-        brands: [],
-        merchIds: [],
-        createdAt: firestoreModule.FieldValue.serverTimestamp(),
-        updatedAt: firestoreModule.FieldValue.serverTimestamp(),
-      },
-      { merge: true }
-    );
-  };
+      if (displayName) {
+        await credential.user.updateProfile({ displayName });
+      }
 
-  const signOut = async () => {
+      const { firestore: payload } = createDefaultProfilePayload(
+        credential.user
+      );
+      const profileOverride = {
+        ...payload,
+        firstName: trimmedFirst || payload.firstName,
+        lastName: trimmedLast || payload.lastName,
+        name: displayName || payload.name,
+        email: trimmedEmail,
+      };
+
+      await firestore()
+        .collection('users')
+        .doc(credential.user.uid)
+        .set(profileOverride, { merge: true });
+    },
+    []
+  );
+
+  const signOutUser = useCallback(async () => {
     await auth().signOut();
     setProfile(null);
-  };
+  }, []);
 
-  const updateProfileInfo = async ({ firstName, lastName, email, password }) => {
-    const current = auth().currentUser;
-    if (!current) {
-      throw new Error('No authenticated user.');
-    }
+  const updateProfileInfo = useCallback(
+    async ({ firstName, lastName, email, password }) => {
+      const currentUser = auth().currentUser;
+      if (!currentUser) {
+        throw new Error('No authenticated user.');
+      }
 
-    const trimmedFirst = (firstName || '').trim();
-    const trimmedLast = (lastName || '').trim();
-    const trimmedEmail = (email || '').trim() || current.email || '';
-    const fullName = [trimmedFirst, trimmedLast].filter(Boolean).join(' ');
+      const trimmedFirst = (firstName || '').trim();
+      const trimmedLast = (lastName || '').trim();
+      const trimmedEmail = (email || '').trim() || currentUser.email || '';
+      const displayName = [trimmedFirst, trimmedLast]
+        .filter(Boolean)
+        .join(' ')
+        .trim();
 
-    if (trimmedEmail !== current.email) {
-      await current.updateEmail(trimmedEmail);
-    }
+      if (trimmedEmail && trimmedEmail !== currentUser.email) {
+        await currentUser.updateEmail(trimmedEmail);
+      }
 
-    if (fullName && fullName !== (current.displayName || '')) {
-      await current.updateProfile({ displayName: fullName });
-    }
+      if (displayName && displayName !== currentUser.displayName) {
+        await currentUser.updateProfile({ displayName });
+      }
 
-    if (password) {
-      await current.updatePassword(password);
-    }
+      if (password) {
+        await currentUser.updatePassword(password);
+      }
 
-    const ref = firestore().collection('users').doc(current.uid);
-    await ref.set(
-      {
-        firstName: trimmedFirst,
-        lastName: trimmedLast,
-        name: fullName || trimmedFirst || trimmedLast || trimmedEmail,
-        email: trimmedEmail,
-        updatedAt: firestoreModule.FieldValue.serverTimestamp(),
-      },
-      { merge: true }
-    );
-  };
+      await firestore()
+        .collection('users')
+        .doc(currentUser.uid)
+        .set(
+          {
+            firstName: trimmedFirst,
+            lastName: trimmedLast,
+            name: displayName || trimmedEmail,
+            email: trimmedEmail,
+            updatedAt: firestore.FieldValue.serverTimestamp(),
+          },
+          { merge: true }
+        );
+    },
+    []
+  );
 
   const myRole = profile?.role || null;
-  const myBrands = Array.isArray(profile?.brands) ? profile.brands : [];
+  const myBrands = normaliseArray(profile?.brands);
 
-  const hasRole = (roleOrArray) => {
-    if (!myRole) return false;
-    return Array.isArray(roleOrArray) ? roleOrArray.includes(myRole) : myRole === roleOrArray;
-  };
+  const hasRole = useCallback(
+    (roleOrRoles) => {
+      if (!myRole) {
+        return false;
+      }
+      if (Array.isArray(roleOrRoles)) {
+        return roleOrRoles.includes(myRole);
+      }
+      return myRole === roleOrRoles;
+    },
+    [myRole]
+  );
 
-  const hasBrand = (brandOrArray) => {
-    if (!myBrands.length) return false;
-    return Array.isArray(brandOrArray)
-      ? brandOrArray.some((brand) => myBrands.includes(brand))
-      : myBrands.includes(brandOrArray);
-  };
+  const hasBrand = useCallback(
+    (brandOrBrands) => {
+      if (!myBrands.length) {
+        return false;
+      }
+      if (Array.isArray(brandOrBrands)) {
+        return brandOrBrands.some((brand) =>
+          myBrands.includes(String(brand).toLowerCase())
+        );
+      }
+      return myBrands.includes(String(brandOrBrands).toLowerCase());
+    },
+    [myBrands]
+  );
 
-  const can = (permission) => {
-    if (!myRole) return false;
-    const permissions = PERMISSIONS_BY_ROLE[myRole] || [];
-    return permissions.includes('*') || permissions.includes(permission);
-  };
+  const can = useCallback(
+    (permission) => {
+      if (!myRole) {
+        return false;
+      }
+      const permissions = basePermissions[myRole] || [];
+      return permissions.includes('*') || permissions.includes(permission);
+    },
+    [myRole]
+  );
 
-  const value = useMemo(
+  const contextValue = useMemo(
     () => ({
       init,
       user,
@@ -224,17 +315,32 @@ export function AuthProvider({ children }) {
       loadingProfile,
       signIn,
       signUp,
-      signOut,
+      signOut: signOutUser,
       updateProfileInfo,
       hasRole,
       hasBrand,
       can,
       ROLES,
     }),
-    [init, user, profile, loadingProfile, myRole, myBrands, updateProfileInfo]
+    [
+      init,
+      user,
+      profile,
+      loadingProfile,
+      signIn,
+      signUp,
+      signOutUser,
+      updateProfileInfo,
+      hasRole,
+      hasBrand,
+      can,
+    ]
   );
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
+  return (
+    <AuthContext.Provider value={contextValue}>{children}</AuthContext.Provider>
+  );
+};
 
 export const useAuth = () => useContext(AuthContext);
+

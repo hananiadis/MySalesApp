@@ -1,13 +1,20 @@
 // /src/screens/MainHomeScreen.js
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { BackHandler, View, Text, StyleSheet, ToastAndroid, useWindowDimensions, TouchableOpacity } from 'react-native';
+import {
+  BackHandler,
+  View,
+  Text,
+  StyleSheet,
+  ToastAndroid,
+  useWindowDimensions,
+  TouchableOpacity,
+} from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import SafeScreen from '../components/SafeScreen';
 import SalesmanInfoCard from '../components/SalesmanInfoCard';
-import KPIBox from '../components/KPIBox';
-import { useAuth, ROLES } from '../context/AuthProvider';
+import { useAuth } from '../context/AuthProvider';
 import { useOnlineStatus } from '../utils/OnlineStatusContext';
 import colors from '../theme/colors';
 
@@ -18,28 +25,18 @@ const BRAND_ROUTE = {
 };
 
 const STRINGS = {
-  monthlyOrders: 'Μηνιαίες Παραγγελίες',
-  totalValue: 'Συνολική Αξία (EUR)',
-  pendingOrders: 'Εκκρεμείς Παραγγελίες',
-  targetRate: 'Επίτευξη Στόχου %',
-  performance: 'KPIs',
-  salesmanPrefix: 'Πωλητής: ',
-  regionPrefix: 'Περιοχή: ',
-  defaultRegion: 'Β. Ελλάδα',
-  lastSyncPrefix: 'Τελευταίος Συγχρονισμός: ',
+  salesmanPrefix: 'Salesperson: ',
+  regionPrefix: 'Region',
+  defaultRegion: 'Not set',
+  lastSyncPrefix: 'Last sync: ',
+  exitHint: 'Press back again to exit',
+  testButton: 'Debug - Test Playmobil KPIs',
 };
 
 const DEFAULT_SALESMAN = {
   firstName: 'Demo',
   lastName: 'Salesperson',
 };
-
-const KPI_METRICS = [
-  { key: 'monthlyOrders', label: STRINGS.monthlyOrders, value: '37' },
-  { key: 'totalValue', label: STRINGS.totalValue, value: '18 420' },
-  { key: 'pendingOrders', label: STRINGS.pendingOrders, value: '5' },
-  { key: 'targetRate', label: STRINGS.targetRate, value: '72 %' },
-];
 
 const BRAND_NAMES = {
   playmobil: 'Playmobil',
@@ -66,36 +63,48 @@ async function getLatestSyncTimestamp() {
 }
 
 export default function MainHomeScreen({ navigation }) {
-  const { profile, hasRole, hasBrand } = useAuth();
+  const auth = useAuth() || {};
+  const profile = auth.profile || null;
+  const role = profile?.role || null;
+  const brands = Array.isArray(profile?.brands) ? profile.brands : [];
   const { isConnected } = useOnlineStatus();
   const { width } = useWindowDimensions();
   const lastBackPressRef = useRef(0);
   const [lastSyncISO, setLastSyncISO] = useState(null);
 
-  const isAdmin = hasRole([ROLES.OWNER, ROLES.ADMIN, ROLES.DEVELOPER]);
+  const isAdmin = ['owner', 'admin', 'developer'].includes(role);
   const isTablet = width >= 700;
 
   const availableBrands = useMemo(() => {
+    const normalized = brands.map((b) =>
+      typeof b === 'string' ? b.toLowerCase() : String(b || '').toLowerCase()
+    );
+    const membership = new Set(normalized);
     const list = [];
-    if (hasBrand('playmobil')) list.push('playmobil');
-    if (hasBrand('kivos')) list.push('kivos');
-    if (hasBrand('john')) list.push('john');
+    if (membership.has('playmobil')) list.push('playmobil');
+    if (membership.has('kivos')) list.push('kivos');
+    if (membership.has('john')) list.push('john');
     return list;
-  }, [hasBrand]);
+  }, [brands]);
 
   const userBrandRoutes = useMemo(
     () => availableBrands.map((brandKey) => BRAND_ROUTE[brandKey]).filter(Boolean),
     [availableBrands]
   );
+  const singleBrandRoute = userBrandRoutes.length === 1 ? userBrandRoutes[0] : null;
 
   useEffect(() => {
-    if (!isAdmin && userBrandRoutes.length === 1) {
-      const onlyRoute = userBrandRoutes[0];
-      navigation.reset({ index: 0, routes: [{ name: onlyRoute }] });
+    if (isAdmin || !singleBrandRoute) {
+      return;
     }
-  }, [isAdmin, userBrandRoutes, navigation]);
+    const state = navigation.getState?.();
+    const activeRoute = state?.routes?.[state.index]?.name;
+    if (activeRoute !== singleBrandRoute) {
+      navigation.navigate(singleBrandRoute);
+    }
+  }, [isAdmin, singleBrandRoute, navigation]);
 
-  // Fetch last sync time (either from profile or local data)
+  // Fetch last sync time
   useEffect(() => {
     (async () => {
       const local = await getLatestSyncTimestamp();
@@ -112,7 +121,8 @@ export default function MainHomeScreen({ navigation }) {
     `${profile?.firstName ?? DEFAULT_SALESMAN.firstName} ${
       profile?.lastName ?? DEFAULT_SALESMAN.lastName
     }`.trim();
-  const regionLabel = `${STRINGS.regionPrefix}${profile?.region ?? STRINGS.defaultRegion}`;
+  // Show email under the name instead of region (no regions assigned for now)
+  const emailLabel = profile?.email ? String(profile.email) : '';
 
   const formattedSync = useMemo(() => {
     if (!lastSyncISO) return '-';
@@ -124,34 +134,25 @@ export default function MainHomeScreen({ navigation }) {
     return `${dd}/${mm} ${hh}:${mins}`;
   }, [lastSyncISO]);
 
-  const connectionDot = (
-    <View
-      style={[
-        styles.dot,
-        { backgroundColor: isConnected ? '#4CAF50' : '#D32F2F' },
-      ]}
-    />
-  );
+  // Single status dot is shown inside SalesmanInfoCard status row; do not append extra dots in the meta line
 
   useFocusEffect(
-  useCallback(() => {
-    const onBackPress = () => {
-      const now = Date.now();
-      if (now - lastBackPressRef.current < 1500) {
-        BackHandler.exitApp(); // double press → exit
-      } else {
-        lastBackPressRef.current = now;
-        ToastAndroid.show('Πατήστε ξανά για έξοδο', ToastAndroid.SHORT); // ✅ toast on first press
-      }
-      return true; // intercept back, prevents default navigation
-    };
+    useCallback(() => {
+      const onBackPress = () => {
+        const now = Date.now();
+        if (now - lastBackPressRef.current < 1500) {
+          BackHandler.exitApp();
+        } else {
+          lastBackPressRef.current = now;
+          ToastAndroid.show(STRINGS.exitHint, ToastAndroid.SHORT);
+        }
+        return true;
+      };
 
-    const sub = BackHandler.addEventListener('hardwareBackPress', onBackPress);
-    return () => sub.remove();
-  }, [])
-);
-
-  const kpiColumns = isTablet ? 3 : 2;
+      const sub = BackHandler.addEventListener('hardwareBackPress', onBackPress);
+      return () => sub.remove();
+    }, [])
+  );
 
   return (
     <SafeScreen
@@ -161,44 +162,37 @@ export default function MainHomeScreen({ navigation }) {
       bodyStyle={styles.scrollBody}
       contentContainerStyle={styles.contentContainer}
     >
-      {/* USER INFO BOX (clickable → profile) */}
+      {/* USER INFO BOX */}
       <TouchableOpacity
         activeOpacity={0.8}
         onPress={() => navigation.navigate('Profile')}
       >
         <SalesmanInfoCard
           name={`${STRINGS.salesmanPrefix}${salesmanName}`}
-          region={
-            <Text style={{ color: colors.textPrimary }}>
-              {regionLabel} {connectionDot}
-            </Text>
-          }
+          region={emailLabel ? (
+            <Text style={{ color: colors.textPrimary }}>{emailLabel}</Text>
+          ) : null}
           lastSyncLabel={`${STRINGS.lastSyncPrefix}${formattedSync}`}
           isOnline={isConnected}
           brands={availableBrands.map((b) => ({
             key: b,
             label: BRAND_NAMES[b] || b,
+            onPress: () =>
+              navigation.navigate(BRAND_ROUTE[b], {
+                screen: 'BrandHome',
+                params: { brand: b },
+              }),
           }))}
         />
       </TouchableOpacity>
 
-      {/* KPIs Section */}
-      <View style={[styles.section, { marginTop: 16 }]}>
-        <Text style={[styles.sectionTitle, { marginTop: 8 }]}>{STRINGS.performance}</Text>
-        <View style={styles.kpiGrid}>
-          {KPI_METRICS.map((metric) => (
-            <View
-              key={metric.key}
-              style={[
-                styles.kpiItem,
-                kpiColumns === 3 ? styles.kpiItemTablet : styles.kpiItemPhone,
-              ]}
-            >
-              <KPIBox label={metric.label} value={metric.value} />
-            </View>
-          ))}
-        </View>
-      </View>
+      {/* Debug actions */}
+      <TouchableOpacity
+        style={styles.testButton}
+        onPress={() => navigation.navigate('TestKPI')}
+      >
+        <Text style={styles.testButtonText}>{STRINGS.testButton}</Text>
+      </TouchableOpacity>
     </SafeScreen>
   );
 }
@@ -213,7 +207,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.textPrimary,
     marginBottom: 18,
-    marginTop: 12, // extra space above header
+    marginTop: 12,
   },
   kpiGrid: {
     flexDirection: 'row',
@@ -230,4 +224,23 @@ const styles = StyleSheet.create({
     marginLeft: 6,
     alignSelf: 'center',
   },
+
+  // 🧪 TEMP TEST BUTTON STYLE
+  testButton: {
+    marginTop: 40,
+    backgroundColor: '#1976d2',
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  testButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
 });
+
+
+
+
+

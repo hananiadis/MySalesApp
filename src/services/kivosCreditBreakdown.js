@@ -1,17 +1,8 @@
 // /src/services/kivosCreditBreakdown.js
 import { loadSpreadsheet } from './spreadsheetCache';
+import { parseLocaleNumber } from '../utils/numberFormat';
 
-// ✅ Converts European-formatted numbers (e.g. "1.234,56") into proper floats
-function toNumber(value) {
-  if (value == null || value === '') return 0;
-  const cleaned = String(value)
-    .replace(/\./g, '')   // remove thousand separators
-    .replace(',', '.');   // convert decimal comma to dot
-  const num = parseFloat(cleaned);
-  return isNaN(num) ? 0 : num;
-}
-
-// ✅ Normalizes customer codes (removes leading zeros, spaces, uppercase)
+// Normalizes customer codes (removes leading zeros, spaces, uppercase)
 function normalizeCode(value) {
   return String(value || '').trim().replace(/^0+/, '').toUpperCase();
 }
@@ -38,21 +29,25 @@ export async function getKivosCreditBreakdown(customerCode) {
     if (!rows.length) return null;
 
     const normalizedTarget = normalizeCode(customerCode);
-
-    for (const row of rows) {
+    for (const row of rows) {
       const sheetCode = normalizeCode(row.c[0]?.v);
       if (sheetCode === normalizedTarget) {
         const record = {
           code: sheetCode,
-          days30: toNumber(row.c[1]?.v),
-          days60: toNumber(row.c[2]?.v),
-          days90: toNumber(row.c[3]?.v),
-          days90plus: toNumber(row.c[4]?.v),
+          name: row.c[1]?.v || '',
+          days30: parseLocaleNumber(row.c[2]?.v),
+          days60: parseLocaleNumber(row.c[3]?.v),
+          days90: parseLocaleNumber(row.c[4]?.v),
+          days90plus: parseLocaleNumber(row.c[5]?.v),
+          balance: parseLocaleNumber(row.c[6]?.v),
         };
 
-        // ✅ Optionally include a total field for convenience
-        record.total =
+        const summed =
           record.days30 + record.days60 + record.days90 + record.days90plus;
+        record.total = record.balance || summed;
+        if (!record.balance) {
+          record.balance = summed;
+        }
 
         return record;
       }
@@ -65,3 +60,4 @@ export async function getKivosCreditBreakdown(customerCode) {
     return null;
   }
 }
+

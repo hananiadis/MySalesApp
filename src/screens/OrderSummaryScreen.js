@@ -1,4 +1,4 @@
-﻿// src/screens/OrderSummaryScreen.js
+// src/screens/OrderSummaryScreen.js
 import React, { useEffect, useRef, useState } from 'react';
 import { View, Text, StyleSheet, Alert, TouchableOpacity, ScrollView } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';

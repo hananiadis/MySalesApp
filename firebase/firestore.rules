@@ -71,6 +71,7 @@ service cloud.firestore {
       return isOrderOwner(order) || isAdminForBrand(brandOrNull(order));
     }
 
+    // --- USERS ---
     match /users/{uid} {
       allow read: if isSignedIn() && (request.auth.uid == uid || isAdmin());
       allow create: if isSignedIn() && request.auth.uid == uid;
@@ -78,48 +79,105 @@ service cloud.firestore {
       allow delete: if isAdmin();
     }
 
+    // --- PRODUCTS ---
     match /products/{docId} {
       allow read: if isSignedIn();
       allow write: if isAdmin();
     }
-
     match /products_john/{docId} {
       allow read: if isSignedIn() && brandIsAccessible('john');
       allow write: if isAdminForBrand('john');
     }
-
     match /products_kivos/{docId} {
       allow read: if isSignedIn() && brandIsAccessible('kivos');
       allow write: if isAdminForBrand('kivos');
     }
 
+    // --- CUSTOMERS ---
     match /customers/{docId} {
       allow read: if isSignedIn();
       allow write: if isAdmin();
     }
-
     match /customers_john/{docId} {
       allow read: if isSignedIn() && brandIsAccessible('john');
       allow write: if isAdminForBrand('john');
     }
-
     match /customers_kivos/{docId} {
       allow read: if isSignedIn() && brandIsAccessible('kivos');
       allow write: if isAdminForBrand('kivos');
     }
 
+    // --- IMAGES & SALESMEN ---
     match /images/{docId} {
       allow read: if isSignedIn();
       allow write: if isAdmin();
     }
+    match /salesmen/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
 
+    // --- SUPERMARKETS ---
+    match /supermarket_stores/{docId} {
+      allow read: if isSignedIn() && (
+        // any signed-in user with at least one brand can read
+        myBrands().size() > 0
+      );
+      allow write: if isAdmin();
+    }
+
+    match /supermarket_listings/{docId} {
+      allow read: if isSignedIn() && (
+        myBrands().size() > 0
+      );
+      allow write: if isAdmin();
+    }
+
+    match /supermarket_meta/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // --- PLAYMOBIL KPI DASHBOARD ---
+    // Sheets cache collection - allows authenticated users to read/write cache
+    match /sheetsCache/{sheetId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+
+    // --- ORDERS ---
     match /orders/{orderId} {
       allow read: if canReadOrder(resource.data);
       allow create: if canCreateOrder(request.resource.data);
       allow update: if canUpdateOrder(request.resource.data, resource.data);
       allow delete: if canDeleteOrder(resource.data);
     }
+    match /orders_john/{orderId} {
+      allow read: if canReadOrder(resource.data);
+      allow create: if canCreateOrder(request.resource.data);
+      allow update: if canUpdateOrder(request.resource.data, resource.data);
+      allow delete: if canDeleteOrder(resource.data);
+    }
+    match /orders_kivos/{orderId} {
+      allow read: if canReadOrder(resource.data);
+      allow create: if canCreateOrder(request.resource.data);
+      allow update: if canUpdateOrder(request.resource.data, resource.data);
+      allow delete: if canDeleteOrder(resource.data);
+    }
+    match /orders_playmobil_supermarket/{orderId} {
+      allow read: if canReadOrder(resource.data);
+      allow create: if canCreateOrder(request.resource.data);
+      allow update: if canUpdateOrder(request.resource.data, resource.data);
+      allow delete: if canDeleteOrder(resource.data);
+    }
+    match /orders_john_supermarket/{orderId} {
+      allow read: if canReadOrder(resource.data);
+      allow create: if canCreateOrder(request.resource.data);
+      allow update: if canUpdateOrder(request.resource.data, resource.data);
+      allow delete: if canDeleteOrder(resource.data);
+    }
 
+    // --- DEFAULT DENY ---
     match /{document=**} {
       allow read, write: if false;
     }

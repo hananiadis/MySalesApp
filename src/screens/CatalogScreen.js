@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useEffect } from 'react';
 import {
   Alert,
   Linking,
@@ -85,6 +85,24 @@ const CatalogScreen = ({ navigation, route }) => {
   const brandData = BRAND_CATALOGS[brandParam] || BRAND_CATALOGS.playmobil;
   const { label: brandName, description, catalogs } = brandData;
 
+  const handleGoBack = useCallback(() => {
+    if (navigation.canGoBack()) {
+      navigation.goBack();
+    } else {
+      navigation.navigate('BrandHome', { brand: brandParam });
+    }
+  }, [brandParam, navigation]);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('beforeRemove', (event) => {
+      if (event.data.action?.type === 'GO_BACK') {
+        event.preventDefault();
+        handleGoBack();
+      }
+    });
+    return unsubscribe;
+  }, [navigation, handleGoBack]);
+
   const handleOpenLink = async (url) => {
     try {
       const supported = await Linking.canOpenURL(url);
@@ -142,7 +160,7 @@ const CatalogScreen = ({ navigation, route }) => {
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => navigation.navigate('BrandHome', { brand: brandParam })}
+          onPress={handleGoBack}
           accessibilityLabel="Επιστροφή στο brand"
         >
           <Ionicons name="arrow-back" size={24} color="#1f4f8f" />

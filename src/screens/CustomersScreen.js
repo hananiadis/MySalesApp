@@ -30,9 +30,9 @@ const MANAGEMENT_ROLES = [ROLES.OWNER, ROLES.ADMIN, ROLES.DEVELOPER];
 
 // UI text (shared by all brands)
 const UI_TEXT = {
-  title: 'Πελάτες',
-  searchPlaceholder: 'Αναζήτηση πελάτη...',
-  empty: 'Δεν βρέθηκαν πελάτες.',
+  title: '\u03A0\u03b5\u03bb\u03ac\u03c4\u03b5\u03c2',
+  searchPlaceholder: '\u0391\u03bd\u03b1\u03b6\u03ae\u03c4\u03b7\u03c3\u03b7...',
+  empty: '\u0397 \u03b1\u03bd\u03b1\u03b6\u03ae\u03c4\u03b7\u03c3\u03b7 \u03b4\u03ad\u03bd \u03b2\u03c1\u03ae\u03ba\u03b5 \u03c0\u03b5\u03bb\u03ac\u03c4\u03b5\u03c2.',
 };
 
 // Detail screen route names per brand
@@ -79,24 +79,25 @@ export default function CustomersScreen() {
 
   const accessibleCustomers = useMemo(() => {
     if (canManageAll) {
-      console.log(`🔍 Admin access: showing all ${customers.length} customers for brand ${brand}`);
+      console.log(`[CustomersScreen] Admin access: showing all ${customers.length} customers for brand ${brand}`);
       return customers;
     }
-    
-    // If user has no linked salesmen, show no customers
+
     if (!userMerchIds.length) {
-      console.log(`ðŸš« No linked salesmen: showing 0 customers for brand ${brand}`);
+      console.log(`[CustomersScreen] No linked salesmen: showing 0 customers for brand ${brand}`);
       return [];
     }
-    
-    // Filter customers based on user's linked salesmen (brand filtering already done by getCustomersFromLocal)
+
     const filtered = filterCustomersBySalesman(customers, userMerchIds, null);
-    console.log(`ðŸ‘¥ User filtering: ${filtered.length}/${customers.length} customers for brand ${brand}`, {
-      userMerchIds,
-      brand,
-      totalCustomers: customers.length,
-      filteredCustomers: filtered.length
-    });
+    console.log(
+      `[CustomersScreen] User filtering: ${filtered.length}/${customers.length} customers for brand ${brand}`,
+      {
+        userMerchIds,
+        brand,
+        totalCustomers: customers.length,
+        filteredCustomers: filtered.length,
+      }
+    );
     return filtered;
   }, [customers, userMerchIds, brand, canManageAll]);
 
@@ -110,13 +111,23 @@ export default function CustomersScreen() {
         style={styles.backButton}
         onPress={handleGoBack}
         accessibilityRole="button"
-        accessibilityLabel="Πίσω"
+        accessibilityLabel="Επιστροφή"
       >
         <Ionicons name="arrow-back" size={22} color="#1f4f8f" />
       </TouchableOpacity>
     ),
     [handleGoBack],
   );
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('beforeRemove', (event) => {
+      if (event.data.action?.type === 'GO_BACK') {
+        event.preventDefault();
+        handleGoBack();
+      }
+    });
+    return unsubscribe;
+  }, [navigation, handleGoBack]);
 
   useEffect(() => {
     let isActive = true;

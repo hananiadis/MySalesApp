@@ -337,14 +337,15 @@ async function importJohnProducts() {
 // CUSTOMER IMPORTS
 // ---------------------------------------------------------------------------
 async function importPlaymobilCustomers() {
-  console.log('\n👥 Importing Playmobil customers...');
+  console.log('\n👥 Importing Playmobil customers (extended)...');
   const response = await axios.get(
     'https://docs.google.com/spreadsheets/d/15iBRyUE0izGRi7qY_VhZgbdH7tojL1hq3F0LI6oIjqQ/export?format=csv&gid=0'
   );
+
   const rows = [];
   await new Promise((resolve, reject) => {
-    require('streamifier')
-      .createReadStream(response.data)
+    const { Readable } = require('stream');
+    Readable.from(response.data)
       .pipe(csv())
       .on('data', (r) => rows.push(r))
       .on('end', resolve)
@@ -353,33 +354,75 @@ async function importPlaymobilCustomers() {
 
   const batchSize = 400;
   let processed = 0;
+
   for (let i = 0; i < rows.length; i += batchSize) {
     const batch = db.batch();
     const chunk = rows.slice(i, i + batchSize);
+
     chunk.forEach((r) => {
       const code = sanitizeText(r['Customer Code']);
       if (!code) return;
+
       const ref = db.collection('customers').doc(code);
+
       const data = {
         customerCode: code,
         name: sanitizeText(r['Name']),
+        name3: sanitizeText(r['Name 3']),
         address: sanitizeText(r['Street']),
         city: sanitizeText(r['City']),
         postalCode: sanitizeText(r['Postal Code']),
-        telephone1: sanitizeText(r['Telephone 1']),
-        vat: sanitizeText(r['VAT Registration No.']),
+        merch: sanitizeText(r['Merch']),
         brand: 'playmobil',
         importedAt: admin.firestore.FieldValue.serverTimestamp(),
+
+        contact: {
+          telephone1: sanitizeText(r['Telephone 1']),
+          telephone2: sanitizeText(r['Telephone 2']),
+          fax: sanitizeText(r['Fax Number']),
+          email: sanitizeText(r['E-Mail Address']),
+        },
+
+        vatInfo: {
+          registrationNo: sanitizeText(r['VAT Registration No.']),
+          office: sanitizeText(r['VAT Office']),
+        },
+
+        salesInfo: {
+          description: sanitizeText(r['Description Sales Group']),
+          groupKey: sanitizeText(r['Group key']),
+          groupKeyText: sanitizeText(r['Group key 1 Text']),
+          telephone1: sanitizeText(r['Telephone 1']), // optional as in your sample
+        },
+
+        region: {
+          id: sanitizeText(r['Region ID']),
+          name: sanitizeText(r['Region']),
+        },
+
+        transportation: {
+          zoneId: sanitizeText(r['Transportation Zone ID']),
+          zone: sanitizeText(r['Transportation Zone']),
+        },
       };
+
+      // remove empty nested objects
+      ['contact', 'vatInfo', 'salesInfo', 'region', 'transportation'].forEach((k) => {
+        if (!data[k] || Object.values(data[k]).every((v) => !v)) delete data[k];
+      });
+
       batch.set(ref, data, { merge: true });
       processed++;
     });
+
     await batch.commit();
-    printProgress(processed, rows.length, 'Playmobil Customers');
+    printProgress(processed, rows.length, 'Playmobil customers');
   }
+
   process.stdout.write('\n');
   console.log('✅ Playmobil customers import done.');
 }
+
 
 // ---------------------------------------------------------------------------
 async function importKivosCustomers() {
@@ -1292,6 +1335,75 @@ async function superMarketMenu() {
 }
 
 // ---------------------------------------------------------------------------
+// FIRESTORE SCHEMA EXPORTER
+// ---------------------------------------------------------------------------
+async function exploreCollection(path, db, schema, visited) {
+  if (visited.has(path)) return;
+  visited.add(path);
+
+  console.log(`🔍 Exploring ${path} ...`);
+  const snapshot = await db.collection(path).limit(20).get();
+  schema[path] = schema[path] || {};
+
+  for (const doc of snapshot.docs) {
+    const data = doc.data();
+    for (const [key, value] of Object.entries(data)) {
+      const type = Array.isArray(value)
+        ? 'array'
+        : value === null
+        ? 'null'
+        : typeof value;
+      if (!schema[path][key]) schema[path][key] = type;
+    }
+
+    // Recursively explore subcollections
+    const subs = await doc.ref.listCollections();
+    for (const sub of subs) {
+      await exploreCollection(`${path}/${doc.id}/${sub.id}`, db, schema, visited);
+    }
+  }
+}
+
+async function exportFirestoreSchema() {
+  console.log('\n📄 Exporting Firestore schema (sample-based)...');
+  const schema = {};
+  const visited = new Set();
+
+  // Add any top-level collections you want to include
+  const topCollections = [
+    'users',
+    'products',
+    'products_kivos',
+    'products_john',
+    'customers',
+    'customers_kivos',
+    'customers_john',
+    'orders_playmobil',
+    'orders_kivos',
+    'orders_john',
+    'supermarket_listings',
+    'supermarket_stores',
+    'supermarket_meta',
+    'salesmen',
+    'brand_settings',
+    'sync_log',
+    'analytics_kpi',
+  ];
+
+  for (const col of topCollections) {
+    try {
+      await exploreCollection(col, db, schema, visited);
+    } catch (e) {
+      console.warn(`⚠️ Failed to scan ${col}:`, e.message);
+    }
+  }
+
+  const outPath = path.join(__dirname, 'firestore_schema.json');
+  fs.writeFileSync(outPath, JSON.stringify(schema, null, 2));
+  console.log(`\n✅ Schema exported to ${outPath}`);
+}
+
+// ---------------------------------------------------------------------------
 // MAIN MENU ENTRYPOINT
 // ---------------------------------------------------------------------------
 async function mainMenu() {
@@ -1306,6 +1418,7 @@ async function mainMenu() {
 4. Rebuild Salesmen Collection
 5. User Management
 6. SuperMarket Management
+7. Export Firestore Schema
 0. Exit
 ==============================`);
     const choice = (await askQuestion('Choose option: ')).trim();
@@ -1338,6 +1451,9 @@ async function mainMenu() {
       case '6':
         await superMarketMenu();
         break;
+	  case '7':
+		await exportFirestoreSchema();
+		break;
       case '0':
         console.log('👋 Exiting Firestore Manager...');
         rl.close();

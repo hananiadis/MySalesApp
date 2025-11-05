@@ -93,6 +93,7 @@ const SuperMarketOrderReviewScreen = () => {
   } = useOrder();
 
   const [collapsed, setCollapsed] = useState(false);
+  const allowHardwareBackRef = useRef(false);
   const [keyboardPadding, setKeyboardPadding] = useState(0);
   const [loadingListings, setLoadingListings] = useState(false);
 
@@ -148,6 +149,12 @@ const SuperMarketOrderReviewScreen = () => {
     null;
 
   const goToProducts = useCallback(() => {
+    if (!fromOrders && navigation.canGoBack()) {
+      allowHardwareBackRef.current = true;
+      navigation.goBack();
+      return;
+    }
+
     if (fromOrders) {
       navigation.replace('SuperMarketProductSelection', {
         store: route?.params?.store,
@@ -164,7 +171,23 @@ const SuperMarketOrderReviewScreen = () => {
         fromReview: true 
       });
     }
-  }, [brandKey, fromOrders, navigation, route?.params]);
+  }, [allowHardwareBackRef, brandKey, fromOrders, navigation, route?.params]);
+
+  useFocusEffect(
+    useCallback(() => {
+      const unsubscribe = navigation.addListener('beforeRemove', (event) => {
+        if (allowHardwareBackRef.current) {
+          allowHardwareBackRef.current = false;
+          return;
+        }
+        if (event.data.action?.type === 'GO_BACK') {
+          event.preventDefault();
+          goToProducts();
+        }
+      });
+      return () => unsubscribe();
+    }, [allowHardwareBackRef, goToProducts, navigation])
+  );
 
   useEffect(() => {
     const showSub = Keyboard.addListener('keyboardDidShow', (event) => {
@@ -288,6 +311,10 @@ const SuperMarketOrderReviewScreen = () => {
         store: route?.params?.store,
         orderId: route?.params?.orderId,
         brand: brandKey,
+        lines: filteredLines.map((line) => ({ ...line })),
+        notes,
+        listings: allListings,
+        inventorySnapshot,
       });
     } catch (error) {
       console.error('[Review] Failed to load listings:', error);
@@ -1015,4 +1042,5 @@ const styles = StyleSheet.create({
 });
 
 export default SuperMarketOrderReviewScreen;
+
 
