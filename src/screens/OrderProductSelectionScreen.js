@@ -13,6 +13,7 @@ import {
   KeyboardAvoidingView,
   ActivityIndicator,
   Keyboard,
+  Image,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Ionicons from 'react-native-vector-icons/Ionicons';
@@ -21,6 +22,7 @@ import { getProductsFromLocal } from '../utils/localData';
 import { getImmediateAvailabilityMap, lookupImmediateStockValue } from '../utils/stockAvailability';
 import { normalizeBrandKey } from '../constants/brands';
 import { computeOrderTotals } from '../utils/orderTotals';
+import { getLocalImagePath } from '../utils/imageHelpers';
 
 export default function OrderProductSelectionScreen({ navigation, route }) {
   const insets = useSafeAreaInsets();
@@ -870,9 +872,27 @@ export default function OrderProductSelectionScreen({ navigation, route }) {
     const stock = stockOf(product);
     const stockDisplay = stock != null ? String(stock) : 'n/a';
     const isStockNA = stockDisplay === 'n/a';
+    
+    // Get cached image path - check frontCover, photoUrl, imageUrl fields
+    const remoteUrl = product.frontCover || product.photoUrl || product.imageUrl || null;
+    const localPath = product.productCode ? getLocalImagePath(product.productCode) : null;
+    const imageUri = localPath ? `file://${localPath}` : remoteUrl;
+    
+    // Placeholder images for each brand
+    const placeholderImages = {
+      playmobil: require('../../assets/playmobil_product_placeholder.png'),
+      kivos: require('../../assets/Kivos_placeholder.png'),
+      john: require('../../assets/john_hellas_logo.png'),
+    };
+    const placeholderSource = placeholderImages[brand] || placeholderImages.playmobil;
 
     return (
       <View style={styles.card}>
+        <Image
+          source={imageUri ? { uri: imageUri } : placeholderSource}
+          style={styles.productImage}
+          resizeMode="contain"
+        />
         <View style={{ flex: 1, minWidth: 0 }}>
           <TouchableOpacity
             onPress={() => openProductDetails(product)}
@@ -911,23 +931,23 @@ export default function OrderProductSelectionScreen({ navigation, route }) {
               )}
             </View>
           </TouchableOpacity>
-          <View style={styles.qtyRow}>
-            <TouchableOpacity onPress={() => decrement(product)} style={styles.qtyTouch}><Text style={styles.qtyBtn}>-</Text></TouchableOpacity>
-            <TextInput
-              style={styles.qtyInput}
-              keyboardType="numeric"
-              value={String(q)}
-              onChangeText={(v) => setQty(product, Math.max(0, parseInt(String(v).replace(/[^0-9]/g, ''), 10) || 0))}
-              maxLength={4}
-              placeholder="0"
-              placeholderTextColor="#bbb"
-              returnKeyType="done"
-              blurOnSubmit
-              selectTextOnFocus
-              onFocus={() => ensureVisible(index)}
-            />
-            <TouchableOpacity onPress={() => increment(product)} style={styles.qtyTouch}><Text style={styles.qtyBtn}>+</Text></TouchableOpacity>
-          </View>
+        </View>
+        <View style={styles.qtyRow}>
+          <TouchableOpacity onPress={() => decrement(product)} style={styles.qtyTouch}><Text style={styles.qtyBtn}>-</Text></TouchableOpacity>
+          <TextInput
+            style={styles.qtyInput}
+            keyboardType="numeric"
+            value={String(q)}
+            onChangeText={(v) => setQty(product, Math.max(0, parseInt(String(v).replace(/[^0-9]/g, ''), 10) || 0))}
+            maxLength={4}
+            placeholder="0"
+            placeholderTextColor="#bbb"
+            returnKeyType="done"
+            blurOnSubmit
+            selectTextOnFocus
+            onFocus={() => ensureVisible(index)}
+          />
+          <TouchableOpacity onPress={() => increment(product)} style={styles.qtyTouch}><Text style={styles.qtyBtn}>+</Text></TouchableOpacity>
         </View>
       </View>
     );
@@ -1034,13 +1054,14 @@ const styles = StyleSheet.create({
   sectionHeaderIndicator: { color: '#0d47a1', fontSize: 15, fontWeight: '700' },
 
   card: { backgroundColor: '#fafdff', borderRadius: 12, padding: 10, marginBottom: 8, flexDirection: 'row', alignItems: 'center', elevation: 2, shadowColor: '#1976d2', shadowOpacity: 0.08, shadowRadius: 4, shadowOffset: { width: 0, height: 2 }, minHeight: 74 },
+  productImage: { width: 60, height: 60, marginRight: 10, borderRadius: 6 },
   code: { color: '#1565c0', fontWeight: 'bold', fontSize: 15, flexShrink: 0 },
   desc: { color: '#1976d2', fontSize: 14, fontWeight: '600', flexShrink: 1 },
   subInfo: { color: '#555', fontSize: 13, marginRight: 6 },
   stockValueText: { fontWeight: 'bold', color: '#0d47a1' },
   stockValueNA: { color: '#d32f2f' },
 
-  qtyRow: { flexDirection: 'row', alignItems: 'center', marginTop: 8, backgroundColor: '#fff', borderRadius: 8, minHeight: 36, minWidth: 96, paddingHorizontal: 4, borderWidth: 1.3, borderColor: '#1976d2', alignSelf: 'flex-start' },
+  qtyRow: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#fff', borderRadius: 8, minHeight: 36, minWidth: 96, paddingHorizontal: 4, borderWidth: 1.3, borderColor: '#1976d2' },
   qtyTouch: { paddingHorizontal: 6, paddingVertical: 4 },
   qtyBtn: { fontSize: 22, color: '#1976d2', fontWeight: 'bold' },
   qtyInput: { width: 40, height: 32, textAlign: 'center', fontSize: 17, color: '#111', marginHorizontal: 3, backgroundColor: '#f5fafd', borderRadius: 5, fontWeight: 'bold', paddingVertical: 0, paddingHorizontal: 0 },

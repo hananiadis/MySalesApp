@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import firestore from '@react-native-firebase/firestore';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth } from '../services/firebase';
 import { 
   getCustomerCodes,
@@ -132,6 +133,26 @@ export default function usePlaymobilKpi({
           throw new Error('No customers found for this user');
         }
 
+        // Check for cached KPI results first (lightweight summary only)
+        console.log('[usePlaymobilKpi] Checking for cached KPI summary...');
+        const cachedKpiJson = await AsyncStorage.getItem('playmobil_kpi_results');
+        const cachedKpiTimestamp = await AsyncStorage.getItem('playmobil_kpi_timestamp');
+        
+        if (cachedKpiJson && cachedKpiTimestamp) {
+          const cacheAge = Date.now() - new Date(cachedKpiTimestamp).getTime();
+          const cacheAgeHours = cacheAge / (1000 * 60 * 60);
+          console.log(`[usePlaymobilKpi] Found cached KPI summary, age: ${cacheAgeHours.toFixed(2)} hours`);
+          
+          if (cacheAgeHours < 12) {
+            console.log('[usePlaymobilKpi] Cache is fresh but need full records for modals');
+            console.log('[usePlaymobilKpi] Will load sheets and recalculate with full records');
+            // Don't return early - we need the full records for the modals
+            // Fall through to load sheets data
+          } else {
+            console.log('[usePlaymobilKpi] Cached KPI summary expired, will recalculate');
+          }
+        }
+
         // Load sheets data
         console.log('[usePlaymobilKpi] Loading sheets data...');
         const sheetsData = await getAllSheetsData();
@@ -164,6 +185,34 @@ export default function usePlaymobilKpi({
         console.log('[usePlaymobilKpi] Getting customer summary...');
         const summary = getCustomerSalesSummary(sheetsData, customerCodes);
 
+        // Cache only lightweight summary (not detailed records - they're too big)
+        console.log('[usePlaymobilKpi] Caching KPI summary metrics (lightweight)...');
+        try {
+          const lightweightCache = {
+            // Store only the metrics, not the detailed records
+            invoiced: {
+              yearly: kpiResult?.invoiced?.yearly,
+              monthly: kpiResult?.invoiced?.monthly,
+              mtd: kpiResult?.invoiced?.mtd,
+            },
+            orders: {
+              yearly: kpiResult?.orders?.yearly,
+              monthly: kpiResult?.orders?.monthly,
+              mtd: kpiResult?.orders?.mtd,
+            },
+            summary: summary.slice(0, 100), // Store only top 100 customers for summary
+            timestamp: new Date().toISOString(),
+          };
+          
+          await AsyncStorage.setItem('playmobil_kpi_results', JSON.stringify(lightweightCache));
+          await AsyncStorage.setItem('playmobil_kpi_timestamp', new Date().toISOString());
+          console.log('[usePlaymobilKpi] KPI summary cached (without heavy record details)');
+        } catch (cacheError) {
+          console.warn('[usePlaymobilKpi] Failed to cache KPI results:', cacheError.message);
+          console.warn('[usePlaymobilKpi] Continuing without cache - will recalculate on next load');
+          // Don't throw - we have the data, just can't cache it
+        }
+
         console.log('[usePlaymobilKpi] KPI calculation complete');
         console.log('[usePlaymobilKpi] Final totals:', {
           invoiced: {
@@ -182,6 +231,17 @@ export default function usePlaymobilKpi({
         }
 
         console.log('[usePlaymobilKpi] Setting state with results');
+        console.log('[usePlaymobilKpi] kpiResult.records structure:', {
+          hasRecords: !!kpiResult.records,
+          hasInvoiced: !!kpiResult.records?.invoiced,
+          hasOrders: !!kpiResult.records?.orders,
+          invoicedCurrentCount: kpiResult.records?.invoiced?.current?.length,
+          invoicedPreviousCount: kpiResult.records?.invoiced?.previous?.length,
+          ordersCurrentCount: kpiResult.records?.orders?.current?.length,
+          ordersPreviousCount: kpiResult.records?.orders?.previous?.length,
+        });
+        console.log('[usePlaymobilKpi] Sample invoiced current record:', kpiResult.records?.invoiced?.current?.[0]);
+        console.log('[usePlaymobilKpi] Sample orders current record:', kpiResult.records?.orders?.current?.[0]);
         setKpis(kpiResult);
         setCustomers(summary);
         setRecordSets(kpiResult.records);

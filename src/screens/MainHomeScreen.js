@@ -16,6 +16,7 @@ import SafeScreen from '../components/SafeScreen';
 import SalesmanInfoCard from '../components/SalesmanInfoCard';
 import { useAuth } from '../context/AuthProvider';
 import { useOnlineStatus } from '../utils/OnlineStatusContext';
+import { getRoleLabel } from '../constants/roles';
 import colors from '../theme/colors';
 
 const BRAND_ROUTE = {
@@ -25,12 +26,10 @@ const BRAND_ROUTE = {
 };
 
 const STRINGS = {
-  salesmanPrefix: 'Salesperson: ',
   regionPrefix: 'Region',
   defaultRegion: 'Not set',
   lastSyncPrefix: 'Last sync: ',
   exitHint: 'Press back again to exit',
-  testButton: 'Debug - Test Playmobil KPIs',
 };
 
 const DEFAULT_SALESMAN = {
@@ -121,6 +120,10 @@ export default function MainHomeScreen({ navigation }) {
     `${profile?.firstName ?? DEFAULT_SALESMAN.firstName} ${
       profile?.lastName ?? DEFAULT_SALESMAN.lastName
     }`.trim();
+  
+  // Get user role label in Greek
+  const roleLabel = getRoleLabel(role, 'el');
+  
   // Show email under the name instead of region (no regions assigned for now)
   const emailLabel = profile?.email ? String(profile.email) : '';
 
@@ -168,7 +171,7 @@ export default function MainHomeScreen({ navigation }) {
         onPress={() => navigation.navigate('Profile')}
       >
         <SalesmanInfoCard
-          name={`${STRINGS.salesmanPrefix}${salesmanName}`}
+          name={`${roleLabel}: ${salesmanName}`}
           region={emailLabel ? (
             <Text style={{ color: colors.textPrimary }}>{emailLabel}</Text>
           ) : null}
@@ -184,14 +187,6 @@ export default function MainHomeScreen({ navigation }) {
               }),
           }))}
         />
-      </TouchableOpacity>
-
-      {/* Debug actions */}
-      <TouchableOpacity
-        style={styles.testButton}
-        onPress={() => navigation.navigate('TestKPI')}
-      >
-        <Text style={styles.testButtonText}>{STRINGS.testButton}</Text>
       </TouchableOpacity>
     </SafeScreen>
   );
@@ -223,20 +218,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginLeft: 6,
     alignSelf: 'center',
-  },
-
-  // 🧪 TEMP TEST BUTTON STYLE
-  testButton: {
-    marginTop: 40,
-    backgroundColor: '#1976d2',
-    paddingVertical: 14,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  testButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
   },
 });
 

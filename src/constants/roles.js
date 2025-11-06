@@ -16,9 +16,9 @@ export const ROLE_LABELS_EL = {
   [ROLES.OWNER]: 'Ιδιοκτήτης',
   [ROLES.ADMIN]: 'Διαχειριστής',
   [ROLES.DEVELOPER]: 'Προγραμματιστής',
-  [ROLES.SALES_MANAGER]: 'Υπεύθυνος Πωλήσεων',
+  [ROLES.SALES_MANAGER]: 'Διευθ. Πωλήσεων',
   [ROLES.SALESMAN]: 'Πωλητής',
-  [ROLES.WAREHOUSE_MANAGER]: 'Αποθηκάριος',
+  [ROLES.WAREHOUSE_MANAGER]: 'Υπευθ. Αποθήκης',
   [ROLES.CUSTOMER]: 'Πελάτης',
 };
 

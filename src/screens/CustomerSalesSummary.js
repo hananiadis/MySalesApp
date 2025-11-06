@@ -10,8 +10,11 @@ import {
 } from 'react-native';
 import firestore from '@react-native-firebase/firestore';
 import SafeScreen from '../components/SafeScreen';
+import KpiDataModal from '../components/KpiDataModal';
 import { loadSpreadsheet } from '../services/spreadsheetCache';
 import { getKivosSpreadsheetRow } from '../services/kivosSpreadsheet';
+import { getKivosCreditBreakdown } from '../services/kivosCreditBreakdown';
+import { calculateCustomerMetrics, getCustomerBalance } from '../services/playmobilCustomerMetrics';
 import { getCustomersFromLocal } from '../utils/localData';
 import { parseLocaleNumber } from '../utils/numberFormat';
 import colors from '../theme/colors';
@@ -63,7 +66,13 @@ export default function CustomerSalesSummary({ route, navigation }) {
 function PlaymobilSalesSummary({ customerId, navigation }) {
   const [customer, setCustomer] = useState(null);
   const [rows, setRows] = useState([]);
+  const [metrics, setMetrics] = useState(null);
+  const [balance, setBalance] = useState(null);
   const [status, setStatus] = useState(STATUS.LOADING);
+  
+  // Modal state
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalData, setModalData] = useState({ title: '', data: [], type: '' });
 
   const now = new Date();
   const currentYear = now.getFullYear();
@@ -80,9 +89,24 @@ function PlaymobilSalesSummary({ customerId, navigation }) {
           setCustomer(found || null);
         }
 
+        const customerCode = found?.customerCode;
+        if (!customerCode) {
+          throw new Error('Customer code not found');
+        }
+
+        // Load spreadsheet data for budget and open orders
         const sheetRows = await loadSpreadsheet('playmobilSales', { force: false });
+        
+        // Calculate metrics from KPI data
+        const calculatedMetrics = await calculateCustomerMetrics(customerCode, now);
+        
+        // Get balance from balance sheet
+        const customerBalance = await getCustomerBalance(customerCode);
+        
         if (!cancelled) {
           setRows(Array.isArray(sheetRows) ? sheetRows : []);
+          setMetrics(calculatedMetrics);
+          setBalance(customerBalance);
           setStatus(STATUS.READY);
         }
       } catch (error) {
@@ -107,76 +131,227 @@ function PlaymobilSalesSummary({ customerId, navigation }) {
     if (status === STATUS.ERROR) {
       return <Text style={styles.error}>Αποτυχία φόρτωσης δεδομένων</Text>;
     }
-    if (!rows.length) {
+    if (!metrics) {
       return <Text style={styles.error}>Δεν υπάρχουν δεδομένα πωλήσεων</Text>;
     }
 
+    // Get budget from spreadsheet
     const headerIndex = rows.findIndex((r) => String(r?.[4] ?? '').trim() === 'Bill-to');
     const dataRows = headerIndex !== -1 ? rows.slice(headerIndex + 1) : rows;
     const customerCode = String(customer?.customerCode || '').trim();
     const row = dataRows.find((r) => String(r?.[4] ?? '').trim() === customerCode);
 
-    if (!row) {
-      return (
-        <Text style={styles.error}>
-          Δεν βρέθηκαν δεδομένα για τον πελάτη {customer?.name || customerCode || '—'}
-        </Text>
-      );
-    }
+    const vBudgetCurr = row ? toNumber(row[13], 0) : 0;
+    const vOpenOrders = row ? toNumber(row[19], 0) : 0;
+    const vOpenDlv = row ? toNumber(row[20], 0) : 0;
+    const vTotalOrders = row ? toNumber(row[21], 0) : 0;
+    const vOB = row ? sanitize(row[22]) : 'N/A';
 
-    const vInvoicesPrev = toNumber(row[8], 0);
-    const vBudgetCurr = toNumber(row[13], 0);
-    const vYtdPrev = toNumber(row[10], 0);
-    const vInvoicedCurr = toNumber(row[15], 0);
-    const vMonthPrev = toNumber(row[11], 0);
-    const vMonthCurr = toNumber(row[12], 0);
-    const vOpenOrders = toNumber(row[19], 0);
-    const vOpenDlv = toNumber(row[20], 0);
-    const vTotalOrders = toNumber(row[21], 0);
-    const vOB = sanitize(row[22]);
-    const vBalance = toNumber(row[23], 0);
+    // Calculate Inv/Bdg percentage
+    const invBdgPercent = vBudgetCurr > 0 
+      ? (metrics.fullYearInvoiced2025 / vBudgetCurr) * 100 
+      : null;
 
-    const pctYtd =
-      vYtdPrev && Number.isFinite(vYtdPrev) ? ((vInvoicedCurr - vYtdPrev) / vYtdPrev) * 100 : null;
-    const pctMonth =
-      vMonthPrev && Number.isFinite(vMonthPrev)
-        ? ((vMonthCurr - vMonthPrev) / vMonthPrev) * 100
-        : null;
+    // Calculate YTD change percentage
+    const ytdChangePercent = metrics.ytdChangePercent;
+
+    // Calculate MTD change percentage
+    const mtdChangePercent = metrics.mtdChangePercent;
+
+    // Handler to show modal with sales data
+    const handleCardPress = (cardType) => {
+      if (!metrics?.records) return;
+      
+      let data = [];
+      let title = '';
+      
+      if (cardType === 'year-comparison') {
+        // Card 1: Show 2024 invoiced data vs 2025 budget
+        // Display 2024 invoiced records (most recent 25)
+        data = metrics.records.invoiced2024;
+        title = `Τιμολογήσεις ${previousYear} - Τελευταίες 25`;
+      } else if (cardType === 'ytd') {
+        // Card 2: Show YTD 2025 invoiced data
+        // Filter for YTD (from Jan 1 to current date in 2025)
+        const currentMonth = now.getMonth();
+        const currentDay = now.getDate();
+        
+        data = metrics.records.invoiced2025.filter(record => {
+          const recordDate = new Date(record.date || record.invoiceDate);
+          if (recordDate.getFullYear() !== currentYear) return false;
+          
+          const recordMonth = recordDate.getMonth();
+          const recordDay = recordDate.getDate();
+          
+          // Include all records up to current date
+          return (recordMonth < currentMonth) || 
+                 (recordMonth === currentMonth && recordDay <= currentDay);
+        });
+        
+        title = `YTD Τιμολογήσεις ${currentYear} (έως ${currentDay}/${currentMonth + 1})`;
+      } else if (cardType === 'mtd') {
+        // Card 3: Show MTD (Month-to-Date) 2025 invoiced data
+        // Filter for current month only, up to current day
+        const currentMonth = now.getMonth();
+        const currentDay = now.getDate();
+        
+        data = metrics.records.invoiced2025.filter(record => {
+          const recordDate = new Date(record.date || record.invoiceDate);
+          return recordDate.getFullYear() === currentYear &&
+                 recordDate.getMonth() === currentMonth && 
+                 recordDate.getDate() <= currentDay;
+        });
+        
+        title = `${currentMonthName} ${currentYear} - MTD (1-${currentDay})`;
+      } else if (cardType === 'ytd-2024') {
+        // Card 2 - Previous year YTD data
+        const currentMonth = now.getMonth();
+        const currentDay = now.getDate();
+        
+        data = metrics.records.invoiced2024.filter(record => {
+          const recordDate = new Date(record.date || record.invoiceDate);
+          if (recordDate.getFullYear() !== previousYear) return false;
+          
+          const recordMonth = recordDate.getMonth();
+          const recordDay = recordDate.getDate();
+          
+          // Include all records up to same date in previous year
+          return (recordMonth < currentMonth) || 
+                 (recordMonth === currentMonth && recordDay <= currentDay);
+        });
+        
+        title = `YTD Τιμολογήσεις ${previousYear} (έως ${currentDay}/${currentMonth + 1})`;
+      } else if (cardType === 'mtd-2024') {
+        // Card 3 - Previous year MTD data
+        const currentMonth = now.getMonth();
+        const currentDay = now.getDate();
+        
+        data = metrics.records.invoiced2024.filter(record => {
+          const recordDate = new Date(record.date || record.invoiceDate);
+          return recordDate.getFullYear() === previousYear &&
+                 recordDate.getMonth() === currentMonth && 
+                 recordDate.getDate() <= currentDay;
+        });
+        
+        title = `${currentMonthName} ${previousYear} - MTD (1-${currentDay})`;
+      } else if (cardType === 'month-full-2024') {
+        // Card 3 - Full month of previous year
+        const currentMonth = now.getMonth();
+        
+        data = metrics.records.invoiced2024.filter(record => {
+          const recordDate = new Date(record.date || record.invoiceDate);
+          return recordDate.getFullYear() === previousYear &&
+                 recordDate.getMonth() === currentMonth;
+        });
+        
+        title = `${currentMonthName} ${previousYear} - Ολόκληρος μήνας`;
+      }
+      
+      setModalData({ title, data, type: 'customer-sales' });
+      setModalVisible(true);
+    };
 
     return (
       <>
         <View style={styles.sectionHeaderRow}>
           <Text style={styles.sectionHeader}>Πωλήσεις</Text>
-          <TouchableOpacity
-            style={styles.testButton}
-            onPress={() => navigation.navigate('CustomerSalesSummaryTest')}
-          >
-            <Text style={styles.testButtonText}>TEST</Text>
-          </TouchableOpacity>
         </View>
 
-        <Metric3Cols
-          labelLeft={`Τιμολογήσεις ${previousYear}`}
-          labelRight={`Budget ${currentYear}`}
-          leftValue={formatCurrency(vInvoicesPrev)}
-          rightValue={formatCurrency(vBudgetCurr)}
-        />
+        {/* Card 1: Year Comparison */}
+        <View style={styles.metricCard}>
+          <View style={styles.metricRow}>
+            <TouchableOpacity 
+              style={styles.metricHalf}
+              onPress={() => handleCardPress('year-comparison')}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.label}>{`Τιμολογήσεις ${previousYear}`}</Text>
+              <Text style={styles.value}>{formatCurrency(metrics.fullYearInvoiced2024)}</Text>
+              <Text style={styles.cardHintSmall}>Πατήστε για λεπτομέρειες</Text>
+            </TouchableOpacity>
+            <View style={styles.metricHalf}>
+              <Text style={styles.label}>{`Budget ${currentYear}`}</Text>
+              <Text style={styles.value}>{formatCurrency(vBudgetCurr)}</Text>
+              {invBdgPercent != null && (
+                <Text style={styles.smallMetric}>
+                  Inv/Bdg: {invBdgPercent.toFixed(1)}%
+                </Text>
+              )}
+            </View>
+          </View>
+        </View>
 
-        <Metric3Cols
-          labelLeft={`Τιμολογημένα YTD ${previousYear}`}
-          labelRight={`Τιμολογημένα ${currentYear}`}
-          leftValue={formatCurrency(vYtdPrev)}
-          rightValue={formatCurrency(vInvoicedCurr)}
-          percent={pctYtd != null ? `${pctYtd.toFixed(1)}%` : null}
-        />
+        {/* Card 2: Year-to-Date Comparison */}
+        <View style={styles.metricCard}>
+          <View style={styles.metricRow}>
+            <TouchableOpacity 
+              style={styles.metricHalf}
+              onPress={() => handleCardPress('ytd-2024')}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.label}>{`Τιμολογημένα YTD ${previousYear}`}</Text>
+              <Text style={styles.value}>{formatCurrency(metrics.ytdInvoiced2024)}</Text>
+              <Text style={styles.cardHintSmall}>Πατήστε για λεπτομέρειες</Text>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              style={[styles.metricHalf, ytdChangePercent != null && {
+                borderBottomWidth: 3,
+                borderBottomColor: ytdChangePercent >= 0 ? '#4caf50' : '#f44336',
+              }]}
+              onPress={() => handleCardPress('ytd')}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.label}>{`Τιμολογημένα ${currentYear}`}</Text>
+              <Text style={styles.value}>{formatCurrency(metrics.ytdInvoiced2025)}</Text>
+              {ytdChangePercent != null && (
+                <Text style={[
+                  styles.percentText,
+                  { color: ytdChangePercent >= 0 ? '#4caf50' : '#f44336' }
+                ]}>
+                  {ytdChangePercent >= 0 ? '+' : ''}{ytdChangePercent.toFixed(1)}%
+                </Text>
+              )}
+              <Text style={styles.cardHintSmall}>Πατήστε για λεπτομέρειες</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
 
-        <Metric3Cols
-          labelLeft={`Τιμολογημένα ${currentMonthName} ${previousYear}`}
-          labelRight={`Τιμολογημένα ${currentMonthName} ${currentYear}`}
-          leftValue={formatCurrency(vMonthPrev)}
-          rightValue={formatCurrency(vMonthCurr)}
-          percent={pctMonth != null ? `${pctMonth.toFixed(1)}%` : null}
-        />
+        {/* Card 3: Month Comparison */}
+        <View style={styles.metricCard}>
+          <View style={styles.metricRow}>
+            <View style={styles.metricHalf}>
+              <Text style={styles.label}>{`Τιμολογημένα ${currentMonthName} ${previousYear}`}</Text>
+              <TouchableOpacity onPress={() => handleCardPress('mtd-2024')} activeOpacity={0.7}>
+                <Text style={styles.valueSmall}>MTD: {formatCurrency(metrics.mtdInvoiced2024)}</Text>
+                <Text style={styles.cardHintSmall}>Πατήστε για λεπτομέρειες</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => handleCardPress('month-full-2024')} activeOpacity={0.7}>
+                <Text style={styles.valueSmall}>Μήνας: {formatCurrency(metrics.fullMonthInvoiced2024)}</Text>
+                <Text style={styles.cardHintSmall}>Πατήστε για λεπτομέρειες</Text>
+              </TouchableOpacity>
+            </View>
+            <TouchableOpacity 
+              style={[styles.metricHalf, mtdChangePercent != null && {
+                borderBottomWidth: 3,
+                borderBottomColor: mtdChangePercent >= 0 ? '#4caf50' : '#f44336',
+              }]}
+              onPress={() => handleCardPress('mtd')}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.label}>{`Τιμολογημένα ${currentMonthName} ${currentYear}`}</Text>
+              <Text style={styles.value}>{formatCurrency(metrics.mtdInvoiced2025)}</Text>
+              {mtdChangePercent != null && (
+                <Text style={[
+                  styles.percentText,
+                  { color: mtdChangePercent >= 0 ? '#4caf50' : '#f44336' }
+                ]}>
+                  {mtdChangePercent >= 0 ? '+' : ''}{mtdChangePercent.toFixed(1)}%
+                </Text>
+              )}
+              <Text style={styles.cardHintSmall}>Πατήστε για λεπτομέρειες</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
 
         <Text style={styles.sectionHeader}>Ανοικτές παραγγελίες</Text>
         <View style={styles.ordersRow}>
@@ -197,11 +372,20 @@ function PlaymobilSalesSummary({ customerId, navigation }) {
 
         <Text style={styles.sectionHeader}>Υπόλοιπο</Text>
         <View style={styles.balanceBox}>
-          <Text style={styles.value}>{formatCurrency(vBalance)}</Text>
+          <Text style={styles.value}>{formatCurrency(balance)}</Text>
         </View>
+        
+        {/* Data Modal */}
+        <KpiDataModal
+          visible={modalVisible}
+          onClose={() => setModalVisible(false)}
+          title={modalData.title}
+          data={modalData.data}
+          type={modalData.type}
+        />
       </>
     );
-  }, [customer, currentMonthName, currentYear, navigation, previousYear, rows, status]);
+  }, [customer, currentMonthName, currentYear, previousYear, rows, status, metrics, balance, modalVisible, modalData]);
 
   return (
     <SafeScreen title="Σύνοψη Πωλήσεων" scroll>
@@ -215,6 +399,7 @@ function KivosSalesSummary({ customerId }) {
     status: STATUS.LOADING,
     customer: null,
     sheetRow: null,
+    creditBreakdown: null,
     error: null,
   });
 
@@ -225,7 +410,7 @@ function KivosSalesSummary({ customerId }) {
       const lookup = String(customerId || '').trim();
       if (!lookup) {
         if (!cancelled) {
-          setState({ status: STATUS.ERROR, customer: null, sheetRow: null, error: 'Δεν βρέθηκε κωδικός πελάτη.' });
+          setState({ status: STATUS.ERROR, customer: null, sheetRow: null, creditBreakdown: null, error: 'Δεν βρέθηκε κωδικός πελάτη.' });
         }
         return;
       }
@@ -251,12 +436,16 @@ function KivosSalesSummary({ customerId }) {
 
         const sheetCode = String(resolvedCustomer?.customerCode || lookup).trim();
         const sheetRow = sheetCode ? await getKivosSpreadsheetRow(sheetCode) : null;
+        
+        // Get credit breakdown for balance
+        const creditBreakdown = sheetCode ? await getKivosCreditBreakdown(sheetCode) : null;
 
         if (!cancelled) {
           setState({
             status: STATUS.READY,
             customer: resolvedCustomer,
             sheetRow,
+            creditBreakdown,
             error: null,
           });
         }
@@ -267,6 +456,7 @@ function KivosSalesSummary({ customerId }) {
             status: STATUS.ERROR,
             customer: null,
             sheetRow: null,
+            creditBreakdown: null,
             error: 'Δεν ήταν δυνατή η φόρτωση των δεδομένων.',
           });
         }
@@ -279,7 +469,7 @@ function KivosSalesSummary({ customerId }) {
     };
   }, [customerId]);
 
-  const { status, customer, sheetRow, error } = state;
+  const { status, customer, sheetRow, creditBreakdown, error } = state;
 
   if (status === STATUS.LOADING) {
     return (
@@ -314,7 +504,13 @@ function KivosSalesSummary({ customerId }) {
     .sort((a, b) => b.year - a.year);
 
   const hasSalesData = sortedSales.length > 0;
-  const balance = toNumber(sheetRow?.balance);
+  
+  // Get balance from credit breakdown
+  const balance = creditBreakdown?.balance != null 
+    ? creditBreakdown.balance 
+    : creditBreakdown?.total != null 
+    ? creditBreakdown.total 
+    : null;
 
   return (
     <SafeScreen title="Σύνοψη Πωλήσεων" scroll>
@@ -325,23 +521,35 @@ function KivosSalesSummary({ customerId }) {
             Δεν υπάρχουν διαθέσιμα ποσά πωλήσεων για τον συγκεκριμένο πελάτη.
           </Text>
         ) : (
-          <View style={styles.kivosRow}>
+          <View style={styles.kivosColumn}>
             {sortedSales.map((item, index) => {
               const reference = sortedSales[index + 1]?.value ?? null;
               const delta =
                 Number.isFinite(item.value) && Number.isFinite(reference) && reference !== 0
                   ? ((item.value - reference) / reference) * 100
                   : null;
-              const trendColor = delta == null ? colors.textPrimary : delta >= 0 ? 'green' : 'red';
+              const trendColor = delta == null ? colors.textPrimary : delta >= 0 ? '#4caf50' : '#f44336';
+              
               return (
-                <View key={item.year} style={styles.kivosBox}>
-                  <Text style={styles.kivosLabel}>{`Τζίρος ${item.year}`}</Text>
-                  <Text style={styles.kivosValue}>{formatCurrency(item.value)}</Text>
-                  {delta != null ? (
+                <View 
+                  key={item.year} 
+                  style={[
+                    styles.kivosBoxHorizontal,
+                    delta != null && {
+                      borderBottomWidth: 3,
+                      borderBottomColor: trendColor,
+                    }
+                  ]}
+                >
+                  <View style={styles.kivosBoxContent}>
+                    <Text style={styles.kivosLabel}>{`Τζίρος ${item.year}`}</Text>
+                    <Text style={styles.kivosValue}>{formatCurrency(item.value)}</Text>
+                  </View>
+                  {delta != null && (
                     <Text style={[styles.kivosDelta, { color: trendColor }]}>
-                      {delta.toFixed(1)}%
+                      {delta >= 0 ? '+' : ''}{delta.toFixed(1)}%
                     </Text>
-                  ) : null}
+                  )}
                 </View>
               );
             })}
@@ -354,35 +562,16 @@ function KivosSalesSummary({ customerId }) {
           </Text>
         ) : null}
 
-        {Number.isFinite(balance) ? (
-          <View style={styles.balanceBox}>
-            <Text style={styles.label}>Υπόλοιπο</Text>
-            <Text style={styles.value}>{formatCurrency(balance)}</Text>
-          </View>
+        {balance != null && Number.isFinite(balance) ? (
+          <>
+            <Text style={styles.sectionHeader}>Υπόλοιπο</Text>
+            <View style={styles.balanceBox}>
+              <Text style={styles.value}>{formatCurrency(balance)}</Text>
+            </View>
+          </>
         ) : null}
       </ScrollView>
     </SafeScreen>
-  );
-}
-
-function Metric3Cols({ labelLeft, labelRight, leftValue, rightValue, percent }) {
-  return (
-    <View style={styles.metric3}>
-      <View style={styles.metricBlock}>
-        <Text style={styles.label}>{labelLeft}</Text>
-        <Text style={styles.value}>{leftValue}</Text>
-      </View>
-      <View style={styles.metricBlock}>
-        <Text style={styles.label}>{labelRight}</Text>
-        <Text style={styles.value}>{rightValue}</Text>
-      </View>
-      {percent ? (
-        <View style={[styles.metricBlock, styles.metricSmall]}>
-          <Text style={styles.label}>Δ%</Text>
-          <Text style={styles.value}>{percent}</Text>
-        </View>
-      ) : null}
-    </View>
   );
 }
 
@@ -402,21 +591,55 @@ const styles = StyleSheet.create({
     marginTop: 12,
     marginBottom: 6,
   },
-  metric3: {
+  metricCard: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    marginVertical: 6,
+    padding: 12,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  metricRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 8,
   },
-  metricBlock: {
+  metricHalf: {
     flex: 1,
     backgroundColor: '#E3F2FD',
-    margin: 4,
-    padding: 8,
-    borderRadius: 10,
+    marginHorizontal: 4,
+    padding: 10,
+    borderRadius: 8,
   },
-  metricSmall: { flex: 0.6 },
-  label: { fontSize: 13, color: colors.textSecondary },
-  value: { fontSize: 15, fontWeight: '700', color: colors.textPrimary },
+  label: { fontSize: 13, color: colors.textSecondary, marginBottom: 4 },
+  value: { fontSize: 16, fontWeight: '700', color: colors.textPrimary },
+  valueSmall: { fontSize: 14, fontWeight: '600', color: colors.textPrimary, marginTop: 2 },
+  smallMetric: { 
+    fontSize: 12, 
+    color: colors.primary, 
+    marginTop: 4,
+    fontWeight: '600'
+  },
+  percentText: {
+    fontSize: 14,
+    fontWeight: '700',
+    marginTop: 4,
+  },
+  cardHint: {
+    fontSize: 11,
+    color: '#5f6a7a',
+    marginTop: 8,
+    textAlign: 'right',
+    fontStyle: 'italic',
+  },
+  cardHintSmall: {
+    fontSize: 10,
+    color: '#5f6a7a',
+    marginTop: 4,
+    fontStyle: 'italic',
+  },
   ordersRow: { flexDirection: 'row', marginTop: 6 },
   orderBox: {
     flex: 1,
@@ -426,30 +649,46 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   orderSpacer: { marginTop: 8 },
-  balanceBox: { backgroundColor: '#E3F2FD', margin: 4, padding: 12, borderRadius: 10 },
-  kivosRow: { flexDirection: 'row', flexWrap: 'wrap' },
-  kivosBox: {
-    flexGrow: 1,
-    minWidth: 140,
-    backgroundColor: '#E3F2FD',
-    paddingVertical: 10,
-    paddingHorizontal: 12,
+  balanceBox: { 
+    backgroundColor: '#E3F2FD', 
+    margin: 4, 
+    padding: 12, 
     borderRadius: 10,
-    marginRight: 12,
+    alignItems: 'center'
+  },
+  kivosColumn: {
+    flexDirection: 'column',
+  },
+  kivosBoxHorizontal: {
+    width: '100%',
+    backgroundColor: '#E3F2FD',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 10,
     marginBottom: 12,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    justifyContent: 'center',
   },
-  kivosLabel: { fontSize: 13, fontWeight: '600', color: colors.textSecondary, textAlign: 'center' },
-  kivosValue: { fontSize: 15, fontWeight: '700', color: colors.textPrimary, textAlign: 'center' },
-  kivosDelta: { marginTop: 4, fontSize: 13, fontWeight: '600', textAlign: 'center' },
-  testButton: {
-    backgroundColor: '#1976d2',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
+  kivosBoxContent: {
+    flex: 1,
   },
-  testButtonText: { color: '#fff', fontSize: 13 },
+  kivosLabel: { 
+    fontSize: 14, 
+    fontWeight: '600', 
+    color: colors.textSecondary,
+    marginBottom: 4,
+  },
+  kivosValue: { 
+    fontSize: 17, 
+    fontWeight: '700', 
+    color: colors.textPrimary,
+  },
+  kivosDelta: { 
+    fontSize: 16, 
+    fontWeight: '700',
+    marginLeft: 12,
+  },
   notice: {
     marginTop: 12,
     color: '#546e7a',

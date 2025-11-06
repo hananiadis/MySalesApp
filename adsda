@@ -1,0 +1,79 @@
+M	.vscode/settings.json
+M	App.js
+A	Playmobil Dashboard - Detailed Code Explanation & Integration Guide.md
+M	SuperMarketOrderFlow.md
+D	assets/Orroi_Xrisis_Politiki_Aporrhtou_MySalesApp.pdf
+D	assets/terms_mysalesapp_gr.html
+M	firebase/firestore.rules
+A	firestore-import/convertFirestoreSchemaToDBML.js
+M	firestore-import/firestoreManager_full.js
+A	firestore-import/firestore_schema.dbml
+A	firestore-import/firestore_schema.json
+M	firestore-import/package-lock.json
+M	firestore-import/package.json
+A	firestore-import/schema/firestore schema MySQL.sql
+A	firestore-import/schema/firestore schema Oracle SQL.sql
+A	firestore-import/schema/firestore schema PostgreSQL.sql
+A	firestore-import/schema/firestore schema SQL Server.sql
+A	firestore-import/schema/firestore schema.pdf
+A	firestore-import/schema/firestore schema.png
+A	firestore-import/schema/firestore schema.svg
+M	jest.config.js
+A	orderflow backup/OrderCustomerSelectScreen.js
+A	orderflow backup/OrderProductSelectionScreen.js
+A	orderflow backup/OrderReviewScreen.js
+A	orderflow backup/OrderSummaryScreen.js
+A	orderflow backup/SuperMarketOrderReviewScreen.js
+A	orderflow backup/SuperMarketOrderSummaryScreen.js
+A	orderflow backup/SuperMarketProductSelectionScreen.js
+A	orderflow backup/SuperMarketStoreSelectScreen.js
+A	orderflow backup/summary etc/OrderContext.js
+A	orderflow backup/summary etc/OrderSummaryScreen.js
+A	orderflow backup/summary etc/SuperMarketOrderSummaryScreen.js
+M	package-lock.json
+M	package.json
+A	src/components/PlaymobilKpiCards.js
+A	src/config/playmobil.js
+M	src/constants/brands.js
+A	src/constants/roles.js
+M	src/context/AuthProvider.js
+A	src/googleSheetsCache.js
+A	src/hooks/usePlaymobilData.js
+A	src/hooks/usePlaymobilKpi.js
+M	src/navigation/AuthStack.js
+M	src/screens/BrandHomeScreen.js
+M	src/screens/CatalogScreen.js
+M	src/screens/CustomerDetailScreen.js
+M	src/screens/CustomerSalesSummary.js
+M	src/screens/CustomersScreen.js
+M	src/screens/DataScreen.js
+M	src/screens/KivosCustomerDetailScreen.js
+M	src/screens/LoginScreen.js
+M	src/screens/MainHomeScreen.js
+M	src/screens/OrderCustomerSelectScreen.js
+M	src/screens/OrderProductSelectionScreen.js
+M	src/screens/OrderReviewScreen.js
+M	src/screens/OrderSummaryScreen.js
+M	src/screens/OrdersManagement.js
+M	src/screens/ProductsScreen.js
+M	src/screens/SignUpScreen.js
+M	src/screens/SuperMarketOrderReviewScreen.js
+M	src/screens/SuperMarketOrderSummaryScreen.js
+M	src/screens/SuperMarketProductSelectionScreen.js
+M	src/screens/SuperMarketStoreSelectScreen.js
+A	src/screens/TestKPI.js
+M	src/screens/UserManagementScreen.js
+A	src/services/customerService.js
+A	src/services/googleSheets.js
+A	src/services/googleSheetsCache.js
+M	src/services/kivosCreditBreakdown.js
+M	src/services/kivosSpreadsheet.js
+A	src/services/kpiCalculations.js
+A	src/services/playmobilKpi.js
+M	src/services/updateAll.js
+M	src/utils/OnlineStatusContext.js
+A	src/utils/customerCodes.js
+M	src/utils/exportSupermarketXLSX.js
+M	src/utils/firestoreOrders.js
+M	src/utils/localData.js
+A	src/utils/numberFormat.js

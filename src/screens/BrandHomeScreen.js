@@ -4,11 +4,16 @@ import { useFocusEffect } from '@react-navigation/native';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import ExcelJS from 'exceljs';
+import { Buffer } from 'buffer';
+import * as FileSystem from 'expo-file-system/legacy';
+import * as Sharing from 'expo-sharing';
 
 import SafeScreen from '../components/SafeScreen';
 import colors from '../theme/colors';
 import { normalizeBrandKey, BRAND_LABEL } from '../constants/brands';
 import PlaymobilKpiCards from '../components/PlaymobilKpiCards';
+import KpiDataModal from '../components/KpiDataModal';
 import usePlaymobilKpi from '../hooks/usePlaymobilKpi';
 import { refreshAllSheetsAndCache } from '../services/playmobilKpi';
 
@@ -81,6 +86,136 @@ const buildActions = ({
   return actions;
 };
 
+// Export helper functions (copied from TestKPI)
+const ensureExcelSupport = () => {
+  if (typeof global !== 'undefined' && typeof global.Buffer === 'undefined') {
+    global.Buffer = Buffer;
+  }
+};
+
+const formatCurrency = (value) =>
+  Number(value ?? 0).toLocaleString('el-GR', { style: 'currency', currency: 'EUR' });
+
+const toExcelDate = (value) => {
+  if (!value) return null;
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    return value;
+  }
+  const parsed = new Date(value);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
+};
+
+async function exportKpiSourceXLSX(records, kpis, referenceDate = new Date()) {
+  ensureExcelSupport();
+
+  const workbook = new ExcelJS.Workbook();
+  workbook.creator = 'MySalesApp';
+  workbook.created = new Date();
+
+  const summarySheet = workbook.addWorksheet('Summary');
+  summarySheet.columns = [
+    { header: 'Field', key: 'field', width: 28 },
+    { header: 'Value', key: 'value', width: 48 },
+  ];
+
+  summarySheet.addRow({
+    field: 'Reference Date',
+    value: referenceDate.toISOString(),
+  });
+
+  summarySheet.addRow({ field: '', value: '' });
+
+  if (kpis?.invoiced) {
+    summarySheet.addRow({ field: 'INVOICED SALES', value: '' });
+    if (kpis.invoiced.yearly?.current) {
+      summarySheet.addRow({
+        field: '  Current Year Total',
+        value: `${formatCurrency(kpis.invoiced.yearly.current.amount)} (${kpis.invoiced.yearly.current.customers || 0} customers)`,
+      });
+    }
+    if (kpis.invoiced.yearly?.previous) {
+      summarySheet.addRow({
+        field: '  Previous Year Total',
+        value: `${formatCurrency(kpis.invoiced.yearly.previous.amount)} (${kpis.invoiced.yearly.previous.customers || 0} customers)`,
+      });
+    }
+  }
+
+  if (kpis?.orders) {
+    summarySheet.addRow({ field: '', value: '' });
+    summarySheet.addRow({ field: 'ORDERS', value: '' });
+    if (kpis.orders.yearly?.current) {
+      summarySheet.addRow({
+        field: '  Current Year Total',
+        value: `${formatCurrency(kpis.orders.yearly.current.amount)} (${kpis.orders.yearly.current.customers || 0} customers)`,
+      });
+    }
+    if (kpis.orders.yearly?.previous) {
+      summarySheet.addRow({
+        field: '  Previous Year Total',
+        value: `${formatCurrency(kpis.orders.yearly.previous.amount)} (${kpis.orders.yearly.previous.customers || 0} customers)`,
+      });
+    }
+  }
+
+  // Add data sheets
+  const datasets = [
+    { key: 'invoiced2025', name: 'Invoiced 2025', data: records?.invoiced?.current || [] },
+    { key: 'invoiced2024', name: 'Invoiced 2024', data: records?.invoiced?.previous || [] },
+    { key: 'orders2025', name: 'Orders 2025', data: records?.orders?.current || [] },
+    { key: 'orders2024', name: 'Orders 2024', data: records?.orders?.previous || [] },
+  ];
+
+  datasets.forEach(({ name, data }) => {
+    if (!data.length) return;
+    const sheet = workbook.addWorksheet(name);
+    sheet.columns = [
+      { header: 'Customer Code', key: 'customerCode', width: 16 },
+      { header: 'Customer Name', key: 'customerName', width: 32 },
+      { header: 'Date', key: 'date', width: 12 },
+      { header: 'Amount', key: 'amount', width: 14 },
+    ];
+
+    let totalAmount = 0;
+    data.forEach((record) => {
+      const amount = Number(record.amount || record.total || record.value || 0);
+      totalAmount += amount;
+      sheet.addRow({
+        customerCode: record.customerCode || record.code || '',
+        customerName: record.customerName || record.name || '',
+        date: toExcelDate(record.date),
+        amount,
+      });
+    });
+
+    sheet.addRow({});
+    sheet.addRow({
+      customerCode: '',
+      customerName: 'TOTAL',
+      date: '',
+      amount: totalAmount,
+    });
+  });
+
+  const buffer = await workbook.xlsx.writeBuffer();
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+  const directory = FileSystem.documentDirectory || '';
+  const fileUri = `${directory}PlaymobilKPI_${timestamp}.xlsx`;
+
+  await FileSystem.writeAsStringAsync(fileUri, buffer.toString('base64'), {
+    encoding: 'base64',
+  });
+
+  if (await Sharing.isAvailableAsync()) {
+    await Sharing.shareAsync(fileUri, {
+      mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      dialogTitle: 'Export Playmobil KPI',
+    });
+  }
+
+  return fileUri;
+}
+
 const BrandHomeScreen = ({ navigation, route }) => {
   const brandParam = route?.params?.brand;
   const brand = useMemo(() => normalizeBrandKey(brandParam), [brandParam]);
@@ -94,6 +229,10 @@ const BrandHomeScreen = ({ navigation, route }) => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [reloadToken, setReloadToken] = useState(0);
   const [referenceDate] = useState(() => new Date());
+  
+  // Modal state for KPI data display
+  const [modalVisible, setModalVisible] = useState(false);
+  const [modalData, setModalData] = useState({ title: '', data: [], type: '' });
 
   const isPlaymobil = brand === 'playmobil';
 
@@ -103,6 +242,8 @@ const BrandHomeScreen = ({ navigation, route }) => {
     error,
     metricSnapshot,
     referenceMoment,
+    kpis,
+    recordSets,
     isLoading: kpisLoading,
   } = usePlaymobilKpi({
     referenceDate,
@@ -113,6 +254,22 @@ const BrandHomeScreen = ({ navigation, route }) => {
   const systemDateLabel = useMemo(() => {
     return new Date().toLocaleDateString('el-GR');
   }, []);
+
+  const handleExportKpi = useCallback(async () => {
+    if (!recordSets) {
+      Alert.alert('Export unavailable', 'KPI data has not loaded yet.');
+      return;
+    }
+
+    try {
+      const fileUri = await exportKpiSourceXLSX(recordSets, kpis, referenceDate);
+      console.log('[BrandHomeScreen] Export successful:', fileUri);
+      Alert.alert('Export Successful', 'KPI data exported successfully.', [{ text: 'OK' }]);
+    } catch (exportError) {
+      console.error('[BrandHomeScreen] Export failed:', exportError);
+      Alert.alert('Export failed', exportError?.message || 'Unknown error');
+    }
+  }, [recordSets, kpis, referenceDate]);
 
   const handleRefreshSheets = useCallback(async () => {
     if (isRefreshing) return;
@@ -144,6 +301,104 @@ const BrandHomeScreen = ({ navigation, route }) => {
       setIsRefreshing(false);
     }
   }, [isRefreshing]);
+
+  const handleKpiCardPress = useCallback((dataset, periodType, metric) => {
+    console.log('[BrandHomeScreen] KPI card pressed:', { dataset, periodType, metric });
+    console.log('[BrandHomeScreen] recordSets:', recordSets);
+    console.log('[BrandHomeScreen] recordSets structure:', {
+      hasRecordSets: !!recordSets,
+      hasInvoiced: !!recordSets?.invoiced,
+      hasOrders: !!recordSets?.orders,
+      invoicedCurrentLength: recordSets?.invoiced?.current?.length,
+      invoicedPreviousLength: recordSets?.invoiced?.previous?.length,
+      orderCurrentLength: recordSets?.orders?.current?.length,
+      orderPreviousLength: recordSets?.orders?.previous?.length,
+    });
+    
+    if (!recordSets) {
+      Alert.alert('Δεδομένα μη διαθέσιμα', 'Τα δεδομένα δεν έχουν φορτωθεί ακόμα.');
+      return;
+    }
+
+    const datasetTitle = dataset === 'invoiced' ? 'Τιμολογήσεις' : 'Παραγγελίες';
+    
+    // Determine which records to show
+    let records = [];
+    let title = '';
+    let type = '';
+
+    if (periodType === 'yearly') {
+      // For yearly cards, show top 25 from current year (all records, not filtered by date range)
+      type = 'yearly';
+      const currentYearRecords = recordSets[dataset]?.current || [];
+      console.log('[BrandHomeScreen] Yearly - currentYearRecords length:', currentYearRecords.length);
+      console.log('[BrandHomeScreen] Yearly - sample record:', currentYearRecords[0]);
+      records = currentYearRecords;
+      title = `${datasetTitle} - Top 25 Πελάτες (Ολόκληρο Έτος)`;
+    } else if (periodType === 'ytd') {
+      // For YTD cards, filter to YTD range and show all
+      type = 'ytd';
+      const currentYearRecords = recordSets[dataset]?.current || [];
+      console.log('[BrandHomeScreen] YTD - currentYearRecords length:', currentYearRecords.length);
+      console.log('[BrandHomeScreen] YTD - currentYearRecords length:', currentYearRecords.length);
+      
+      // Filter to YTD (from Jan 1 to current date)
+      const now = new Date();
+      const currentMonth = now.getMonth();
+      const currentDay = now.getDate();
+      const currentYear = now.getFullYear();
+      
+      records = currentYearRecords.filter(record => {
+        const recordDate = new Date(record.date || record.Date);
+        if (recordDate.getFullYear() !== currentYear) return false;
+        const recordMonth = recordDate.getMonth();
+        const recordDay = recordDate.getDate();
+        return (recordMonth < currentMonth) || 
+               (recordMonth === currentMonth && recordDay <= currentDay);
+      });
+      
+      console.log('[BrandHomeScreen] YTD - filtered records length:', records.length);
+      console.log('[BrandHomeScreen] YTD - sample filtered record:', records[0]);
+      
+      const monthName = now.toLocaleString('el-GR', { month: 'long' });
+      title = `${datasetTitle} - YTD (1 Ιαν - ${currentDay} ${monthName})`;
+    } else if (periodType === 'mtd') {
+      // For monthly cards, filter to current month only
+      type = 'monthly';
+      const currentYearRecords = recordSets[dataset]?.current || [];
+      console.log('[BrandHomeScreen] MTD - currentYearRecords length:', currentYearRecords.length);
+      console.log('[BrandHomeScreen] MTD - currentYearRecords length:', currentYearRecords.length);
+      
+      // Filter to current month only
+      const now = new Date();
+      const currentMonth = now.getMonth();
+      const currentDay = now.getDate();
+      const currentYear = now.getFullYear();
+      
+      records = currentYearRecords.filter(record => {
+        const recordDate = new Date(record.date || record.Date);
+        return recordDate.getMonth() === currentMonth && 
+               recordDate.getDate() <= currentDay &&
+               recordDate.getFullYear() === currentYear;
+      });
+      
+      console.log('[BrandHomeScreen] MTD - filtered records length:', records.length);
+      console.log('[BrandHomeScreen] MTD - sample filtered record:', records[0]);
+      
+      const monthName = now.toLocaleString('el-GR', { month: 'long' });
+      title = `${datasetTitle} - ${monthName} MTD (1-${currentDay})`;
+    }
+
+    console.log('[BrandHomeScreen] Final modal data:', {
+      title,
+      recordsLength: records.length,
+      type,
+      sampleRecord: records[0]
+    });
+
+    setModalData({ title, data: records, type });
+    setModalVisible(true);
+  }, [recordSets]);
 
   const navigateToStack = useCallback(
     (routeName, params) => {
@@ -214,7 +469,7 @@ const BrandHomeScreen = ({ navigation, route }) => {
             <View style={styles.kpiActions}>
               <Text style={styles.systemTag}>System: {systemDateLabel}</Text>
               <TouchableOpacity
-                style={[styles.refreshButton, isRefreshing && styles.refreshButtonDisabled]}
+                style={[styles.iconButton, isRefreshing && styles.iconButtonDisabled]}
                 onPress={handleRefreshSheets}
                 disabled={isRefreshing}
               >
@@ -223,6 +478,13 @@ const BrandHomeScreen = ({ navigation, route }) => {
                 ) : (
                   <Ionicons name="refresh-outline" size={20} color="#1e88e5" />
                 )}
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.iconButton, !recordSets && styles.iconButtonDisabled]}
+                onPress={handleExportKpi}
+                disabled={!recordSets}
+              >
+                <Ionicons name="download-outline" size={20} color="#1e88e5" />
               </TouchableOpacity>
             </View>
           </View>
@@ -242,6 +504,7 @@ const BrandHomeScreen = ({ navigation, route }) => {
               metricSnapshot={metricSnapshot}
               referenceMoment={referenceMoment}
               error={error}
+              onCardPress={handleKpiCardPress}
             />
           )}
         </>
@@ -263,6 +526,15 @@ const BrandHomeScreen = ({ navigation, route }) => {
           </TouchableOpacity>
         ))}
       </View>
+
+      {/* KPI Data Modal */}
+      <KpiDataModal
+        visible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        title={modalData.title}
+        data={modalData.data}
+        type={modalData.type}
+      />
     </SafeScreen>
   );
 };
@@ -370,7 +642,7 @@ const styles = StyleSheet.create({
     color: '#6b7280',
     marginRight: 6,
   },
-  refreshButton: {
+  iconButton: {
     width: 36,
     height: 36,
     borderRadius: 8,
@@ -379,8 +651,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#f7fbff',
+    marginLeft: 4,
   },
-  refreshButtonDisabled: {
+  iconButtonDisabled: {
     opacity: 0.6,
   },
   kpiLoader: {
