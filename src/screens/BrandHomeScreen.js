@@ -1,12 +1,16 @@
 ﻿// src/screens/BrandHomeScreen.js
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useState } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import SafeScreen from '../components/SafeScreen';
 import colors from '../theme/colors';
 import { normalizeBrandKey, BRAND_LABEL } from '../constants/brands';
+import PlaymobilKpiCards from '../components/PlaymobilKpiCards';
+import usePlaymobilKpi from '../hooks/usePlaymobilKpi';
+import { refreshAllSheetsAndCache } from '../services/playmobilKpi';
 
 const BRAND_ART = {
   playmobil: require('../../assets/playmobil_logo.png'),
@@ -86,6 +90,61 @@ const BrandHomeScreen = ({ navigation, route }) => {
   const routeNames = navigation?.getState?.()?.routeNames || [];
   const hasOrdersTab = routeNames.includes('OrdersMgmt');
 
+  // KPI state for Playmobil brand only
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [reloadToken, setReloadToken] = useState(0);
+  const [referenceDate] = useState(() => new Date());
+
+  const isPlaymobil = brand === 'playmobil';
+
+  // Use the KPI hook only for Playmobil
+  const {
+    status,
+    error,
+    metricSnapshot,
+    referenceMoment,
+    isLoading: kpisLoading,
+  } = usePlaymobilKpi({
+    referenceDate,
+    enabled: isPlaymobil,
+    reloadToken,
+  });
+
+  const systemDateLabel = useMemo(() => {
+    return new Date().toLocaleDateString('el-GR');
+  }, []);
+
+  const handleRefreshSheets = useCallback(async () => {
+    if (isRefreshing) return;
+    try {
+      setIsRefreshing(true);
+      const result = await refreshAllSheetsAndCache();
+      console.log('[BrandHomeScreen] Sheets refreshed:', {
+        invoiced2025: result?.invoiced2025?.length,
+        invoiced2024: result?.invoiced2024?.length,
+        orders2025: result?.orders2025?.length,
+        orders2024: result?.orders2024?.length,
+        headerDates: result?._headerDates,
+      });
+      // Write last sync timestamp
+      try {
+        const nowISO = new Date().toISOString();
+        await AsyncStorage.setItem('sync:last:playmobilSheets', nowISO);
+        console.log('[BrandHomeScreen] Wrote last sync timestamp:', nowISO);
+      } catch (err) {
+        console.warn('[BrandHomeScreen] Failed to write last sync timestamp:', err);
+      }
+      // Trigger re-fetch in the hook
+      setReloadToken((t) => t + 1);
+      Alert.alert('Sheets refreshed', 'Τα δεδομένα ανανεώθηκαν από τα Google Sheets.');
+    } catch (e) {
+      console.error('[BrandHomeScreen] handleRefreshSheets ERROR:', e);
+      Alert.alert('Refresh failed', e?.message || 'Unknown error');
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [isRefreshing]);
+
   const navigateToStack = useCallback(
     (routeName, params) => {
       let navigatorRef = navigation;
@@ -147,6 +206,46 @@ const BrandHomeScreen = ({ navigation, route }) => {
           <Text style={styles.headerTitle}>{title}</Text>
         </View>
       </View>
+
+      {isPlaymobil && (
+        <>
+          <View style={styles.kpiHeader}>
+            <Text style={styles.kpiTitle}>KPI Dashboard</Text>
+            <View style={styles.kpiActions}>
+              <Text style={styles.systemTag}>System: {systemDateLabel}</Text>
+              <TouchableOpacity
+                style={[styles.refreshButton, isRefreshing && styles.refreshButtonDisabled]}
+                onPress={handleRefreshSheets}
+                disabled={isRefreshing}
+              >
+                {isRefreshing ? (
+                  <ActivityIndicator size="small" color="#1e88e5" />
+                ) : (
+                  <Ionicons name="refresh-outline" size={20} color="#1e88e5" />
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {kpisLoading ? (
+            <View style={styles.kpiLoader}>
+              <ActivityIndicator size="large" color={colors.primary} />
+              <Text style={styles.kpiLoaderText}>Φόρτωση KPI...</Text>
+            </View>
+          ) : error ? (
+            <View style={styles.kpiError}>
+              <Text style={styles.kpiErrorText}>{error}</Text>
+            </View>
+          ) : (
+            <PlaymobilKpiCards
+              status={status}
+              metricSnapshot={metricSnapshot}
+              referenceMoment={referenceMoment}
+              error={error}
+            />
+          )}
+        </>
+      )}
 
       <Text style={styles.actionsTitle}>{STRINGS.quickActions}</Text>
       <View style={styles.actionGrid}>
@@ -248,6 +347,71 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: colors.textPrimary,
+  },
+  kpiHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 16,
+    marginTop: 8,
+  },
+  kpiTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: colors.textPrimary,
+  },
+  kpiActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  systemTag: {
+    fontSize: 12,
+    color: '#6b7280',
+    marginRight: 6,
+  },
+  refreshButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#cfe1fb',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#f7fbff',
+  },
+  refreshButtonDisabled: {
+    opacity: 0.6,
+  },
+  kpiLoader: {
+    backgroundColor: colors.white,
+    borderRadius: 16,
+    paddingVertical: 26,
+    paddingHorizontal: 18,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 3,
+  },
+  kpiLoaderText: {
+    marginTop: 10,
+    fontSize: 14,
+    color: colors.textSecondary || '#495057',
+  },
+  kpiError: {
+    backgroundColor: '#fff3cd',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
+  },
+  kpiErrorText: {
+    color: '#856404',
+    fontSize: 14,
+    textAlign: 'center',
   },
 });
 
