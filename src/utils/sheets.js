@@ -66,36 +66,68 @@ export async function fetchSpreadsheetData(sheetUrl, { force = false } = {}) {
     force || !meta || !meta.lastFetchedAt || hoursSince(meta.lastFetchedAt) >= 24;
 
   if (!shouldRefetch) {
+    console.log('[fetchSpreadsheetData] Using cached (not stale), refreshed=false');
     return { rowsText: null, refreshed: false, meta };
   }
 
+  console.log(`[fetchSpreadsheetData] Fetching ${sheetUrl.substring(0, 80)}...`);
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 20000);
 
-  const res = await fetch(sheetUrl, { signal: controller.signal });
-  clearTimeout(timer);
+  try {
+    const res = await fetch(sheetUrl, { signal: controller.signal });
+    clearTimeout(timer);
 
-  if (!res.ok) {
-    throw new Error(`Sheet fetch failed (${res.status})`);
+    if (!res.ok) {
+      console.error(`[fetchSpreadsheetData] HTTP ${res.status} for ${sheetUrl}`);
+      throw new Error(`Sheet fetch failed (${res.status})`);
+    }
+
+    const rowsText = await res.text();
+    console.log(`[fetchSpreadsheetData] Fetched ${rowsText.length} chars`);
+    const checksum = textChecksum(rowsText);
+
+    // If force=true, always return fresh data even if checksum matches
+    // If checksum unchanged and last fetch <24h and NOT forced, treat as not refreshed
+    if (!force && meta && meta.checksum === checksum && hoursSince(meta.lastFetchedAt) < 24) {
+      console.log('[fetchSpreadsheetData] Checksum unchanged, refreshed=false');
+      return { rowsText: null, refreshed: false, meta };
+    }
+
+    const newMeta = await setSheetMeta(sheetUrl, { checksum });
+    console.log('[fetchSpreadsheetData] Success, refreshed=true');
+    return { rowsText, refreshed: true, meta: newMeta };
+  } catch (error) {
+    clearTimeout(timer);
+    console.error('[fetchSpreadsheetData] Fetch error:', error.message);
+    throw error;
   }
-
-  const rowsText = await res.text();
-  const checksum = textChecksum(rowsText);
-
-  // If checksum unchanged and last fetch <24h, treat as not refreshed
-  if (meta && meta.checksum === checksum && hoursSince(meta.lastFetchedAt) < 24) {
-    return { rowsText: null, refreshed: false, meta };
-  }
-
-  const newMeta = await setSheetMeta(sheetUrl, { checksum });
-  return { rowsText, refreshed: true, meta: newMeta };
 }
 
 /**
- * Minimal CSV parser (handles quotes and commas in quotes).
+ * Minimal CSV parser (handles quotes and commas/semicolons in quotes).
+ * Auto-detects delimiter (comma or semicolon) from first line.
  * Returns an array of rows, each row = array of string cells.
  */
 export function parseCSV(text) {
+  // Auto-detect delimiter from first line (before first newline)
+  const firstLineEnd = text.indexOf('\n');
+  const sampleLine = firstLineEnd > 0 ? text.substring(0, firstLineEnd) : text;
+  
+  // Count commas and semicolons outside quotes in first line
+  let commaCount = 0, semiCount = 0, inQuote = false;
+  for (let j = 0; j < sampleLine.length; j++) {
+    if (sampleLine[j] === '"') inQuote = !inQuote;
+    else if (!inQuote) {
+      if (sampleLine[j] === ',') commaCount++;
+      else if (sampleLine[j] === ';') semiCount++;
+    }
+  }
+  
+  // Choose delimiter with higher count (default to comma if tied)
+  const delimiter = semiCount > commaCount ? ';' : ',';
+  console.log(`[parseCSV] Detected delimiter: "${delimiter}" (commas: ${commaCount}, semicolons: ${semiCount})`);
+
   const rows = [];
   let i = 0, field = '', row = [], insideQuotes = false;
 
@@ -111,7 +143,7 @@ export function parseCSV(text) {
     }
 
     if (c === '"') { insideQuotes = true; i++; continue; }
-    if (c === ',') { row.push(field); field = ''; i++; continue; }
+    if (c === delimiter) { row.push(field); field = ''; i++; continue; }
     if (c === '\n') { row.push(field); rows.push(row); field = ''; row = []; i++; continue; }
     if (c === '\r') { i++; continue; }
 
@@ -120,5 +152,7 @@ export function parseCSV(text) {
 
   row.push(field);
   rows.push(row);
+  
+  console.log(`[parseCSV] Parsed ${rows.length} rows, first row has ${rows[0]?.length || 0} columns`);
   return rows;
 }

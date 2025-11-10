@@ -68,6 +68,7 @@ function PlaymobilSalesSummary({ customerId, navigation }) {
   const [rows, setRows] = useState([]);
   const [metrics, setMetrics] = useState(null);
   const [balance, setBalance] = useState(null);
+  const [debugInfo, setDebugInfo] = useState(null); // debug snapshot for troubleshooting
   const [status, setStatus] = useState(STATUS.LOADING);
   
   // Modal state
@@ -95,7 +96,12 @@ function PlaymobilSalesSummary({ customerId, navigation }) {
         }
 
         // Load spreadsheet data for budget and open orders
-        const sheetRows = await loadSpreadsheet('playmobilSales', { force: false });
+        // FORCE REFRESH to re-parse with new semicolon-aware parser
+        console.log('[CustomerSalesSummary] Loading playmobilSales sheet (force refresh)...');
+        const sheetRows = await loadSpreadsheet('playmobilSales', { force: true });
+        console.log('[CustomerSalesSummary] Sheet loaded, rows:', Array.isArray(sheetRows) ? sheetRows.length : 'null');
+        // Capture a tiny debug snapshot of first two rows (headers + first data) to help trace indices
+        const snapshot = Array.isArray(sheetRows) ? sheetRows.slice(0, 2) : [];
         
         // Calculate metrics from KPI data
         const calculatedMetrics = await calculateCustomerMetrics(customerCode, now);
@@ -107,6 +113,7 @@ function PlaymobilSalesSummary({ customerId, navigation }) {
           setRows(Array.isArray(sheetRows) ? sheetRows : []);
           setMetrics(calculatedMetrics);
           setBalance(customerBalance);
+          setDebugInfo({ headerPreview: snapshot });
           setStatus(STATUS.READY);
         }
       } catch (error) {
@@ -135,17 +142,116 @@ function PlaymobilSalesSummary({ customerId, navigation }) {
       return <Text style={styles.error}>Δεν υπάρχουν δεδομένα πωλήσεων</Text>;
     }
 
-    // Get budget from spreadsheet
-    const headerIndex = rows.findIndex((r) => String(r?.[4] ?? '').trim() === 'Bill-to');
-    const dataRows = headerIndex !== -1 ? rows.slice(headerIndex + 1) : rows;
-    const customerCode = String(customer?.customerCode || '').trim();
-    const row = dataRows.find((r) => String(r?.[4] ?? '').trim() === customerCode);
+    // --- Dynamic header parsing for playmobilSales sheet ---
+    // Headers are at row 5 (index 4) in this specific sheet
+    console.log('[CustomerSalesSummary] Total rows loaded:', rows.length);
+    console.log('[CustomerSalesSummary] Row 5 (index 4):', rows[4]);
+    
+    // The header row is at index 4 (row 5 in Excel)
+    const headerRow = rows[4];
+    console.log('[CustomerSalesSummary] Header row found:', headerRow ? 'YES' : 'NO');
+    console.log('[CustomerSalesSummary] Header row content:', headerRow);
+    
+    const headerMap = {};
+    if (headerRow && Array.isArray(headerRow)) {
+      headerRow.forEach((cell, idx) => {
+        const key = String(cell || '').trim();
+        if (key) {
+          headerMap[key.toLowerCase()] = idx;
+          // Also store original case for debugging
+          if (idx <= 25) { // Log first 26 columns
+            console.log(`[CustomerSalesSummary] Column ${idx}: "${key}"`);
+          }
+        }
+      });
+    }
+    console.log('[CustomerSalesSummary] Header map keys:', Object.keys(headerMap).slice(0, 30));
 
-    const vBudgetCurr = row ? toNumber(row[13], 0) : 0;
-    const vOpenOrders = row ? toNumber(row[19], 0) : 0;
-    const vOpenDlv = row ? toNumber(row[20], 0) : 0;
-    const vTotalOrders = row ? toNumber(row[21], 0) : 0;
-    const vOB = row ? sanitize(row[22]) : 'N/A';
+    const customerCode = String(customer?.customerCode || '').trim();
+    console.log('[CustomerSalesSummary] Looking for customer code:', customerCode);
+    
+    // Data rows start after row 5 (index 5 onwards)
+    const dataRows = rows.slice(5);
+    console.log('[CustomerSalesSummary] Data rows count:', dataRows.length);
+    
+    // Find the Bill-to column index
+    const codeColIndex = headerMap['bill-to'];
+    console.log('[CustomerSalesSummary] Bill-to column index:', codeColIndex);
+    
+    const row = dataRows.find((r) => {
+      if (!Array.isArray(r)) return false;
+      if (Number.isFinite(codeColIndex)) {
+        const cellValue = String(r[codeColIndex] || '').trim();
+        return cellValue === customerCode;
+      }
+      return r.some((cell) => String(cell || '').trim() === customerCode);
+    });
+    console.log('[CustomerSalesSummary] Matching row found:', row ? 'YES' : 'NO');
+    if (row) {
+      console.log('[CustomerSalesSummary] Matching row first 25 cells:', row.slice(0, 25));
+    }
+
+    // Helper to safely read by header name with fallback index list
+    const readByHeader = (names, fallbackIndices = []) => {
+      for (const n of names) {
+        const idx = headerMap[n.toLowerCase()];
+        if (Number.isFinite(idx) && row && row[idx] != null && row[idx] !== '') {
+          return row[idx];
+        }
+      }
+      for (const i of fallbackIndices) {
+        if (row && Number.isFinite(i) && row[i] != null && row[i] !== '') {
+          return row[i];
+        }
+      }
+      return null;
+    };
+
+    // Use the exact column names from the sheet:
+    // Column N (user index 14, array index 13): "TTL BDG 2025"
+    // Column T (user index 20, array index 19): "Open Orders"
+    // Column U (user index 21, array index 20): "Open Dlv's"
+    // Column V (user index 22, array index 21): "Total Orders 2025"
+    // Column W (user index 23, array index 22): "%O/B"
+    const rawBudget = readByHeader(['TTL BDG 2025', 'ttl bdg 2025'], [13]);
+    const rawOpenOrders = readByHeader(['Open Orders', 'open orders'], [19]);
+    const rawOpenDlv = readByHeader(["Open Dlv's", "open dlv's", 'Open Dlvs'], [20]);
+    const rawTotalOrders = readByHeader(['Total Orders 2025', 'total orders 2025'], [21]);
+    const rawOB = readByHeader(['%O/B', '%o/b'], [22]);
+
+    console.log('[CustomerSalesSummary] Raw values extracted:', {
+      rawBudget,
+      rawOpenOrders,
+      rawOpenDlv,
+      rawTotalOrders,
+      rawOB
+    });
+
+    const vBudgetCurr = toNumber(rawBudget, 0);
+    const vOpenOrders = toNumber(rawOpenOrders, 0);
+    const vOpenDlv = toNumber(rawOpenDlv, 0);
+    const vTotalOrders = toNumber(rawTotalOrders, 0);
+    const vOB = sanitize(rawOB);
+    
+    console.log('[CustomerSalesSummary] Parsed numeric values:', {
+      vBudgetCurr,
+      vOpenOrders,
+      vOpenDlv,
+      vTotalOrders,
+      vOB
+    });
+
+    // Fallback: if orders metrics still zero but KPI metrics have orders dataset, compute openOrdersAmount from metrics
+    let effectiveOpenOrders = vOpenOrders;
+    if (effectiveOpenOrders === 0 && metrics?.records?.orders2025?.length) {
+      const alt = metrics.records.orders2025.reduce((sum, r) => {
+        const val = Number(r.amount || r.total || r.value || 0);
+        return sum + (Number.isFinite(val) ? val : 0);
+      }, 0);
+      if (alt > 0) {
+        effectiveOpenOrders = alt;
+      }
+    }
 
     // Calculate Inv/Bdg percentage
     const invBdgPercent = vBudgetCurr > 0 
@@ -357,7 +463,7 @@ function PlaymobilSalesSummary({ customerId, navigation }) {
         <View style={styles.ordersRow}>
           <View style={styles.orderBox}>
             <Text style={styles.label}>Ανοικτές παραγγελίες</Text>
-            <Text style={styles.value}>{formatCurrency(vOpenOrders)}</Text>
+            <Text style={styles.value}>{formatCurrency(effectiveOpenOrders)}</Text>
             <Text style={[styles.label, styles.orderSpacer]}>Ανοικτές προς παράδοση</Text>
             <Text style={styles.value}>{formatCurrency(vOpenDlv)}</Text>
           </View>
@@ -374,6 +480,15 @@ function PlaymobilSalesSummary({ customerId, navigation }) {
         <View style={styles.balanceBox}>
           <Text style={styles.value}>{formatCurrency(balance)}</Text>
         </View>
+        {__DEV__ && debugInfo ? (
+          <View style={styles.debugBox}>
+            <Text style={styles.debugTitle}>DEBUG HEADERS</Text>
+            {Array.isArray(debugInfo.headerPreview) && debugInfo.headerPreview.map((r, i) => (
+              <Text key={i} style={styles.debugLine}>{JSON.stringify(r)}</Text>
+            ))}
+            <Text style={styles.debugLine}>Detected columns: {Object.keys(headerMap).join(', ')}</Text>
+          </View>
+        ) : null}
         
         {/* Data Modal */}
         <KpiDataModal
@@ -699,5 +814,21 @@ const styles = StyleSheet.create({
     marginTop: 8,
     color: colors.textSecondary,
     fontSize: 14,
+  },
+  debugBox: {
+    backgroundColor: '#0b395433',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 8,
+  },
+  debugTitle: { 
+    fontWeight: '700', 
+    fontSize: 12, 
+    color: '#0b3954', 
+    marginBottom: 6 
+  },
+  debugLine: { 
+    fontSize: 10, 
+    color: '#0b3954' 
   },
 });

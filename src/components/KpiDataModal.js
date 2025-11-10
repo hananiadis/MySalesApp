@@ -1,5 +1,5 @@
 // src/components/KpiDataModal.js
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   Modal,
   View,
@@ -34,20 +34,28 @@ const formatDate = (dateValue) => {
   return String(dateValue);
 };
 
-export default function KpiDataModal({ visible, onClose, title, data, type }) {
+export default function KpiDataModal({ visible, onClose, title, data, previousData = [], type, activeSalesmenIds = [], availableSalesmen = [] }) {
+  const [activeTab, setActiveTab] = useState('current'); // 'current' or 'previous'
+  
+  const currentYear = new Date().getFullYear();
+  const previousYear = currentYear - 1;
+  
   const { displayData, totalAmount } = useMemo(() => {
+    const sourceData = activeTab === 'current' ? data : previousData;
+    
     console.log('[KpiDataModal] Processing data:', { 
-      dataLength: data?.length, 
+      dataLength: sourceData?.length, 
       type,
-      sampleRecord: data?.[0] 
+      activeTab,
+      sampleRecord: sourceData?.[0] 
     });
     
-    if (!data || !Array.isArray(data)) {
+    if (!sourceData || !Array.isArray(sourceData)) {
       console.log('[KpiDataModal] No valid data');
       return { displayData: [], totalAmount: 0 };
     }
 
-    let processedData = [...data];
+    let processedData = [...sourceData];
     let total = 0;
 
     // For yearly data, show top 25 customers by amount
@@ -127,7 +135,7 @@ export default function KpiDataModal({ visible, onClose, title, data, type }) {
     });
 
     return { displayData: processedData, totalAmount: total };
-  }, [data, type]);
+  }, [data, previousData, type, activeTab]);
 
   if (!visible) return null;
 
@@ -142,11 +150,45 @@ export default function KpiDataModal({ visible, onClose, title, data, type }) {
         <View style={styles.modalContainer}>
           {/* Header */}
           <View style={styles.header}>
-            <Text style={styles.headerTitle}>{title}</Text>
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <Ionicons name="close-outline" size={28} color={colors.text} />
-            </TouchableOpacity>
+            <View style={styles.headerTop}>
+              <Text style={styles.headerTitle}>{title}</Text>
+              <TouchableOpacity onPress={onClose} style={styles.closeButton}>
+                <Ionicons name="close-outline" size={28} color={colors.text} />
+              </TouchableOpacity>
+            </View>
+            {activeSalesmenIds?.length ? (
+              <Text style={styles.scopeNote}>
+                Φίλτρο πωλητών: {activeSalesmenIds.length === (availableSalesmen?.length || 0)
+                  ? 'Όλοι'
+                  : activeSalesmenIds.map(id => {
+                      const found = availableSalesmen.find(s => s.id === id);
+                      return found ? found.label : id;
+                    }).join(', ')}
+              </Text>
+            ) : null}
           </View>
+
+          {/* Year Tabs - only show if we have previous data */}
+          {previousData && previousData.length > 0 && (
+            <View style={styles.tabContainer}>
+              <TouchableOpacity
+                style={[styles.tab, activeTab === 'current' && styles.tabActive]}
+                onPress={() => setActiveTab('current')}
+              >
+                <Text style={[styles.tabText, activeTab === 'current' && styles.tabTextActive]}>
+                  {currentYear}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.tab, activeTab === 'previous' && styles.tabActive]}
+                onPress={() => setActiveTab('previous')}
+              >
+                <Text style={[styles.tabText, activeTab === 'previous' && styles.tabTextActive]}>
+                  {previousYear}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
 
           {/* Summary */}
           <View style={styles.summary}>
@@ -247,7 +289,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     borderRadius: 16,
     width: '95%',
-    maxHeight: SCREEN_HEIGHT * 0.85,
+    maxHeight: SCREEN_HEIGHT * 0.9,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -255,13 +297,15 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   header: {
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  headerTop: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
   },
   headerTitle: {
     fontSize: 18,
@@ -269,12 +313,42 @@ const styles = StyleSheet.create({
     color: colors.text,
     flex: 1,
   },
+  scopeNote: {
+    fontSize: 10,
+    color: '#6b7280',
+    marginTop: 4,
+  },
   closeButton: {
     padding: 4,
   },
+  tabContainer: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    marginTop: 8,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderBottomWidth: 2,
+    borderBottomColor: 'transparent',
+  },
+  tabActive: {
+    borderBottomColor: '#1e88e5',
+  },
+  tabText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: colors.textSecondary,
+  },
+  tabTextActive: {
+    color: '#1e88e5',
+  },
   summary: {
     paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingVertical: 10,
     backgroundColor: colors.background,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
@@ -282,15 +356,15 @@ const styles = StyleSheet.create({
   summaryRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginVertical: 4,
+    marginVertical: 2,
   },
   summaryLabel: {
-    fontSize: 14,
+    fontSize: 13,
     color: colors.textSecondary,
     fontWeight: '500',
   },
   summaryValue: {
-    fontSize: 14,
+    fontSize: 13,
     color: colors.text,
     fontWeight: '600',
   },

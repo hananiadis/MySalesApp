@@ -1,7 +1,7 @@
 ﻿// src/screens/BrandHomeScreen.js
-import React, { useMemo, useCallback, useState } from 'react';
+import React, { useMemo, useCallback, useState, useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ActivityIndicator, Alert, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ExcelJS from 'exceljs';
@@ -105,7 +105,7 @@ const toExcelDate = (value) => {
   return Number.isNaN(parsed.getTime()) ? null : parsed;
 };
 
-async function exportKpiSourceXLSX(records, kpis, referenceDate = new Date()) {
+async function exportKpiSourceXLSX(records, kpis, referenceDate = new Date(), context = {}) {
   ensureExcelSupport();
 
   const workbook = new ExcelJS.Workbook();
@@ -118,10 +118,13 @@ async function exportKpiSourceXLSX(records, kpis, referenceDate = new Date()) {
     { header: 'Value', key: 'value', width: 48 },
   ];
 
-  summarySheet.addRow({
-    field: 'Reference Date',
-    value: referenceDate.toISOString(),
-  });
+  summarySheet.addRow({ field: 'Reference Date', value: referenceDate.toISOString() });
+  if (Array.isArray(context.activeSalesmenIds)) {
+    summarySheet.addRow({ field: 'Salesmen Scope', value: context.activeSalesmenIds.join(', ') || 'ALL' });
+  }
+  if (Array.isArray(context.availableSalesmen)) {
+    summarySheet.addRow({ field: 'Available Salesmen', value: context.availableSalesmen.map(s => s.id).join(', ') });
+  }
 
   summarySheet.addRow({ field: '', value: '' });
 
@@ -229,12 +232,31 @@ const BrandHomeScreen = ({ navigation, route }) => {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [reloadToken, setReloadToken] = useState(0);
   const [referenceDate] = useState(() => new Date());
+  // Salesmen filter UI state (Playmobil only)
+  const [selectedSalesmenIds, setSelectedSalesmenIds] = useState(null); // null -> All
   
   // Modal state for KPI data display
   const [modalVisible, setModalVisible] = useState(false);
   const [modalData, setModalData] = useState({ title: '', data: [], type: '' });
 
   const isPlaymobil = brand === 'playmobil';
+
+  // Persist salesman selection per brand (Playmobil)
+  useEffect(() => {
+    (async () => {
+      try {
+        const saved = await AsyncStorage.getItem('playmobil:selectedSalesmenIds');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length) {
+            setSelectedSalesmenIds(parsed);
+          }
+        }
+      } catch (e) {
+        console.warn('[BrandHomeScreen] Failed to read saved salesman selection', e?.message);
+      }
+    })();
+  }, []);
 
   // Use the KPI hook only for Playmobil
   const {
@@ -245,11 +267,14 @@ const BrandHomeScreen = ({ navigation, route }) => {
     kpis,
     recordSets,
     isLoading: kpisLoading,
+    availableSalesmen = [],
+    activeSalesmenIds = [],
   } = usePlaymobilKpi({
     referenceDate,
     enabled: isPlaymobil,
     reloadToken,
-  });
+    selectedSalesmenIds,
+  }) || {};
 
   const systemDateLabel = useMemo(() => {
     return new Date().toLocaleDateString('el-GR');
@@ -262,7 +287,18 @@ const BrandHomeScreen = ({ navigation, route }) => {
     }
 
     try {
-      const fileUri = await exportKpiSourceXLSX(recordSets, kpis, referenceDate);
+      // Build context for export and dynamic filename suffix
+      const selectedLabels = (availableSalesmen || [])
+        .filter(s => !selectedSalesmenIds || selectedSalesmenIds.includes(s.id))
+        .map(s => s.label);
+      const isAll = !selectedSalesmenIds || !selectedSalesmenIds.length;
+      const scopeLabel = isAll ? 'ALL' : (selectedLabels.length <= 3 ? selectedLabels.join('_') : `${selectedLabels.length}_SALES`);
+
+      const fileUri = await exportKpiSourceXLSX(recordSets, kpis, referenceDate, {
+        activeSalesmenIds,
+        availableSalesmen,
+        scopeLabel,
+      });
       console.log('[BrandHomeScreen] Export successful:', fileUri);
       Alert.alert('Export Successful', 'KPI data exported successfully.', [{ text: 'OK' }]);
     } catch (exportError) {
@@ -322,33 +358,41 @@ const BrandHomeScreen = ({ navigation, route }) => {
 
     const datasetTitle = dataset === 'invoiced' ? 'Τιμολογήσεις' : 'Παραγγελίες';
     
-    // Determine which records to show
-    let records = [];
+    // Use sheet reference date instead of system date
+    const refDate = referenceMoment || new Date();
+    console.log('[BrandHomeScreen] Using reference date from sheet:', refDate.toISOString());
+    
+    // Determine which records to show - include both current and previous year
+    let currentRecords = [];
+    let previousRecords = [];
     let title = '';
     let type = '';
 
     if (periodType === 'yearly') {
-      // For yearly cards, show top 25 from current year (all records, not filtered by date range)
+      // For yearly cards, show top 25 from current year and previous year
       type = 'yearly';
       const currentYearRecords = recordSets[dataset]?.current || [];
+      const previousYearRecords = recordSets[dataset]?.previous || [];
       console.log('[BrandHomeScreen] Yearly - currentYearRecords length:', currentYearRecords.length);
-      console.log('[BrandHomeScreen] Yearly - sample record:', currentYearRecords[0]);
-      records = currentYearRecords;
+      console.log('[BrandHomeScreen] Yearly - previousYearRecords length:', previousYearRecords.length);
+      currentRecords = currentYearRecords;
+      previousRecords = previousYearRecords;
       title = `${datasetTitle} - Top 25 Πελάτες (Ολόκληρο Έτος)`;
     } else if (periodType === 'ytd') {
-      // For YTD cards, filter to YTD range and show all
+      // For YTD cards, filter to YTD range for both years using sheet reference date
       type = 'ytd';
       const currentYearRecords = recordSets[dataset]?.current || [];
+      const previousYearRecords = recordSets[dataset]?.previous || [];
       console.log('[BrandHomeScreen] YTD - currentYearRecords length:', currentYearRecords.length);
-      console.log('[BrandHomeScreen] YTD - currentYearRecords length:', currentYearRecords.length);
+      console.log('[BrandHomeScreen] YTD - previousYearRecords length:', previousYearRecords.length);
       
-      // Filter to YTD (from Jan 1 to current date)
-      const now = new Date();
-      const currentMonth = now.getMonth();
-      const currentDay = now.getDate();
-      const currentYear = now.getFullYear();
+      // Filter to YTD (from Jan 1 to reference date)
+      const currentMonth = refDate.getMonth();
+      const currentDay = refDate.getDate();
+      const currentYear = refDate.getFullYear();
+      const previousYear = currentYear - 1;
       
-      records = currentYearRecords.filter(record => {
+      currentRecords = currentYearRecords.filter(record => {
         const recordDate = new Date(record.date || record.Date);
         if (recordDate.getFullYear() !== currentYear) return false;
         const recordMonth = recordDate.getMonth();
@@ -357,46 +401,65 @@ const BrandHomeScreen = ({ navigation, route }) => {
                (recordMonth === currentMonth && recordDay <= currentDay);
       });
       
-      console.log('[BrandHomeScreen] YTD - filtered records length:', records.length);
-      console.log('[BrandHomeScreen] YTD - sample filtered record:', records[0]);
+      previousRecords = previousYearRecords.filter(record => {
+        const recordDate = new Date(record.date || record.Date);
+        if (recordDate.getFullYear() !== previousYear) return false;
+        const recordMonth = recordDate.getMonth();
+        const recordDay = recordDate.getDate();
+        return (recordMonth < currentMonth) || 
+               (recordMonth === currentMonth && recordDay <= currentDay);
+      });
       
-      const monthName = now.toLocaleString('el-GR', { month: 'long' });
+      console.log('[BrandHomeScreen] YTD - filtered current records length:', currentRecords.length);
+      console.log('[BrandHomeScreen] YTD - filtered previous records length:', previousRecords.length);
+      
+      const monthName = refDate.toLocaleString('el-GR', { month: 'long' });
       title = `${datasetTitle} - YTD (1 Ιαν - ${currentDay} ${monthName})`;
     } else if (periodType === 'mtd') {
-      // For monthly cards, filter to current month only
+      // For monthly cards, filter to current month for both years using sheet reference date
       type = 'monthly';
       const currentYearRecords = recordSets[dataset]?.current || [];
+      const previousYearRecords = recordSets[dataset]?.previous || [];
       console.log('[BrandHomeScreen] MTD - currentYearRecords length:', currentYearRecords.length);
-      console.log('[BrandHomeScreen] MTD - currentYearRecords length:', currentYearRecords.length);
+      console.log('[BrandHomeScreen] MTD - previousYearRecords length:', previousYearRecords.length);
       
       // Filter to current month only
-      const now = new Date();
-      const currentMonth = now.getMonth();
-      const currentDay = now.getDate();
-      const currentYear = now.getFullYear();
+      const currentMonth = refDate.getMonth();
+      const currentDay = refDate.getDate();
+      const currentYear = refDate.getFullYear();
+      const previousYear = currentYear - 1;
       
-      records = currentYearRecords.filter(record => {
+      currentRecords = currentYearRecords.filter(record => {
         const recordDate = new Date(record.date || record.Date);
         return recordDate.getMonth() === currentMonth && 
                recordDate.getDate() <= currentDay &&
                recordDate.getFullYear() === currentYear;
       });
       
-      console.log('[BrandHomeScreen] MTD - filtered records length:', records.length);
-      console.log('[BrandHomeScreen] MTD - sample filtered record:', records[0]);
+      previousRecords = previousYearRecords.filter(record => {
+        const recordDate = new Date(record.date || record.Date);
+        return recordDate.getMonth() === currentMonth && 
+               recordDate.getDate() <= currentDay &&
+               recordDate.getFullYear() === previousYear;
+      });
       
-      const monthName = now.toLocaleString('el-GR', { month: 'long' });
+      console.log('[BrandHomeScreen] MTD - filtered current records length:', currentRecords.length);
+      console.log('[BrandHomeScreen] MTD - filtered previous records length:', previousRecords.length);
+      
+      const monthName = refDate.toLocaleString('el-GR', { month: 'long' });
       title = `${datasetTitle} - ${monthName} MTD (1-${currentDay})`;
     }
 
     console.log('[BrandHomeScreen] Final modal data:', {
       title,
-      recordsLength: records.length,
+      currentRecordsLength: currentRecords.length,
+      previousRecordsLength: previousRecords.length,
       type,
-      sampleRecord: records[0]
+      sampleCurrentRecord: currentRecords[0],
+      samplePreviousRecord: previousRecords[0]
     });
 
-    setModalData({ title, data: records, type });
+    setModalData({ title, data: currentRecords, previousData: previousRecords, type });
     setModalVisible(true);
   }, [recordSets]);
 
@@ -468,6 +531,57 @@ const BrandHomeScreen = ({ navigation, route }) => {
             <Text style={styles.kpiTitle}>KPI Dashboard</Text>
             <View style={styles.kpiActions}>
               <Text style={styles.systemTag}>System: {systemDateLabel}</Text>
+              {/* Salesmen Filter (chips) */}
+              {isPlaymobil && (
+                <View style={styles.salesmenFilterWrap}>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                    <TouchableOpacity
+                      style={[styles.filterChip, !activeSalesmenIds?.length || !selectedSalesmenIds ? styles.filterChipActive : null]}
+                      onPress={async () => {
+                        setSelectedSalesmenIds(null); // All
+                        try { await AsyncStorage.removeItem('playmobil:selectedSalesmenIds'); } catch {}
+                        setReloadToken(t => t + 1);
+                      }}
+                    >
+                      <Text style={[styles.filterChipText, !activeSalesmenIds?.length || !selectedSalesmenIds ? styles.filterChipTextActive : null]}>Όλοι</Text>
+                    </TouchableOpacity>
+                    {(availableSalesmen || []).map(s => {
+                      const isActive = Array.isArray(selectedSalesmenIds)
+                        ? selectedSalesmenIds.includes(s.id)
+                        : false;
+                      return (
+                        <TouchableOpacity
+                          key={s.id}
+                          style={[styles.filterChip, isActive && styles.filterChipActive]}
+                          onPress={async () => {
+                            let next;
+                            setSelectedSalesmenIds(prev => {
+                              next = Array.isArray(prev) ? [...prev] : [];
+                              if (isActive) {
+                                next = next.filter(id => id !== s.id);
+                              } else {
+                                next.push(s.id);
+                              }
+                              if (!next.length) next = null;
+                              return next;
+                            });
+                            try {
+                              if (next && next.length) {
+                                await AsyncStorage.setItem('playmobil:selectedSalesmenIds', JSON.stringify(next));
+                              } else {
+                                await AsyncStorage.removeItem('playmobil:selectedSalesmenIds');
+                              }
+                            } catch {}
+                            setReloadToken(t => t + 1);
+                          }}
+                        >
+                          <Text style={[styles.filterChipText, isActive && styles.filterChipTextActive]}>{s.label}</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
+                  </ScrollView>
+                </View>
+              )}
               <TouchableOpacity
                 style={[styles.iconButton, isRefreshing && styles.iconButtonDisabled]}
                 onPress={handleRefreshSheets}
@@ -505,6 +619,8 @@ const BrandHomeScreen = ({ navigation, route }) => {
               referenceMoment={referenceMoment}
               error={error}
               onCardPress={handleKpiCardPress}
+              activeSalesmenIds={activeSalesmenIds}
+              availableSalesmen={availableSalesmen}
             />
           )}
         </>
@@ -533,7 +649,10 @@ const BrandHomeScreen = ({ navigation, route }) => {
         onClose={() => setModalVisible(false)}
         title={modalData.title}
         data={modalData.data}
+        previousData={modalData.previousData}
         type={modalData.type}
+        activeSalesmenIds={activeSalesmenIds}
+        availableSalesmen={availableSalesmen}
       />
     </SafeScreen>
   );
@@ -669,6 +788,31 @@ const styles = StyleSheet.create({
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 4 },
     elevation: 3,
+  },
+  salesmenFilterWrap: {
+    marginRight: 8,
+    maxWidth: 220,
+  },
+  filterChip: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: 14,
+    backgroundColor: '#eef5ff',
+    borderWidth: 1,
+    borderColor: '#cfe1fb',
+    marginHorizontal: 4,
+  },
+  filterChipActive: {
+    backgroundColor: '#1e88e5',
+    borderColor: '#1e88e5',
+  },
+  filterChipText: {
+    fontSize: 12,
+    color: '#1e88e5',
+    fontWeight: '600',
+  },
+  filterChipTextActive: {
+    color: '#ffffff',
   },
   kpiLoaderText: {
     marginTop: 10,

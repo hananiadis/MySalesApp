@@ -39,6 +39,8 @@ export default function usePlaymobilKpi({
   enabled = true,
   verbose = false,
   reloadToken = 0,
+  // New: optional subset of salesman IDs (playmobil_*). If empty/null -> use all available for user.
+  selectedSalesmenIds = null,
 } = {}) {
   console.log('[usePlaymobilKpi] Hook initialized', { 
     referenceDate: referenceDate.toISOString(), 
@@ -52,6 +54,9 @@ export default function usePlaymobilKpi({
   const [kpis, setKpis] = useState(null);
   const [customers, setCustomers] = useState([]);
   const [recordSets, setRecordSets] = useState(null);
+  // New: expose full list of available Playmobil salesmen for filtering UI
+  const [availableSalesmen, setAvailableSalesmen] = useState([]); // [{id,label,merchName}]
+  const [activeSalesmenIds, setActiveSalesmenIds] = useState([]); // Effective subset used for KPI computation
 
   useEffect(() => {
     if (!enabled) {
@@ -123,10 +128,36 @@ export default function usePlaymobilKpi({
           throw new Error('No Playmobil salesmen linked to this user');
         }
 
-        // Get customer codes
-        console.log('[usePlaymobilKpi] Fetching customer codes...');
-        const customerCodes = await getCustomerCodes(playmobilIds, 'playmobil');
-        console.log('[usePlaymobilKpi] Customer codes received:', customerCodes.length);
+        // Build available salesman objects with simple label derivation.
+        // Label strategy: remove prefix playmobil_, replace '_' with space, uppercase words.
+        const salesmanObjects = playmobilIds.map(id => {
+          const merchName = id.split('_').slice(1).join('_');
+          const label = merchName
+            .split('_')
+            .map(part => part.toUpperCase())
+            .join(' ');
+          return { id, merchName, label };
+        });
+        setAvailableSalesmen(salesmanObjects);
+        console.log('[usePlaymobilKpi] Available salesmen objects:', salesmanObjects);
+
+        // Determine active salesman subset
+        let subsetIds = Array.isArray(selectedSalesmenIds) ? selectedSalesmenIds.filter(Boolean) : [];
+        if (subsetIds.length) {
+          // Ensure they exist in playmobilIds
+          subsetIds = subsetIds.filter(id => playmobilIds.includes(id));
+          console.log('[usePlaymobilKpi] Using provided selectedSalesmenIds subset:', subsetIds);
+        }
+        if (!subsetIds.length) {
+          subsetIds = playmobilIds; // fallback to all
+          console.log('[usePlaymobilKpi] No subset provided (or invalid) -> using ALL playmobil salesmen');
+        }
+        setActiveSalesmenIds(subsetIds);
+
+        // Get customer codes for active subset only
+        console.log('[usePlaymobilKpi] Fetching customer codes for active subset...', { count: subsetIds.length });
+        const customerCodes = await getCustomerCodes(subsetIds, 'playmobil');
+        console.log('[usePlaymobilKpi] Customer codes received (subset):', customerCodes.length);
 
         if (!customerCodes.length) {
           console.error('[usePlaymobilKpi] No customers found');
@@ -242,9 +273,9 @@ export default function usePlaymobilKpi({
         });
         console.log('[usePlaymobilKpi] Sample invoiced current record:', kpiResult.records?.invoiced?.current?.[0]);
         console.log('[usePlaymobilKpi] Sample orders current record:', kpiResult.records?.orders?.current?.[0]);
-        setKpis(kpiResult);
-        setCustomers(summary);
-        setRecordSets(kpiResult.records);
+  setKpis(kpiResult);
+  setCustomers(summary);
+  setRecordSets(kpiResult.records);
         setStatus(STATUS.DONE);
         
         console.log('[usePlaymobilKpi] SUCCESS - Status set to done');
@@ -281,7 +312,7 @@ export default function usePlaymobilKpi({
       console.log('[usePlaymobilKpi:useEffect] Cleanup - setting cancelled to true');
       cancelled = true;
     };
-  }, [enabled, referenceDate, verbose, reloadToken]);
+  }, [enabled, referenceDate, verbose, reloadToken, selectedSalesmenIds]);
 
   const metricSnapshot = useMemo(() => {
     const base = kpis || {};
@@ -314,6 +345,8 @@ export default function usePlaymobilKpi({
     recordSets,
     referenceMoment,
     metricSnapshot,
+    availableSalesmen,
+    activeSalesmenIds,
     isLoading: status === STATUS.LOADING || status === STATUS.INITIAL,
     isError: status === STATUS.ERROR,
     isDone: status === STATUS.DONE,
@@ -325,6 +358,8 @@ export default function usePlaymobilKpi({
     customersCount: customers.length,
     hasError: !!error,
     hasRecordSets: !!recordSets,
+    availableSalesmenCount: availableSalesmen.length,
+    activeSalesmenCount: activeSalesmenIds.length,
     isLoading: returnValue.isLoading,
     isError: returnValue.isError,
     isDone: returnValue.isDone,

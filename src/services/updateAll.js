@@ -62,7 +62,15 @@ async function setLastSyncISO(brandKey, collectionKey, isoString) {
 function spreadsheetKeysForBrand(brandKey) {
   switch (brandKey) {
     case 'playmobil':
-      return ['playmobilSales', 'playmobilStock'];
+      return [
+        'playmobilSales', 
+        'playmobilStock',
+        'sales2025',
+        'orders2025',
+        'balance2025',
+        'sales2024',
+        'orders2024'
+      ];
     case 'kivos':
       return ['kivosCustomers', 'kivosCredit'];
     case 'john':
@@ -404,11 +412,16 @@ async function updateBrand(brandKey, { supportsSuperMarketBrand }) {
 
   // SPREADSHEETS (24h cache; refresh if TTL or checksum changed)
   const sheetKeys = spreadsheetKeysForBrand(safeBrand).filter((k) => SPREADSHEETS[k]);
+  console.log('[updateAll] sheet keys for brand', { brand: safeBrand, allKeys: spreadsheetKeysForBrand(safeBrand), filteredKeys: sheetKeys });
+  
   for (const key of sheetKeys) {
     try {
+      console.log('[updateAll] loading spreadsheet', { brand: safeBrand, key });
       await loadSpreadsheet(key, { force: true });
       brandSummary.sheets.push({ key, status: 'ok' });
+      console.log('[updateAll] spreadsheet loaded successfully', { brand: safeBrand, key });
     } catch (error) {
+      console.error('[updateAll] spreadsheet load failed', { brand: safeBrand, key, error: error?.message });
       brandSummary.sheets.push({
         key,
         status: 'error',
@@ -441,6 +454,8 @@ export async function updateAllDataForUser({
   brandAccess = [], // e.g. ['playmobil','kivos']
   supportsSuperMarketBrand = () => false,
 } = {}) {
+  console.log('[updateAllDataForUser] START', { brandAccess, availableBrands: AVAILABLE_BRANDS });
+  
   const summary = {
     startedAt: Date.now(),
     brands: [],
@@ -449,6 +464,8 @@ export async function updateAllDataForUser({
   };
 
   const rawBrands = Array.isArray(brandAccess) && brandAccess.length ? brandAccess : AVAILABLE_BRANDS;
+  console.log('[updateAllDataForUser] rawBrands:', rawBrands);
+  
   const brandSet = new Set(
     rawBrands
       .map((b) => normalizeBrandKey(b))
@@ -458,8 +475,10 @@ export async function updateAllDataForUser({
     AVAILABLE_BRANDS.forEach((b) => brandSet.add(normalizeBrandKey(b)));
   }
   const resolvedBrands = Array.from(brandSet);
+  console.log('[updateAllDataForUser] resolvedBrands to process:', resolvedBrands);
 
   for (const brand of resolvedBrands) {
+    console.log('[updateAllDataForUser] Processing brand:', brand);
     try {
       const brandResult = await updateBrand(brand, { supportsSuperMarketBrand });
       summary.brands.push(brandResult);
