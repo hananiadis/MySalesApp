@@ -18,6 +18,7 @@ import { useAuth, ROLES } from '../context/AuthProvider';
 import { getCustomersFromLocal } from '../utils/localData';
 import { normalizeBrandKey } from '../constants/brands';
 import { filterCustomersBySalesman } from '../utils/customerFiltering';
+import { getKivosCreditBreakdown } from '../services/kivosCreditBreakdown';
 
 const CUSTOMER_PLACEHOLDERS = {
   playmobil: require('../../assets/avatar_placeholder.png'),
@@ -73,6 +74,7 @@ export default function CustomersScreen() {
   const [customers, setCustomers] = useState([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
+  const [balances, setBalances] = useState(new Map());
 
   // Get user's linked salesmen (merchIds)
   const userMerchIds = profile?.merchIds || [];
@@ -161,6 +163,49 @@ export default function CustomersScreen() {
     };
   }, [brand]);
 
+  // Fetch balances for Kivos customers
+  useEffect(() => {
+    if (brand !== 'kivos' || !accessibleCustomers.length) {
+      return;
+    }
+
+    let isActive = true;
+    const fetchBalances = async () => {
+      const balanceMap = new Map();
+      
+      // Fetch balances in parallel (limit concurrency to avoid overwhelming the API)
+      const batchSize = 10;
+      for (let i = 0; i < accessibleCustomers.length; i += batchSize) {
+        const batch = accessibleCustomers.slice(i, i + batchSize);
+        const promises = batch.map(async (customer) => {
+          try {
+            const creditBreakdown = await getKivosCreditBreakdown(customer.customerCode);
+            return { code: customer.customerCode, balance: creditBreakdown?.balance ?? 0 };
+          } catch (error) {
+            console.warn(`Failed to fetch balance for ${customer.customerCode}:`, error);
+            return { code: customer.customerCode, balance: 0 };
+          }
+        });
+        
+        const results = await Promise.all(promises);
+        if (!isActive) return;
+        
+        results.forEach(({ code, balance }) => {
+          balanceMap.set(code, balance);
+        });
+        
+        // Update state after each batch
+        setBalances(new Map(balanceMap));
+      }
+    };
+
+    fetchBalances();
+
+    return () => {
+      isActive = false;
+    };
+  }, [brand, accessibleCustomers]);
+
   const filtered = useMemo(() => {
     const trimmed = search.trim().toLowerCase();
     const source = accessibleCustomers;
@@ -186,33 +231,46 @@ export default function CustomersScreen() {
     [brand]
   );
 
-  const renderItem = ({ item }) => (
-    <View style={styles.infoRow}>
-      <TouchableOpacity
-        style={styles.infoButton}
-        activeOpacity={0.75}
-        onPress={() => navigation.navigate(detailRouteName, { customerId: item.id, brand })}
-      >
-        <Image source={placeholderSource} style={styles.avatar} resizeMode="contain" />
-        <View style={styles.infoCol}>
-          <Text style={styles.customerMain}>
-            {item.customerCode} - {item.name}
-          </Text>
-          <Text style={styles.customerSub}>
-            {item.address?.street || ''} {item.address?.city || ''}
-          </Text>
-        </View>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.cartBtn}
-        onPress={() => navigation.navigate('OrderCustomerSelectScreen', { prefillCustomer: item, brand })}
-        accessibilityRole="button"
-        accessibilityLabel="Νέα παραγγελία"
-      >
-        <Ionicons name="cart" size={28} color="#007AFF" />
-      </TouchableOpacity>
-    </View>
-  );
+  const renderItem = ({ item }) => {
+    const isKivos = brand === 'kivos';
+    const balance = isKivos ? balances.get(item.customerCode) : null;
+    const hasBalance = balance != null && Number.isFinite(balance);
+    // Only show balance if it's significant (more than ±0.10)
+    const showBalance = hasBalance && Math.abs(balance) > 0.10;
+    
+    return (
+      <View style={styles.infoRow}>
+        <TouchableOpacity
+          style={styles.infoButton}
+          activeOpacity={0.75}
+          onPress={() => navigation.navigate(detailRouteName, { customerId: item.id, brand })}
+        >
+          <Image source={placeholderSource} style={styles.avatar} resizeMode="contain" />
+          <View style={styles.infoCol}>
+            <Text style={styles.customerMain}>
+              {item.customerCode} - {item.name}
+            </Text>
+            <Text style={styles.customerSub}>
+              {item.address?.street || ''} {item.address?.city || ''}
+            </Text>
+            {isKivos && showBalance && (
+              <Text style={[styles.customerBalance, balance > 0 && styles.customerBalanceNegative]}>
+                Υπόλοιπο: {balance.toLocaleString('el-GR', { style: 'currency', currency: 'EUR' })}
+              </Text>
+            )}
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.cartBtn}
+          onPress={() => navigation.navigate('OrderCustomerSelectScreen', { prefillCustomer: item, brand })}
+          accessibilityRole="button"
+          accessibilityLabel="Νέα παραγγελία"
+        >
+          <Ionicons name="cart" size={28} color="#007AFF" />
+        </TouchableOpacity>
+      </View>
+    );
+  };
 
   return (
     <SafeScreen title={UI_TEXT.title} headerLeft={headerLeft} bodyStyle={styles.body}>
@@ -284,6 +342,15 @@ const styles = StyleSheet.create({
   infoCol: { flex: 1, justifyContent: 'center' },
   customerMain: { fontWeight: 'bold', color: '#00599d', fontSize: 15 },
   customerSub: { color: '#444', fontSize: 13 },
+  customerBalance: { 
+    color: '#22c55e', 
+    fontSize: 13, 
+    fontWeight: '600', 
+    marginTop: 2,
+  },
+  customerBalanceNegative: {
+    color: '#ef4444',
+  },
   cartBtn: {
     backgroundColor: '#eaf6ff',
     borderRadius: 22,

@@ -23,6 +23,8 @@ import { getImmediateAvailabilityMap, lookupImmediateStockValue } from '../utils
 import { normalizeBrandKey } from '../constants/brands';
 import { computeOrderTotals } from '../utils/orderTotals';
 import { getLocalImagePath } from '../utils/imageHelpers';
+import { calculateProductPrice, getOfferSummary } from '../services/kivosProductOffers';
+import { KIVOS_CHANNELS } from '../config/kivosChannels';
 
 export default function OrderProductSelectionScreen({ navigation, route }) {
   const insets = useSafeAreaInsets();
@@ -33,6 +35,7 @@ export default function OrderProductSelectionScreen({ navigation, route }) {
   const setOrderLines = typeof orderCtx.setOrderLines === 'function' ? orderCtx.setOrderLines : () => {};
   const paymentMethod = orderCtx.paymentMethod || orderCtx.order?.paymentMethod || 'prepaid_cash';
   const orderCustomer = orderCtx.customer || orderCtx.order?.customer || null;
+  const customerChannel = orderCustomer?.channel || KIVOS_CHANNELS.STATIONARY;
 
   const rawRouteProducts = Array.isArray(route?.params?.products) ? route.params.products : [];
   const brand = useMemo(
@@ -84,7 +87,7 @@ export default function OrderProductSelectionScreen({ navigation, route }) {
   }, []);
 
   const handleGoBack = useCallback(() => {
-    navigation.navigate('OrderCustomerSelectScreen', { brand });
+    navigation.navigate('BrandHome', { brand });
   }, [brand, navigation]);
 
   useFocusEffect(
@@ -390,7 +393,6 @@ export default function OrderProductSelectionScreen({ navigation, route }) {
     const description = descOf(product);
     const wholesale = wholesaleOf(product);
     const srp = srpOf(product);
-    const offer = offerOf(product);
     const barcode = barcodeOf(product);
     const q = Math.max(0, Number(qty) || 0);
     const isKivos = brand === 'kivos';
@@ -398,9 +400,17 @@ export default function OrderProductSelectionScreen({ navigation, route }) {
     const usesPackages = isKivos || isJohn;
     const sanitizedWholesale = roundCurrency(wholesale);
     const sanitizedSrp = roundCurrency(srp);
-    const sanitizedOffer = roundCurrency(offer);
+    
+    // Get channel-specific offer for Kivos
+    let offerPriceValue = null;
+    if (isKivos) {
+      const priceInfo = calculateProductPrice(product, customerChannel);
+      if (priceInfo.hasOffer) {
+        offerPriceValue = roundCurrency(priceInfo.finalPrice);
+      }
+    }
+    
     const baseWholesale = sanitizedWholesale ?? 0;
-    const offerPriceValue = sanitizedOffer;
     const unitPrice = isKivos && offerPriceValue != null ? offerPriceValue : baseWholesale;
 
     setOrderLines((prev = []) => {
@@ -852,8 +862,19 @@ export default function OrderProductSelectionScreen({ navigation, route }) {
     const srp = srpOf(product);
     const isKivosBrand = brand === 'kivos';
     const isJohnBrand = brand === 'john';
-    const offerPrice = isKivosBrand ? offerOf(product) : null;
-    const hasOfferPrice = isKivosBrand && Number.isFinite(offerPrice) && offerPrice > 0;
+    
+    // Get channel-specific offer for Kivos
+    let offerPrice = null;
+    let hasOfferPrice = false;
+    let offerLabel = null;
+    if (isKivosBrand) {
+      const priceInfo = calculateProductPrice(product, customerChannel);
+      if (priceInfo.hasOffer) {
+        offerPrice = priceInfo.finalPrice;
+        hasOfferPrice = true;
+        offerLabel = getOfferSummary(product, customerChannel);
+      }
+    }
     const rawPackageSize = isKivosBrand || isJohnBrand ? packageSizeOf(product) : 1;
     const roundedPackageSize =
       isKivosBrand || isJohnBrand
@@ -885,6 +906,9 @@ export default function OrderProductSelectionScreen({ navigation, route }) {
       john: require('../../assets/john_hellas_logo.png'),
     };
     const placeholderSource = placeholderImages[brand] || placeholderImages.playmobil;
+    
+    // Check if product is best seller (Playmobil only)
+    const isBestSeller = brand === 'playmobil' && product.bestSeller === true;
 
     return (
       <View style={styles.card}>
@@ -902,14 +926,22 @@ export default function OrderProductSelectionScreen({ navigation, route }) {
             <View style={{ flexDirection: 'row', alignItems: 'center', minWidth: 0 }}>
               <Text style={styles.code}>{code}</Text>
               <Text style={styles.desc} numberOfLines={1} ellipsizeMode="tail"> {' '} {descOf(product)}</Text>
+              {isBestSeller && (
+                <Image 
+                  source={require('../../assets/orange_head.png')} 
+                  style={styles.bestSellerIcon}
+                  resizeMode="contain"
+                />
+              )}
             </View>
             <View style={{ flexDirection: 'row', marginTop: 4, flexWrap: 'wrap' }}>
               <Text style={styles.subInfo}>
                 Χ.Τ.: <Text style={{ fontWeight: 'bold' }}>{`€${displayWholesalePrice.toFixed(2)}`}</Text>
               </Text>
               {hasOfferPrice ? (
-                <Text style={styles.subInfo}>
+                <Text style={[styles.subInfo, { color: '#22c55e' }]}>
                   {' '}| Προσφορά: <Text style={{ fontWeight: 'bold' }}>{`€${displayOfferPrice.toFixed(2)}`}</Text>
+                  {offerLabel ? <Text style={{ fontSize: 10, fontStyle: 'italic' }}> ({offerLabel})</Text> : null}
                 </Text>
               ) : null}
               {displaySrp != null ? (
@@ -1055,6 +1087,7 @@ const styles = StyleSheet.create({
 
   card: { backgroundColor: '#fafdff', borderRadius: 12, padding: 10, marginBottom: 8, flexDirection: 'row', alignItems: 'center', elevation: 2, shadowColor: '#1976d2', shadowOpacity: 0.08, shadowRadius: 4, shadowOffset: { width: 0, height: 2 }, minHeight: 74 },
   productImage: { width: 60, height: 60, marginRight: 10, borderRadius: 6 },
+  bestSellerIcon: { width: 16, height: 16, marginLeft: 6 },
   code: { color: '#1565c0', fontWeight: 'bold', fontSize: 15, flexShrink: 0 },
   desc: { color: '#1976d2', fontSize: 14, fontWeight: '600', flexShrink: 1 },
   subInfo: { color: '#555', fontSize: 13, marginRight: 6 },

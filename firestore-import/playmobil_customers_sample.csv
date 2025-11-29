@@ -1,0 +1,958 @@
+Customer Code,Name,Street,Postal Code,City,Telephone 1,Telephone 2,Fax Number,E-Mail Address,Name 3,VAT Registration No.,VAT Office,Description Sales Group,Group key,Group key 1 Text,Region ID,Region,Transportation Zone ID,Transportation Zone,Merch
+1402094,ΑΓΑΟΓΛΟΥ ΑΝΤΩΝ.ΠΑΡΑΣΚΕΥΗ,ΙΠΠΟΚΡΑΤΟΥΣ 21,59100,ΒΕΡΟΙΑ,2331067323,6979191855,,trabolin@otenet.gr,ΠΑΙΧΝΙΔΙΑ,EL043502104,ΒΕΡΟΙΑΣ,PMH Small customers,2050-FZA,Other Toy Stores,17,Imathia,8,Central Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1401252,ΑΓΓΕΛΟΠΟΥΛΟΣ Δ. ΝΙΚΟΛΑΟΣ,ΛΑΜΙΑΣ 26,40300,ΦΑΡΣΑΛΑ,2491022034,,,angelnik@otenet.gr,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ-ΠΑΙΧΝΙΔΙΑ,EL044770380,ΛΑΡΙΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404962,ΑΓΙΩΤΗ ΑΘ. ΘΕΟΔΩΡΑ,ΕΛΛΗΣΠΟΝΤΟΥ 112,38445,Ν. ΙΩΝΙΑ ΒΟΛΟΥ,2421091030,,,agiotid@otenet.gr,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL057936741,ΒΟΛΟΥ,PMH Small customers,2050-ZAZ,Other Stationery Stores,37,Magnisia,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404902,ΑΘΑΝΑΣΙΟΥ ΑΝ.ΕΥΑΓΓΕΛΟΣ,ΑΧΕΡΟΝΤΟΣ 61,48062,ΚΑΝΑΛΑΚΙ,2684023092,,,athanasiou_8@hotmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL302266864,ΠΡΕΒΕΖΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,42,Preveza,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410159,ΑΘΩΣ ΔΙΑΝΟΜΕΣ Α.Ε.,ΘΕΣ/ΝΙΚΗΣ & ΜΟΣΧΟΝΗΣΙΩΝ ΓΩΝΙΑ,63200,Ν.ΜΟΥΔΑΝΙΑ,2373021132,6944351864,,afasouliotis@yahoo.gr,ΕΜΠΟΡΙΑ-ΔΙΑΝΟΜΕΣ ΠΡΟΙΌΝΤΩΝ ΚΑΠΝΟΥ,EL997545324,Ν.ΜΟΥΔΑΝΙΩΝ,PMH Distrib./WSales,2050-GBZ,Other Distributors Food,25,Khalkidhiki,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410148,ΑΚΡΙΒΑΚΗΣ Α.ΙΩΑΝΝΗΣ,ΒΟΥΛΓΑΡΟΚΤΟΝΟΥ 8 & ΘΗΧΗΣ(ΓΩΝΙΑ),55133,ΚΑΛΑΜΑΡΙΑ,2313069326,6978481982,,ioannis.akrivakis@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL109752950,ΚΑΛΑΜΑΡΙΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404626,ΑΛΒΑΝΟΥ ΧΡΥΣΗ,ΒΑΣ.ΓΕΩΡΓΙΟΥ 122,68400,ΣΟΥΦΛΙ,2554024322,,,alvxri@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL129250073,ΣΟΥΦΛΙΟΥ+,PMH Small customers,2050-ZAZ,Other Stationery Stores,10,Evros,9,East Macedon./Th,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411181,ΑΛΕΓΡΗΣ Ι & Κ. & Α. Ο.Ε.,ΜΗΤΡ.ΜΕΘΟΔΙΟΥ 14,49100,ΚΕΡΚΥΡΑ,2661033240,6977436959,,alegrisoe@yahoo.gr,ΧΑΡΤΙΚΑ-ΕΙΔΗ ΓΡΑΦΗΣ-ΣΧΟΛΙΚΑ,EL999556414,Β ΚΕΡΚΥΡΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,24,Kerkira,10,Ionian Islands,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411465,ΑΛΕΞΙΑΔΟΥ ΙΩΑΝ.ΚΥΡΙΑΚΗ,ΕΛ.ΒΕΝΙΖΕΛΟΥ 1,56430,ΣΤΑΥΡΟΥΠΟΛΗ,2310667893,6936654592,,info@mybookstore.gr,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL110192920,ΑΜΠΕΛΟΚΗΠΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411624,ΑΛΕΞΙΑΔΟΥ ΚΩΝ.ΕΛΕΝΗ,Μ.ΑΛΕΞΑΝΔΡΟΥ 27,55134,ΚΑΛΑΜΑΡΙΑ,2310488199,,,info@pomelo.gr,ΕΜΠΟΡΙΟ ΕΙΔΩΝ ΟΙΚΙΑΚΗΣ ΧΡΗΣΗΣ,EL139983055,ΚΑΛΑΜΑΡΙΑΣ,PMH Small customers,2050-WZA,Other Mixt Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410311,ΑΛΕΞΙΟΥ Ν. ΑΘΑΝΑΣΙΟΣ,ΙΑΣΟΝΟΣ 14,37100,ΑΛΜΥΡΟΣ,2422021472,,,typoseto@gmail.com,ΕΚΤΥΠΩΤΙΚΟ ΚΕΝΤΡΟ-ΓΡΑΦ.ΥΛΗ,EL111040203,Ν.ΙΩΝΙΑΣ ΒΟΛΟΥ,PMH Small customers,2050-ZAZ,Other Stationery Stores,37,Magnisia,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411744,ΑΛΠΟΥ ΣΠΥΡΙΔΟΥΛΑ,ΦΙΛΕΛΛΗΝΩΝ 24,47100,ΑΡΤΑ,2681074292,6973974025,,spyridoulaalpou@gmail.com,ΠΑΙΧΝΙΔΙΑ ΨΙΛΙΚΑ ΕΠΟΧΙΑΚΑ,EL140204725,ΑΡΤΑΣ,PMH Small customers,2050-FZA,Other Toy Stores,5,Arta,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410789,ΑΜΑΝΑΤΙΔΗΣ ΧΑΡ.ΑΘΑΝΑΣΙΟΣ,Μ.ΑΛΕΞΑΝΔΡΟΥ 48,60100,ΚΑΤΕΡΙΝΗ,2351079916,6940585388,,alfavitarion@gmail.com,ΒΙΒΛΙΑ-ΧΑΡΤΙΚΑ-ΕΚΤΥΠΩΣΕΙΣ,EL055775195,ΚΑΤΕΡΙΝΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,40,Pieria,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404106,ΑΜΒΡΟΣΙΑΔΟΥ ΕΥΘΥΜΙΑ,ΣΤΑΥΡΟΣ,57014,ΣΤΑΥΡΟΣ ΘΕΣ/ΝΙΚΗΣ,2397061521,,,vivlioxora@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL048198232,ΛΑΓΚΑΔΑ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1400042,ΑΜΟΙΡΙΔΗΣ ΚΩΝ. ΔΗΜΗΤΡΙΟΣ,Μ. ΑΛΕΞΑΝΔΡΟΥ 27,59300,ΑΛΕΞΑΝΔΡΕΙΑ,2333022069,,,,ΨΙΛΙΚΑ-ΠΑΙΧΝΙΔΙΑ,EL027952256,ΑΛΕΞΑΝΔΡΕΙΑΣ,PMH Small customers,2050-FZA,Other Toy Stores,17,Imathia,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404692,ΑΝΑΓΝΩΣΤΟΠΟΥΛΟΥ ΒΑΣΙΛΙΚΗ,ΛΑΜΙΑΣ 5,40300,ΦΑΡΣΑΛΑ,2491025597,,,gkoutzios@sch.gr,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL069491695,ΛΑΡΙΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404433,ΑΝΑΓΝΩΣΤΟΥ ΑΡ.ΙΩΑΝΝΑ,23ης ΦΕΒΡΟΥΑΡΙΟΥ 6,46100,ΗΓΟΥΜΕΝΙΤΣΑ,2665026587,6970355108,,sbouraioanna@yahoo.gr,ΠΑΙΧΝΙΔΙΑ ΒΙΒΛΙΑ ΧΑΡ,EL053760198,ΗΓΟΥΜΕΝΙΤΣΑΣ,PMH Small customers,2050-FZA,Other Toy Stores,47,Thesprotia,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410684,ΑΝΑΓΝΩΣΤΟΥ ΕΙΡΗΝΗ,ΣΟΡΩΝΗ,85106,ΡΟΔΟΣ,2241041525,,,stergos.savvakis@gmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL136148671,ΡΟΔΟΥ 7542,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1412195,ΑΝΑΓΝΩΣΤΙΔΗΣ ΔΗΜΗΤΡΙΟΣ,ΧΑΡΙΛΑΟΥ ΤΡΙΚΟΥΠΗ 3,57003,ΑΓΙΟΣ ΑΘΑΝΑΣΙΟΣ ΘΕΣ/ΝΙΚΗΣ,2310701755,,,e.koukopoulou_ark@hotmail.gr,ΒΙΒΛ. ΔΩΡΑ ΠΑΙΧΝ.,EL300093793,ΙΩΝΙΑΣ ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404516,ΑΝΑΝΙΑΔΟΥ ΑΝΑΣΤΑΣΙΑ & ΣΙΑ ΟΕ,28ης ΟΚΤΩΒΡΙΟΥ 66,57009,ΚΑΛΟΧΩΡΙ,2310752955,,2310754651,berberogianni@ath.forthnet.gr,ΧΑΡΤΙΚΑ -ΒΙΒΛΙΑ-ΠΑΙΧΝΙΔΙΑ,EL800364203,ΙΩΝΙΑ ΘΕΣ/ΝΙΚΗΣ,PMH Medium customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1403052,ΑΝΑΝΙΑΔΟΥ Θ-ΑΝΑΝΙΑΔΗΣ Α ΟΕ,ΘΕΣΣΑΛΟΝΙΚΗΣ 16,61100,ΚΙΛΚΙΣ,2341029469,,,my.toy.gr@gmail.com,ΕΜΠΟΡΙΑ ΠΑΙΧΝΙΔΙΩΝ,EL099798599,ΚΙΛΚΙΣ,PMH Medium customers,2050-FZA,Other Toy Stores,29,Kilkis,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1402200,ΑΝΑΣΤΑΣΙΑΔΗΣ ΗΡ. ΒΑΣΙΛΕΙΟΣ,ΒΟΣΠΟΡΟΥ 111,54454,ΚΑΤΩ ΤΟΥΜΠΑ,2310916350,,,rabbitoys@yahoo.gr,ΠΑΙΔΙΚΑ ΠΑΙΧΝΙΔΙΑ,EL035042470,ΣΤ ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1402491,ΑΝΔΡΕΑΔΗΣ Δ. ΙΩΑΝΝΗΣ,ΚΑΡΑΙΣΚΑΚΗ 2,58500,ΣΚΥΔΡΑ,2381082348,,,71andrea@otenet.gr,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL046433370,ΕΔΕΣΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,39,Pella,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1403806,ΑΝΔΡΕΑΔΟΥ Α. ΜΥΡΟΠΗ,ΙΘΑΚΗΣ 22 & ΑΡΚΑΔΙΟΥ,56429,ΠΟΛΙΧΝΗ,2310652189,,,pixida1@yahoo.gr,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL037893456,Ε ΘΕΣ/ΝΙΚΗΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1400702,ΑΝΤΩΝΙΑΔΟΥ ΦΩΤΕΙΝΗ ΣΥΖ. ΕΥΘΥΜΙΟΥ,ΝΕΑ ΠΕΡΙΦΕΡΕΙΑΚΗ ΟΔΟΣ ΒΕΡΟΙΑΣ,59100,ΒΕΡΟΙΑ,2331027170-23310,,,info@tzastores.gr,ΠΑΙΔΙΚΑ ΠΑΙΧΝΙΔΙΑ-ΜΠΕΜΠΕ,EL040777075,ΒΕΡΟΙΑΣ,PMH Medium customers,2050-FJA,Antoniadou,17,Imathia,8,Central Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411401,ΑΝΤΩΝΟΠΟΥΛΟΣ Ε-ΤΑΣΙΟΣ Δ.-ΤΖΙΟΥΒΑΡΑ,ΠΑΛΑΙΣΤΙΝΗΣ 15-17,41223,ΛΑΡΙΣΑ,2410530844,6976474660,,eanton83@gmail.com,ΠΑΝΤΟΠΩΛΕΙΟ,EL801401876,ΛΑΡΙΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410928,ΑΠΕΡΓΗ ΣΤ.ΑΝΘΙΑ,ΛΑΚΚΑ,49082,ΠΑΞΟΙ,2662033015,6973523956,,anthia9@hotmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ-ΕΙΔΗ ΔΩΡΩΝ,EL302205416,ΚΕΡΚΥΡΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,24,Kerkira,10,Ionian Islands,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1412167,ΑΡΑΜΑΔΑΝΙΔΗΣ ΙΩΑΝΝΗΣ,ΝΟΣΟΚΟΜΕΙΟΥ 9,50200,ΠΤΟΛΕΜΑΙΔΑ,2463021760,,,g_arama@yahoo.gr,ΕΜΠΟΡΙΟ ΠΑΙΧΝΙΔΙΩΝ,EL070328256,ΠΤΟΛΕΜΑΙΔΑΣ,PMH Small customers,2050-FZA,Other Toy Stores,31,Kozani,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411015,ΑΡΓΥΡΙΑΔΟΥ Ι. - Μ.ΦΕΖΟΠΟΥΛΟΣ,Λ.ΔΗΜΟΚΡΑΤΙΑΣ 91,60300,ΑΙΓΙΝΙΟ ΚΑΤΕΡΙΝΗΣ,2353023526,,,argiriadou_fezopoulos@hotmail.gr,ΣΟΥΠΕΡ ΜΑΡΚΕΤ,EL099606810,ΚΑΤΕΡΙΝΗΣ,PMH Small customers,2050-SZA,Other Food Stores,40,Pieria,5,Thessaly,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1402015,ΑΡΓΥΡΟΠΟΥΛΟΣ ΕΥΘΥΜΙΟΣ,Γ.ΜΠΟΥΣΙΟΥ 5,51100,ΓΡΕΒΕΝΑ,2462023145,,,,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL040790362,ΓΡΕΒΕΝΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,15,Grevena,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411468,ΑΡΚΟΥΔΗΣ ΘΕΟΦΑΝΗΣ,ΜΟΝΑΣΤΗΡΙΟΥ 95,54627,ΘΕΣ/ΝΙΚΗ,2310542032,,,fanisarkoudis@hotmail.com,ΣΥΣΤΗΜΤΑ ΣΥΝΑΓΕΡΜΟΥ,EL070308417,Α ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-VZA,Other e-Shops,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1404063,ΑΤΣΑΛΑΚΗ Ν. ΚΛΕΙΩ,ΕΛ.ΒΕΝΙΖΕΛΟΥ 71-ΕΠΤΑΛΟΦΟΣ,56123,ΑΜΠΕΛΟΚΗΠΟΙ ΘΕΣ/ΚΗΣ,2310732244,6946464676,,pinokioka@windowslive.com,ΛΙΑΝ.ΕΜΠΟΡΙΟ ΠΑΙΧΝΙΔΙΩΝ,EL051537792,ΑΜΠΕΛΟΚΗΠΩΝ,PMH Tele Sales cust.,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410112,ΑΧΛΑΔΙΩΤΗΣ ΓΕΩΡΓ.ΙΩΑΝΝΗΣ,ΕΜΠΟΡΙΚΟΣ ΔΡΟΜΟΣ,85200,ΚΑΛΥΜΝΟΣ,2243051304,,,sxolikokentro@hotmail.com,ΣΧΟΛΙΚΟ ΚΕΝΤΡΟ,EL108171197,ΚΩ,PMH Medium customers,2050-ZAZ,Other Stationery Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411575,ΒΑΘΡΑΚΗΣ ΑΘ.ΙΩΑΝΝΗΣ,ΤΣΑΡΙΤΣΑΝΗ,40010,ΤΣΑΡΙΤΣΑΝΗ,2493081125,,,thanos.vathrakis@gmail.com,ΧΑΡΤΙΚΑ-ΜΠΙΖΟΥ-ΕΙΔΗ ΔΩΡΩΝ,EL110822528,ΛΑΡΙΣΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1403710,ΒΑΙΡΑΜΙΔΗΣ ΓΕΩΡΓΙΟΣ & ΑΝΤΩΝΙΑ Ο.Ε.,2ο ΧΛΜ ΓΙΑΝΝΙΤΣΩΝ-ΘΕΣ/ΚΗΣ,58100,ΓΙΑΝΝΙΤΣΑ,2382026580,2382081013,,info@storgi.gr,ΠΑΙΧΝΙΔΙΑ ΠΑΙΔΙΚΑ,EL092316705,ΓΙΑΝΝΙΤΣΩΝ,PMH Small customers,2050-FZA,Other Toy Stores,39,Pella,8,Central Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404335,ΒΑΛΣΑΜΑΚΗΣ ΑΡΙΣΤ. ΓΕΩΡΓΙΟΣ,Π.ΠΑΠΑΔΟΠΟΥΛΟΥ 16,55236,ΠΑΝΟΡΑΜΑ,2310342082,,,,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL059419898,Ζ' ΘΕΣ/ΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1411118,ΒΑΡΑΧΙΔΟΥ Γ.ΕΥΡΥΔΙΚΗ,ΕΡΜΟΥ 73,54623,ΘΕΣ/ΝΙΚΗ,2310270132,,,info@ilovethessaloniki.com,ΤΟΥΡΙΣΤΙΚΑ-ΕΙΔΗ ΔΩΡΩΝ,EL104221811,Δ ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-WZA,Other Mixt Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1412190,ΒΑΡΑΧΙΔΟΥ Ε.Ε.,ΔΗΜΗΤΡΙΟΥ ΓΟΥΝΑΡΗ 28,54621,ΘΕΣ/ΝΙΚΗ,2314311353,,,info@ilovethessaloniki.com,ΤΟΥΡΙΣΤΙΚΑ-ΕΙΔΗ ΔΩΡΩΝ,EL802670773,Δ ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-WZA,Other Mixt Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411594,ΒΑΡΦΗΣ ΑΛ.ΧΡΗΣΤΟΣ,40 ΕΚΚΛΗΣΕΙΩΝ 2,56532,ΠΟΛΙΧΝΗ ΘΕΣ/ΝΙΚΗΣ,2310639756,,,ekdosisvarfi@gmail.com,ΕΚΔΟΣΕΙΣ-ΕΜΠΟΡΙΑ ΒΙΒΛΙΩΝ,EL059746793,Ε ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411625,ΒΑΣΔΙΑΡΗΣ Γ.ΝΙΚΟΛΑΟΣ,ΑΝΔΡΙΑΝΟΥΠΟΛΕΩΣ 3-5,60100,ΚΑΤΕΡΙΝΗ,2351023827,,,vasdiarisgeorge@yahoo.gr,ΧΟΝΔΡΙΚΟ ΕΜΠΟΡΙΟ ΠΑΙΧΝΙΔΙΩΝ,EL153097375,ΚΑΤΕΡΙΝΗΣ,PMH Small customers,2050-FZA,Other Toy Stores,40,Pieria,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411494,ΒΑΣΙΑΔΗΣ ΑΘΑΝΑΣΙΟΣ,ΕΛ.ΒΕΝΙΖΕΛΟΥ 1,57400,ΣΙΝΔΟΣ,2310570042,,,info@v-kimolia.gr,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL046233083,ΙΩΝΙΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404576,ΒΑΣΙΛΑΚΟΣ Γ. ΗΛΙΑΣ,ΜΠΛΑΤΣΟΥΚΑ 12,43100,ΚΑΡΔΙΤΣΑ,2441025714,,2441077089,vasilakos.ilias@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL047523698,ΚΑΡΔΙΤΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,20,Kardhitsa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404756,ΒΑΣΙΛΕΙΑΔΟΥ Ε.ΔΟΥΚΕΝΗ,Ν.ΜΟΥΔΑΝΙΑ ΧΑΛΙΚΙΔΙΚΗΣ,63200,ΝΕΑ ΜΟΥΔΑΝΙΑ,2373021629,,,,ΠΑΙΔΙΚΑ ΠΑΙΧΝΙΔΙΑ,EL027825060,Ν.ΜΟΥΔΑΝΙΩΝ,PMH Small customers,2050-FZA,Other Toy Stores,25,Khalkidhiki,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1402318,ΒΑΣΙΛΕΙΟΥ Γ - Μ.ΖΩΗ ΟΕ,ΜΑΚΡΥΓΙΑΝΝΗ 3,47100,ΑΡΤΑ,2681070448,,,,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL082337281,ΑΡΤΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,5,Arta,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1400046,ΒΑΦΕΙΑΔΗΣ ΑΝΑΣ.ΠΕΤΡΟΣ,ΤΖΙΒΑΡΟΠΟΥΛΟΥ 75,57100,ΚΟΥΦΑΛΙΑ,2391053288,6976694655,,tv1990@otenet.gr,ΧΑΡΤΙΚΑ/ΠΑΙΧΝΙΔΙΑ,EL032093810,ΙΩΝΙΑΣ ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1400889,ΒΑΦΕΙΑΔΗΣ Γ. & ΣΙΑ Ο.Ε.,ΒΕΝΙΖΕΛΟΥ 36,69100,ΚΟΜΟΤΗΝΗ,2531023072-25310,,2531023001,info@e-vafeiadis.gr,ΒΙΒΛΙΑ-ΧΑΡΤΙΚΑ-ΔΩΡΑ-ΑΝΑΛΩΣΙΜΑ,EL092884087,ΚΟΜΟΤΗΝΗΣ,PMH Medium customers,2050-ZAZ,Other Stationery Stores,44,Rodhopi,9,East Macedon./Th,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410279,ΒΙΒΛΙΟΠΩΛΕΙΟ CLOU Α.Ε.,Μ.ΑΛΕΞΑΝΔΡΟΥ 6,41223,ΛΑΡΙΣΑ,2410538597,,,cloubooks@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL800748548,Α ΛΑΡΙΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1402305,ΒΟΓΙΑΤΖΗΣ ΜΙΧΑΛΗΣ,ΑΜΜΟΧΩΣΤΟΥ 2-4,85100,ΡΟΔΟΣ,2241025516,75789,,michael.voyage@gmail.com,ΤΟΥΡ ΕΙΔΗ-ΠΑΙΧΝΙΔΙΑ,EL017278585,ΡΟΔΟΥ 7542,PMH Small customers,2050-WZA,Other Mixt Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404818,ΒΡΑΔΕΛΗ ΕΛΕΝΗ,25ΗΣ ΜΑΡΤΙΟΥ 9,57008,Ν.ΜΑΓΝΗΣΙΑ ΘΕΣ/ΝΙΚΗΣ,2310782793,6944341982,,elenivradeli@gmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL067920044,ΙΩΝΙΑΣ (4234),PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410026,ΒΡΑΚΑ ΕΛΕΝΗ,ΝΙΚΗΣ 81,64007,ΝΕΑ ΠΕΡΑΜΟΣ,2594022029,6939639695,,,ΕΙΔΗ ΔΩΡΩΝ,EL300722530,ΚΑΒΑΛΑΣ,PMH Small customers,2050-WZA,Other Mixt Stores,22,Kavala,9,East Macedon./Th,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1400328,ΓΑΒΑΛΙΔΗΣ ΚΩΝ/ΝΟΣ & ΣΙΑ Ο.Ε.,Μ.ΑΛΕΞΑΝΔΡΟΥ 6,52200,ΑΡΓΟΣ ΟΡΕΣΤΙΚΟ,2467042278,,,io.sandalidis@yahoo.com,ΒΙΒΛΙΑ-ΧΑΡΤΙΚΑ-ΠΑΙΧΝΙΔΙΑ-ΔΩΡΑ,EL082330913,ΚΑΣΤΟΡΙΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,21,Kastoria,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411173,ΓΕΡΓΟΥ Δ.-ΣΤΡΑΒΑ Χ. Ο.Ε.,ΠΛΑΤ.ΜΕΤΑΞΑ 7-ΠΕΖΟΔΡΟΜΟΣ,57500,ΕΠΑΝΟΜΗ ΘΕΣ/ΝΙΚΗΣ,2392044334,6981243743,,abcepanomi@gmail.com,ΕΚΤΥΠΩΣΕΙΣ-ΒΙΒΛΙΟΠΩΛΕΙΟ,EL801157144,ΚΑΛΑΜΑΡΙΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1402878,ΓΕΩΡΓΙΟΥ ΜΑΓΔΑΛΗΝΗ,ΠΛ.ΑΓΓΕΛΗ ΓΑΤΣΟΥ,58400,ΑΡΙΔΑΙΑ,2384028120-23840,2384028803,2384028121,symvoli2@gmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL047012456,ΕΔΕΣΣΑΣ-ΑΡΙΔΑΙΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,39,Pella,8,Central Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1403200,ΓΕΩΡΓΟΥΛΑΣ Ν. ΑΝΑΣΤΑΣΙΟΣ,ΑΡΓΟΝΑΥΤΩΝ 20,40200,ΕΛΑΣΣΟΝΑ,2493024716,,,tas.georg@yahoo.gr,ΠΑΙΧΝΙΔΙΑ-ΣΧΟΛΙΚΑ,EL037611863,Α ΛΑΡΙΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411589,ΓΕΩΡΓΟΥΛΗ ΕΛΕΝΑ,ΜΑΡΚΟΥ ΜΠΟΤΣΑΡΗ 2,45500,ΚΑΤΣΙΚΑΣ-ΙΩΑΝΝΙΝΑ,2651092297,,,thestore.e.x.2021@gmail.com,ΨΙΛΙΚΑ - ΕΙΔΗ ΒΙΒΛΙΟΠΩΛΕΙΟΥ,EL142619047,ΙΩΑΝΝΙΝΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,18,Ioannina,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1400038,ΓΙΑΓΚΑ ΑΘΑΝΑΣΙΑ,ΧΡΙΣΤ. ΛΑΝΑΡΑ 1,59200,ΝΑΟΥΣΑ,2332028601-23320,,,athanasia.giagka@yahoo.com,ΠΑΙΧΝΙΔΙΑ-ΒΡΕΦΙΚΑ-ΠΑΙΔ.ΕΙΔΗ,EL042502284,ΒΕΡΟΙΑΣ,PMH Small customers,2050-FZA,Other Toy Stores,17,Imathia,8,Central Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404190,ΓΙΑΛΑΜΑΣ Δ. & ΣΙΑ Ε.Ε.,ΒΙΠΕΘ ΣΙΝΔΟΥ,57022,ΒΙ.ΠΕ.Θ.,2310784851,2310784853,2310784853,nikoletaz@gialamas.gr,ΕΙΣΑΓΩΓΕΣ ΕΙΔΩΝ ΔΩΡΟΥ,EL082612824,ΙΩΝΙΑΣ,PMH Small customers,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1403370,ΓΙΑΝΝΑΚΟΣ ΔΗΜΗΤΡΙΟΣ,ΛΟΡΔΟΥ ΒΥΡΩΝΟΣ 9,45444,ΙΩΑΝΝΙΝΑ,2651079621,,,takisgiannakos@gmail.com,ΠΑΙΧΝΙΔΙΑ,EL044153118,Α'ΙΩΑΝΝΙΝΩΝ,PMH Small customers,2050-FZA,Other Toy Stores,18,Ioannina,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411136,ΓΙΑΝΝΑΚΟΥ ΠΑΝΑΓΙΩΤΑ,ΜΠΙΖΑΝΙΟΥ 107,48200,ΦΙΛΙΠΠΙΑΔΑ,2683024625,,,notagiannakou@yahoo.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL044015190,ΠΡΕΒΕΖΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,42,Preveza,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1412176,ΓΙΑΝΝΑΚΟΥΔΑΚΗΣ ΝΙΚΟΛΑΟΣ,ΟΣΙΑΣ ΠΑΡΑΣΚΕΥΗΣ 34,63080,Ν.ΚΑΛΛΙΚΡΑΤΕΙΑ,2399023530,,,nigianna1234@gmail.com,ΕΙΔΗ ΔΩΡΩΝ,EL049054756,Ν.ΜΟΥΔΑΝΙΩΝ,PMH Small customers,2050-FZA,Other Toy Stores,25,Khalkidhiki,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404996,ΓΙΑΝΝΟΥΤΣΟΣ ΧΡ.& ΥΙΟΙ ΟΕ,14ΗΣ ΜΑΙΟΥ 89,68100,ΑΛΕΞΑΝΔΡΟΥΠΟΛΗ,2551026233,,,,ΧΟΝΔΡΕΜΠΟΡ.ΤΣΙΓ-ΖΑΧ.,EL091079943,ΑΛΕΞΑΝΔΡΟΥΠΟΛΗΣ,PMH Distrib./WSales,2050-GBB,Atlas,10,Evros,9,East Macedon./Th,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410954,ΓΙΑΠΟΥΤΖΗΣ Ι.ΣΤΥΛΙΑΝΟΣ,Μ.ΜΠΟΤΣΑΡΗ 152,54453,ΘΕΣΣΑΛΟΝΙΚΗ,2310920480,,,info@fouskafoo.gr,ΕΙΔΗ ΔΩΡΩΝ-ΜΠΑΛΟΝΙΑ,EL049590172,ΣΤ ΘΕΣΣΑΛΟΝΙΚΗΣ,PMH Small customers,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411783,ΓΙΔΑΡΟΠΟΥΛΟΥ ΒΑΣ. - ΣΙΑ ΟΕ,ΚΑΠΟΔΙΣΤΡΙΟΥ 28,42100,ΤΡΙΚΑΛΑ,2431026555,6973739361,,info@gidaropoulou.gr,ΧΑΡΤΙΚΑ-ΑΝΑΛΩΣΙΜΑ,EL999770258,ΤΡΙΚΑΛΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,49,Trikala,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404247,ΓΚΑΝΑΛΑΣ ΣΠΥΡΙΔΩΝ,ΕΘΝ.ΑΝΤΙΣΤΑΣΕΩΣ 18,48100,ΠΡΕΒΕΖΑ,2682028921,,,spirgan@yahoo.gr,ΕΜΠΟΡΙΑ ΠΑΙΧΝΙΔΙΩΝ,EL066322292,ΠΡΕΒΕΖΑΣ,PMH Small customers,2050-FZA,Other Toy Stores,42,Preveza,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1402650,ΓΚΑΝΑΤΣΙΟΣ Ν. ΚΩΝ/ΝΟΣ,ΑΓ.ΠΑΡΑΣΚΕΥΗΣ 4,40100,ΤΥΡΝΑΒΟΣ,2492026246,,,kgkanatsios@yahoo.com,ΒΙΒΛΙΟΠΩΛΕΙΟ-ΧΑΡΤΟΠΩΛΕΙΟ,EL076252072,Α ΛΑΡΙΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404693,ΓΚΑΡΓΚΑΒΟΥΖΗ ΙΩΑΝ.ΚΥΡΙΑΚΗ,ΑΚΑΔΗΜΟΥ-ΝΥΜΦΑΙΟΥ ΤΘ 4012,56224,ΕΥΟΣΜΟ,2310387887,,2310387885,kyriakigk@gmail.com,ΕΜΠΟΡΙΑ ΧΑΡΤΙΚΩΝ-ΣΧΟ,EL069765780,ΑΜΠΕΛΟΚΗΠΩΝ,PMH Distrib./WSales,2050-GCZ,Other Distributors Stationery,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411260,ΓΚΕΚΑ ΧΡΗΣΤΟΥ ΚΟΙΝΩΝΙΑ ΚΛΗΡΟΝΟΜΩΝ,ΙΩΑΝΝΗ ΓΑΓΑΛΗ 21,63080,ΝΕΑ ΚΑΛΛΙΚΡΑΤΕΙΑ,2399020275,,2399020276,melani.book@yahoo.gr,ΒΙΒΛΙΟΠΩΛΕΙΟ-ΠΑΙΧΝΙΔΙΑ,EL996913397,Ν.ΜΟΥΔΑΝΙΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,25,Khalkidhiki,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410816,ΓΚΙΚΙΖΑ Κ.ΒΑΣΙΛΙΚΗ,ΠΕΥΚΟΧΩΡΙ,63085,ΧΑΛΚΙΔΙΚΗ,2374063594,6975771165,,,ΛΙΑΝΙΚΟ ΕΜΠΟΡΙΟ ΠΑΙΧΝΙΔΙΩΝ,EL128539067,Ν.ΜΟΥΔΑΝΙΩΝ,PMH Tele Sales cust.,2050-FZA,Other Toy Stores,25,Khalkidhiki,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404462,ΓΚΙΟΥΤΖΕΝΗ ΒΑΣΙΛΙΚΗ,ΠΟΤΟΣ-ΘΑΣΟΥ,64002,ΛΙΜΕΝΑΡΙΑ,2593051403,6906156610,,sotlabiris@hotmail.com,ΝΕΟΤ/ΣΜΟΣ-ΠΑΙΧΝΙΔΙΑ,EL047588224,ΘΑΣΟΥ,PMH Tele Sales cust.,2050-FZA,Other Toy Stores,22,Kavala,9,East Macedon./Th,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1405004,ΓΚΟΛΑΣ Μ.ΝΙΚΟΛΑΟΣ,ΑΛΙΚΑΡΝΑΣΣΟΥ 2,55133,ΚΑΛΑΜΑΡΙΑ,6936783232,,,,ΧΟΝΔΡΙΚΟ ΕΜΠΟΡΙΟ ΠΑΙΧΝΙΔΙΩΝ,EL064730730,ΚΑΛΑΜΑΡΙΑΣ,PMH Distrib./WSales,2050-GBB,Atlas,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411917,ΓΚΟΥΝΤΟΥΒΑ Χ. ΒΑΙΑ,ΒΕΝΙΖΕΛΟΥ 14,40200,ΕΛΑΣΣΟΝΑ,2493022250,,,zygouris@hotmail.com,ΠΡΑΚΤΟΡΕΙΟ ΕΦΗΜ.-ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL110833280,ΕΛΑΣΣΟΝΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411405,ΓΚΟΥΤΖΟΥΡΕΛΑ ΕΛΚΑ,ΟΙΚΟΝΟΜΟΥ 5,40200,ΕΛΑΣΣΟΝΑ,2493733303,,,vgkoutzourelas@gmail.com,ΠΑΝΤΟΠΩΛΕΙΟ,EL043659328,ΕΛΑΣΣΟΝΑΣ,PMH Small customers,2050-SZA,Other Food Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404135,ΓΟΥΝΑΡΙΔΗΣ ΙΩΑΚΕΙΜ & ΣΙΑ ΟΕ,Ι.ΔΡΑΓΟΥΜΗ 14,54624,ΘΕΣΣΑΛΟΝΙΚΗ,2310277104,,,xionati.paixnidia@gmail.com,ΠΑΙΧΝΙΔΙΑ,EL998227344,Β'ΘΕΣ/ΚΗΣ,PMH Medium customers,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1401971,ΓΡΑΜΜΑΤΙΚΗ ΤΖΕΛΛΑ,ΠΑΤΡΙΑΡΧΟΥ ΓΡΗΓΟΡΙΟΥ 17Γ,43200,ΠΑΛΑΜΑΣ,2444022412,,,grammatikitzella@yahoo.gr,ΒΙΒΛΙΑ ΧΑΡΤΙΚΑ ΠΑΙΧΝΙΔΙΑ,EL045810680,ΚΑΡΔΙΤΣΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,20,Kardhitsa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1403658,ΓΡΗΓΟΡΙΑΔΗΣ Ν.- Κ.ΨΑΘΑ Ο.Ε.,ΑΝΘΗ ΔΑΓΚΛΗ 19,67100,ΞΑΝΘΗ,2541022214,,,pinokio70@gmail.com,ΑΠΟΘ.ΨΙΛΙΚΑ-ΠΑΙΧΝΙΔ.,EL999389091,Α'ΞΑΝΘΗΣ,PMH Small customers,2050-FZA,Other Toy Stores,51,Xanthi,9,East Macedon./Th,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404614,ΓΡΗΓΟΡΙΑΔΟΥ ΓΡ.ΑΡΓΥΡΩ,ΣΜΥΡΝΗΣ 46 Ν.ΚΡΗΝΗ,55132,ΚΑΛΑΜΑΡΙΑ,2310435751,6936943030,,ourania.bookshop@gmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL140810553,ΚΑΛΑΜΑΡΙΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411525,ΓΥΦΤΑΚΗΣ ΙΩΑΝΝΗΣ,ΒΥΘΟΣ,50001,ΚΟΖΑΝΗ,2468023150,,,frosoambatzidou@gmail.com,ΠΑΙΧΝΙΔΙΑ-ΕΙΔΗ ΔΩΡΩΝ,EL107790447,ΚΟΖΑΝΗΣ,PMH Small customers,2050-WZA,Other Mixt Stores,31,Kozani,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404645,ΔΕΜΙΡΤΖΟΓΛΟΥ ΑΙΚΑΤΕΡΙΝΗ,ΑΛ.ΠΑΠΑΝΑΣΤΑΣΙΟΥ 75,54453,ΚΑΤΩ ΤΟΥΜΠΑ,2310951580,,,,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL022350809,Η ΘΕΣ/ΚΗΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1402764,ΔΕΡΕΚΗΣ Α.ΔΗΜΗΤΡΙΟΣ,ΜΑΚΕΔΟΝΟΜΑΧΩΝ 62 ΕΥΟΣΜΟΣ,56224,ΕΥΟΣΜΟ,2310706756,,,,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL055076071,ΑΜΠΕΛΟΚΗΠΩΝ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1402701,ΔΕΣΚΑΣ ΒΑΣ.ΣΩΤΗΡΙΟΣ,ΣΠ.ΛΙΒΑΔΑ 3,48060,ΠΑΡΓΑ,2684032217,,,sdeskas@otenet.gr,ΒΙΒΛΙΑ-ΠΑΙΧΝΙΔΙΑ-ΔΩΡΑ,EL038142787,ΠΡΕΒΕΖΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,42,Preveza,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1403270,ΔΗΜΑΤΑΤΗ Π. & Α. ΥΙΟΙ Ο.Ε.,ΕΛ. ΒΕΝΙΖΕΛΟΥ 3,62300,ΣΙΔΗΡΟΚΑΣΤΡΟ,2323022308,,,dimatatis@gmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ - ΚΥΝΗΓ.ΕΙΔΗ,EL081861566,ΣΕΡΡΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,46,Serrai,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410134,ΔΗΜΗΣΙΩΡΗΣ ΓΕΩΡΓΙΟΣ,ΑΡΧ.ΠΑΝΤΕΛΕΗΜΟΝΟΣ 26,58200,ΕΔΕΣΣΑ,2381029617,,,dimiss88@yahoo.gr,ΠΑΙΧΝΙΔΙΑ,EL135007225,ΕΔΕΣΣΑΣ,PMH Small customers,2050-FZA,Other Toy Stores,39,Pella,8,Central Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410526,ΔΗΜΗΤΡΙΑΔΗΣ ΔΗΜ. ΑΒΡΑΑΜ,ΔΕΛΦΩΝ 36,54641,ΘΕΣΣΑΛΟΝΙΚΗ,2310820635,,,,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ-ΣΦΡΑΓΙΔΕΣ,EL078886980,ΣΤ ΘΕΣ/ΝΙΚΗΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411201,ΔΗΜΗΤΡΙΑΔΗΣ Κ ΣΙΑ ΙΚΕ,ΒΕΝΙΖΕΛΟΥ 49,68100,ΑΛΕΞΑΝΔΡΟΥΠΟΛΗ,2551088603,,2551035801,dimitriadis1965@hotmail.gr,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL092889359,ΑΛΕΞΑΝΔΡΟΥΠΟΛΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,10,Evros,9,East Macedon./Th,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411404,ΔΗΜΗΤΡΙΟΥ ΜΙΧ.ΙΩΑΝΝΑ,ΜΑΚΡΥΓΙΑΝΝΗ 52,56431,ΑΝΩ ΗΛΙΟΥΠΟΛΗ,2310663668,,,joandimitriou@gmail.com,ΧΑΡΤΙΚΑ-ΒΙΒΛΙΑ,EL113040708,ΑΜΠΕΛΟΚΗΠΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410111,ΔΗΜΟΠΟΥΛΟΥ Ι. ΕΛΕΝΗ,Κ.ΠΑΛΑΙΟΛΟΓΟΥ 19,85100,ΡΟΔΟΣ,2241029185,,,,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL029484570,ΡΟΔΟΥ,PMH Small customers,2050-ZAZ,Other Stationery Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1403742,ΔΗΜΟΥ ΠΟΛΥΞΕΝΗ - ΔΗΜΟΥ ΓΕΩΡΓΙΑ ΟΕ,Κ.ΑΙΤΩΛΟΥ 8,47132,ΑΡΤΑ,2681079331,,,epohistore@gmail.com,ΛΙΑΝΙΚΟ ΕΜΠΟΡΙΟ ΠΑΙΧΝΙΔΙΩΝ,EL999130519,ΑΡΤΑΣ,PMH Medium customers,2050-ZAZ,Other Stationery Stores,5,Arta,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1402321,ΔΙΑΜΑΝΤΗΣ ΠΟΛΥΧΡΟΝΗΣ,ΞΑΝΘΟΥ 5,85300,ΚΩΣ,2242026814,,,,ΠΑΙΧΝΙΔΙΑ,EL047336997,ΚΩ,PMH Small customers,2050-FZA,Other Toy Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410231,ΔΙΚΤΥΟ ΕΜΠΟΡ. & ΥΠΗΡΕΣ.ΤΗΛ. Ι.Κ.Ε.,Κ.ΚΑΡΑΜΑΝΛΗ 143,54249,ΘΕΣΣΑΛΟΝΙΚΗ,2310311611,,,info@diktyoshop.gr,ΕΜΠΟΡΙΑ,EL800713352,Η ΘΕΣ/ΝΙΚΗΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404666,ΔΙΠΛΑΡΙΔΟΥ Σ.ΠΑΣΧΑΛΙΝΑ,ΑΓΓΕΛΟΧΩΡΙ,59034,ΕΙΡΗΝΟΥΠΟΛΗ,2332047327,,,,ΒΙΒΛΙΟΠΩΛΕΙΟ ΑΞΕΣ.,EL065895649,ΝΑΟΥΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,17,Imathia,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411290,ΔΟΓΙΑΣ ΔΗΜΗΤΡΙΟΣ,ΚΙΕΡΙΟΥ 99,43300,ΣΟΦΑΔΕΣ,2443023795,6988087536,,dimitriosdogias@yahoo.gr,ΕΙΔΗ ΔΩΡΩΝ,EL067213755,ΚΑΡΔΙΤΣΑΣ,PMH Small customers,2050-WZA,Other Mixt Stores,20,Kardhitsa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1403709,ΔΟΛΙΑΝΙΤΗΣ ΔΗΜ.& ΣΙΑ ΕΕ (ΔΗΜΟΚΡΙΤΕΙ,ΔΗΜΟΚΡΙΤΟΥ 7Α,69100,ΚΟΜΟΤΗΝΗ,2531084040,2531031412,,info@dimokriteio.gr,ΦΩΤ.ΕΡΓΑΣΤ-ΒΙΒΛΙΟΔΕΤΕΙΟ,EL999729502,ΚΟΜΟΤΗΝΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,44,Rodhopi,9,East Macedon./Th,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404180,ΔΟΥΚΑ ΖΑΦΕΙΡΙΑ του ΔΗΜΗΤΡΙΟΥ,ΩΡΑΙΟΚΑΣΤΡΟΥ 4,56431,ΣΤΑΥΡΟΥΠΟΛΗ,2310606196,,,dzafeiria@hotmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL116510372,ΑΜΠΕΛΟΚΗΠΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1402526,ΔΟΥΚΗ ΑΝΔΡΟΝΙΚΗ του ΣΤΕΦΑΝΟΥ,ΠΤΟΛΕΜΑΙΩΝ 3,52100,ΚΑΣΤΟΡΙΑ,2467022259,,,,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL013170315,ΚΑΣΤΟΡΙΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,21,Kastoria,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411043,ΔΩΔΕΚΑΝΗΣΙΑΚΗ ΕΤΑΙΡ.ΥΠΗΡ & ΕΜΠΟΡ.Ο.,ΗΛΙΑ ΒΕΝΕΖΗ - ΗΛΙΟΥΠΟΛΗ,85100,ΡΟΔΟΣ,2241043211,,2241060751,,ΒΙΒΛΙΟΠΩΛΕΙΟ-ΣΧΟΛΙΚΑ ΕΙΔΗ,EL999245060,ΡΟΔΟΥ 7542,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1402303,ΕΛΕΥΘΕΡΙΑΔΟΥ ΓΕΩΡΓΙΟΥ ΘΕΟΔΟΣΙΑ,ΒΕΤΣΟΠΟΥΛΟΥ 130,59300,ΑΛΕΞΑΝΔΡΕΙΑ,2333023343,,,,ΧΑΡΤΙΚΑ,EL047204800,ΑΛΕΞΑΝΔΡΕΙΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,17,Imathia,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404750,ΕΛΕΥΘΕΡΙΩΤΟΥ ΣΤ.ΑΝΝΑ,Σ.Σ.ΜΟΥΡΙΕΣ,61003,Σ. Σ. ΜΟΥΡΙΩΝ,2341031206,,,kivosonline@gmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL112193790,ΚΙΛΚΙΣ-ΓΟΥΜ/ΣΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,29,Kilkis,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410982,ΕΜΜΑΝΟΥΗΛ ΜΑΡΙΑ,ΠΑΠΑΜΑΡΚΟΥ ΧΑΡ. 9,50400,ΒΕΛΒΕΝΤΟ ΚΟΖΑΝΗΣ,2464031251,,,mariaemmanouil9@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL044819770,ΚΟΖΑΝΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,31,Kozani,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411512,ΕΜΜΑΝΟΥΗΛΙΔΗΣ ΑΝΑΣΤΑΣΙΟΣ,ΚΩΝΣΤΑΝΤΙΝΟΥΠΟΛΕΩΣ 215,68200,ΟΡΕΣΤΙΑΔΑ,2552022640,6955366600,,info@emmanouilidoutoys.gr,ΒΙΒΛΙΟΠΩΛΕΙΟ-ΧΑΡΤΙΚΑ,EL052808256,ΟΡΕΣΤΙΑΔΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,10,Evros,9,East Macedon./Th,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410767,ΕΜΠΟΡΙΚΕΣ ΔΙΑΝΟΜΕΣ ΚΕΝΤΡ.ΜΑΚΕΔΟΝΙΑΣ,ΕΓΝΑΤΙΑΣ 4,58100,ΓΙΑΝΝΙΤΣΑ,2382081315,,,info@msiae.gr,ΑΠΟΘΗΚΗ ΤΣΙΓΑΡΩΝ -ΖΑΧΑΡΩΔΗ,EL800679133,ΓΙΑΝΝΙΤΣΩΝ,PMH Distrib./WSales,2050-GBZ,Other Distributors Food,39,Pella,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1402044,ΕΜΠΟΡΙΚΕΣ ΕΠΙΧΕΙΡΗΣΕΙΣ 3Τ Α.Ε.,Β.ΚΩΝ/ΝΟΥ 2,68200,ΟΡΕΣΤΙΑΔΑ,2552027600-25520,2552027601,2552027602,3tt@otenet.gr,ΕΜΠΟΡΙΟ,EL094131061,ΟΡΕΣΤΙΑΔΑΣ,PMH Small customers,2050-WZA,Other Mixt Stores,10,Evros,9,East Macedon./Th,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410804,ΕΣΚΙΤΖΙΑΝ ΑΡΑΜ,11ο ΧΛΜ ΘΕΣΣΑΛΟΝΙΚΗΣ ΜΟΥΔΑΝΙΩΝ,57001,ΘΕΣΣΑΛΟΝΙΚΗ,2314015371,6944290099,,eskitzian@gmail.com,ΥΠΗΡΕΣΙΕΣ ΕΣΤΙΑΣΗΣ,EL041935227,Α ΘΕΣΣΑΛΟΝΙΚΗΣ,PMH Small customers,2050-SZA,Other Food Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411621,ΕΥΘΥΜΙΟΥ Δ. ΑΓΓΕΛΙΚΗ,ΛΕΩΦ.ΕΛΕΥΘΕΡΙΑΣ 20,63200,Ν.ΜΟΥΔΑΝΙΑ,2373024111,6938626398,,info@paizografima.gr,ΒΙΒΛΙΟΠΩΛΕΙΟ-ΠΑΙΧΝΙΔΙΑ-ΣΧΟΛΙΚΑ-ΕΙΔΗ,EL109598559,Ν.ΜΟΥΔΑΝΙΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,25,Khalkidhiki,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410995,ΕΥΣΤΑΘΙΟΥ ΚΩΝ/ΝΟΣ & ΣΙΑ ΕΕ,28ΗΣ ΟΚΤΩΒΡΙΟΥ 20 & ΚΟΡΑΗ,41222,ΛΑΡΙΣΑ,2410286149,,2410286149,tobiblio@yahoo.gr,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL999152223,Α ΛΑΡΙΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404899,ΖΑΓΟΡΙΑΝΟΥ ΜΑΡΙΑ,ΛΙΜΕΝΑΡΙΑ,64002,ΛΙΜΕΝΑΡΙΑ,2593051845,,,zagori_maru@yahoo.gr,ΒΙΒΛΙΟΠΩΛΕΙΟ ΓΝΩΜΗ,EL300845995,ΚΑΒΑΛΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,22,Kavala,9,East Macedon./Th,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1405818,ΖΑΚΟΠΟΥΛΟΣ ΙΟΡΔΑΝΗΣ,ΞΑΝΘΗΣ 9,64200,ΧΡΥΣΟΥΠΟΛΗ,2591022417,,,,ΠΑΙΧΝΙΔΙΑ - ΕΙΔΗ ΜΠΕΜΠΕ,EL138419391,ΚΑΒΑΛΑΣ,PMH Small customers,2050-FZA,Other Toy Stores,22,Kavala,9,East Macedon./Th,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411396,ΖΑΜΠΕΤΑ ΧΡΗΣΤΑΚΗ ΚΟΙΝΩΝ.ΚΛΗΡΟΝΟΜΩΝ,18ο ΧΛΜ ΘΕΣ/ΝΙΚΗΣ-ΠΕΡΑΙΑΣ,55102,ΚΑΛΑΜΑΡΙΑ ΤΘ 22463,2392071760,,2392071761,info@zampetas.gr,ΤΡΟΧΟΣΠΙΤΑ-ΑΥΤΟΚΙΝ-ΕΙΔΗ ΚΑΜΠΙΝΓΚ,EL999923986,ΚΑΛΑΜΑΡΙΑΣ,PMH Small customers,2050-WZA,Other Mixt Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404361,ΖΑΝΝΑ Α.Ε.,ΝΑΥΑΡΧΟΥ ΤΟΜΠΑΖΗ Τ.Θ.144,57013,ΩΡΑΙΟΚΑΣΤΡΟ,2310689999-23106,2310689998,2310689997,edytoys@otenet.gr,ΕΜΠΟΡΙΑ ΠΑΙΧΝΙΔΙΩΝ,EL082293427,ΦΑΕ ΘΕΣ/ΝΙΚΗΣ,PMH Distrib./WSales,2050-GAZ,Other Distributors Toys,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1403293,ΖΑΠΠΑ ΠΑΝΑΓΙΩΤΑ,Λ.ΣΟΦΟΥ 5,51100,ΓΡΕΒΕΝΑ,2462028749,,,panazappa@gmail.com,ΕΜΠΟΡΙΟ ΠΑΙΔΙΚΩΝ ΠΑΙΧΝΙΔΙΩΝ,EL068117311,ΓΡΕΒΕΝΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,15,Grevena,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1412217,ΖΑΠΠΑΣ ΧΡΗΣΤΟΣ,Λ.ΣΟΦΟΥ 5,51100,ΓΡΕΒΕΝΑ,2462028749,6988621692,,panazappa@gmail.com,ΕΜΠΟΡΙΟ ΠΑΙΔΙΚΩΝ ΠΑΙΧΝΙΔΙΩΝ,EL143724240,ΓΡΕΒΕΝΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,15,Grevena,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411832,ΖΑΠΩΝΗΣ ΧΡΗΣΤΟΣ,ΦΡ.ΠΑΠΑΧΡΗΣΤΙΔΗ 124,64100,ΕΛΕΥΘΕΡΟΥΠΟΛΗ,2592022352,,2592110249,zaponiskostas@gmail.com,ΒΙΒΛΙΑ-ΧΑΡΤΙΚΑ-ΣΧΟΛΙΚΑ ΔΩΡΑ,EL041571095,ΚΑΒΑΛΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,22,Kavala,9,East Macedon./Th,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411041,ΖΑΧΑΡΑΚΗ ΑΘΑΝ.ΚΑΛΛΙΟΠΗ,ΕΡΜΟΥ 117,38333,ΑΛΜΥΡΟΣ,2422022451,6907768283,,kzaharak78@gmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ-ΦΩΤΟΑΝΤΙΓΡΑΦΑ,EL111000266,Ν.ΙΩΝΙΑΣ ΒΟΛΟΥ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,37,Magnisia,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1403175,ΖΑΧΑΡΙΑΣ Ε.Χ. Ο.Ε.,ΚΟΝΔΥΛΗ 41,42200,ΚΑΛΑΜΠΑΚΑ,2432079139,,2432079140,,ΕΜΠΟΡ.ΕΙΣΑΓ.ΠΑΙΧ/ΔΙΩΝ,EL099714507,ΤΡΙΚΑΛΩΝ,PMH Small customers,2050-FZA,Other Toy Stores,49,Trikala,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411138,ΖΑΧΟΣ ΔΗΜ.ΘΩΜΑΣ,ΠΛΑΣΤΗΡΑ 8,43131,ΚΑΡΔΙΤΣΑ,2441022216-24415,,2441500005,info@zaxos.gr,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL100953860,ΚΑΡΔΙΤΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,20,Kardhitsa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410981,ΖΕΙΚΟΥ ΑΦΟΙ Ο.Ε.,ΓΡΗΓ.ΛΑΜΠΡΑΚΗ 121,54351,Α.ΤΟΥΜΠΑ,2310938818,,,zeikos@hotmail.com,ΒΙΒΛΙΑ-ΧΑΡΤΙΚΑ-ΕΙΔΗ ΔΩΡΩΝ,EL999735115,Δ ΘΕΣ/ΝΙΚΗΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411834,ΖΕΠ ΜΟΝΟΠΡΟΣΩΠΗ ΙΚΕ,ΑΠΕΛΛΟΥ 19,58300,ΚΩΣ,2242024411,,,miaaou1@gmail.com,ΓΕΝΙΚΟ ΕΜΠΟΡΙΟ,EL800813406,ΚΩ,PMH Small customers,2050-WZA,Other Mixt Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411449,ΖΕΡΒΑ ΔΗΜ.ΕΛΕΥΘΕΡΙΑ,ΠΕΤΑ,47100,ΑΡΤΑ,2681082412,6932214900,,elef.zerva@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL105164822,ΑΡΤΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,5,Arta,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1400080,ΖΗΜΠΡΑ ΔΗΜΗΤΡΙΟΥ ΥΙΟΙ Ο.Ε.,ΗΡΑΚΛΕΙΑ,62400,ΗΡΑΚΛΕΙΑ,2325022278,,,,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL081868070,A'ΣΕΡΡΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,46,Serrai,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404917,ΖΗΣΗ ΒΑΣΙΛΙΚΗ,Μ.ΑΛΕΞΑΝΔΡΟΥ 57,51100,ΓΡΕΒΕΝΑ,2462087339,,2462087280,vivlioxwra@hotmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL139555546,ΓΡΕΒΕΝΩΝ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,15,Grevena,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404734,ΖΙΑΚΑ ΔΗΜ. ΧΡΥΣΑ,25ης ΜΑΡΤΙΟΥ 26,40003,ΑΓΙΑ,2494023092-24940,,,stefgallos@hotmail.com,ΠΑΙΧΝΙΔΙΑ ΒΙΒΛΙΟΠΩΛΕΙΟ,EL111291089,ΛΑΡΙΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411753,ΗΛΕΚΤΡ.ΚΑΤΑΣΤΗΜΑ Ο ΚΥΚΛΟΣ ΜΟΥ Ε.Ε.,Λ.ΙΩΑΝΝΙΝΩΝ 386,48100,ΠΡΕΒΕΖΑ,2682306969,,,info@mykyklos.gr,ΗΛΕΚΤΡΟΝΙΚΟ ΚΑΤΑΣΤΗΜΑ,EL801650198,ΠΡΕΒΕΖΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,42,Preveza,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1403266,ΗΡΓΗ ΒΑΣΙΛΙΚΗ συζ.ΓΕΩΡΓΙΟΥ,ΚΟΛΟΚΟΤΡΩΝΗ 4,52100,ΚΑΣΤΟΡΙΑ,2467024212,,,,ΒΙΒΛΙΟΠΩΛΕΙΟ-ΓΚΑΛΕΡΙ,EL047168463,ΚΑΣΤΟΡΙΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,21,Kastoria,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404542,ΘΑΛΑΣΣΙΝΟΥ Ν.ΥΙΟΙ Ε.Ε.,ΚΟΡΥΤΣΑΣ & ΑΡΓΥΡΟΚΑΣΤΡΟΥ,85300,ΚΩΣ,2242028907,6945751935,,polykentro2@gmail.com,ΒΙΒΛ/ΠΩΛΕΙΟ-ΠΟΛΙΤ.ΠΟΛΥΚΕΝΤΡΟ,EL099269930,ΚΩ,PMH Small customers,2050-ZAZ,Other Stationery Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1402610,ΘΕΟΔΟΣΑΚΗ ΘΕΟΛΟΓΙΑ,ΝΕΑΠΟΛΗ ΚΟΖΑΝΗΣ,50001,ΝΕΑΠΟΛΗ ΚΟΖΑΝΗΣ,2468023552,,,,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL046260940,ΝΕΑΠΟΛΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,31,Kozani,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1403598,ΘΕΟΔΩΡΙΔΟΥ ΑΝΑΣΤ. ΕΛΕΝΗ,ΑΣΠΡΟΒΑΛΤΑ,57021,ΘΕΣ/ΝΙΚΗ,2397026026,,,bibliopwleiotheodoridou@yahoo.gr,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL128883849,ΛΑΓΚΑΔΑ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404910,ΘΕΟΔΩΡΟΠΟΥΛΟΥ Ν.ΑΙΚΑΤΕΡΙΝΗ,ΤΣΟΤΥΛΙ,50002,ΤΣΟΤΥΛΙ,2468032641,,,,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL107756398,ΚΟΖΑΝΗΣ-ΝΕΑΠΟΛΗΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,31,Kozani,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410081,ΘΕΣΣΑΛΟΝΙΚΕΥΣ ΕΥΣ.ΓΕΩΡΓΙΟΣ,ΜΑΡΑΣΛΗ 84,54249,ΘΕΣΣΑΛΟΝΙΚΗ,2310300247,,,gthessalonikefs@hotmail.gr,ΠΑΙΧΝΙΔΙΑ-ΧΑΡΤΙΚΑ-ΦΩΤΟΑΝΤΙΓΡΑΦΑ,EL045344688,Ζ ΘΕΣ/ΝΙΚΗΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1402025,ΘΕΣΣΑΛΟΝΙΚΕΩΣ ΧΡΥΣΟΥΛΑ,ΜΑΡΑΣΛΗ 84 ΧΑΡΙΛΑΟΥ,54249,ΧΑΡΙΛΑΟΥ,031-300247,,,,ΠΑΙΧΝΙΔΙΑ,EL041196647,Ζ ΘΕΣ/ΝΙΚΗΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404841,ΘΩΜΑΙΔΟΥ ΑΙΚΑΤΕΡΙΝΗ,ΚΕΝΤΡ.ΠΛΑΤΕΙΑ ΑΓΓΕΛΟΧΩΡΙ,59034,ΕΙΡΗΝΟΥΠΟΛΗ,2332048067,,,xrises_selides@yahoo.gr,ΒΙΒΛΙΟΠΩΛΕΙΟ-ΧΑΡΤΟΠΩΛΕΙΟ,EL064875733,ΒΕΡΟΙΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,17,Imathia,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411440,ΙΜΠΟΥΣΗΣ ΑΛ.-ΙΜΠΟΥΣΗΣ ΘΕΟΔ. Ε.Ε.,ΓΕΩΡΓΙΟΥ ΣΕΦΕΡΗ 11,56728,ΝΕΑΠΟΛΗ ΘΕΣ/ΝΙΚΗΣ,6940727815,,,alexander_impousis@outlook.com,ΕΜΠΟΡΙΟ ΠΑΙΧΝΙΔΙΩΝ & ΒΡΕΦΙΚΩΝ ΕΙΔΩΝ,EL801505980,Ε ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404573,ΙΣΠΑΝΙΔΗΣ ΕΛ.ΝΙΚΟΛΑΟΣ,ΚΑΤΟΥΝΗ 45,54625,ΘΕΣΣΑΛΟΝΙΚΗ,2310532936,,,john_90_@hotmail.com,ΕΙΣΑΓ.-ΕΜΠΟΡΙΑ ΕΠ.ΕΙΔΩΝ,EL028115949,Β ΘΕΣ/ΚΗΣ,PMH Distrib./WSales,2050-GAZ,Other Distributors Toys,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1404287,ΙΩΑΝΝΙΔΟΥ ΔΗΜΗΤΡΑ,ΒΑΣ.ΚΩΝΣΤΑΝΤΙΝΟΥ 129,68200,ΟΡΕΣΤΙΑΔΑ,2552022049,,,bibliopolioioannidou@gmail.com,ΒΙΒΛΙΑ ΧΑΡΤΙΚΑ,EL067039841,ΟΡΕΣΤΙΑΔΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,10,Evros,9,East Macedon./Th,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411571,ΙΩΣΗΦΙΔΗΣ Λ. ΣΠΥΡΟΣ,ΒΕΛΙΣΣΑΡΙΟΥ 20 & ΜΠΙΖΑΝΙΟΥ ΓΩΝΙΑ,54640,ΘΕΣ/ΝΙΚΗ,2310821706,,,info@schoolcenter.gr,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ-ΕΞΟΠΛΙΣΜΟΙ ΣΧΟΛΕΙ,EL047812355,ΣΤ ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1403867,ΚΑΔΕΜΛΙΑΔΗΣ Ι. ΠΑΡΘΕΝΗΣ,ΧΡ.ΣΜΥΡΝΗΣ 2,58400,ΑΡΙΔΑΙΑ,2384024850,693 776 1277,,kademliadis@yahoo.gr,ΒΙΒΛΙΟΠΩΛΕΙΟ ΧΑΡΤΙΚΑ,EL035608795,ΕΔΕΣΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,39,Pella,8,Central Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411346,ΚΑΖΑΚΟΣ Ι.ΚΩΝΣΤΑΝΤΙΝΟΣ,ΗΡΩΩΝ 1940-ΠΥΛΗ ΤΡΙΚΑΛΩΝ,42032,ΤΡΙΚΑΛΑ,6984282505,2434023203,,xartemporiki@yahoo.com,ΒΙΒΛΙΑ-ΧΑΡΤΙΚΑ-ΠΑΙΧΝΙΔΙΑ,EL112246922,ΤΡΙΚΑΛΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,49,Trikala,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1402247,ΚΑΚΑΒΕΛΑΣ ΝΙΚΟΣ,ΔΗΜΗΤΡΑΚΟΥ 5,61100,ΚΙΛΚΙΣ,2341023057,,,,ΧΑΡΤΙΚΑ,EL046023669,ΚΙΛΚΙΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,29,Kilkis,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411363,ΚΑΚΟΥΣΙΟΣ ΚΩΝΣΤΑΝΤΙΝΟΣ,Δ.ΤΕΡΤΙΠΗ 4,43100,ΚΑΡΔΙΤΣΑ,2441070290,,,selides0@gmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL063748887,ΚΑΡΔΙΤΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,20,Kardhitsa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1400052,ΚΑΛΑΙΤΖΙΔΗΣ ΛΑΖΑΡΟΣ,"ΜΑΚΡΥΓΙΑΝΝΗ 52,ΗΛΙΟΥΠΟΛΗ",56431,ΣΤΑΥΡΟΥΠΟΛΗ,2310663668,,,joandimitriou@gmail.com,ΧΑΡΤΙΚΑ/ΠΑΙΧΝΙΔΙΑ,EL025448622,ΑΜΠΕΛΟΚΗΠΩΝ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1412003,ΚΑΛΑΙΤΖΙΔΟΥ ΣΟΦΙΑ,ΒΕΝΙΖΕΛΟΥ 5,61300,ΓΟΥΜΕΝΙΣΣΑ,2343043600,,,lakiskalaitzidis@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL104760462,ΚΙΛΚΙΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,29,Kilkis,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1400541,ΚΑΛΑΙΤΖΟΠΟΥΛΟΣ Ο.Ε.,Β. ΚΩΝ/ΝΟΥ 11,50200,ΠΤΟΛΕΜΑΙΔΑ,2463027297,,,pedotopos@hotmail.com,ΠΑΙΔΙΚΑ ΠΑΙΧΝΙΔΙΑ,EL081715839,ΠΤΟΛΕΜΑΙΔΑΣ,PMH Medium customers,2050-FZA,Other Toy Stores,31,Kozani,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404898,ΚΑΛΑΚΙΚΟΣ ΠΕΤΡΟΣ,ΚΑΜΑΡΙΩΤΙΣΣΑ,68002,ΣΑΜΟΘΡΑΚΗ,2551041026,6972074052,,petrosam21@gmail.com,ΒΙΒΛΙΟΠ-ΠΑΙΧΝΙΔΙΑ,EL048336307,ΑΛΕΞΑΝΔΡΟΥΠΟΛΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,10,Evros,9,East Macedon./Th,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404713,ΚΑΜΠΟΥΡΑΚΗΣ Δ. ΝΙΚΟΛΑΟΣ,Λ.ΕΛΕΥΘΕΡΙΑΣ 23,85104,ΚΡΕΜΑΣΤΗ ΡΟΔΟΥ,2241093920,,2241096050,einia@otenet.gr,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL032774012,ΡΟΔΟΥ 7542,PMH Small customers,2050-ZAZ,Other Stationery Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410552,ΚΑΝΔΗΛΑΚΗΣ Ι. ΚΩΝΣΤΑΝΤΙΝΟΣ,ΕΛΕΥΘΕΡΙΟΥ ΒΕΝΙΖΕΛΟΥ 178,58100,ΓΙΑΝΝΙΤΣΑ,2382022257,,,kkandilakis@gmail.com,ΕΜΠΟΡΙΟ ΠΑΙΧΝΙΔΙΩΝ,EL065174926,ΓΙΑΝΝΙΤΣΩΝ,PMH Small customers,2050-FZA,Other Toy Stores,39,Pella,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1403961,ΚΑΡΑΒΑΣΙΛΗ Γ. ΕΥΑΓΓΕΛΙΑ,ΙΕΡΙΣΣΟΣ,63075,ΙΕΡΙΣΣΟΣ,2377022832,,,evakarava@yahoo.gr,ΒΙΛΙΟΧΑΡΤΟΠΩΛΕΙΟ-ΦΩΤΟΤΥΠΙΕΣ,EL109511692,ΠΟΛΥΓΥΡΟΥ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,25,Khalkidhiki,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1403844,ΚΑΡΑΓΙΑΝΝΗΣ ΙΩΑΝΝΗΣ,ΜΑΚΕΔΟΝΟΜΑΧΩΝ 15,51100,ΓΡΕΒΕΝΑ,2462022928,,2462502317,karagiannisg@windowslive.com,ΒΙΒΛΙΑ-ΧΑΡΤΙΚΑ-ΠΑΙΧΝΙΔΙΑ,EL103732649,ΓΡΕΒΕΝΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,15,Grevena,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410517,ΚΑΡΑΓΙΩΡΓΗ Σ.- Ι. ΚΑΣΣΗΣ Ο.Ε.,Μ.ΑΛΕΞΑΝΔΡΟΥ 41,56121,ΑΜΠΕΛΟΚΗΠΟΙ,2310744521,,,,ΠΑΙΧΝΙΔΙΑ-ΔΩΡΑ-ΦΩΤΟΑΝΤΙΓΡΑΦΑ,EL800792271,ΑΜΠΕΛΟΚΗΠΩΝ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404392,ΚΑΡΑΓΚΟΥΝΗ ΙΩΑΝΝΑ,ΑΘΗΝΑΣ 46,37100,ΑΛΜΥΡΟΣ,2422026025,,,alm.symbol@yahoo.gr,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL029919913,ΑΛΜΥΡΟΥ,PMH Small customers,2050-ZAZ,Other Stationery Stores,37,Magnisia,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404441,ΚΑΡΑΔΗΜΟΣ-ΤΣΕΛΙΟΣ-ΑΛΕΞΙΑΔΟΥ ΟΕ,ΒΑΣΙΛΕΙΟΥ Β2,60100,ΚΑΤΕΡΙΝΗ,2351028900,,,tseliosk1@yahoo.gr,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL099934264,Β'ΚΑΤΕΡΙΝΗΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,40,Pieria,8,Central Macedoni,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1410236,ΚΑΡΑΘΑΝΟΥ ΒΑΣΙΛΙΚΗ,28ΗΣ ΟΚΤΩΒΡΙΟΥ 56,41221,ΛΑΡΙΣΑ,2410233584,,,kara.thanos@hotmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL041171665,Α ΛΑΡΙΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1404266,ΚΑΡΑΜΠΑΤΖΙΑΣ ΙΩΑΝΝΗΣ,ΦΙΛΙΠΠΟΥ & 25ης ΜΑΡΤΙΟΥ,63077,ΚΑΣΣΑΝΔΡΕΙΑ,2374024011,,,,ΠΑΙΧΝΙΔΙΑ ΕΙΔΗ ΔΩΡΩΝ,EL104230659,ΚΑΣΣΑΝΔΡΑΣ,PMH Tele Sales cust.,2050-WZA,Other Mixt Stores,25,Khalkidhiki,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410263,ΚΑΡΑΝΑΣΙΟΥ Δ.ΑΝΑΣΤΑΣΙΑ,ΖΑΒΙΡΑ 1,50300,ΣΙΑΤΙΣΤΑ,6947075306,2465021814,,,ΕΙΔΗ ΔΩΡΩΝ-ΧΑΡΤΙΚΑ-ΑΠΟΡ.,EL113274525,ΚΟΖΑΝΗΣ,PMH Tele Sales cust.,2050-WZA,Other Mixt Stores,31,Kozani,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411477,ΚΑΡΑΝΤΑΓΛΗΣ ΑΙΜ.ΓΕΩΡΓΙΟΣ,ΠΑΡΑΛΙΑ ΟΦΡΥΝΙΟΥ,65302,ΚΑΒΑΛΑ,2594031346,6937757462,,karantaglisgiorgos30@yahoo.gr,ΒΙΒΛΙΟΠΩΛΕΙΟ-ΕΙΔΗ ΔΩΡΩΝ,EL128166688,ΚΑΒΑΛΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,22,Kavala,9,East Macedon./Th,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1401955,ΚΑΡΑΟΓΛΑΝΗΣ Γ.ΙΩΑΝΝΗΣ,28ης ΟΚΤΩΒΡΙΟΥ 240,67100,ΞΑΝΘΗ,2541078687,,2541026555,pyramida@windowslive.com,ΧΑΡΤΙΚΑ-ΒΙΒΛΙΑ-ΠΑΙΧΝΙΔΙΑ,EL032090173,ΞΑΝΘΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,51,Xanthi,9,East Macedon./Th,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1412069,ΚΑΡΑΠΑ ΔΕΣΠΟΙΝΑ,ΣΤΑΥΡΙΩΤΩΝ 6Α,57013,ΩΡΑΙΟΚΑΣΤΡΟ,2310694375,,,monogramma6a@gmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL109502161,Α ΘΕΣΣΑΛΟΝΙΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411139,ΚΑΡΑΣΗΣ Ν.ΑΘΑΝΑΣΙΟΣ,ΚΑΡΑΙΣΚΑΚΗ 38,42100,ΤΡΙΚΑΛΑ,2431038610,,,athanasioskarasis41@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL115170861,ΤΡΙΚΑΛΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,49,Trikala,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1412119,ΚΑΡΑΣΜΑΝΑΚΗΣ ΒΑΣΙΛΕΙΟΣ,Ι.ΦΡΑΓΚΟΥΛΗ 14,68300,ΔΙΔΥΜΟΤΕΙΧΟ,2553026540,,,papyros.book@yahoo.gr,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL027182927,ΟΡΕΣΤΙΑΔΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,10,Evros,9,East Macedon./Th,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411572,ΚΑΡΑΦΥΛΛΙΔΗΣ ΓΕΩΡΓΙΟΣ,ΜΑΝΔΑΛΙΔΟΥ 2Α,68300,ΔΙΔΥΜΟΤΕΙΧΟ,2553022218,,,kukuvaya18@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL151520371,ΟΡΕΣΤΙΑΔΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,10,Evros,9,East Macedon./Th,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1402684,ΚΑΡΓΑΚΗ Ι.ΠΕΡΣΕΦΟΝΗ,ΛΟΧ.ΝΤΑΝΙΑ 12,57004,ΝΕΑ ΜΗΧΑΝΙΩΝΑ,2392031671,,,kargakis4@yahoo.gr,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL046812671,ΚΑΛΑΜΑΡΙΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1403860,ΚΑΡΓΑΚΗΣ ΘΕΟΔΩΡΟΥ ΧΡΗΣΤΟΣ,ΔΗΜΟΚΡΑΤΙΑΣ 15,54352,ΑΝΩ ΤΟΥΜΠΑ,2392065671,,,xristos_karg@hotmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL126365264,ΚΑΛΑΜΑΡΙΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404493,ΚΑΡΟΛΙΔΟΥ ΧΡΥΣΟΥΛΑ,ΚΑΛΑΜΠΑΚΙ,66031,ΚΑΛΑΜΠΑΚΙ,2521052469,6973431098,,storylandgrr@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL101850580,ΔΡΑΜΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,8,Dhrama,9,East Macedon./Th,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1405000,ΚΑΡΥΟΦΥΛΛΗΣ Β.ΑΝΕΣΤΗΣ,ΕΘΝ.ΑΝΤΙΣΤΑΣΗΣ 19,61100,ΚΙΛΚΙΣ,2341023306,,,,ΧΟΝΔΡ.ΕΜΠΟΡ.ΣΙΓΑΡ.,EL046944121,ΚΙΛΚΙΣ,PMH Distrib./WSales,2050-GBB,Atlas,29,Kilkis,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411074,ΚΑΡΥΠΙΔΗΣ Χ.ΠΑΙΔΟΤΟΠΟΣ Ο.Ε.,Ν.ΠΛΑΣΤΗΡΑ & ΕΥΕΛΠΙΔΩΝ 2,55132,ΚΑΛΑΜΑΡΙΑ,2310495633,,,playtimepaidotopos2017@gmail.com,ΠΑΙΔΟΤΟΠΟΣ,EL997179750,ΚΑΛΑΜΑΡΙΑΣ,PMH Tele Sales cust.,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411446,ΚΑΤΑΚΟΣ Φ.ΑΘΑΝΑΣΙΟΣ,ΚΥΠΡΟΥ 1,41222,ΛΑΡΙΣΑ,2410287800,,,thkatakos@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ-ΠΑΙΧΝΙΔΙΑ,EL046381450,ΛΑΡΙΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404630,ΚΑΤΡΑΚΗΣ ΓΕΩΡΓ.ΠΑΝΑΓΙΩΤΗΣ,ΦΙΛΙΠΠΟΥΠΟΛΕΩΣ 17,56123,ΑΜΠΕΛΟΚΗΠΟΙ ΘΕΣ/ΚΗΣ,2310724450,,,pan.kat1806@gmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL028629137,ΑΜΠΕΛΟΚΗΠΩΝ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404715,ΚΑΤΡΑΦΥΛΛΙΑ Β. & ΣΙΑ ΟΕ,ΞΕΝΟΔ.ΑΤΛΑΝΤΙΚΑ AEGEAN BLUE,85103,ΑΦΑΝΤΟΥ ΡΟΔΟΥ,2241056732,,,,ΤΟΥΡΙΣΤΙΚΑ ΕΙΔΗ- ΜΙΝΙ ΜΑΡΚΕΤ,EL800469904,ΡΟΔΟΥ 7542,PMH Small customers,2050-SZA,Other Food Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404714,ΚΑΤΡΑΦΥΛΛΙΑ ΒΑΣΙΛΙΚΗ,Λ.ΗΡΑΚΛΕΙΔΩΝ 100,85100,ΡΟΔΟΣ,2241033305,,,,SUPER MARKET-ΤΟΥΡΙΣΤΙΚΑ,EL051506951,ΡΟΔΟΥ,PMH Tele Sales cust.,2050-SZA,Other Food Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410152,ΚΑΤΣΑΜΑΚΗΣ Σ.ΔΗΜΗΤΡΙΟΣ,ΗΛΕΚΤΡΑΣ ΑΠΟΣΤΟΛΟΥ 16 & ΠΡΩΤΟΜΑΓΙΑΣ,56224,ΘΕΣ/ΝΙΚΗ,2310640999,,2310640999,7nanoigr@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ-ΧΑΡΤΙΚΑ,EL125797689,ΑΜΠΕΛΟΚΗΠΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410137,ΚΑΤΣΗΣ ΘΕΟΔΩΡΟΣ,ΠΛΑΤΑΝΟΥΛΙΑ,40100,ΤΥΡΝΑΒΟΣ,2410831456,,,katsiteo@otenet.gr,ΓΕΩΠΟΝΟΣ,EL071753013,Α ΛΑΡΙΣΑΣ,PMH Tele Sales cust.,2050-WZA,Other Mixt Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1404437,ΚΕΜΕΡΛΗ ΟΛΥΜΠΙΑ,ΑΓ.ΓΕΩΡΓΙΟΥ 17,63200,ΝΕΑ ΜΟΥΔΑΝΙΑ,2373023020,,,olympiakemerli@yahoo.gr,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL109556083,Ν.ΜΟΥΔΑΝΙΩΝ,PMH Medium customers,2050-ZAZ,Other Stationery Stores,25,Khalkidhiki,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411791,ΚΕΣΟΠΟΥΛΟΣ ΙΟΡΔ.ΠΑΝΑΓΙΩΤΗΣ,ΡΗΓΑ ΦΕΡΑΙΟΥ 31,56429,ΝΕΑ ΕΥΚΑΡΠΙΑ,6974885283,,,bbprodactions@gmail.com,ΕΜΠΟΡΙΑ ΠΑΙΧΝΙΔΙΩΝ,EL114971642,Ε ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404050,ΚΙΟΥΠΤΣΙΔΗΣ ΕΜ. ΙΩΑΝΝΗΣ,ΒΑΣ.ΠΑΥΛΟΥ,69100,ΚΟΜΟΤΗΝΗ,2531300281,6946333474,,,ΕΚΜΕΤΑΛ.ΠΕΡΙΠΤΕΡΟΥ,EL044582484,ΚΟΜΟΤΗΝΗ,PMH Medium customers,2050-FZA,Other Toy Stores,44,Rodhopi,9,East Macedon./Th,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411376,ΚΙΟΥΡΤΖΗΣ Θ. Ο.Ε.,18ο ΧΛΜ ΘΕΣ/ΝΙΚΗΣ-Ν.ΜΗΧΑΝΙΩΝΑΣ,57019,ΘΕΣΣΑΛΟΝΙΚΗ,2392073300,,,info@carplanet.gr,ΠΡΑΤΗΡΙΟ ΥΓΡΩΝ ΚΑΥΣΙΜΩΝ-ΑΝΤΙΠΡΟΣΩΠΕ,EL999429241,ΚΑΛΑΜΑΡΙΑΣ,PMH Small customers,2050-WZA,Other Mixt Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404967,ΚΙΤΣΑ Α.ΒΑΣΙΛΙΚΗ,ΕΡΜΗ 5-7,40200,ΕΛΑΣΣΟΝΑ,2493022517,6947404868,,efimeris@otenet.gr,ΕΜΠΟΡΙΚΕΣ ΕΠΙΧΕΙΡΗΣΕΙΣ,EL122331699,Α ΛΑΡΙΣΑΣ,PMH Small customers,2050-FZA,Other Toy Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411217,ΚΙΤΣΕΛΙΔΟΥ Σ.ΚΥΡΙΑΚΗ,ΚΟΥΝΤΟΥΡΙΩΤΟΥ 35,55132,ΚΑΛΑΜΑΡΙΑ,2310029133,,2310441722,bookmikro@gmail.com,ΒΙΒΛΙΑ ΧΑΡΤΙΚΑ ΦΩΤΟΤΥΠΙΕΣ ΔΩΡΑ,EL052929091,ΚΑΛΑΜΑΡΙΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1403410,ΚΟΓΙΟΥ Ι. ΦΩΤΕΙΝΗ,ΔΕΣΚΑΤΗ,51200,ΓΡΕΒΕΝΑ,2462032778,,,,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL107709533,ΔΕΣΚΑΤΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,15,Grevena,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1404840,ΚΟΚΚΙΝΗΣ ΠΑΡ.ΓΕΩΡΓΙΟΣ,Κ.ΚΑΡΑΜΑΝΛΗ 66,60065,ΠΛΑΤΑΜΩΝΑΣ,2352042234,6948048154,,,ΤΟΥΡΙΣΤΙΚΑ ΕΙΔΗ,EL117369228,Β ΚΑΤΕΡΙΝΗΣ,PMH Small customers,2050-WZA,Other Mixt Stores,40,Pieria,8,Central Macedoni,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1402249,ΚΟΛΙΟΥ ΚΩΝ. ΑΦΟΙ ΕΠΕ,ΑΡΙΣΤΑΓΟΡΑ & ΓΑΡΟΥΦΑΛΙΑ,47100,ΑΡΤΑ,2681075666,,2681079511,koliosth@hotmail.com,ΧΑΡΤΙΚΑ ΔΩΡΑ ΠΑΙΧΝΙΔΑ,EL095162397,ΑΡΤΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,5,Arta,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411059,ΚΟΝΤΟΚΩΣΤΑ ΑΝΤΩΝ.ΧΡΙΣΤΙΝΑ,Δ.ΤΕΡΤΙΠΗ 21,43100,ΚΑΡΔΙΤΣΑ,2441079944,6982555220,2441079945,boulodi@hotmail.com,ΕΜΠΟΡΙΟ ΨΙΛΙΚΩΝ,EL140854783,ΚΑΡΔΙΤΣΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,20,Kardhitsa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404660,ΚΟΣΜΙΔΗ ΑΦΟΙ ΟΕ,ΕΛ.ΒΕΝΙΖΕΛΟΥ 91,64200,ΧΡΥΣΟΥΠΟΛΗ,2591022867,,,kosmidis.store@gmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL999196477,ΚΑΒΑΛΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,22,Kavala,9,East Macedon./Th,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1403781,ΚΟΤΖΑΜΠΟΥΓΙΟΥΚΗ Χ.-ΚΑΣΣΗΣ Ι.ΟΕ,ΜΑΥΡΟΜΙΧΑΛΗ 41,56533,ΠΟΛΙΧΝΗ,2310600084,,,alfavitari.polihnis@gmail.com,ΒΙΒΛ/ΛΕΙΟ-ΠΑΙΧΝΙΔΙΑ,EL999618795,ΝΕΑΠΟΛΗΣ ΘΕΣ/ΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404749,ΚΟΤΣΙΡΑ Δ.ΜΑΡΙΑ,ΕΛ.ΒΕΝΙΖΕΛΟΥ 17 - ΔΡΥΜΟΣ,57200,ΛΑΓΚΑΔΑΣ,2394110254,,2394110255,grafi_drymos@yahoo.gr,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL131935630,Α ΘΕΣ/ΝΙΚΗΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410069,ΚΟΥΚΑΣ ΝΙΚΟΛΑΟΣ,ΣΤ. ΔΡΑΓΟΥΜΗ 6,53100,ΦΛΩΡΙΝΑ,2385024552,,,,ΠΑΙΧΝΙΔΙΑ,EL027146547,ΦΛΩΡΙΝΑΣ,PMH Small customers,2050-FZA,Other Toy Stores,12,Florina,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1402813,ΚΟΥΚΟΠΟΥΛΟΥ ΕΥΣΤΡΑΤΙΑ συζ ΒΛΑΣΙΟΥ,Χ.ΤΡΙΚΟΥΠΗ 3,57003,ΑΓΙΟΣ ΑΘΑΝΑΣΙΟΣ ΘΕΣ/ΝΙΚΗΣ,2310701755,,,e.koukopoulou_ARK@hotmail.gr,ΒΙΒΛ. ΔΩΡΑ ΠΑΙΧΝ.,EL047700486,ΙΩΝΙΑΣ ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1403747,ΚΟΥΛΑΚΙΩΤΗΣ Κ. ΓΕΩΡΓΙΟΣ,ΕΘΝ ΑΝΤΙΣΤΑΣΗΣ 13,58500,ΣΚΥΔΡΑ,2381081882,,,,ΕΙΔΗ ΚΥΝΗΓΙΟΥ-ΠΑΙΧΝΙ,EL044146649,ΣΚΥΔΡΑΣ,PMH Tele Sales cust.,2050-FZA,Other Toy Stores,39,Pella,8,Central Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1401930,ΚΟΥΜΟΥΔΗ ΑΝΤ.ΕΥΑΝΘΙΑ,25ης ΜΑΡΤΙΟΥ 112,54249,ΧΑΡΙΛΑΟΥ,2310327049,,,trenaki93@hotmail.com,ΠΑΙΔΙΚΑ ΠΑΙΧΝΙΔΙΑ,EL045674641,Ζ ΘΕΣ/ΝΙΚΗΣ,PMH Medium customers,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411530,ΚΟΥΡΟΥΝΙΩΤΗ ΒΑΣΙΛΙΚΗ & ΣΙΑ Ε.Ε.,Μ.ΑΛΕΞΑΝΔΡΟΥ 10,57006,ΣΟΥΡΩΤΗ ΘΕΡΜΗΣ,2396041070,,,gogoula86@windowslive.com,ΣΟΥΠΕΡ ΜΑΡΚΕΤ,EL997614600,Ζ ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1402557,ΚΟΥΡΤΣΕΛΙΔΗΣ ΧΡ.ΑΜΑΝΑΤΙΟΣ,ΠΛΑΤΑΜΩΝΑΣ,60065,ΠΛΑΤΑΜΩΝΑΣ,2352042606,,,amanatisk@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ-ΨΙΛΙΚΑ,EL075532490,Β ΚΑΤΕΡΙΝΗΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,40,Pieria,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404946,ΚΟΥΣΗΣ Θ.ΚΩΝΣΤΑΝΤΙΝΟΣ,Σ.Σ. ΜΟΥΡΙΕΣ,61003,Σ. Σ. ΜΟΥΡΙΩΝ,2341031866,6947376343,,peripteras1981@yahoo.gr,ΨΙΛΙΚΑ-ΕΙΔΗ ΔΩΡΩΝ,EL079729265,ΚΙΛΚΙΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,29,Kilkis,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411782,ΚΟΧΛΙΚΗ ΑΦΕΣ ΟΕ,ΙΠΠΟΚΡΑΤΟΥΣ 14,56625,ΣΥΚΙΕΣ,2310622485,,,iridabookshop@gmal.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL801721478,Ε ΘΕΣ/ΝΙΚΗΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411010,ΚΡΑΛΛΗ ΖΩΗ,ΑΓ.ΔΗΜΗΤΡΙΟΥ 39,58200,ΕΔΕΣΣΑ,2381027719,,2381027019,kralli.vivliopoleio@gmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL105950415,ΕΔΕΣΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,39,Pella,8,Central Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404611,ΚΡΙΝΗΣ ΙΩΑΝ.ΠΑΝΑΓΙΩΤΗΣ,Μ.ΜΠΟΤΣΑΡΗ 11,54643,ΘΕΣΣΑΛΟΝΙΚΗ,2310823130,6973335119,,KRINISPA@OTENET.GR,ΕΜΠΟΡΙΟ ΠΑΙΧΝΙΔΙΩΝ,EL046846270,Β ΘΕΣ/ΚΗΣ,PMH Small customers,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1412208,ΚΡΙΤΣΙΛΙΔΗΣ ΑΘΑΝΑΣΙΟΣ,ΛΕΩΦΟΡΟΣ ΣΤΡΑΤΟΥ 17,60150,ΠΑΡΑΛΙΑ ΚΑΤΕΡΙΝΗΣ,2351063053,6974482604,,sakiskri@otenet.gr,ΤΟΥΡΙΣΤΙΚΑ ΕΙΔΗ,EL047563280,ΚΑΤΕΡΙΝΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,40,Pieria,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411605,ΚΥΖΙΡΙΔΟΥ ΣΥΜΕΛΑ,24ΗΣ ΙΟΥΛΙΟΥ&ΣΑΦΡΑΜΠΟΛΕΩΣ,58500,ΣΚΥΔΡΑ,2381083151,,,theodosiadis-ologramma@hotmail.com,ΒΙΒΛΙΑ-ΧΑΡΤΙΚΑ-ΠΑΙΧΝΙΔΙΑ,EL046433935,ΕΔΕΣΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,39,Pella,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404274,ΚΥΡΑΜΑΣ Ι.ΝΙΚΟΛΑΟΣ,"ΟΛΥΜΠΟΥ 59,Ν.ΠΟΡΟΙ",60065,ΠΛΑΤΑΜΩΝΑΣ,2352041433,,,kyramasn@yahoo.gr,ΕΦΗΜΕΡΙΔΕΣ ΠΕΡΙΟΔΙΚΑ,EL121911499,ΚΑΤΕΡΙΝΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,40,Pieria,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1403085,ΚΥΡΙΑΖΟΣ ΝΙΚΟΛΑΟΣ του ΚΥΡ,ΜΗΤΡΟΠΟΛΕΩΣ 74,52100,ΚΑΣΤΟΡΙΑ,2467027012,,,Kyriazos@yahoo.gr,ΒΙΒΛΙΑ-ΧΑΡΤΙΚΑ-ΠΑΙΧΝ,EL031415969,ΚΑΣΤΟΡΙΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,21,Kastoria,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1400899,ΚΥΡΙΑΚΙΔΟΥ Δ.- ΕΛΕΖΙΔΗ Ε. ΟΕ,ΚΟΒΕΔΑΡΩΝ 10,50100,ΚΟΖΑΝΗ,2461031580,,,,ΠΑΙΧΝΙΔΙΑ-ΧΑΡΤΙΚΑ,EL081833186,ΚΟΖΑΝΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,31,Kozani,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1404521,ΚΥΡΙΤΣΗ ΕΛΕΝΗ,ΚΕΝΤΡΙΚΗ ΠΛΑΤΕΙΑ ΚΟΝΙΤΣΑΣ,44100,ΚΟΝΙΤΣΑ,2655022434,,,ekiritsi@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ ΧΑΡΤΙΚΑ,EL045385290,ΚΟΝΙΤΣΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,18,Ioannina,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411184,ΚΥΡΤΖΑΛΙΔΟΥ ΠΑΡΘΕΝΑ,Ν.ΣΗΜΑΝΤΡΑ,63200,ΧΑΛΚΙΔΙΚΗ,2373061170,,,rena.kyrtzal@gmail.com,ΕΙΔΗ ΒΙΒΛΙΟΠΩΛΕΙΟΥ,EL137441904,Ν.ΜΟΥΔΑΝΙΩΝ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,25,Khalkidhiki,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1403909,ΚΩΝΣΤΑΝΤΑΡΑΣ Γ. ΠΕΤΡΟΣ,ΛΑΚΚΙ ΛΕΡΟΥ,85401,ΛΑΚΚΙ ΛΕΡΟΥ,2247025288,,2247023198,stekileros1989@hotmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ-ΤΟΥΡ.ΕΙΔΗ-ΠΑΙΧΝΙΔ,EL043326349,ΚΩ,PMH Small customers,2050-ZAZ,Other Stationery Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404889,ΚΩΝΣΤΑΝΤΕΛΙΑΣ Ι.ΑΘΑΝΑΣΙΟΣ,ΦΑΝΗ ΜΙΣΚΑΚΗ 20,57007,ΧΑΛΚΗΔΟΝΑ,2391023520,,,,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL040514724,ΙΩΝΙΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404468,ΚΩΝΣΤΑΝΤΙΝΙΔΗΣ ΜΙΧ.ΚΩΝ/ΝΟΣ,ΣΤΡ.ΣΑΡΑΦΗ 67,55135,ΚΑΛΑΜΑΡΙΑ,2315317733,6942963969,,vivlioidees@gmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ-ΦΩΤΟΤΥΠΙΕΣ,EL128261526,ΚΑΛΑΜΑΡΙΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404012,ΚΩΝΣΤΑΝΤΙΝΙΔΟΥ ΦΩΣΤΗΡΟΥΛΑ,ΓΚΕΡΤΣΟΥ 12 & ΕΔΕΣΣΗΣ ΓΩΝΙΑ,50132,ΚΟΖΑΝΗ,2461040987,,,mproumpas@gmail.com,ΒΡΕΦΙΚΑ ΠΑΙΔΙΚΑ,EL046856692,ΚΟΖΑΝΗΣ,PMH Small customers,2050-FZA,Other Toy Stores,31,Kozani,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1404833,ΚΩΣΤΑΡΑΣ ΚΩΝΣΤΑΝΤΙΝΟΣ,ΦΙΛΙΠΠΟΥ 31,52100,ΚΑΣΤΟΡΙΑ,2467080859,,,,SUPER MARKET,EL048072788,ΚΑΣΤΟΡΙΑΣ,PMH Small customers,2050-SZA,Other Food Stores,21,Kastoria,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1401999,ΚΩΣΤΑΡΕΛΗΣ ΚΩΝΣΤΑΝΤΙΝΟΣ,ΠΛΑΤΕΙΑ ΑΡΧ.ΧΡΥΣΑΝΘΟΥ 35,69100,ΚΟΜΟΤΗΝΗ,2531033744,,,kostarelis@kostarelis.com,ΠΑΙΧΝΙΔΙΑ ΔΩΡΑ,EL026207037,ΚΟΜΟΤΗΝΗΣ,PMH Medium customers,2050-FZA,Other Toy Stores,44,Rodhopi,9,East Macedon./Th,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404498,ΚΩΣΤΟΓΛΟΥ ΔΗΜ. ΚΥΡΙΑΚΗ,ΜΑΚΕΔΟΝΙΑΣ 94,54248,ΘΕΣΣΑΛΟΝΙΚΗ,2310327964,6996750536,,stixoratoupote@gmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ-ΔΩΡΑ,EL073586355,Η ΘΕΣ/ΚΗΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410072,ΛΑΓΟΣ Ι.ΠΕΤΡΟΣ,ΠΑΠΑΚΥΡΙΑΖΗ 31,41222,ΛΑΡΙΣΑ,2410256374,,,lagostoys.larisa@gmail.com,ΠΑΙΧΝΙΔΙΑ-ΔΩΡΑ-ΣΧΟΛΙΚΑ,EL140432980,Α ΛΑΡΙΣΑΣ,PMH Small customers,2050-FZA,Other Toy Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404056,ΛΑΖΑΡΙΔΗΣ ΙΩΑΝΝΗΣ & ΣΙΑ ΟΕ,ΦΛΕΜΙΓΚ 27,60134,ΚΑΤΕΡΙΝΗ,2351039494,2351026028,,lazaridis_toys@yahoo.gr,ΧΑΡΤΙΚΑ-ΑΝΤΙΠΡΟΣΩΠΕΙΕΣ,EL082634017,ΚΑΤΕΡΙΝΗΣ,PMH Distrib./WSales,2050-GCZ,Other Distributors Stationery,40,Pieria,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411395,ΛΑΖΟΣ Π.ΓΕΩΡΓΙΟΣ,ΜΗΤΡ.ΜΕΘΟΔΙΟΥ 9,49100,ΚΕΡΚΥΡΑ,2661026622,,,bimbopaidika@gmail.com,ΚΑΤΑΣΤΗΜΑ ΥΠΟΔΗΜΑΤΩΝ,EL031070385,ΚΕΡΚΥΡΑΣ,PMH Small customers,2050-VZA,Other e-Shops,24,Kerkira,10,Ionian Islands,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410556,ΛΑΛΑΚΗΣ ΚΩΝΣΤΑΝΤΙΝΟΣ,ΠΟΤΟΣ,64002,ΘΑΣΟΣ,6945808666,,,,ΕΜΠΟΡΙΟ ΨΙΛΙΚΩΝ,EL108812614,ΚΑΒΑΛΑΣ,PMH Distrib./WSales,2050-GBZ,Other Distributors Food,22,Kavala,9,East Macedon./Th,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1403290,ΛΑΜΠΡΙΔΗΣ ΕΠΙΧΕΙΡΗΣΕΙΣ ΠΑΙΧΝΙΔΙΩΝ Α,Θ.ΠΑΣΧΙΔΗ 42,45445,ΙΩΑΝΝΙΝΑ,2651074805-26510,,,info@lampridis.gr,ΧΟΝΔΡΙΚΟ ΕΜΠΟΡΙΟ ΠΑΙΧΝΙΔΙΩΝ,EL081568349,Α ΙΩΑΝΝΙΝΩΝ,PMH Medium customers,2050-FZA,Other Toy Stores,18,Ioannina,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404201,ΛΕΙΒΑΔΙΩΤΟΥ ΑΝΑΣΤΑΣΙΑ,ΠΑΠΑΓΕΩΡΓΑΚΗ 35,63100,ΠΟΛΥΓΥΡΟΣ,2371022943,,,onpaper_polygyros@hotmail.com,ΕΦΗΜΕΡ-ΠΕΡΙΟΔ-ΨΙΛΙΚΑ,EL108909412,ΠΟΛΥΓΥΡΟΥ,PMH Small customers,2050-ZAZ,Other Stationery Stores,25,Khalkidhiki,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1412020,ΛΕΚΟΣ Γ. ΔΗΜΗΤΡΙΟΣ,ΣΚΟΥΦΑ 103,47100,ΑΡΤΑ,2681027478,,,lekosgr@yahoo.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL151975200,ΑΡΤΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,5,Arta,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404751,ΛΕΡΑ ΧΡΗ.ΜΑΓΔΑΛΗΝΗ,ΛΕΩΦ. ΤΖΩΝ ΚΕΝΝΕΝΤΥ 2,55535,ΠΥΛΑΙΑ,2310302266,2310302266,,,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL042959930,Ζ ΘΕΣ/ΝΙΚΗΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411725,ΛΕΤΣΙΟΣ ΔΗΜΗΤΡΙΟΣ,ΠΛΑΤΕΙΑ 28ΗΣ ΟΚΤΩΒΡΙΟΥ 1,50100,ΚΟΖΑΝΗ,2461039256-24610,,2461039256,papirosbookstores@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL123547816,ΚΟΖΑΝΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,31,Kozani,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404827,ΛΙΑΚΟΥ ΓΙΑΝΝΟΥΛΑ,ΑΝ ΔΗΜΗΤΡΙΟΥ 63,67100,ΞΑΝΘΗ,2541072122,,,,ΔΩΡΑ-ΠΑΙΧΝΙΔΙΑ-Λ.ΤΕΧ,EL029393892,ΞΑΝΘΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,51,Xanthi,9,East Macedon./Th,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1403831,ΛΙΑΝΑΡΙΔΟΥ Π. ΑΝΤΩΝΙΑ,ΕΡΜΟΥ 165,38221,ΒΟΛΟΣ,2421025817,,,lianaridouantonia@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ-ΧΑΡΤΟΠΩΛΕΙΟ ΕΚΔΟΣΕΙΣ,EL104202488,Α ΒΟΛΟΥ,PMH Small customers,2050-ZAZ,Other Stationery Stores,37,Magnisia,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404288,ΛΙΑΤΟΣ ΘΕΟΔΩΡΟΣ,Μ.ΑΛΕΞΑΝΔΡΟΥ 4,50300,ΣΙΑΤΙΣΤΑ,2465021025,,,33doro@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ-ΠΑΙΧΝΙΔΙΑ,EL045318671,ΚΟΖΑΝΗΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,31,Kozani,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1401589,ΛΙΤΣΑ Μ. ΣΟΥΛΤΑΝΑ,Κ.ΤΑΛΙΑΔΟΥΡΗ 1,51100,ΓΡΕΒΕΝΑ,2462085025,2462085025,,souzanagrev@yahoo.gr,ΒΙΒΛΙΑ - ΠΑΙΧΝΙΔΙΑ,EL043451634,ΓΡΕΒΕΝΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,15,Grevena,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1403599,ΛΩΛΟΥ ΕΛΕΥΘΕΡΙΑ,ΠΡΙΟΒΟΛΟΥ 16,47100,ΑΡΤΑ,2681075206,,,selidalolou@yahoo.gr,ΒΙΒΛ/ΛΕΙΟ-ΔΩΡΑ,EL067663698,ΑΡΤΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,5,Arta,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410524,ΜΑΓΙΑΦΗΣ Μ.ΠΑΝΤΕΛΗΣ,ΠΗΓΑΔΙΑ,85700,ΚΑΡΠΑΘΟΣ,2245023594,,,,ΤΟΥΡΙΣΤ.ΕΙΔΗ-ΠΑΙΧΝΙΔΙΑ,EL101749187,ΡΟΔΟΥ,PMH Small customers,2050-FZA,Other Toy Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411459,ΜΑΓΙΟΓΛΟΥ ΔΕΣΠΟΙΝΑ,ΜΕΣΣΗΝΙΑΣ 1,56532,ΘΕΣ/ΝΙΚΗ,2315519056,,,info@playoclock.gr,ΛΟΓΟΘΕΡΑΠΕΥΤΡΙΑ,EL153200790,Ε ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-VZA,Other e-Shops,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1402190,ΜΑΓΝΗΣΑΛΗ ΓΕΩΡΓΙΑ,ΚΑΤΣΑΝΤΩΝΗ 30,56334,ΕΛΕΥΘΕΡΙΑ,2310759450,,,fani_magnisali@yahoo.gr,ΒΙΒΛΙΟΠΩΛΕΙΟ-ΧΑΡΤΙΚΑ,EL046705091,ΙΩΝΙΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404393,ΜΑΓΟΠΟΥΛΟΥ ΚΩΝ/ΝΟΥ ΑΝΝΑ,ΚΑΡΑΟΛΗ ΔΗΜΗΤΡΙΟΥ 32,56224,ΕΥΟΣΜΟ,2310708093,,,,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL073567992,ΙΩΝΙΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1402559,ΜΑΖΑΝΙΤΗ ΛΑΜΠΡΙΝΗ συζ.Β.,"ΜΑΚΡΥΓΙΑΝΝΗ 62,Α.ΗΛΙΟΥΠΟΛ",56431,ΣΤΑΥΡΟΥΠΟΛΗ,2310606392,6939367652,,mazaniti@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL045276510,ΑΜΠΕΛΟΚΗΠΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1403912,ΜΑΚΡΗ Π.ΑΝΑΣΤΑΣΙΑ,Ρ.ΦΕΡΑΙΟΥ 169,56625,ΣΥΚΙΕΣ,2310618003,,,,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL037727638,Ε ΘΕΣ/ΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411415,ΜΑΚΡΗΣ ΕΜΜΑΝΟΥΗΛ,ΔΑΓΚΛΗ 7-9,67100,ΞΑΝΘΗ,2541084996,,,makrisman@yahoo.gr,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL142530286,ΞΑΝΘΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,51,Xanthi,9,East Macedon./Th,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411578,ΜΑΚΡΟΠΟΥΛΟΥ ΜΑΡΙΑ & ΕΦΗ ΟΕ,ΠΑΝΑΓΟΥΛΗ 4,59200,ΝΑΟΥΣΑ,2332022420,,,maromakro1234@gmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL801082001,ΒΕΡΟΙΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,17,Imathia,8,Central Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404574,ΜΑΛΙΩΤΑΣ Κ.ΘΩΜΑΣ,ΒΕΤΣΟΠΟΥΛΟΥ 96,59300,ΑΛΕΞΑΝΔΡΕΙΑ,2333022200,,,bimboshop@gmail.com,ΒΡΕΦΙΚΑ ΕΙΔΗ-ΠΑΙΧΝΙΔΙΑ,EL049336540,ΒΕΡΟΙΑΣ,PMH Small customers,2050-FZA,Other Toy Stores,17,Imathia,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1401370,ΜΑΛΛΙΑΡΗΣ Α. - ΠΑΙΔΕΙΑ Α.Ε.,ΔΗΜ.ΓΟΥΝΑΡΗ 39,54622,ΘΕΣΣΑΛΟΝΙΚΗ,2310279079,2310278707,2310264856,logistirio@malliaris.gr,ΕΚΔΟΣΕΙΣ-ΒΙΒΛΙΑ-ΧΑΡΤΙΚΑ,EL094098115,ΦΑΕ ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1403420,ΜΑΛΟΦΤΗΣ ΕΜΜ. ΜΙΧΑΗΛ,ΚΑΡΠΑΘΟΣ,85700,ΚΑΡΠΑΘΟΣ,2245023912,,,maloftis.m@live.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL042205646,ΚΑΡΠΑΘΟΥ,PMH Small customers,2050-ZAZ,Other Stationery Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1405024,ΜΑΝΙΚΑ ΛΑΜΠΡΙΝΗ,ΕΘΝ.ΑΝΤΙΣΤΑΣΕΩΣ 38,55133,ΚΑΛΑΜΑΡΙΑ,2310488618,,,info@thebookhouse.gr,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL140800363,ΚΑΛΑΜΑΡΙΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1412079,ΜΑΝΤΖΙΟΥ ΜΑΡΙΑ,ΕΘΝ.ΑΝΤΙΣΤΑΣΕΩΣ 127,45500,ΚΑΤΣΙΚΑ ΙΩΑΝΝΙΝΩΝ,2651094440,,,mantzioum@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ-ΠΑΙΧΝΙΔΙΑ-ΨΙΛΙΚΑ,EL136500818,ΙΩΑΝΝΙΝΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,18,Ioannina,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411580,ΜΑΡΓΙΟΛΑΣ ΒΑΣ. ΠΑΥΛΟΣ,ΑΝΕΞΑΡΤΗΣΙΑΣ 103-ΣΙΝΑ,45444,ΙΩΑΝΝΙΝΑ,2651029768,6944298816,,pmargiolas@hotmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL105303170,ΙΩΑΝΝΙΝΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,18,Ioannina,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411663,ΜΑΡΡΑΣ ΦΙΛΙΠΠΟΣ,ΑΝΑΤΟΛΙΚΗΣ ΘΡΑΚΗΣ 78,54453,ΘΕΣ/ΝΙΚΗ,2310323999,6999222999,,toyschool.gr@gmail.com,ΕΜΠΟΡΙΟ ΠΑΙΧΝΙΔΙΩΝ,EL061109732,Δ ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404785,ΜΑΡΤΙΝΟΥ Π.ΕΛΕΝΗ,ΡΟΔΑ,49081,ΚΑΡΟΥΣΑΔΕΣ ΚΕΡΚΥΡΑ,2663064088,6948118606,,vanillachic@gmail.com,ΕΜΠΟΡΙΟ ΕΝΔΥΜ-ΠΑΙΧΝ.,EL066088930,ΚΕΡΚΥΡΑΣ,PMH Tele Sales cust.,2050-FZA,Other Toy Stores,24,Kerkira,10,Ionian Islands,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411142,ΜΑΣΙΜΟ ΕΜΠΟΡΙΚΗ ΜΟΝΟΠΡ.ΕΠΕ,ΠΟΤΑΜΟΙ-ΡΟΤΣΟ,85200,ΚΑΛΥΜΝΟΣ,2243024550,,,,ΥΠΕΡΑΓΟΡΑ,EL800500555,ΚΩΣ,PMH Tele Sales cust.,2050-WZA,Other Mixt Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410990,ΜΑΣΛΟΥΝΚΑΣ ΠΕΤΡΟΣ,ΟΜΗΡΟΥ 3,66033,ΚΑΤΩ ΝΕΥΡΟΚΟΠΙ,2523023737,6945788480,,petrosglass@hotmail.com,ΓΕΝΙΚΟ ΕΜΠΟΡΙΟ,EL032629343,ΔΡΑΜΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,8,Dhrama,9,East Macedon./Th,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404817,ΜΑΣΤΡΟΠΑΥΛΟΥ ΚΑΛΛΙΟΠΗ,ΚΑΣΟΣ,85800,ΚΑΣΟΣ,2245041710,,,,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL110627317,ΚΑΡΠΑΘΟΥ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404289,ΜΑΥΡΙΔΗΣ ΠΑΡ.ΙΩΑΝΝΗΣ,ΑΝΑΤ.ΘΡΑΚΗΣ 17,55134,ΚΑΛΑΜΑΡΙΑ,2310437663,2310459507,,starlet0@otenet.gr,ΒΙΒΛΙΑ ΧΑΡΤΙΚΑ ΔΩΡΑ,EL044346764,ΚΑΛΑΜΑΡΙΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1403931,ΜΑΥΡΟΠΟΥΛΟΣ ΓΕΩΡΓΙΟΣ,25ης ΜΑΡΤΙΟΥ 1-3,57500,ΕΠΑΝΟΜΗ,2392045042,2392043122,2392045062,axionesti@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL131109030,ΚΑΛΑΜΑΡΙΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404232,ΜΑΥΡΟΠΟΥΛΟΣ ΚΩΝ/ΝΟΣ & ΥΙΟΙ Ο.Ε.,1ο ΧΛΜ Ν.ΠΕΛΛΑΣ ΓΙΑΝΝΙΤΣΩΝ,58005,ΓΙΑΝΝΙΤΣΑ,2382031313,,,tmicrokosmos@gmail.com,ΠΑΙΔΙΚΑ ΠΑΙΧΝΙΔΙΑ,EL998694211,ΓΙΑΝΝΙΤΣΩΝ,PMH Medium customers,2050-FZA,Other Toy Stores,39,Pella,8,Central Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411406,ΜΕΛΙΔΟΥ Β.ΜΑΡΙΑ,Θ.ΣΟΦΟΥΛΗ 57,55131,ΚΑΛΑΜΑΡΙΑ,2313252526,6942050161,,marmelidou@gmail.com,ΓΕΝΙΚΟ ΜΠΟΡΙΟ-ΚΑΤΑΣΚΕΥΕΣ,EL127560203,ΚΑΛΑΜΑΡΙΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404518,ΜΕΛΙΣΣΑΝΙΔΟΥ Α.& Δ. ΟΕ,ΛΑΖΛΑΡΙΑ ΑΡΙΔΑΙΑΣ,58400,ΑΡΙΔΑΙΑ,2384021068,2384022048,2384022048,amelissanidou@yahoo.gr,ΑΠΟΘΗΚΗ ΤΡΟΦΙΜΩΝ,EL081988370,ΑΡΙΔΑΙΑΣ,PMH Distrib./WSales,2050-GBB,Atlas,39,Pella,8,Central Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1403930,ΜΕΜΤΣΑ ΑΙΚΑΤΕΡΙΝΗ,Δ.ΤΣΙΑΠΑΝΟΥ 28,54352,ΑΝΩ ΤΟΥΜΠΑ,2310904520,,,,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL074984644,ΤΟΥΜΠΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404733,ΜΕΧΜΕΤ ΟΓΛΟΥ ΧΑΝΙΦΕ,ΠΑΠΑΔΗΜΑ 12,69300,ΣΑΠΕΣ,2532022755,,2532022786,hdenize13@hotmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL077536134,ΣΑΠΩΝ ΚΟΜΟΤΗΝΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,44,Rodhopi,9,East Macedon./Th,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411582,ΜΗΛΙΟΣ ΠΑΝΑΓΙΩΤΗΣ ΤΟΥ ΒΑΣ.,ΔΙΟΙΚΗΤΗΡΙΟΥ 33,52200,ΑΡΓΟΣ ΟΡΕΣΤΙΚΟ,2467043005,,,pcmilios@otenet.gr,ΧΑΡΤΙΚΑ-ΠΑΙΧΝΙΔΙΑ,EL166824338,ΚΑΣΤΟΡΙΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,21,Kastoria,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1402337,ΜΗΤΚΑΣ ΙΩΑΝΝΗΣ & ΣΙΑ ΟΕ,ΒΕΝΙΖΕΛΟΥ 24,68300,ΔΙΔΥΜΟΤΕΙΧΟ,2553022284,,,,ΒΙΒΛΙΑ ΧΑΡΤΙΚΑ ΕΙΔΗ ΔΩΡΩΝ,EL081927930,ΔΙΔΥΜΟΤΕΙΧΟΥ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,10,Evros,9,East Macedon./Th,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404395,ΜΗΤΟΣ ΟΡ.& ΣΙΑ ΕΕ,ΑΛ.ΖΑΡΡΑ 26,47100,ΑΡΤΑ,2681075353,,,iambos@windowslive.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL998579430,ΑΡΤΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,5,Arta,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404691,ΜΗΤΡΟΔΗΜΟΣ Κ.ΔΗΜΗΤΡΙΟΣ,ΣΥΚΟΥΡΙΟ,40006,ΣΥΚΟΥΡΙ,2495051756,,,dimmitrod@yahoo.gr,ΕΜΠΟΡΙΟ ΖΑΧΑΡΩΔΩΝ-ΑΝΑΨ.,EL027899441,Β ΛΑΡΙΣΑΣ,PMH Small customers,2050-SZA,Other Food Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1401803,ΜΗΤΡΟΥΛΑ ΓΕΩΡΓΙΑ,ΒΟΛΟΥ 120,41336,ΛΑΡΙΣΑ,2410553059,,,kubos@hotmail.gr,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL046032261,Β ΛΑΡΙΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404490,ΜΗΤΣΙΑΡΗ Α.ΔΙΑΔΟΧΟΙ ΟΕ,ΠΛ.25ης ΜΑΡΤΙΟΥ 14,68400,ΣΟΥΦΛΙ,2554022303-25540,2554022072,,diadoxoimitsiari@yahoo.gr,ΥΑΛΙΚΑ- ΠΛΑΣΤ.-ΠΑΙΧΝΙΔΙΑ,EL091346540,ΑΛΕΞΑΝΔΡΟΥΠΟΛΗΣ,PMH Small customers,2050-WZA,Other Mixt Stores,10,Evros,9,East Macedon./Th,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404814,ΜΙΧΑΛΟΥΔΗ ΧΡΙΣΤΙΝΑ & ΣΙΑ Ο.Ε.,Α.ΠΑΠΑΝΔΡΕΟΥ 63,56728,ΝΕΑΠΟΛΗ,2310635532,,,info@oistrolabos.gr,ΒΙΒΛΙΟΠΩΛΕΙΟ-ΕΚΔΟΣΕΙ,EL800484378,Ε-ΝΕΑΠΟΛΗΣ ΘΕΣ.,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411577,ΜΙΧΑΛΟΥΛΗ ΙΟΥΛΙΑ,ΦΑΡΣΑΛΩΝ 115,41005,ΝΙΚΑΙΑ ΛΑΡΙΣΑΣ,2410922401,,2410922501,oneiropagida.nikaia@hotmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL131170492,ΛΑΡΙΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410164,ΜΟΡΦΩΤΙΚΗ ΕΣΤΙΑ ΚΑΛΑΜΑΡΙΑΣ ΜΟΝ Ι.Κ.,ΠΑΣΑΛΙΔΗ & ΒΙΘΥΝΙΑΣ 21,55132,ΚΑΛΑΜΑΡΙΑ,2310418922-23104,,2310415060,epoptika@gmail.com,ΒΙΒΛΙΑ-ΧΑΡΤΙΚΑ-ΠΑΙΧΝΙΔΙΑ,EL800532608,ΚΑΛΑΜΑΡΙΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404356,ΜΟΥΛΗΣ Γ. ΙΩΑΝΝΗΣ,ΚΟΛΟΚΟΤΡΩΝΗ 7,58400,ΑΡΙΔΑΙΑ,2384500615,6986322169,,ioan_moulis1@yahoo.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL107035522,ΕΔΕΣΣΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,39,Pella,8,Central Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1412042,ΜΟΥΡΑΤΙΔΗΣ ΑΝΤ.ΑΛΕΞΑΝΔΡΟΣ,ΤΣΑΛΟΠΟΥΛΟΥ 14,62122,ΣΕΡΡΕΣ,6973050648,,,bigsaroglaki@hotmail.com,ΛΙΑΝ. ΕΜΠΟΡΙΟ ΠΑΙΧΝΙΔΙΩΝ ΜΕΣΩ ΔΙΑΔΙ,EL101991338,ΣΕΡΡΩΝ,PMH Small customers,2050-FZA,Other Toy Stores,46,Serrai,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404887,ΜΟΥΣΔΡΑΚΑ Π.ΕΙΡΗΝΗ ΧΡΥΣΟΒΑΛΑΝΤΗ,ΠΑΡΑΛ.ΟΔΟΣ ΛΕΠΤΟΚΑΡΥΑΣ,60063,ΛΕΠΤΟΚΑΡΥΑ,2352031862,6977165432,,dionm80@windowslive.com,ΠΑΝΤΟΠΩΛΕΙΟ-ΕΦΗΜΕΡΙΔΕΣ-ΨΙΛΙΚΑ,EL108533489,ΚΑΤΕΡΙΝΗΣ,PMH Small customers,2050-FZA,Other Toy Stores,40,Pieria,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404970,ΜΠΑΛΑΓΚΑΣ Ν. - ΚΟΛΙΟΥΛΗ Β. Ο.Ε.,ΕΛ.ΒΕΝΙΖΕΛΟΥ 5,47100,ΑΡΤΑ,2681073761,,,kimoliabooks@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL800608853,ΑΡΤΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,5,Arta,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404522,ΜΠΑΛΤΑΤΖΙΔΗ Ι. & Ζ. & ΚΑΝΕΛΛΟΣ Δ. Ο,2ο ΧΛΜ ΠΟΛΥΓΥΡΟΥ ΜΠΟΔΟΣΑΚΕΙΟΥ,50200,ΠΤΟΛΕΜΑΙΔΑ,2463029990,,,centroptol@gmail.com,ΕΙΣΑΓΩΓΕΣ ΧΑΡΤΙΚΩΝ,EL082694420,ΠΤΟΛΕΜΑΙΔΑΣ,PMH Small customers,2050-SZA,Other Food Stores,31,Kozani,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404236,ΜΠΑΝΙΚΑ Δ.ΑΙΚΑΤΕΡΙΝΗ,ΠΑΠΑΦΗ 83,54453,ΚΑΤΩ ΤΟΥΜΠΑ,2310933363,,,banikakaterina@gmail.com,ΛΙΑΝΙΚΟ ΕΜΠΟΡ.ΒΙΒΛΙΩΝ ΧΑΡΤΙΚΩΝ,EL130929151,ΣΤ ΘΕΣ/ΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411012,ΜΠΑΞΕΒΑΝΗΣ ΠΑΝ.ΧΡΙΣΤΟΦΟΡΟΣ,25ΗΣ ΜΑΡΤΙΟΥ 45,57008,ΙΩΝΙΑ ΘΕΣ/ΝΙΚΗΣ,2310783735,,,nasiaxristoforos@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL155304886,ΙΩΝΙΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404998,ΜΠΑΡΑΣ Α.ΖΗΚΑΣ Δ. ΟΕ,2οΧΛΜ ΚΑΤΕΡΙΝΗΣ-ΝΕΦΕΣΟΥ,60100,ΚΑΤΕΡΙΝΗ,2351026604,,,,ΑΠΟΘΗΚΗ ΨΙΛΙΚΩΝ-ΖΑΧ.,EL998953329,Β ΚΑΤΕΡΙΝΗΣ,PMH Distrib./WSales,2050-GBB,Atlas,40,Pieria,8,Central Macedoni,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1410032,ΜΠΑΡΔΑΣ ΑΘΑΝΑΣΙΟΣ,ΙΩΑΝΝΙΝΩΝ 11,41334,ΛΑΡΙΣΑ,2410612003,,,bardas.sakis@yahoo.gr,ΒΙΒΛΙΑ-ΧΑΡΤΙΚΑ-ΦΩΤΟΤΥΠΙΕΣ,EL067941421,Β ΛΑΡΙΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411009,ΜΠΑΡΜΠΑΣ ΒΑΣΙΛΕΙΟΣ,ΚΩΝ.ΔΕΜΕΡΤΖΗ 7,54632,ΘΕΣ/ΝΙΚΗ,6947427300,2310556160,,info@phone4u.gr,ΗΛΕΚΤΡΟΝΙΚΟ ΕΜΠΟΡΙΟ,EL130909268,Ε ΘΕΣΣΑΛΟΝΙΚΗΣ,PMH Tele Sales cust.,2050-VZA,Other e-Shops,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1402008,ΜΠΑΡΤΖΙΩΚΑΣ Χ.ΗΛΙΑΣ,ΚΑΡΑΙΣΚΑΚΗ 31,43200,ΠΑΛΑΜΑΣ,2444022744,,,bargbook@otenet.gr,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL046799078,ΚΑΡΔΙΤΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,20,Kardhitsa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410268,ΜΠΑΡΤΖΙΩΚΑΣ Χ.ΚΩΝΣΤΑΝΤΙΝΟΣ,ΚΑΡΑΪΣΚΑΚΗ 31,43200,ΠΑΛΑΜΑΣ,2444022744,,,,ΕΙΔΗ BEBE-ΠΑΙΧΝΙΔΙΑ,EL043042629,ΚΑΡΔΙΤΣΑΣ,PMH Small customers,2050-FZA,Other Toy Stores,20,Kardhitsa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410741,ΜΠΑΣΔΑΝΗΣ Κ. ΔΗΜΗΤΡΙΟΣ,ΝΙΚΟΛΑΟΥ ΖΩΪΔΗ 18 & ΑΓ.ΓΕΩΡΓΙΟΥ ΓΩΝ,69100,ΚΟΜΟΤΗΝΗ,2531084540,6945751434,2531082008,basdanis@gmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL101329710,ΚΟΜΟΤΗΝΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,44,Rodhopi,9,East Macedon./Th,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1412004,ΜΠΑΤΑΛΑΜΑ ΑΝΑΣΤΑΣΙΑ,ΤΑΒΑΚΗ 17,57001,ΘΕΡΜΗ,2316023282,,,avoketaconceptstore@gmail.com,ΛΙΑΝΙΚΟ ΕΜΠΟΡΙΟ,EL150956617,Ζ ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-WZA,Other Mixt Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1403232,ΜΠΑΤΖΙΟΥ ΡΟΔΗ,ΜΗΤΡΟΠΟΛΕΩΣ 22,50300,ΣΙΑΤΙΣΤΑ,2465023400,,,gianissiasios@gmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL068091573,ΚΟΖΑΝΗΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,31,Kozani,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404813,ΜΠΑΤΣΗ ΕΛΕΥΘΕΡΙΑ,ΠΡΟΜΑΧΟΙ ΑΡΙΔΑΙΑΣ,58400,ΑΡΙΔΑΙΑ,2384075810,6972871434,,mocre73@gmail.com,ΥΑΛΙΚΑ-ΠΑΙΧΝΙΔΙΑ-ΣΧΟΛΙΚΑ,EL046563637,ΕΔΕΣΣΑΣ-ΑΡΙΔΑΙΑ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,39,Pella,8,Central Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404121,ΜΠΑΧΑΣ Γ.-ΓΟΝΙΔΑΚΗ Α.Ο.Ε.,ΣΚΑΛΑ ΠΑΤΜΟΥ,85500,ΠΑΤΜΟΣ,2247032431,,,giorgos@bachas.gr,ΚΕΝΤΡΟ ΗΜΕΡ & ΠΕΡΙΟΔ.ΤΥΠΟΥ-ΨΙΛΙΚΑ,EL099592118,ΛΕΡΟΥ,PMH Small customers,2050-WZA,Other Mixt Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404953,ΜΠΑΧΤΣΕΒΑΝΗΣ ΓΕΩΡΓΙΟΣ,ΗΡΟΔΟΤΟΥ 17,69100,ΚΟΜΟΤΗΝΗ,2531026882,,,,ΕΜΠΟΡΙΟ ΠΑΙΧΝΙΔΙΩΝ,EL101348693,ΚΟΜΟΤΗΝΗΣ,PMH Strat. customers,2050-FZA,Other Toy Stores,44,Rodhopi,9,East Macedon./Th,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1403218,ΜΠΕΚΙΑΡΗΣ ΑΝΑΣΤ. ΘΕΜΙΣΤΟΚΛΗΣ,Π. ΜΕΛΑ 10,55535,ΠΥΛΑΙΑ,2310310737,,,thebe@hotmail.gr,ΒΙΒΙΛ/ΠΩΛΕΙΟ-ΕΙΔ ΔΩΡΩΝ-ΠΑΙΧΝΙΔΙΑ,EL030678409,Ζ'ΘΕΣΣΑΛΟΝΙΚΗΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1403949,ΜΠΕΡΤΣΑ ΜΑΡΙΑ & ΣΙΑ Ε.Ε.,ΑΝΑΛΗΨΕΩΣ 39,38333,ΒΟΛΟΣ,2421058736,,,vivliopoliomaties@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL099980465,ΒΟΛΟΥ,PMH Small customers,2050-ZAZ,Other Stationery Stores,37,Magnisia,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411637,ΜΠΗΣΙΚΛΗ Ι.ΓΕΩΡΓΙΑ,ΒΑΣ. ΟΛΓΑΣ 167,54645,ΘΕΣΣΑΛΟΝΙΚΗ,2310831706,6949268931,,lamprospanagopoulos@yahoo.com,ΠΑΙΧΝΙΔΙΑ,EL055464160,ΚΑΛΑΜΑΡΙΑΣ,PMH Small customers,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404761,ΜΠΙΚΟΥ ΖΗΣ.ΑΓΓΕΛΙΚΗ,ΚΟΣΜΑ ΑΙΤΩΛΟΥ 33,54642,ΘΕΣΣΑΛΟΝΙΚΗ,2310953060,,,pandatoys2@gmail.com,ΧΟΝ-ΛΙΑΝ ΕΜΠΟΡ.ΠΑΙΧΝ,EL030740596,Η' ΘΕΣΣΑΛΟΝΙΚΗΣ,PMH Tele Sales cust.,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411004,ΜΠΙΝΟΠΟΥΛΟΣ Φ. ΚΑΙ ΣΙΑ ΟΕ,Μ.ΑΛΕΞΑΝΔΡΟΥ 45,56224,ΕΥΟΣΜΟΣ,2310778080,,2310778090,,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL800710534,ΑΜΠΕΛΟΚΗΠΩΝ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1402868,ΜΠΟΓΙΑΝΝΟΥ ΓΕΡ.ΔΗΜΗΤΡΑ,ΛΟΥΤΡΩΝ 37,57200,ΛΑΓΚΑΔΑΣ,2394025808,,,tobibliopolio@yahoo.gr,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ-ΦΩΤΟΤΥΠΙΕΣ,EL046691033,ΛΑΓΚΑΔΑ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404206,ΜΠΟΔΙΤΣΟΠΟΥΛΟΣ ΑΛΕΞΑΝΔΡΟΣ & ΣΙΑ ΟΕ,ΜΑΥΡΟΜΙΧΑΛΗ 75,56533,ΠΟΛΙΧΝΗ,2310603026,,,,ΒΙΒΛΙΟΠΩΛΕΙΟ & ΣΥΝΑΦΗ ΕΙΔΗ,EL099375806,Ε ΘΕΣ/ΝΙΚΗΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411521,ΜΠΟΝΙΟΥ ΒΑΣ. ΕΥΜΟΡΦΙΑ,Π.ΚΑΡΟΛΙΔΟΥ 14,54453,Κ.ΤΟΥΜΠΑ ΘΕΣ/ΝΙΚΗΣ,2315110169,,,tomarkadoraki@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL068735021,Δ ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410752,ΜΠΟΥΖΙΟΥΡΗΣ Θ. ΣΠΥΡΙΔΩΝ,8ης ΔΕΚΕΜΒΡΙΟΥ 5,46100,ΗΓΟΥΜΕΝΙΤΣΑ,2665025106,6932897112,,info@boomtoys.gr,ΠΑΙΧΝΙΔΙΑ,EL065594620,ΗΓΟΥΜΕΝΙΤΣΑΣ,PMH Small customers,2050-FZA,Other Toy Stores,47,Thesprotia,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1412029,ΜΠΟΥΡΝΑΖΟΥ ΕΙΡΗΝΗ,ΜΑΥΡΟΜΜΑΤΙ,43060,ΜΟΥΖΑΚΙ ΚΑΡΔΙΤΣΑΣ,6987358112,,,fotistouralias1@gmail.com,ΕΙΔΗ ΔΩΡΩΝ,EL109256989,ΚΑΡΔΙΤΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,20,Kardhitsa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411622,ΜΠΟΥΣΠΟΥΡΑΝΟΥ ΑΦΟΙ Ο.Ε.,ΜΙΑΟΥΛΗ 41,57500,ΠΛΑΓΙΑΡΙ ΘΕΣ/ΝΙΚΗΣ,2315317900,,2315317900,diametros2004@yahoo.gr,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL801702218,ΚΑΛΑΜΑΡΙΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1402177,ΜΠΟΥΤΣΗΣ Γ.ΒΑΣΙΛΕΙΟΣ,ΣΥΝΤ/ΧΟΥ ΠΑΠΑΠΕΤΡΟΥ 16,53200,ΑΜΥΝΤΑΙΟ,2386023974,,,boutsis@yahoo.gr,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL073898050,ΦΛΩΡΙΝΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,12,Florina,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410003,ΜΤΤ Ι.Κ.Ε,ΑΝΤ. ΤΡΙΤΣΗ 15-17,55535,ΠΥΛΑΙΑ,2310471999,,,n.vitouratou@puro.com.gr,ΧΟΝΔΡ. ΕΜΠΟΡΙΟ ΑΞΕΣ. & ΠΡ.ΤΕΧΝΟΛ,EL800605193,Ζ ΘΕΣ/ΚΗΣ,PMH Medium customers,2050-GCZ,Other Distributors Stationery,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1403752,ΝΑΙΣΚΕΣ ΧΡΗΣΤΟΣ,ΑΝΤ. ΙΩΑΝΝΙΔΗ 7,85300,ΚΩΣ,2242029950,,,,ΠΑΙΧΝΙΔΙΑ,EL031821935,ΚΩ,PMH Small customers,2050-FZA,Other Toy Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410747,ΝΑΚΟΥ ΚΩΝΣΤΑΝΤΙΝΑ,Ν.ΣΚΟΥΦΑ 189,47100,ΑΡΤΑ,2681070672,,,,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL127655517,ΑΡΤΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,5,Arta,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404621,ΝΑΛΜΠΑΝΤΗ ΧΡΙΣΤΙΝΑ,21ης ΙΟΥΝΙΟΥ 111,61100,ΚΙΛΚΙΣ,2341025070,,,,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL151351362,ΚΙΛΚΙΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,29,Kilkis,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411857,ΝΑΝΟΥΔΗ Δ.ΑΝΝΑ,ΔΗΜ.ΣΤΑΜΚΟΥ & ΑΠ.ΛΟΥΚΑ,58100,ΓΙΑΝΝΙΤΣΑ,2382306760,6939421656,,info@kiddylab.gr,ΚΕΝΤΡΟ ΨΥΧΟΛ. & ΨΥΧΟΠΑΙΔΑΓΩΓΙΚΗΣ ΥΠ,EL141977812,ΓΙΑΝΝΙΤΣΩΝ,PMH Small customers,2050-VZA,Other e-Shops,39,Pella,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411473,ΝΑΟΥΜ Β. ΑΓΓΕΛΟΣ,Α.ΠΑΠΑΝΙΚΟΛΑΟΥ 2,57014,ΣΤΑΥΡΟΣ ΘΕΣ/ΝΙΚΗΣ,2397065830,6975816980,,aggelos6600@hotmail.com,ΚΕΝΤΡΙΚΟ ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL138613544,ΛΑΓΚΑΔΑ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411208,ΝΑΣΟΥΦΙΔΗΣ ΓΕΩΡΓΙΟΣ,ΤΡΑΠΕΖΟΥΝΤΟΣ 75,55132,ΚΑΛΑΜΑΡΙΑ,2310451803,,,kostistoys@hotmail.com,ΠΑΙΧΝΙΔΙΑ-ΣΧΟΛΙΚΑ,EL160557104,ΚΑΛΑΜΑΡΙΑΣ,PMH Small customers,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404196,ΝΕΡΑΝΤΖΗ ΑΘΑΝ. ΑΡΕΤΗ,ΕΜΠΕΔΟΚΛΕΟΥΣ 42,54351,ΑΝΩ ΤΟΥΜΠΑ,2310939948,6988506128,,nerantziareti@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL047280198,Δ ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411596,ΝΙΚΟΛΑΙΔΗΣ ΔΗΜ.ΝΙΚΟΛΑΟΣ,ΑΓ.ΓΕΩΡΓΙΟΥ 22,14234,ΘΕΣΣΑΛΟΝΙΚΗ,2310783604,,,epohi@hotmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL032038592,ΙΩΝΙΑΣ ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1403698,ΝΙΚΟΛΑΙΔΗΣ ΧΑΡΑΛΑΜΠΟΣ,ΚΟΜΝΗΝΩΝ 66,55132,ΚΑΛΑΜΑΡΙΑ,2310481956,6937558555,2310486598,info@e-paideia.gr,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL047082606,ΚΑΛΑΜΑΡΙΑΣ,PMH Distrib./WSales,2050-GCA,Nikolaidis,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410012,ΝΙΚΟΛΑΟΥ Α. ΒΑΪΟΣ,ΒΕΝΙΖΕΛΟΥ 1,41221,ΛΑΡΙΣΑ,2410534567,,,,ΡΟΥΧΑ-ΒΑΠΤΙΣΗ,EL056494033,Β ΛΑΡΙΣΑΣ,PMH Small customers,2050-WZA,Other Mixt Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1403578,ΝΙΚΟΛΑΟΥ ΙΩΑΝΝΑ,ΠΛ.ΕΛΕΥΘΕΡΙΑΣ 2,58200,ΕΔΕΣΣΑ,2381027936,,,dimiss88@yahoo.gr,ΠΑΙΧΝΙΔΙΑ-ΕΙΔΗ ΛΑΙΚΗΣ ΤΕΧΝΗΣ,EL105970820,ΕΔΕΣΣΑΣ,PMH Small customers,2050-FZA,Other Toy Stores,39,Pella,8,Central Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410104,ΝΟΣΗΛΕΥΤΙΚΗ Α.Ε.,ΠΑΝΟΡΑΜΑ,55236,ΘΕΣ/ΝΙΚΗ,2310390756,,,,ΚΛΙΝΙΚΗ ΑΓΙΟΣ ΛΟΥΚΑΣ ΤΜΗΜΑ ΠΡΟΜΗΘ.,EL094024440,ΦΑΕ ΘΕΣ/ΝΙΚΗΣ,PMH Tele Sales cust.,2050-SZA,Other Food Stores,48,Thessaloniki,8,Central Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411750,ΝΟΥΡΗ ΜΠΑΡΙΣ,ΙΩΑΝΝΙΝΩΝ 60,69100,ΚΟΜΟΤΗΝΗ,6944210486,6988998280,,koukoubagiashop@gmail.com,ΛΙΑΝΙΚΟ ΕΜΠΟΡΙΟ ΧΑΡΤΙΚΩΝ ΕΙΔΩΝ,EL144280541,ΚΟΜΟΤΗΝΗΣ,PMH Medium customers,2050-ZAZ,Other Stationery Stores,44,Rodhopi,9,East Macedon./Th,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1400141,ΝΤΑΛΑΓΙΩΡΓΟΥ ΑΦΟΙ Θ. Ο.Ε.,ΠΛΑΣΤΗΡΑ 16,43131,ΚΑΡΔΙΤΣΑ,2441020544,,,paixnidoupoli@live.com,ΕΜΠΟΡΙΑ ΠΑΙΧΝΙΔΙΩΝ,EL091812555,ΚΑΡΔΙΤΣΑΣ,PMH Medium customers,2050-FZA,Other Toy Stores,20,Kardhitsa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404221,ΝΤΑΜΠΑΛΕΤΣΙΟΣ Β.ΔΗΜΗΤΡΙΟΣ,ΑΙΟΛΟΥ 31 & ΓΟΥΝΑΡΗ ΓΩΝΙΑ,41221,ΛΑΡΙΣΑ,2410554463,,,,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ-ΠΑΙΧΝΙΔΙΑ-ΣΧΟΛΙΚΑ,EL056767469,Β'ΛΑΡΙΣΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404779,ΝΤΑΝΗ ΧΡ.ΧΡΙΣΤΙΑΝΑ,ΚΥΠΡΟΥ 15,46100,ΗΓΟΥΜΕΝΙΤΣΑ,2665025128,,,christianadani@gmail.com,ΕΜΠΟΡΙΑ ΠΑΙΔΙΚΩΝ ΕΙΔΩΝ,EL108040923,ΗΓΟΥΜΕΝΙΤΣΑΣ,PMH Small customers,2050-FZA,Other Toy Stores,47,Thesprotia,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410145,ΝΤΕΛΗ ΧΟΥΣΕΪΝ ΑΧΜΕΤ του ΜΕΧΜΕΤ,ΠΑΠΑΔΗΜΑ 6,69300,ΣΑΠΕΣ,2532111117,,,,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ-ΠΑΙΧΝΙΔΙΑ,EL076803359,ΚΟΜΟΤΗΝΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,44,Rodhopi,9,East Macedon./Th,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404406,ΝΤΙΝΑΣ Κ. ΜΙΛΤΙΑΔΗΣ,"ΚΑΡΑΪΣΚΑΚΗ 90,ΠΑΛΑΜΑΣ",43200,ΠΑΛΑΜΑΣ,2444023488-24440,,2444022009,dinas.miltos@gmail.com,ΤΥΠΟΓΡΑΦΕΙΟ-ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL047105624,ΚΑΡΔΙΤΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,20,Kardhitsa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411536,ΝΤΟΚΟΥΤΣΗΣ ΘΕΟΔΩΡΟΣ,ΠΑΠΑΝΑΣΤΑΣΙΟΥ 20,57400,ΣΙΝΔΟΣ,2310797405,,,ntokoutsis@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL070854613,ΙΩΝΙΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410742,ΝΩΤΑΣ ΝΙΚ.-ΤΣΑΝΤΕΚΙΔΗΣ ΧΡ.Ο.Ε.,ΓΙΑΝΝΙΤΣΩΝ 61 & ΚΟΛΕΤΤΗ,54627,ΘΕΣΣΑΛΟΝΙΚΗ,6948501143,,,nikosnotas@yahoo.gr,ΕΚΜΕΤΑΛΛΕΥΣΗ ΚΑΤΑΣΤ.ΨΙΛΙΚΩΝ-ΠΕΡΙΠΤΕ,EL800641980,Α ΘΕΣΣΑΛΟΝΙΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404057,ΞΕΝΟΔΟΧΙΔΗΣ ΒΑΣ.ΚΩΝ/ΝΟΣ,ΣΚΟΥΤΑΡΙ,62100,ΣΕΡΡΕΣ,2321041921,,,,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ-ΕΙΔΗ ΔΩΡΩΝ,EL074458515,Α ΣΕΡΡΩΝ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,46,Serrai,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1412037,ΞΗΡΑΚΙΑΣ ΑΠΟΣΤΟΛΟΣ,ΤΑΛΙΑΔΟΥΡΟΥ 2,43132,ΕΜΠΟΡΙΚΟ ΚΕΝΤΡΟ ΚΑΡΔΙΤΣΑΣ,2441022311,,,anagnosibookstore@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL129326373,ΚΑΡΔΙΤΣΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,20,Kardhitsa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404706,ΞΥΣΦΙΓΚΗ ΔΗΜ. ΕΙΡΗΝΗ,ΠΟΛΥΧΡΟΝΟ,63085,ΧΑΛΚΙΔΙΚΗ,2374053829,,,xisfigirena@hotmail.com,ΕΝΔΥΜΑΤΑ-ΥΠΟΔΗΜΑΤΑ ΕΙΔΗ ΛΑΙΚΗΣ ΤΕΧΝ,EL062822420,ΚΑΣΣΑΝΔΡΑΣ,PMH Tele Sales cust.,2050-WZA,Other Mixt Stores,25,Khalkidhiki,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411439,ΟΙΚΟΝΟΜΙΔΟΥ ΜΑΡΙΑ,ΤΑΒΑΚΗ 6,57001,ΘΕΡΜΗ,2314053054,,,hi@thetoylab.gr,ΛΙΑΝΙΚΟ ΕΜΠΟΡΙΟ ΠΑΙΧΝΙΔΙΩΝ,EL047465248,Ζ ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1402087,ΟΜΟΥΡΤΖΑΝΗΣ ΜΙΧ.ΧΡΗΣΤΟΣ,ΣΕΡΡΩΝ 15,54454,ΚΑΤΩ ΤΟΥΜΠΑ,2310913036,,,crismour2008@hotmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ-ΕΙΔΗ ΔΩΡΩΝ,EL032833526,ΤΟΥΜΠΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411334,ΟΡΓΕΤΤΑ ΑΦΟΙ ΟΕ,ΑΛ.ΔΙΑΚΟΥ 48,85100,ΚΑΛΥΘΙΕΣ ΡΟΔΟΥ,2241008581,,2241002661,totrenaki@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL999245140,ΡΟΔΟΥ,PMH Small customers,2050-ZAZ,Other Stationery Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1402201,ΟΡΦΑΝΙΔΗΣ ΣΤΑΥΡ. ΙΩΑΝΝΗΣ,ΠΙΕΡΙΩΝ 51,59100,ΒΕΡΟΙΑ,2331028950,,,omikron2@otenet.gr,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL039518467,ΒΕΡΟΙΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,17,Imathia,8,Central Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404600,ΟΡΦΑΝΙΔΗΣ ΧΡΙΣΤΟΦΟΡΟΣ,ΜΟΝΑΣΤΗΡΙΟΥ 91-93,54627,ΘΕΣΣΑΛΟΝΙΚΗ,2310523133,,,,ΑΠΟΘΗΚΗ ΨΙΛΙΚΩΝ,EL054410590,Α ΘΕΣ/ΚΗΣ,PMH Distrib./WSales,2050-GBZ,Other Distributors Food,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1410225,Π.Χ. ΤΣΑΚΙΡΙΔΗΣ ΙΚΕ,3ο ΧΛΜ ΚΟΖΑΝΗΣ-ΘΕΣ/ΝΙΚΗΣ,50100,ΚΟΖΑΝΗ,2461023711-24610,,2461024314,,ΓΕΝΙΚΟ ΕΜΠΟΡΙΟ-ΤΣΙΓΑΡΑ,EL081885331,ΚΟΖΑΝΗΣ,PMH Distrib./WSales,2050-GBB,Atlas,31,Kozani,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1403905,ΠΑΓΩΤΗ ΟΛΓΑ,ΕΛΕΥΘΕΡΙΑΣ 14,55337,ΤΡΙΑΝΔΡΙΑ,2310920966,,,,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL112707626,ΣΤ ΘΕΣ/ΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1402086,ΠΑΓΩΤΗ ΧΡΙΣΤΙΝΑ,ΓΡ.ΛΑΜΠΡΑΚΗ 216,54352,ΑΝΩ ΤΟΥΜΠΑ,2311241621,,2311241622,klelia.biblia@gmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL046529773,Δ ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1403522,ΠΑΙΔΕΙΑ - ΒΙΒΛΙΟΠΩΛΕΙΑ ΑΕ,ΚΑΝΑΡΗ 11,41223,ΛΑΡΙΣΑ,2410284304,2410284541,,director@pediabooks.gr,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL099316818,Α'ΛΑΡΙΣΑΣ,PMH Medium customers,2050-ZAZ,Other Stationery Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1402537,ΠΑΝΑΓΙΔΗΣ ΜΙΧ.ΑΝΤΩΝΙΟΣ,Γ.ΣΤΑΜΑΤΕΛΟΥ 10,54352,ΑΝΩ ΤΟΥΜΠΑ,2310900314,,,exofillo@gmail.com,ΒΙΒΛΙΟΧ/ΠΩΛΕΙΟ ΔΩΡΑ,EL036217014,ΣΤ ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410305,ΠΑΝΑΓΙΩΤΙΔΗΣ Ε.ΣΑΡΑΝΤΗΣ,ΑΝΔΡΕΑ ΠΑΠΑΝΔΡΕΟΥ 209-211,56532,ΠΟΛΙΧΝΗ,2310634489,,,maskarasgr@gmail.com,ΠΑΙΧΝΙΔΙΑ-ΕΙΔΗ BEBE-ΣΧΟΛΙΚΑ,EL118834988,Ε ΘΕΣΣΑΛΟΝΙΚΗΣ,PMH Tele Sales cust.,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1405014,ΠΑΝΑΓΙΩΤΙΔΟΥ Α&Β ΟΕ,4οΧΛΜ ΔΡΑΜΑΣ-ΚΑΒΑΛΑΣ,66100,ΔΡΑΜΑ,2521045225,,,,ΧΟΝ.ΕΜΠΟΡΙΟ-ΑΝΤΙΠΡΟΣ,EL999888003,ΔΡΑΜΑΣ,PMH Distrib./WSales,2050-GBB,Atlas,8,Dhrama,9,East Macedon./Th,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404273,ΠΑΝΑΓΙΩΤΟΠΟΥΛΟΣ ΗΛ.ΧΡΥΣΟΣΤΟΜΟΣ,"ΚΩΝ/ΠΟΛΕΩΣ 10, Ν.ΡΥΣΙΟ",57001,Ν.ΡΥΣΙΟ,2392073090,,,chrises.selides@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL135272740,Ζ ΘΕΣ/ΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410046,ΠΑΝΑΓΙΩΤΟΥ ΧΡΙΣΤΙΝΑ,ΒΟΡΕΙΟΥ ΗΠΕΙΡΟΥ,44100,ΚΟΝΙΤΣΑ,2655023622,,,kyttaro_konitsa@hotmail.com,ΕΙΔΗ ΔΩΡΩΝ-ΠΑΙΧΝΙΔΙΑ,EL045386145,ΙΩΑΝΝΙΝΩΝ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,18,Ioannina,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404855,ΠΑΝΟΣ N.ΒΑΣΙΛΕΙΟΣ,ΡΟΔΟΥ 49,41447,ΛΑΡΙΣΑ,2410535329,,,kyrillidou@hotmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL138711064,Β ΛΑΡΙΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410759,ΠΑΝΤΕΛΑΚΗΣ Ι & ΣΙΑ Ο.Ε.,ΣΩΚΡΑΤΟΥΣ 114,85100,ΡΟΔΟΣ,2241062877,6944640324,2241069722,ibiscus1@otenet.gr,ΕΜΠΟΡΙΟ ΕΙΔΩΝ ΔΩΡΟΥ-ΕΙΣΑΓΩΓΕΣ-ΕΞΑΓΩ,EL099657324,ΡΟΔΟΥ 7542,PMH Distrib./WSales,2050-GAB,Pantelakis,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404758,ΠΑΝΤΕΛΑΚΟΣ ΚΩΝΣΤΑΝΤΙΝΟΣ,"ΛΕΩΦ,ΑΘΗΝΩΝ 8,ΑΓ.ΑΘΑΝΑΣΙΟ",57003,"ΑΓΙΟΣ ΑΘΑΝΑΣΙΟΣ, ΘΕΣ/ΚΗΣ",2310702139,6947902942,,,ΕΙΔΗ ΓΑΜ-ΒΑΦΤ-ΔΩΡΩΝ,EL300063659,ΑΓ.ΑΘΑΝΑΣΙΟΥ,PMH Tele Sales cust.,2050-WZA,Other Mixt Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411869,ΠΑΝΤΕΛΙΔΗ ΕΙΡΗΝΗ,ΖΗΠΑΡΙ,85300,ΚΩΣ,2242069645,,,eirinipantelidi@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ-ΕΙΔΗ ΔΩΡΩΝ,EL130602768,ΚΩ,PMH Small customers,2050-ZAZ,Other Stationery Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411833,ΠΑΝΤΕΛΙΔΗΣ ΙΩΑΝ.ΚΩΝΣΤΑΝΤΙΝΟΣ,ΜΑΥΡΟΜΙΧΑΛΗ 35,56533,ΠΟΛΙΧΝΗ,2316024025,,,oneirobooks@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL110151507,Ε ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1403649,ΠΑΠΑΒΑΣΙΛΕΙΟΥ ΔΕΣΠΟΙΝΑ,ΒΥΡΩΝΟΣ 6,85103,ΑΦΑΝΤΟΥ ΡΟΔΟΥ,2241052933,,,faros@farosgnosis.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL038945928,ΡΟΔΟΥ 7542,PMH Small customers,2050-ZAZ,Other Stationery Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1403678,ΠΑΠΑΓΕΩΡΓΙΟΥ ΑΝΝΑ,ΕΙΡΗΝΗΣ & ΦΙΛΙΑΣ 13,50400,ΒΕΛΒΕΝΤΟΣ,2464032182,,,,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL107807526,ΣΕΡΒΙΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,31,Kozani,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1403275,ΠΑΠΑΓΕΩΡΓΟΠΟΥΛΟΥ ΕΥΘ. ΑΛΕΞΑΝΔΡΑ,ΜΕΓ. ΑΛΕΞΑΝΔΡΟΥ 28,56532,ΜΕΤΕΩΡΑ ΘΕΣ/ΚΗΣ,2310622331,,,bibliologos@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL113763413,Ε ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404355,ΠΑΠΑΓΙΑΝΝΑΚΗΣ Σ. ΝΙΚΟΛΑΟΣ,ΧΑΝΙΩΝ 1,55132,ΚΑΛΑΜΑΡΙΑ,2310445521,6945014508,,xartoupoli@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ-ΣΧΟΛΙΚΑ-ΕΙΔΗ ΔΩΡΩΝ,EL117603040,ΚΑΛΑΜΑΡΙΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411619,ΠΑΠΑΓΙΑΝΝΗ ΜΟΝΟΠΡΟΣΩΠΗ ΙΚΕ,ΑΠΟΛΛΩΝΟΣ 14,42131,ΤΡΙΚΑΛΑ,2431030193,6981886098,,aliki.71@hotmail.gr,ΧΑΡΤΙΚΑ-ΒΙΒΛΙΑ-ΠΑΙΧΝΙΔΙΑ,EL800753755,ΤΡΙΚΑΛΩΝ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,49,Trikala,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1403489,ΠΑΠΑΓΙΑΝΝΗΣ ΧΡ.ΒΑΣΙΛΕΙΟΣ,ΜΕΓ.ΑΛΕΞΑΝΔΡΟΥ 57,53100,ΦΛΩΡΙΝΑ,2385029637,,,info@bookstoregonia.gr,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL045598861,ΦΛΩΡΙΝΑΣ,PMH Small customers,2050-FZA,Other Toy Stores,12,Florina,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404647,ΠΑΠΑΓΙΑΝΝΙΔΗΣ ΙΩΑΝ.ΑΘΑΝΑΣΙΟΣ,Α ΠΑΠΑΝΔΡΕΟΥ 27,56334,ΕΛΕΥΘΕΡΙΟ ΚΟΡΔΕΛΙΟ,2310708798,,2310760243,p8anasis@gmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL117863808,ΙΩΝΙΑΣ (4234),PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411072,ΠΑΠΑΔΗΜΗΤΡΙΟΥ ΑΘΑΝΑΣΙΑ,28ΗΣ ΟΚΤΩΒΡΙΟΥ 57 & ΚΩΝΣΤΑΝΤΑ,37300,ΒΟΛΟΣ,2428091411,6981277875,,atpapadimitriou@gmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL105489917,ΒΟΛΟΥ,PMH Small customers,2050-ZAZ,Other Stationery Stores,37,Magnisia,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404942,ΠΑΠΑΔΗΜΗΤΡΙΟΥ ΙΩΑΝ. ΚΩΝΣΤΑΝΤΙΝΟΣ,Ν.ΠΛΑΣΤΗΡΑ 5,54250,ΧΑΡΙΛΑΟΥ,2310329219,,,kivotos.books@gmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL037353403,Ζ ΘΕΣ/ΝΙΚΗΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410952,ΠΑΠΑΔΟΠΟΥΛΟΣ ΑΡΙΣΤΕΙΔΗΣ,ΓΡ.ΛΑΜΠΡΑΚΗ 213,54352,ΑΝΩ ΤΟΥΜΠΑ,2313075174,6945436470,,aristeidis_85@hotmail.com,ΕΟΡΤΑΣΤΙΚΑ-ΑΠΟΚΡΙΑΤΙΚΑ,EL128289314,ΣΤ ΘΕΣΣΑΛΟΝΙΚΗΣ,PMH Small customers,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404994,ΠΑΠΑΔΟΠΟΥΛΟΣ Β. & ΣΙΑ ΟΕ ΤΡΟΦΕΜΠΟ,"ΑΓΡΟΤΕΜΑΧΙΟ,ΘΕΣΗ ΤΟΥΜΠΑ",57008,ΙΩΝΙΑ ΘΕΣ/ΝΙΚΗΣ,2310604529,,,,ΖΑΧΑΡΩΔΗ-ΨΙΛΙΚΑ,EL082495719,ΙΩΝΙΑΣ,PMH Distrib./WSales,2050-GBB,Atlas,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1404340,ΠΑΠΑΔΟΠΟΥΛΟΣ ΔΙΟΝ.ΓΕΩΡΓΙΟΣ,ΓΡ.ΛΑΜΠΡΑΚΗ 39,59300,ΑΛΕΞΑΝΔΡΕΙΑ,2333027700,,,info@bambinobaby.gr,ΠΑΙΔΙΚΑ ΒΑΠΤΙΣΤΙΚΑ,EL073982886,ΒΕΡΟΙΑΣ,PMH Small customers,2050-FZA,Other Toy Stores,17,Imathia,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404404,ΠΑΠΑΔΟΠΟΥΛΟΣ ΧΡ. & ΣΙΑ Ε.Ε.,ΔΩΔΕΚΑΝΗΣΟΥ 12,56224,ΕΥΟΣΜΟ,2310809250,,,papabel@otenet.gr,ΕΙΣΑΓ-ΕΜΠΟΡ ΠΑΙΧΝΙΔΙ,EL997741488,ΑΜΠΕΛΟΚΗΠΩΝ,PMH Strat. customers,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1411418,ΠΑΠΑΔΟΠΟΥΛΟΣ ΧΡ.ΣΤΥΛΙΑΝΟΣ,ΠΕΡΙΚΛΕΟΥΣ 26,56224,ΕΥΟΣΜΟΣ,2310705757,,,book2bookstores@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL113045476,ΑΜΠΕΛΟΚΗΠΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404954,ΠΑΠΑΔΟΠΟΥΛΟΥ ΒΑΣΙΛΙΚΗ,25ΗΣ ΜΑΡΤΙΟΥ 11 ΑΓ.ΛΟΥΚΑΣ,65404,ΚΑΒΑΛΑ,2510600174,,,,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL145512680,ΚΑΒΑΛΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,22,Kavala,9,East Macedon./Th,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411193,ΠΑΠΑΔΟΠΟΥΛΟΥ ΕΥΑΓΓΕΛΙΑ,Μ.ΑΛΕΞΑΝΔΡΟΥ 4,51100,ΓΡΕΒΕΝΑ,2462022336,,,anagnostdimitr@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL075669906,ΓΡΕΒΕΝΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,15,Grevena,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411474,ΠΑΠΑΔΟΠΟΥΛΟΥ ΚΩΝ/ΝΟΥ ΕΛΕΝΗ,ΑΓ.ΝΙΚΟΛΑΟΥ 4,56224,ΛΙΤΟΧΩΡΟ,2352083010,,,elenispiros@yahoo.com,ΧΑΡΤΙΚΑ-ΠΑΙΧΝΙΔΙΑ,EL102743224,ΚΑΤΕΡΙΝΗΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,40,Pieria,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1405002,ΠΑΠΑΖΗΣΗ ΑΦΟΙ ΟΕ,ΒΑΤΕΡΟ,50100,ΚΟΖΑΝΗ,2461095549,,,,MINI MARKET,EL999134101,ΚΟΖΑΝΗΣ,PMH Distrib./WSales,2050-GBB,Atlas,31,Kozani,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411852,ΠΑΠΑΘΑΝΑΣΙΟΥ Κ. ΙΩΑΝΝΗΣ,ΜΠΙΖΑΝΙΟΥ 29,48100,ΠΡΕΒΕΖΑ,2682023171,6976677883,,doumasion@yahoo.gr,ΗΛΕΚΤΡΟΝΙΚΟ ΕΜΠΟΡΙΟ ΠΑΙΧΝΙΔΙΩΝ,EL116078901,ΠΡΕΒΕΖΑΣ,PMH Small customers,2050-VZA,Other e-Shops,42,Preveza,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404870,ΠΑΠΑΜΙΧΟΥ ΑΣΤ.ΕΙΡΗΝΗ,ΜΑΚΕΔΟΝΟΜΑΧΩΝ 20,57010,ΑΣΒΕΣΤΟΧΩΡΙ,6977930319,2311284916,,poeker@ath.forthnet.gr,ΒΙΒΛ-ΧΑΡΤ-ΠΑΙΧΝΙΔΙΑ,EL039920680,Ε ΘΕΣ/ΝΙΚΗΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410237,ΠΑΠΑΝΑΤΣΙΟΣ Γ. ΧΡΗΣΤΟΣ,ΦΑΡΣΑΛΩΝ 164,41335,ΛΑΡΙΣΑ,2410617521,,,epgfast@otenet.gr,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL158135705,Β ΛΑΡΙΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1404957,ΠΑΠΑΝΤΟΣ ΚΩΝΣΤΑΝΤΙΝΟΣ,ΤΡΙΚΑΛΩΝ 12,42200,ΚΑΛΑΜΠΑΚΑ,2432075556,,,kostas_250@hotmail.com,ΒΙΒΛΙΑ ΧΑΡΤΙΚΑ ΠΑΙΧΝΙΔΙΑ,EL111338960,ΤΡΙΚΑΛΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,49,Trikala,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1412021,ΠΑΠΑΠΟΣΤΟΛΟΥ ΙΩΑΝΝΗΣ,ΓΕΝΙ ΤΣΕΣΜΕ,85300,ΚΩΣ,6946548257,,,giannis_papapap@hotmail.com,ΕΜΠΟΡΙΟ,EL130619566,ΚΩ,PMH Small customers,2050-FZA,Other Toy Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410974,ΠΑΠΑΠΡΟΔΡΟΜΟΥ ΦΑΝΗ,ΕΘΝΙΚΗΣ ΑΝΤΙΣΤΑΣΕΩΣ 25,55134,ΚΑΛΑΜΑΡΙΑ,2310440744,,,,ΕΙΔΗ ΔΩΡΩΝ-ΠΑΙΧΝΙΔΙΑ,EL020977543,ΚΑΛΑΜΑΡΙΑΣ,PMH Tele Sales cust.,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411452,ΠΑΠΑΡΟΥΝΗ ΕΙΡΗΝΗ,ΦΙΛΟΘΕΗ,47100,ΑΡΤΑ,2681052396,6973960592,,eirinipaparounh@hotmail.gr,ΒΙΒΛΙΟΠΩΛΕΙΟ-ΕΙΔΩ ΔΩΡΩΝ,EL062546303,ΑΡΤΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,5,Arta,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411495,ΠΑΠΑΤΡΙΑΝΤΑΦΥΛΛΟΥ Μ. ΚΑΙ ΣΙΑ Ο.Ε.,ΣΤΑΥΡΟΥ ΜΠΑΡΕΤΗ 16,57200,ΛΑΓΚΑΔΑΣ,2394023200,6978635162,2394023203,info@balarina.gr,ΗΛΕΚΤΡΟΝΙΚΕΣ ΠΩΛΗΣΕΙΣ ΠΑΙΧΝΙΔΙΩΝ,EL800530258,ΛΑΓΚΑΔΑ,PMH Small customers,2050-VZA,Other e-Shops,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404300,ΠΑΠΟΥΛΙΔΗΣ ΗΡΑΚΛΗΣ,ΤΖΙΒΕΛΙΚΙΔΗ 2,64200,ΧΡΥΣΟΥΠΟΛΗ,2591024245,,,iraklis1980@yahoo.gr,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL138404574,ΧΡΥΣ/ΛΗΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,22,Kavala,9,East Macedon./Th,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404694,ΠΑΠΟΥΤΣΑ ΦΑΚΙΡΗ ΔΗΜΗΤΡΑ,ΠΑΠΑΝΑΣΤΑΣΙΟΥ 68,41222,ΛΑΡΙΣΑ,2410254040,,2410254160,papoutsasd@yahoo.gr,ΓΡΑΦΙΚΑ ΑΝΑΛΩΣΙΜΑ,EL070758650,ΛΑΡΙΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1400069,ΠΑΠΟΥΤΣΙΔΟΥ Σ κ ΣΙΑ Ε.Ε.,ΑΜΙΣΟΥ 47 & ΜΕΤΑΜΟΡΦΩΣΕΩΣ 6,55131,ΚΑΛΑΜΑΡΙΑ,2310417236,,,,ΒΙΒΛΙΑ-ΠΑΙΧΝΙΔΙΑ,EL093710257,ΚΑΛΑΜΑΡΙΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404204,ΠΑΠΠΑ Β.ΕΥΑΓΓΕΛΙΑ,ΑΞΙΟΥΠΟΛΗ,61100,ΚΙΛΚΙΣ,2343031003,,,alfabitari1@yahoo.com,ΒΙΒΛΙΑ-ΧΑΡΤΙΚΑ-ΠΑΙΧΝΙΔΙΑ,EL046004378,ΚΙΛΚΙΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,29,Kilkis,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410967,ΠΑΡΟΥΚΑ ΜΑΡΙΑ,Σ. ΤΡΟΥΠΚΟΥ 4,54300,ΧΑΛΑΣΤΡΑ,2310792378,,,,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ-ΨΗΦΙΑΚ.ΕΚΤΥΠΩΣΕΙΣ,EL117475406,ΙΩΝΙΑΣ ΘΕΣ/ΝΙΚΗΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411375,ΠΑΣΣΑΛΙΔΟΥ Π.ΜΑΡΙΑ,ΜΕΓ.ΑΛΕΞΑΝΔΡΟΥ 103,61100,ΠΟΛΥΚΑΣΤΡΟ,2343020098,6971671274,,mariapassalidou@yahoo.gr,ΒΙΒΛΙΑ-ΧΑΡΤΙΚΑ-ΠΑΙΧΝΙΔΙΑ,EL135322968,ΚΙΛΚΙΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,29,Kilkis,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404560,ΠΑΣΧΑΛΟΥΔΗ ΝΙΚ.ΕΥΑΓΓΕΛΙΑ,ΠΛΑΓΙΑΡΙ,57500,ΕΠΑΝΩΜΗΣ,2392063365,6977567531,,eva.pashaloudi@yahoo.gr,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL044993285,ΚΑΛΑΜΑΡΙΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404896,ΠΑΤΑΚΑΣ ΚΥΡΙΑΚΟΣ,ΑΠΕΛΛΟΥ 48,85100,ΡΟΔΟΣ,2241078587,2241078587,,kpatakas72@gmail.com,ΠΑΝΤΟΠΩΛΕΙΟ,EL075328663,ΡΟΔΟΥ,PMH Small customers,2050-WZA,Other Mixt Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411422,ΠΑΤΟΥΚΑ ΑΙΚΑΤΕΡΙΝΗ,ΖΑΓΚΛΙΒΕΡΙ,57012,ΛΑΓΚΑΔΑ,2393032227,6947802648,,patoukasar.patoukasath@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ ΧΑΡΤΙΚΑ ΕΙΔΗ ΔΩΡΩΝ,EL049278463,ΛΑΓΚΑΔΑ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411433,ΠΑΥΛΙΔΗΣ ΒΑΣΙΛΕΙΟΣ & ΣΙΑ ΟΕ,1Οο ΧΛΜ ΘΕΣ/ΝΙΚΗΣ-ΝΕΟΧΩΡΟΥΔΑΣ,57500,ΘΕΣ/ΝΙΚΗ,2310789489,6982674845,2310789490,pavlidou@medicalplan.gr,ΔΙΑΝΟΜΕΣ ΠΑΡΑΦΑΡΜΑΚΕΥΤΙΚΩΝ,EL999671778,Ν.ΙΩΝΙΑΣ,PMH Medium customers,2050-GZA,Distributors Various,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1411793,ΠΑΥΛΙΔΗΣ Π.ΝΙΚΟΛΑΟΣ,21ΗΣ ΙΟΥΝΙΟΥ 145,61100,ΚΙΛΚΙΣ,2341022706,,,pavlinikos@gmail.com,ΠΑΙΧΝΙΔΙΑ,EL040812807,ΚΙΛΚΙΣ,PMH Small customers,2050-FZA,Other Toy Stores,29,Kilkis,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411498,ΠΕΓΚΛΙΔΗΣ Ι.ΣΤΕΦΑΝΟΣ,ΕΡΥΜΑΝΘΟΥ 4 & ΠΟΛΥΚΡΑΤΟΥΣ,54224,ΕΥΟΣΜΟΣ ΘΕΣ/ΝΙΚΗΣ,2310680007,6973045575,,watercosmos@yahoo.gr,ΛΙΑΝΙΚΟ & ΧΟΝΔΡΙΚΟ ΕΜΠΟΡΙΟ ΤΡΟΦΙΜΩΝ,EL127341909,ΑΜΠΕΛΟΚΗΠΩΝ,PMH Distrib./WSales,2050-GBZ,Other Distributors Food,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411788,ΠΕΛΛΙΟΥ ΒΑΣΙΛΙΚΗ,Δ.Δ.ΚΥΜΙΝΩΝ-ΔΗΜΟΥ ΑΞΙΟΥ,57300,ΧΑΛΑΣΤΡΑ,2391042388,,,pelliouvaso@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL128949671,ΙΩΝΙΑΣ ΘΕΣΣΑΛΟΝΙΚΗΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410083,ΠΕΛΠΑΣ ΔΗΜ.ΚΩΝΣΤΑΝΤΙΝΟΣ,ΔΗΜ.ΤΣΕΤΙΝΕ 3,69100,ΚΟΜΟΤΗΝΗ,2531081760,,2531081763,pelpas@otenet.gr,ΕΜΠΟΡΙΟ ΒΙΒΛΙΩΝ & ΠΑΙΧΝΙΔΙΩΝ,EL046426643,ΚΟΜΟΤΗΝΗΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,10,Evros,9,East Macedon./Th,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410541,ΠΕΡΠΑΤΟΥΛΗΣ-ΧΑΤΖΗΔΗΜΗΤΡΙΟΥ ΑΕΕ,1ης ΙΟΥΛΙΟΥ 15,66132,ΔΡΑΜΑ,2521057500,,25210440488,,ΓΕΝΙΚΟ ΕΜΠΟΡΙΟ,EL800713296,ΔΡΑΜΑΣ,PMH Distrib./WSales,2050-GBZ,Other Distributors Food,8,Dhrama,9,East Macedon./Th,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410782,ΠΕΤΡΑΝΗΣ Χ. ΖΟΡΜΠΑΣ Γ. Ο.Ε.,ΙΤΑΜΟΥ 4,43100,ΚΑΡΔΙΤΣΑ,6944818210,,,petranis.zorbas@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ-ΠΑΙΧΝΙΔΙΑ,EL800415521,ΚΑΡΔΙΤΣΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,20,Kardhitsa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410787,ΠΕΤΡΗ ΡΟΔΟΥΛΑ,ΣΥΒΟΤΑ,46100,ΘΕΣΠΡΩΤΙΑ,2665093500,6947261563,,Margarita-1584@hotmail.com,ΤΟΥΡΙΣΤΙΚΑ ΕΙΔΗ-ΚΟΣΜΗΜΑΤΑ,EL045698024,ΗΓΟΥΜΕΝΙΤΣΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,47,Thesprotia,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410758,ΠΕΤΡΗΣ Π.ΓΕΩΡΓΙΟΣ,Λ.ΕΙΡΗΝΗΣ 83,48100,ΠΡΕΒΕΖΑ,2682061272-26824,,,xartino@gmail.com,ΠΑΙΧΝΙΔΙΑ-ΔΩΡΑ,EL101365930,ΠΡΕΒΕΖΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,42,Preveza,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410748,ΠΕΧΛΙΒΑΝΙΔΟΥ ΑΘΗΝΑ,Γ.ΒΙΖΥΗΝΟΥ 70,54636,ΘΕΣΣΑΛΟΝΙΚΗ,2310206001,,,epoliteia40@gmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ-ΕΙΔΗ ΔΩΡΩΝ,EL135538313,Δ ΘΕΣΣΑΛΟΝΙΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404290,ΠΗΣ ΝΙΚΟΣ-ΠΕΤΡΗ ΜΑΡΙΑ ΟΕ,4ο ΧΛΜ ΚΩ-ΧΩΡΙΑ,85300,ΚΩΣ,2242068688,,,kouklospitokos@hotmail.com,ΠΑΙΧΝΙΔΙΑ,EL997918089,ΚΩ,PMH Medium customers,2050-WZA,Other Mixt Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1412015,ΠΗΤΤΑ ΓΕΩΡΓ.ΑΝΑΣΤΑΣΙΑ,Κ.ΔΑΜΑΣΚΟΥ 51,57011,N.ΜΕΣΗΜΒΡΙΑ ΘΕΣΣΑΛΟΝΙΚΗΣ,2310713448,6942798350,,papazaxarioumaria@yahoo.gr,ΒΙΒΛΙΟΠΩΛΕΙΟ-ΕΙΔΗ ΔΩΡΩΝ,EL148009059,ΙΩΝΙΑΣ ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404541,ΠΙΣΚΙΟΥΛΗΣ ΙΩΑΝ.ΘΕΟΔΩΡΟΣ,ΠΑΠΑΦΛΕΣΣΑ 11,56123,ΑΜΠΕΛΟΚΗΠΟΙ ΘΕΣ/ΚΗΣ,2310744084,,,,ΒΙΒΛΙΟΠΩΛΕΙΟ-ΦΩΤΟΤΥΠΙΕΣ,EL116548429,ΑΜΠΕΛΟΚΗΠΩΝ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404353,ΠΛΑΤΗΣ ΠΑΝ.& ΠΛΑΤΗ ΕΛΙΣ ΟΕ,ΕΡΜΟΥ,85100,ΦΑΛΗΡΑΚΙ ΡΟΔΟΥ,2241087104,6944728999,,panagiotisplatis@yahoo.gr,ΕΙΔΗ ΔΩΡΩΝ,EL099657895,ΡΟΔΟΥ 7542,PMH Small customers,2050-FZA,Other Toy Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410078,ΠΟΔΑΡΑΣ ΕΥΘΥΜΙΟΣ,11ΗΣ ΝΟΕΜΒΡΙΟΥ 17,52100,ΚΑΣΤΟΡΙΑ,2467022049,,,,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL141431028,ΚΑΣΤΟΡΙΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,21,Kastoria,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404265,ΠΟΛΥΧΡΟΥ ΜΑΡΙΑ,Ν.ΜΑΡΜΑΡΑΣ,63081,ΝΕΟΣ ΜΑΡΜΑΡΑΣ,2375072845,,,onpapermarmara@outlook.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL073576325,ΠΟΛΥΓΥΡΟΥ,PMH Small customers,2050-ZAZ,Other Stationery Stores,25,Khalkidhiki,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1403017,ΠΟΥΛΗΜΕΝΟΣ ΓΕΩΡ. ΘΕΟΧΑΡΗΣ,ΣΑΡΑΝΤΑΠΟΡΟΥ 3,54640,ΘΕΣΣΑΛΟΝΙΚΗ,2310839350,,,poulimenos.haris@windowslive.com,ΨΙΛΙΚΑ ΚΑΙ ΣΥΝΑΦΗ ΕΙΔΗ/ΦΩΤΟΑΝΤΙΓΡΑΦ,EL032514214,ΣΤ ΘΕΣΣΑΛΟΝΙΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1403842,ΠΟΥΛΙΟΣ Α. ΚΩΝΣΤΑΝΤΙΝΟΣ,ΦΡ. ΠΑΠΑΧΡΗΣΤΙΔΗ 111,64100,ΕΛΕΥΘΕΡΟΥΠΟΛΗ,2592023472,6949399789,,,ΠΑΙΧΝΙΔΙΑ - ΜΠΕΜΠΕ,EL034582300,ΕΛΕΥΘΕΡ/ΠΟΛΗΣ,PMH Small customers,2050-FZA,Other Toy Stores,22,Kavala,9,East Macedon./Th,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404789,ΠΟΥΛΙΟΣ ΠΕΤΡΟΣ,ΟΙΝΟΗΣ 3,56224,ΕΥΟΣΜΟΣ,2310547337,,,,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL128141307,ΑΜΠΕΛΟΚΗΠΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1402628,ΠΟΥΦΛΗ ΒΑΣΙΛΙΚΗ,ΠΛ.ΤΗΜΕΝΙΔΩΝ 1,58200,ΕΔΕΣΣΑ,2381021240,6937478719,,vaso.mesimerli@gmail.com,ΕΜΠΟΡΙΑ ΠΑΙΧΝΙΔΙΩΝ,EL037358226,ΕΔΕΣΣΑΣ,PMH Small customers,2050-FZA,Other Toy Stores,39,Pella,8,Central Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404453,ΠΡΕΚΑΣ ΠΑΝΑΓΙΩΤΗΣ ΤΟΥ ΘΕΟΔΩΡΟΥ,ΚΑΛΑΜΙΩΤΙΣΣΑ,85200,ΚΑΛΥΜΝΟΣ,2243051112,,,,ΒΙΒΛΙΟΠΩΛΕΙΟ ΠΑΙΧΝΙΔ,EL106656746,ΚΩΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411797,ΠΡΟΔΡΟΜΟΥ ΣΠ.ΙΩΑΝΝΗΣ,28ΗΣ ΟΚΤΩΒΡΙΟΥ 33,57005,Ν.ΜΑΓΝΗΣΙΑ,2310785361,6981051433,,sales@babybrands.gr,ΒΡΕΦΙΚΑ ΕΙΔΗ,EL148006217,ΙΩΝΙΑΣ ΘΕΣΣΑΛΟΝΙΚΗΣ,PMH Small customers,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404286,ΠΡΟΚΟΣ Ν. & ΣΙΑ ΟΕ,Λ.ΠΑΝ/ΜΙΟΥ (ΕΝΑΝΤΙ ΠΥΛΗΣ),45500,ΙΩΑΝΝΙΝΑ Τ.Ο.819,2651092600,2651091190,2651091190,info@nprokos.gr,ΧΑΡΤΙΚΑ - ΑΝΑΛΩΣΙΜΑ Η/Υ,EL999426109,ΙΩΑΝΝΙΝΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,18,Ioannina,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410815,ΠΡΩΙΟΥ ΑΓΓΕΛΙΚΗ,ΑΓ.ΚΥΡΙΑΚΗΣ 63,57500,ΕΠΑΝΩΜΗ,6944670562,,,,ΥΠΗΡΕΣΙΕΣ ΠΑΙΔΟΤΟΠΟΥ,EL113453263,ΚΑΛΑΜΑΡΙΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1401518,ΠΤΟΛΕΜΑΙΣ Ε.Π.Ε.,3ο ΧΛΜ ΠΤΟΛ/ΔΑΣ-ΦΛΩΡΙΝΑΣ,50200,ΠΤΟΛΕΜΑΙΔΑ,2463027511,2463026950,,ptolepe1@otenet.gr,ΣΟΥΠΕΡ ΜΑΡΚΕΤ,EL095147763,ΠΤΟΛΕΜΑΙΔΑΣ,PMH Small customers,2050-SZA,Other Food Stores,31,Kozani,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411635,ΡΑΜΜΟΥ ΡΑΦΑΕΛΑ,6ΗΣ ΟΚΤΩΒΡΙΟΥ 76,40200,ΕΛΑΣΣΟΝΑ,2493301527,6936128909,,info@engnosei.gr,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL151912446,ΛΑΡΙΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1410309,ΡΑΜΠΟΤΑΣ ΒΑΣ. ΛΑΖΑΡΟΣ,ΣΟΥΡΩΤΗ ΒΑΣΙΛΙΚΑ,57006,ΘΕΣ/ΝΙΚΗ,2311822840,6972328682,,parabel@otenet.gr,ΕΜΠΟΡΙΑ & ΕΙΣΑΓ.ΠΑΙΧΝΙΔΙΩΝ,EL103963753,Ζ ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1411435,ΡΑΠΚΟΥ ΕΛΕΥΘΕΡΙΑ,ΣΤΡΑΤΩΝΙ,63074,ΧΑΛΚΙΔΙΚΗΣ,2376100298,6944870923,,koukouvagiachalkidikis@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ-ΕΙΔΗ ΔΩΡΩΝ,EL154406819,ΠΟΛΥΓΥΡΟΥ,PMH Small customers,2050-ZAZ,Other Stationery Stores,25,Khalkidhiki,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404941,ΡΑΦΑΗΛΙΔΗΣ ΕΥΣΤ.ΓΕΩΡΓΙΟΣ,TAINAΡΟΥ ΚΑΙ ΚΑΙΡΗ ΓΩΝΙΑ,60100,ΚΑΤΕΡΙΝΗ,2351074574,,,entvipokl@hotmail.com,ΒΙΒΛΙΑ-ΧΑΡΤΙΚΑ-ΔΩΡΑ-ΤΥΠΟΣ,EL033749824,ΚΑΤΕΡΙΝΗΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,40,Pieria,8,Central Macedoni,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1404940,ΡΕΠΑΣ ΧΡ.ΝΙΚΟΛΑΟΣ,4ΗΣ ΝΟΕΜΒΡΙΟΥ 19,50300,ΣΙΑΤΙΣΤΑ,2465500201,,,nickreppas@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL113268635,ΝΕΑΠΟΛΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,31,Kozani,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410588,ΡΙΖΟΣ Γ.ΘΕΟΔΩΡΟΣ,ΔΗΜΑΡΧΙΑΣ 33,59200,ΝΑΟΥΣΑ,2332029131,,,,ΖΑΧΑΡΟΠΛΑΣΤΕΙΟ,EL049461583,ΒΕΡΟΙΑΣ,PMH Tele Sales cust.,2050-SZA,Other Food Stores,17,Imathia,8,Central Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411077,ΡΟΥΖΙΟΥ ΑΘΗΝΑ & ΣΙΑ ΕΕ,ΚΥΜΙΝΑ,57300,ΘΕΣ/ΝΙΚΗ,2391041886,,,,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL801152738,ΙΩΝΙΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1401131,ΡΟΥΚΟΥΝΟΓΛΟΥ Γ.- ΛΑΔΙΑΣ & ΣΙΑ Ο.Ε.,ΕΛ. ΒΕΝΙΖΕΛΟΥ 43,50500,ΣΕΡΒΙΑ ΚΟΖΑΝΗΣ,2464021568,,2464022049,ladiaskarelia@outlook.com.gr,ΓΕΝΙΚΟ ΕΜΠΟΡΙΟ,EL092307075,ΣΕΡΒΙΩΝ ΚΟΖΑΝΗ,PMH Small customers,2050-ZAZ,Other Stationery Stores,31,Kozani,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1403933,ΡΩΜΑΝΙΔΟΥ ΕΙΡΗΝΗ,ΧΡΥΣΟΣΤΟΜΟΥ ΣΜΥΡΝΗΣ 05,58400,ΑΡΙΔΑΙΑ,2384022540,,,irom@hotmail.gr,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL069916930,ΑΡΙΔΑΙΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,39,Pella,8,Central Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404869,ΡΩΜΑΣ ΑΝ. ΧΡΥΣΟΒΑΛΑΝΤΗΣ,ΠΛΑΤΕΙΑ ΑΓΟΡΑΣ 3,53200,ΑΜΥΝΤΑΙΟ,2386022422,,,,ΠΑΙΧΝΙΔΙΑ,EL108286449,ΦΛΩΡΙΝΑΣ,PMH Small customers,2050-FZA,Other Toy Stores,12,Florina,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411385,ΣΑΒΒΙΔΟΥ Σ.ΕΛΕΝΗ,ΕΛ.ΒΕΝΙΖΕΛΟΥ 146,56728,ΝΕΑΠΟΛΗ ΘΕΣ/ΝΙΚΗΣ,23100617308,6909765028,,molyvotiki20@yahoo.com,ΒΙΒΛΙΟΠΩΛΕΙΟ-ΕΙΔΗ ΔΩΡΩΝ,EL063041359,Ε ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411507,ΣΑΒΒΟΥΛΙΔΗΣ ΜΙΧΑΗΛ,1ο ΧΛΜ ΠΟΛΥΓΥΡΟΥ-ΓΕΡΑΚΙΝΗΣ,63100,ΠΟΛΥΓΥΡΟΣ,2371023474,6944326979,,savoutheo@gmail.com,ΕΜΠΟΡΙΟ ΠΑΙΧΝΙΔΙΩΝ & ΕΙΔΩΝ ΘΑΛΑΣΣΗΣ,EL147537227,ΠΟΛΥΓΥΡΟΥ,PMH Distrib./WSales,2050-GAZ,Other Distributors Toys,25,Khalkidhiki,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411426,ΣΑΛΤΟΥ ΕΛΙΣΑΒΕΤ,ΑΓΓΕΛΑΚΗ 21,54621,ΘΕΣ/ΝΙΚΗ,2310267108,,,sales@salto.gr,ΕΚΔΟΣΕΙΣ-ΒΙΒΛΙΟΠΩΛΕΙΟ,EL073509976,Δ ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1404388,ΣΑΜΟΛΑΔΑ Α. & ΣΙΑ Ο.Ε.,ΛΑΖ.ΤΣΑΜΗ 70,54352,ΑΝΩ ΤΟΥΜΠΑ,2310907422,,,,ΒΙΒΛ/ΛΕΙΟ-ΕΙΔΗ ΔΩΡΩΝ,EL998033088,ΤΟΥΜΠΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1405007,ΣΑΝΓΟΥΙΝΓΚ ΧΟΤΕΛΣ ΕΛΛΑΣ ΤΟΥΡ.ΕΚΜ.ΑΕ,5o ΧΛΜ ΡΟΔΟΥ-ΚΑΛΛΙΘΕΑΣ,85100,ΡΟΔΟΣ,2241088134,,,,ΞΕΝΟΔΟΧΕΙΟ,EL094101265,ΡΟΔΟΥ,PMH Small customers,2050-SZA,Other Food Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1401757,ΣΑΝΗΣ ΣΤ.ΔΗΜΗΤΡΙΟΣ,ΔΗΜΟΣΘΕΝΟΥΣ 23,41336,ΛΑΡΙΣΑ,2410239759,,,dsanis@otenet.gr,ΒΙΒΛ/ΛΕΙΟ-ΕΙΔΗ ΔΩΡΩΝ,EL044825683,Β ΛΑΡΙΣΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404299,ΣΑΠΟΥΝΤΖΗ ΣΤΕΦ.ΘΕΟΔΩΡΑ,ΕΛ.ΒΕΝΙΖΕΛΟΥ 82,56728,ΝΕΑΠΟΛΗ,2310610908,,,,ΒΙΒΛ/ΛΕΙΟ -ΠΑΙΧΝΙΔΙΑ,EL041191399,ΝΕΑΠΟΛΗΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404945,ΣΑΡΙΔΗΣ ΘΕΟΔ.ΣΤΕΦΑΝΟΣ,ΧΑΛΚΟΚΟΝΔΥΛΗ 10,54629,ΘΕΣΣΑΛΟΝΙΚΗ,2310734731,,,,ΖΑΧΑΡΩΔΗ ΠΡΟΙΟΝΤΑ,EL044993273,Α ΘΕΣ/ΝΙΚΗΣ,PMH Tele Sales cust.,2050-SZA,Other Food Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1404338,ΣΑΡΙΚΟΣ ΜΙΛΤΙΑΔΗΣ,ΣΤΑΥΡΟΥ ΜΠΑΡΕΤΗ 20,57200,ΛΑΓΚΑΔΑΣ,2394020778,6943177756,,miltos32003@yahoo.gr,ΠΑΙΧΝΙΔΙΑ ΕΙΔΗ ΔΩΡΩΝ,EL301317477,ΛΑΓΚΑΔΑ,PMH Small customers,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411570,ΣΑΧΙΝΗ Γ.ΔΙΚΑΙΑ,ΙΑΛΥΣΟΥ 31,85101,ΙΑΛΥΣΟΣ ΡΟΔΟΥ,2241094223,,2241095323,sachinibookshop26@gmail.com,ΣΧΟΛΙΚΑ-ΧΑΡΤΙΚΑ-ΠΑΙΧΝΙΔΙΑ,EL164210370,ΡΟΔΟΥ 7542,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404592,ΣΒΟΛΑΚΗΣ ΦΩΤ.ΑΘΑΝΑΣΙΟΣ,ΔΗΜΟΚΡΑΤΙΑΣ 16,57004,ΜΗΧΑΝΙΩΝΑ,2392031073,6947180698,,svolakis.th@gmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL126356046,ΚΑΛΑΜΑΡΙΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404303,ΣΕΡΕΝΙΔΟΥ Κ.ΕΥΑΓΓΕΛΙΑ,ΣΟΧΟΣ,57002,ΣΟΧΟΣ,2395022810,6972491864,,,ΑΝΘΗ-ΦΥΤΑ-ΔΩΡΑ,EL040834037,ΣΟΧΟΥ,PMH Small customers,2050-WZA,Other Mixt Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410052,ΣΙΑΜΗ ΓΕΩ. ΠΑΝΑΓΙΩΤΑ,ΒΕΝΙΖΕΛΟΥ 30,62300,ΣΙΔΗΡΟΚΑΣΤΡΟ,2323024583,,,giwtasiami12@gmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ-ΠΑΙΧΝΙΔΙΑ,EL100336346,ΣΕΡΡΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,46,Serrai,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410688,ΣΙΑΜΟΠΟΥΛΟΥ ΒΑΣΙΛΙΚΗ,28ης ΟΚΤΩΒΡΙΟΥ 19,45500,ΙΩΑΝΝΙΝΑ,2651031773-23510,,,bigmagos@otenet.gr,ΕΜΠΟΡΙΑ ΠΑΙΧΝΙΔΙΑ,EL041259872,ΙΩΑΝΝΙΝΩΝ,PMH Medium customers,2050-FZA,Other Toy Stores,18,Ioannina,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410079,ΣΙΑΝΗΣ ΧΑΡΑΛΑΜΠΟΣ,Α.ΒΕΛΟΥΧΙΩΤΗ 1,56123,ΑΜΠΕΛΟΚΗΠΟΙ,2310727299,,,paizoume.gr@gmail.com,ΕΜΠΟΡΙΟ ΠΑΙΧΝΙΔΙΩΝ,EL113036873,ΑΜΠΕΛΟΚΗΠΩΝ,PMH Small customers,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1412170,ΣΙΑΝΗΣ ΧΑΡΑΛΑΜΠΟΣ & ΣΙΑ Ε.Ε.,Α.ΒΕΛΟΥΧΙΩΤΗ 1,56121,ΑΜΠΕΛΟΚΗΠΟΙ ΘΕΣ/ΚΗΣ,2310727299,,,paizoume.gr@gmail.com,ΕΜΠΟΡΙΟ ΠΑΙΧΝΙΔΙΩΝ,EL802160447,ΑΜΠΕΛΟΚΗΠΩΝ,PMH Small customers,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404805,ΣΙΣΚΟΥ Μ.-ΣΙΣΚΟΥ Δ. ΟΕ,ΚΥΠΡΟΥ & ΛΕΣΒΟΥ 11,41222,ΛΑΡΙΣΑ,2410259717,,,larissa.polyxromo@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL997844963,Α ΛΑΡΙΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1402292,ΣΚΑΝΔΑΛΟΥ Γ.ΑΓΛΑΙΑ,ΛΑΡΙΣΗΣ 7,40003,ΑΓΙΑ,2494024154,,,aglaia-artion@hotmail.com,ΒΙΒΙΛ/ΠΩΛΕΙΟ-ΕΙΔΗ ΔΩΡΩΝ-ΠΑΙΧΝΙΔΙΑ,EL071852181,Α ΛΑΡΙΣΑΣ-ΑΓΙΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404634,ΣΚΑΡΛΑΤΑΚΗΣ ΚΥΡ.ΓΙΩΡΓΟΣ,25ης ΜΑΡΤΙΟΥ 48,54248,ΘΕΣΣΑΛΟΝΙΚΗ,2310855908,,,,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL154705776,Ζ ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404278,ΣΚΙΡΤΑ ΑΦΟΙ Ο.Ε.,ΑΡΤΑΚΗΣ & ΡΟΔΟΥ 23,54453,ΚΑΤΩ ΤΟΥΜΠΑ,2310928472,6945159133,,sales@skirtas.gr,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ-ΦΩΤΟΤΥΠΙΕΣ,EL998032670,Δ ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404594,ΣΚΟΥΛΗΣ ΑΛΕΞΑΝΔΡΟΣ,Ν.ΜΑΡΜΑΡΑΣ,63081,ΝΕΟΣ ΜΑΡΜΑΡΑΣ,2375071105,,,gpatrinou@yahoo.gr,SUPER MARKET,EL106450258,ΠΟΛΥΓΥΡΟΥ,PMH Tele Sales cust.,2050-SZA,Other Food Stores,25,Khalkidhiki,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411576,ΣΟΛΟΜΩΝΙΔΟΥ ΚΩΝ.ΑΚΡΙΒΗ,ΠΟΛΥΤΕΧΝΕΙΟΥ 75 & ΠΑΛΑΜΑ,48100,ΠΡΕΒΕΖΑ,2682061610,,,info@mykyklos.gr,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL054297078,ΠΡΕΒΕΖΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,42,Preveza,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1412032,ΣΟΥΓΚΑΡΗ ΧΡΥΣΑΝΘΗ,ΠΡΟΦΗΤΗ ΗΛΙΑ 8,59100,ΒΕΡΟΙΑ,2331308333,,,chrisanthi.s13@gmail.com,ΕΜΠΟΡΙΟ ΒΡΕΦΙΚΩΝ ΕΙΔΩΝ,EL130792793,ΒΕΡΟΙΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,17,Imathia,8,Central Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411420,ΣΟΥΛΙΩΤΗΣ Ι.ΔΗΜΗΤΡΙΟΣ,ΡΗΓΑ ΦΕΡΑΙΟΥ 84,37500,ΒΕΛΕΣΤΙΝΟ,2425023737,,,hartikemolyvi@yahoo.gr,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL119403105,Ν.ΙΩΝΙΑΣ ΜΑΓΝΗΣΙΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,37,Magnisia,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1402547,ΣΟΦΙΑΝΟΣ ΑΛΕΞ.ΣΤΥΛΙΑΝΟΣ,ΙΩΑΝ.ΘΕΟΤΟΚΗ 19,49100,ΚΕΡΚΥΡΑ,2661049375,2661031813,,sofcorfu@yahoo.gr,ΕΜΠΟΡΙΟ ΠΑΙΧΝΙΔΙΩΝ,EL034838498,ΚΕΡΚΥΡΑΣ,PMH Medium customers,2050-FZA,Other Toy Stores,24,Kerkira,10,Ionian Islands,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411052,ΣΟΦΙΑΝΟΥ Κ.-ΔΟΛΜΑ Π. Ο.Ε.,ΣΤ.ΜΠΑΡΕΤΗ 13,57200,ΛΑΓΚΑΔΑΣ,2394301906,,,ksofianou@hotmail.gr,ΠΑΙΧΝΙΔΙΑ-ΒΙΒΛΙΑ-ΧΑΡΤΙΚΑ,EL801067415,ΛΑΓΚΑΔΑ,PMH Small customers,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1403902,ΣΠΑΝΟΥ Γ.ΧΑΡΟΥΛΑ,Π.ΜΕΛΑ 10,51100,ΓΡΕΒΕΝΑ,2462022377,,,,ΕΜΠΟΡΙΟ ΠΑΙΧΝΙΔΙΩΝ,EL075668842,ΓΡΕΒΕΝΩΝ,PMH Small customers,2050-FZA,Other Toy Stores,15,Grevena,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404003,ΣΠΕΤΣΑΡΙΔΗΣ Δ. & Π. ΟΕ,Λ.ΣΤΡΑΤΟΥ 4,54640,ΘΕΣΣΑΛΟΝΙΚΗ,2310835722,,,info@socratis.gr,ΒΙΒΛΙΟΠΩΛΕΙΟ-ΧΑΡΤΙΚΑ,EL998828659,Δ ΘΕΣ/ΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1403911,ΣΠΥΡΟΥ ΙΩΑΝΝΗΣ & ΣΙΑ ΟΕ,ΣΚΟΥΦΑ 163,47100,ΑΡΤΑ,2681074598,,2681021455,spirou_ioannis@yahoo.gr,ΒΙΒΛΙΟΠΩΛΕΙΟ-ΧΑΡΤΟΠΩΛΕΙΟ,EL081614383,ΑΡΤΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,5,Arta,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404776,ΣΤΑΘΗ ΦΑΝΗ,ΓΑΛΑΤΙΣΤΑ,63073,ΓΑΛΑΤΙΣΤΑ,2371031872,,,xartaetos213@hotmail.gr,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL067839580,ΠΟΛΥΓΥΡΟΥ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,25,Khalkidhiki,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404651,ΣΤΑΘΗΣ Δ.ΘΕΟΦΑΝΗΣ & ΣΙΑ ΟΕ,ΤΑΛΙΑΔΟΥΡΟΥ 2,43100,ΚΑΡΔΙΤΣΑ (ΕΜΠΟΡΙΚΟ ΚΕΝΤΡΟ),2441022311,,,stathisbookstore@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL999091692,ΚΑΡΔΙΤΣΑΣ,PMH Medium customers,2050-ZAZ,Other Stationery Stores,20,Kardhitsa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404242,ΣΤΕΡΓΙΟΥΛΑ ΚΑΛΛΙΟΠΗ,ΘΕΟΔΩΡΑΚΟΠΟΥΛΟΥ &ΚΑΙΡΗ 41,41335,ΛΑΡΙΣΑ,2410614204,,,linastergioula@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ-ΕΙΔΗ ΔΩΡΩΝ,EL067940031,Β ΛΑΡΙΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1402107,ΣΤΕΡΓΙΟΥΛΑΣ ΘΕΟΔΩΡΟΣ,ΚΑΡΑΟΛΗ ΔΗΜΗΤΡΙΟΥ 22 & ΠΛΑΠΟΥΤΑ 2Α,41334,ΛΑΡΙΣΑ,2410614344,,,info@e-stergioulas.gr,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL046915790,ΛΑΡΙΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404747,ΣΤΟΙΚΟΥ ΟΛΓΑ,ΕΠΑΝΟΜΗ,57500,ΕΠΑΝΩΜΗΣ,2392044403,,,,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL145956150,ΚΑΛΑΜΑΡΙΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1403379,ΣΥΚΟΥΔΗ-ΛΑΓΟΥΜΤΖΗ ΣΩΤΗΡΙΑ,ΛΙΜΕΝΑΣ ΘΑΣΟΥ,64004,ΘΑΣΟΣ,2593023223,,,,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL042691527,ΘΑΣΟΥ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,22,Kavala,9,East Macedon./Th,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404557,ΣΥΛΛΕΛΗΣ ΕΜΠΟΡΙΚΗ ΕΠΕ,Δ.ΜΗΤΡΟΠΟΥΛΟΥ 5,54642,ΘΕΣΣΑΛΟΝΙΚΗ,2310582482,,2310580763,syllelisemporiki2@yahoo.gr,ΔΙΑΝΟΜΕΣ ΖΑΧ.ΑΝΑΨ.Ψ.,EL099956336,Η ΘΕΣ/ΚΗΣ,PMH Distrib./WSales,2050-GBZ,Other Distributors Food,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404112,ΣΥΝΟΔΗΣ Ε.& ΣΙΑ ΟΕ,ΒΡΥΟΥΛΩΝ 64,55132,ΚΑΛΑΜΑΡΙΑ,2310455495,,,,ΠΑΙΧΝΙΔΙΑ,EL998333823,ΚΑΛΑΜΑΡΙΑΣ,PMH Small customers,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404025,ΣΥΡΙΔΑΚΗ ΑΝΝΑ,ΛΑΚΚΙ ΛΕΡΟΥ,85401,ΛΑΚΚΙ ΛΕΡΟΥ,2247024940,,,siridaki@gmail.com,ΠΑΙΧΝΙΔΙΑ,EL044341387,ΚΩ,PMH Tele Sales cust.,2050-WZA,Other Mixt Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410746,ΣΩΤΗΡΟΠΟΥΛΟΙ ΑΦΟΙ Ο.Ε.,Ν.ΝΙΚΟΛΑΟΥ 2,62100,ΣΕΡΡΕΣ,2321051612,,,afoisotir@gmail.com,ΕΜΠ.ΑΝΑΛΩΣ.ΓΡΑΦ.ΤΥΠΟΓΡΑΦΕΙΟ-ΒΙΒΛΙΟΠ,EL800709443,ΣΕΡΡΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,46,Serrai,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404320,ΤΑΚΗ ΜΟΝΟΠΡΟΣΩΠΗ ΙΚΕ,ΑΛΕΞ. ΧΩΝΟΥ 2,59200,ΝΑΟΥΣΑ,2332027337,,,tzepos.nadia@otenet.gr,ΕΜΠΟΡΙΑ ΠΑΙΧΝΙΔΙΩΝ,EL998840882,ΒΕΡΟΙΑΣ,PMH Small customers,2050-FZA,Other Toy Stores,17,Imathia,8,Central Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1401322,ΤΑΞΙΔΟΥ ΒΑΣΙΛΙΚΗ συζ.ΣΤΑΥΡΟΥ,ΙΠΠΟΚΡΑΤΟΥΣ 14,56625,ΣΥΚΙΕΣ,2310622985,,,taxidis@windowlive.com,ΧΑΡΤΙΚΑ - ΠΑΙΧΝΙΔΙΑ,EL040539480,Ε ΘΕΣΣΑΛΟΝΙΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1400646,ΤΑΣΙΟΣ Β.ΠΕΤΡΟΣ,Κ. ΓΚΟΝΟΥ 3,61300,ΓΟΥΜΕΝΙΣΣΑ,2343041303,,,info@tasiostech.gr,ΠΑΙΧΝΙΔΙΑ-ΧΑΡΤΙΚΑ,EL040786780,ΚΙΛΚΙΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,29,Kilkis,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404351,ΤΑΤΑΡΗ ΙΩΑΝ. ΑΙΚΑΤΕΡΙΝΗ,Π.ΜΑΞΙΜΟΥ,85200,ΚΑΛΥΜΝΟΣ,2243022809,,,k2903a@hotmail.com,ΕΜΠΟΡΙΟ ΧΑΡΤΙΚΩΝ ΕΙΔΩΝ-ΒΙΒΛΙΩΝ-ΠΑΙΧ,EL108156970,ΚΩ,PMH Small customers,2050-ZAZ,Other Stationery Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404398,ΤΕΖΑΨΙΔΗΣ Π. ΔΗΜΗΤΡΙΟΣ,"ΕΛΕΘΕΡΙΑΣ 2 ,ΦΙΛΥΡΟ",57010,ΑΣΒΕΣΤΟΧΩΡΙ,2310677456,,,dimtez@hotmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL150468634,Ε ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404740,ΤΕΡΠΙΝΑΣ ΜΟΝΟΠΡΟΣΩΠΗ ΙΚΕ,2ο ΧΛΜ ΦΛΩΡΙΝΑΣ-ΘΕΣ/ΚΗΣ,53100,ΦΛΩΡΙΝΑ,2385044819,,,terpinas@otenet.gr,ΛΙΑΝΙΚΟ ΕΜΠΟΡΙΟ ΠΑΙΧΝΙΔΙΩΝ,EL800503324,ΦΛΩΡΙΝΑΣ,PMH Medium customers,2050-FZA,Other Toy Stores,12,Florina,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410775,ΤΖΗΜΟΠΟΥΛΟΣ ΗΛΙΑΣ,ΣΩΚΡΑΤΟΥΣ 145,85100,ΡΟΔΟΣ,6951745934,6944586875,,beka-max@otenet.gr,ΤΟΥΡΙΣΤΙΚΑ ΕΙΔΗ,EL063460658,ΡΟΔΟΥ,PMH Tele Sales cust.,2050-FZA,Other Toy Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410583,ΤΖΙΑΦΕΤΑΣ ΧΡΗΣΤΟΣ,ΔΕΣΚΑΤΗ ΓΡΕΒΕΝΩΝ,51200,ΔΕΣΚΑΤΗ,2462032798,,,xristos.tziafetas@gmail.com,MINI MARKET,EL046747070,ΓΡΕΒΕΝΩΝ,PMH Small customers,2050-SZA,Other Food Stores,15,Grevena,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411778,ΤΖΙΜΑ Γ.-ΨΑΡΡΑΣ Β. Ο.Ε.,Γ.ΚΥΡΓΙΟΥ 3,45332,ΙΩΑΝΝΙΝΑ,2651072255,6948106851,,arrhto45@gmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL999409696,ΙΩΑΝΝΙΝΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,18,Ioannina,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1402155,ΤΖΙΟΓΚΙΔΟΥ ΔΗΜΗΤΡΑ,ΒΕΝΙΖΕΛΟΥ 96,68300,ΔΙΔΥΜΟΤΕΙΧΟ,2553024978,,,gnosibook@gmail.com,ΒΙΒΛΙΟΠ/ΕΙΟ,EL046629077,ΔΙΔΥΜΟΤΕΙΧΟΥ,PMH Small customers,2050-ZAZ,Other Stationery Stores,10,Evros,9,East Macedon./Th,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411046,ΤΖΙΟΤΖΙΟΣ ΒΑΣΙΛΕΙΟΣ,13ης ΟΚΤΩΒΡΙΟΥ 151,51100,ΓΡΕΒΕΝΑ,2462082610,,,,ΕΠΙΠΛΑ-ΗΛΕΚΤΡΙΚΑ-ΜΟΤ/ΔΑ,EL143705826,ΓΡΕΒΕΝΩΝ,PMH Strat. customers,2050-FZA,Other Toy Stores,15,Grevena,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1403921,ΤΖΙΟΤΖΙΟΥ Π. ΘΕΟΔΩΡΑ,ΒΑΣ.ΠΑΥΛΟΥ 93-ΚΡΥΑ ΒΡΥΣΗ,58100,ΓΙΑΝΝΙΤΣΑ,2382063111,2382063111,,makis165@hotmail.com,ΧΑΡΤΟΒΙΒΛΙΟΠΩΛΕΙΟ-ΕΙΔΗ ΔΩΡΩΝ,EL049334385,ΓΙΑΝΝΙΤΣΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,39,Pella,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1402164,ΤΖΟΥΜΚΑ-ΚΑΡΑΓΙΑΝΝΗ Ι.ΚΩΝ/ΝΤΙΑ,ΒΕΤΣΟΠΟΥΛΟΥ 32,59300,ΑΛΕΞΑΝΔΡΕΙΑ,2333028124,,,,ΧΑΡΤΙΚΑ - ΠΑΙΧΝΙΔΙΑ,EL047206158,ΑΛΕΞΑΝΔΡΕΙΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,17,Imathia,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1402187,ΤΟΛΙΟΠΟΥΛΟΥ ΚΟΠΑΝΟΥ ΓΕΩΡΓΙΑ,Θ. ΖΙΑΚΑ 4,51100,ΓΡΕΒΕΝΑ,2462300957,6974463542,,,ΠΑΙΧΝΙΔΙΑ-ΕΙΔΗ ΜΠΕΜΠΕ,EL046979888,ΓΡΕΒΕΝΩΝ,PMH Small customers,2050-FZA,Other Toy Stores,15,Grevena,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410138,ΤΟΜΠΑΖΗΣ ΚΩΝ.ΔΗΜΗΤΡΙΟΣ,ΕΛ.ΒΕΝΙΖΕΛΟΥ 133,58100,ΓΙΑΝΝΙΤΣΑ,2382022328,,,,ΒΙΒΛΙΑ-ΣΧΟΛΙΚΑ-ΧΑΡΤΙΚΑ,EL134837106,ΓΙΑΝΝΙΤΣΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,39,Pella,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1402521,ΤΟΞΙΔΟΥ Κ.ΕΛΕΝΗ,ΚΥΠΡΟΥ 38,58400,ΑΡΙΔΑΙΑ,2384021265-23840,,,toxidoue@otenet.gr,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ-ΕΜΠΟΡΙΑ ΠΑΙΧΝΙΔΙΩ,EL056095384,ΕΔΕΣΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,39,Pella,8,Central Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410558,ΤΟΠΟΥΖΙΔΟΥ Γ. ΕΛΕΝΗ,28ης ΟΚΤΩΒΡΙΟΥ 39,56224,ΕΥΟΣΜΟΣ,2310775713,,,vivliofagosev@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΑ-ΠΟΛΥΧΩΡΟΙ,EL051066584,ΑΜΠΕΛΟΚΗΠΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410540,ΤΟΥΡΙΣΤΙΚΑΙ ΕΠΙΧΕΙΡΗΣΕΙΣ ΑΙΓΑΙΟΥ Α.,ΗΛΙΑΔΩΝ 4,85100,ΙΑΛΥΣΟΣ ΡΟΔΟΣ,2241023021,,,,ΞΕΝΟΔΟΧΕΙΟ,EL094215348,ΡΟΔΟΥ,PMH Tele Sales cust.,2050-SZA,Other Food Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411809,ΤΟΥΧΤΙΔΗΣ ΒΑΡΥΠΑΤΗΣ Ο.Ε.,ΚΑΝΑΡΗ 27,54453,ΘΕΣΣΑΛΟΝΙΚΗ,2316024051,6988759068,,info@nerdonomicon.gr,ΛΙΑΝΙΚΟ ΕΜΠΟΡΙΟ ΠΑΙΧΝΙΔΙΩΝ,EL801951710,ΚΑΛΑΜΑΡΙΑΣ,PMH Tele Sales cust.,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411342,ΤΡΑΚΑ ΧΑΡ. ΜΕΡOΠΗ,ΓΑΛΑΤΙΣΤΑ,63073,ΧΑΛΚΙΔΙΚΗ,2371032100,,,ptraka@hotimail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL106450191,ΠΟΛΥΓΥΡΟΥ,PMH Small customers,2050-ZAZ,Other Stationery Stores,25,Khalkidhiki,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404146,ΤΡΕΥΛΑΣ ΘΩΜΑΣ & ΣΙΑ ΟΕ,ΑΜΠΕΛΟΚΗΠΩΝ 39,57019,ΠΕΡΑΙΑ,2392076126,,,sales@gnosi.eu,ΒΙΒΛΙΟΠΩΛΕΙΟ-ΧΑΡΤΙΚΑ,EL998334101,ΚΑΛΑΜΑΡΙΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1401908,ΤΡΙΑΝΤΑΦΥΛΛΟΥ ΧΡΥΣΗ,ΜΑΡΑΘΩΝΟΣ 10,85100,ΡΟΔΟΣ,2241065325,,,info@sholikifolia.gr,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL043125761,ΡΟΔΟΥ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410586,ΤΡΙΓΩΝΗ ΚΩΝ.ΕΛΕΥΘΕΡΙΑ,ΓΡ. ΛΑΜΠΡΑΚΗ 27,54638,ΘΕΣ/ΝΙΚΗ,2314030503,6977801092,,eltrigon@gmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ-ΕΙΔΗ ΔΩΡΩΝ-ΦΩΤΟΤΥ,EL044498692,ΣΤ ΘΕΣ/ΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411370,ΤΣΑΒΔΑΡΙΔΗΣ ΓΕΩΡΓΙΟΥ ΑΦΟΙ ΟΕ,25ΗΣ ΜΑΡΤΙΟΥ 23,50200,ΠΤΟΛΕΜΑΙΔΑ,2463026952,6973436504,2463081000,tsavdaridis.g@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ-ΤΥΠΟΓΡΑΦΕΙΟ,EL800611949,ΠΤΟΛΕΜΑΙΔΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,31,Kozani,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1410220,ΤΣΑΓΑΝΑΚΗΣ Κ.- ΤΣΑΓΑΝΑΚΗ Χ. Ο.Ε.,ΔΙΑΛΟΓΗΣ 25-ΙΩΝΙΑ,54628,ΘΕΣΣΑΛΟΝΙΚΗ,2310201484,,,kouniampela2016@gmail.com,ΕΜΠΟΡΙΑ ΕΚΜΕΤΑΛ.ΠΑΙΔΙΚΩΝ ΠΑΙΧΝΙΔΟΜ.,EL081469452,ΙΩΝΙΑΣ,PMH Small customers,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410325,ΤΣΑΔΗΜΑ ΒΙΡΓΙΝΙΑ,ΚΑΡΑΟΛΗ & ΔΗΜΗΤΡΙΟΥ 19,40100,ΤΥΡΝΑΒΟΣ,2492022172,,,georgehatzibarbas@yahoo.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL114507071,ΛΑΡΙΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411414,ΤΣΑΝΑΚΑ ΘΕΟΔΩΡΑ,ΚΟΥΜΑ 45,41222,ΛΑΡΙΣΑ,2410553355,,,bibliognwsi@hotmail.gr,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL117322310,ΛΑΡΙΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411064,ΤΣΑΝΤΕΚΙΔΗΣ ΧΡ.-ΝΩΤΑΣ ΝΙΚ.Ο.Ε.,ΑΜΜΟΥΛΙΑΝΗΣ & ΑΓ.ΔΗΜΗΤΡΙΟΥ,54638,ΘΕΣΣΑΛΟΝΙΚΗ,2310525215,,,,ΕΚΜΕΤΑΛΛΕΥΣΗ ΠΕΡΙΠΤΕΡΟΥ-ΨΙΛΙΚΑ,EL800856105,ΣΤ ΘΕΣΣΑΛΟΝΙΚΗΣ,PMH Tele Sales cust.,2050-SZA,Other Food Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1402811,ΤΣΑΟΥΡΕΛΟΥ ΑΓΓΕΛΙΚΗ ΣΥΖ ΣΑΒΒΑ,Δ.&Μ. ΠΑΠΑΔΟΠΟΥΛΟΥ 12,58100,ΓΙΑΝΝΙΤΣΑ,2382029669,6943667573,,zouzoutoys@yahoo.gr,ΠΑΙΔΙΚΑ ΠΑΙΧΝΙΔΙΑ,EL048186964,ΓΙΑΝΝΙΤΣΩΝ,PMH Medium customers,2050-FZA,Other Toy Stores,39,Pella,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410544,ΤΣΑΧΙΡΙΔΗΣ ΚΩΝΣΤΑΝΤΙΝΟΣ,ΔΟΡΥΛΑΙΟΥ 13,54454,Κ.ΤΟΥΜΠΑ,2310907206,,,,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL054674663,ΣΤ ΘΕΣΣΑΛΟΝΙΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404690,ΤΣΕΡΤΣΗ ΠΑΝ.ΦΩΤΕΙΝΗ,ΑΓ.ΓΕΩΡΓΙΟΥ 4,61100,ΚΙΛΚΙΣ,2341022200,,2341022200,,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL044606056,ΚΙΛΚΙΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,29,Kilkis,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404018,ΤΣΙΑΡΑΣ Κ.-ΤΣΙΟΜΠΛΙΚΑΣ Ν.Ο.Ε.,ΕΥΑΓΓΕΛΙΣΤΡΙΑΣ 4,51100,ΓΡΕΒΕΝΑ,2462022475,2462087998,,grafimagrevena@otenet.gr,ΤΥΠΟΓΡΑΦΕΙΟ-ΧΑΡΤΙΚΑ,EL099296041,ΓΡΕΒΕΝΩΝ,PMH Medium customers,2050-ZAZ,Other Stationery Stores,15,Grevena,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1410313,ΤΣΙΓΑΡΑΣ ΠΑΣΧΑΛΗΣ,ΔΕΣΚΑΤΗ,51200,ΓΡΕΒΕΝΑ,2462032470,6979755305,,,ΥΔΡΑΥΛΙΚΑ ΕΙΔΗ,EL065401562,ΓΡΕΒΕΝΩΝ,PMH Tele Sales cust.,2050-WZA,Other Mixt Stores,15,Grevena,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410329,ΤΣΙΛΙΟΥ ΑΓΓΕΛΙΚΗ,ΚΑΡΔΙΤΣΗΣ 97,41336,ΛΑΡΙΣΑ,2410620804,,,,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL114538951,Β ΛΑΡΙΣΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1401875,ΤΣΙΜΕΤΑΣ ΓΕΩΡΓΙΟΣ,ΛΟΧΑΓΟΥ ΦΑΝΟΥΡΑΚΗ 34,85100,ΡΟΔΟΣ,2241027007,,,,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL027329837,ΡΟΔΟΥ,PMH Medium customers,2050-ZAZ,Other Stationery Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404769,ΤΣΙΟΓΚΑ ΔΗΜΗΤΡΑ,ΚΟΝΔΥΛΗ 25,42200,ΚΑΛΑΜΠΑΚΑ,2432077484,,2432077484,kolios.aris@gmail.com,ΕΚΤΥΠΩΣΕΙΣ-ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL062182761,ΤΡΙΚΑΛΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,49,Trikala,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1412058,ΤΣΙΡΟΠΟΥΛΟΥ Β.ΑΡΙΣΤΕΑ,ΧΑΤΖΗΜΙΧΑΛΗ 74,41334,ΛΑΡΙΣΑ,2410670174,,,paperbookstores@gmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL077155050,ΛΑΡΙΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411742,ΤΣΙΣΙΜΟΙΡΗΣ Μ. & Δ. Ο.Ε.,Λ.ΕΛΕΥΘΕΡΙΑΣ 80,85104,ΚΡΕΜΑΣΤΗ ΡΟΔΟΥ,2241093365,,,tsisimoiris@gmail.com,ΥΠΕΡΑΓΟΡΑ ΤΡΟΦΙΜΩΝ,EL999675058,ΡΟΔΟΥ,PMH Tele Sales cust.,2050-SZA,Other Food Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410140,ΤΣΙΦΟΥΤΗΣ ΚΩΝΣΤ.ΧΡΗΣΤΟΣ,Μ.ΑΛΕΞΑΝΔΡΟΥ 10,62200,ΝΙΓΡΙΤΑ,2322023015,,,typoart@otenet.gr,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ-ΤΥΠΟΓΡΑΦΕΙΟ,EL146908125,ΣΕΡΡΩΝ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,46,Serrai,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1403340,ΤΣΟΛΑΚΙΔΗΣ Κ.,28ης ΟΚΤΩΒΡΙΟΥ 150,67100,ΞΑΝΘΗ,2541022938,6948065072,,k.tsolakidis@yahoo.gr,ΠΑΙΧΝΙΔΙΑ-ΕΙΔΗ ΔΩΡΩΝ,EL034774996,Α'ΞΑΝΘΗΣ,PMH Strat. customers,2050-FZA,Other Toy Stores,51,Xanthi,9,East Macedon./Th,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411464,ΤΣΟΠΟΥΡΙΔΗΣ Ν.ΠΡΟΔΡΟΜΟΣ,ΒΕΝΙΖΕΛΟΥ 72,41221,ΛΑΡΙΣΑ,2414003020,,,vamtoys2019@gmail.com,ΠΑΙΧΝΙΔΙΑ,EL103922365,ΛΑΡΙΣΑΣ,PMH Small customers,2050-FZA,Other Toy Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411479,ΦΑΡΜΑ ΛΟΤΖΙΚ ΕΞΠΡΕΣ ΜΟΝΟΠΡΟΣΩΠΗ Α.Ε,ΧΑΛΚΗΣ 23,57001,ΘΕΣ/ΝΙΚΗ,2316009870,,,info@ontime.deals,ΗΛΕΚΤΡΟΝΙΚΟ ΚΑΤΑΣΤΗΜΑ,EL801212475,ΦΑΕ ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-WZA,Other Mixt Stores,48,Thessaloniki,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411226,ΦΑΤΣΙΟΣ ΚΩΝ.ΝΙΚΟΛΑΟΣ,ΓΡ.ΛΑΜΠΡΑΚΗ 6,46100,ΗΓΟΥΜΕΝΙΤΣΑ,2665025310,,,nikosfatsios@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL108000175,ΗΓΟΥΜΕΝΙΤΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,47,Thesprotia,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411519,ΦΙΛΙΟΓΛΟΥ Θ.ΕΛΕΥΘΕΡΙΟΣ,ΝΟΣΟΚΟΜΕΙΟΥ 5,50200,ΠΤΟΛΕΜΑΙΔΑ,2463029442,6978889028,,lefterisfil@hotmail.com,ΕΜΠΟΡΙΑ ΠΑΙΧΝΙΔΙΩΝ,EL138119474,ΠΤΟΛΕΜΑΙΔΑΣ,PMH Small customers,2050-FZA,Other Toy Stores,31,Kozani,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404991,ΦΙΝΤΙΡΑΚΑΚΗΣ ΠΑΝΑΓΙΩΤΗΣ,Λ.ΝΙΚΗΣ 33,57014,ΣΤΑΥΡΟΣ ΘΕΣ/ΝΙΚΗΣ,2397061208-69802,6940893206,,,ΘΑΛΑΣΣΙΑ ΕΙΔΗ-ΨΙΛΙΚΑ,EL301309373,ΛΑΓΚΑΔΑ,PMH Tele Sales cust.,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1402485,ΦΟΙΝΙΚΟΠΟΥΛΟΣ ΚΩΝ.ΙΩΑΝΝΗΣ,ΚΑΡΑΜΑΝΛΗ 7,62200,ΝΙΓΡΙΤΑ,2322022338,,,yannisfn@hotmail.gr,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL047461182,Α ΣΕΡΡΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,46,Serrai,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410737,ΦΟΥΡΙΚΟΥ ΔΗΜ.ΚΥΡΙΑΚΗ,2ο ΧΛΜ ΣΥΜΜΑΧ.ΟΔΟΥ ΩΡΑΙΟΚΑΣΤΡΟΥ,57013,ΘΕΣΣΑΛΟΝΙΚΗ,2310688793,,2310688794,info@e-delight.gr,ΚΑΤΑΣΚΕΥΗ & ΕΜΠΟΡΙΑ ΚΕΡΙΩΝ,EL065090860,Α ΘΕΣΣΑΛΟΝΙΚΗΣ,PMH Tele Sales cust.,2050-ZBZ,Other B2B,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404613,ΦΟΥΤΣΙΤΖΗΣ Χ.ΙΩΑΝΝΗΣ,Γ.ΠΑΠΑΝΙΚΟΛΑΟΥ 86Α ΠΕΥΚΑ,57010,ΠΕΥΚΑ-ΑΣΒΕΣΤΟΧΩΡΙ,2310676085,,,sublimelogistirio@gmail.com,ΒΙΒΛΙΑ-ΧΑΡΤΙΚΑ-ΑΝΑΛΩΣΙΜΑ-ΠΑΙΧΝΙΔΙΑ,EL079553568,Ε ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410926,ΦΡΑΓΚΟΥ ΕΛΕΥΘΕΡΙΟΣ,ΑΘΗΝΩΝ 11,85100,ΑΝΑΛΗΨΗ ΡΟΔΟΥ,6979586339,,,,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ-ΠΑΙΧΝΙΔΙ,EL101654844,ΡΟΔΟΥ,PMH Small customers,2050-ZAZ,Other Stationery Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411639,ΦΩΤΟΥ ΚΩΝΣΤΑΝΤΙΝΑ,ΓΡΑΜΜΕΝΙΤΣΑ,47100,ΑΡΤΑΣ,2681304655,6907551940,,piterpan.fotou@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ ΠΗΤΕΡ ΠΑΝ,EL120635429,ΑΡΤΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,5,Arta,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411336,ΧΑΛΜΑΝΤΖΗ ΓΕΩΡΓΙΑ,ΑΓΙΑΣ ΣΟΦΙΑΣ 2,47100,ΑΡΤΑ,2681303685,,2681303685,Artbookstores@gmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL151993567,ΑΡΤΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,5,Arta,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410966,ΧΑΜΟΥΡΟΥΔΗΣ Γ. ΧΑΜΟΥΡΟΥΔΗ Μ. Ο.Ε.,ΜΕΓ.ΑΛΕΞΑΝΔΡΟΥ 84,61200,ΠΟΛΥΚΑΣΤΡΟ,2343024770,,,protypo.oe@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL800994460,ΚΙΛΚΙΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,29,Kilkis,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1400699,ΧΑΝΤΕ ΕΥΑΓΓΕΛΙΑ συζ ΚΩΝ/ΝΟΥ,ΕΛ.ΒΕΝΙΖΕΛΟΥ 7 ΧΑΛΑΣΤΡΑ,57300,ΧΑΛΑΣΤΡΑ,2310792265,,,,ΠΑΙΧΝΙΔΙΑ-ΕΤΟΙΜΑ ΕΝΔΥΜΑΤΑ,EL041315769,ΙΩΝΙΑΣ,PMH Small customers,2050-WZA,Other Mixt Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404424,ΧΑΡΑΤΣΙΔΟΥ Ν.ΔΗΜΗΤΡΑ,Γ.ΠΑΠΑΝΔΡΕΟΥ 27,54645,ΘΕΣΣΑΛΟΝΙΚΗ,2310846790,6976773158,,,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL143771798,Η ΘΕΣ/ΚΗΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411188,ΧΑΡΙΖΑΝΗ Δ.ΠΕΤΡΟΥΛΑ,ΧΑΛΚΗΔΟΝΑ,57007,ΘΕΣΣΑΛΟΝΙΚΗ,2391022444,,,charizanip@hotmail.com,ΒΙΒΛΙΑ-ΔΩΡΑ-ΣΧΟΛΙΚΑ-ΧΑΡΤΙΚΑ,EL054324405,ΙΩΝΙΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410547,ΧΑΡΙΣΗ ΔΑΦΝΗ,ΝΙΚΟΠΟΛΕΩΣ 21,45221,ΙΩΑΝΝΙΝΑ,2651083407,,,,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL121501216,ΙΩΑΝΝΙΝΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,18,Ioannina,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411386,ΧΑΡΙΤΙΔΗΣ Α.ΙΩΑΝΝΗΣ,ΚΑΤΟΥΝΗ 45,54625,ΘΕΣΣΑΛΟΝΙΚΗ,2310533019,,,jonh_90_@hotmail.com,ΕΙΣΑΓΩΓΕΣ-ΕΜΠΟΡΙΟ-ΠΑΙΧΝΙΔΙΑ,EL139976261,Α ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-WZA,Other Mixt Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404704,ΧΑΡΤΕΡΟΣ ΠΑΥΛΟΣ,ΚΟΛΥΜΠΙΑ ΕΥΚΑΛΥΠΤΩΝ,85103,ΑΦΑΝΤΟΥ ΡΟΔΟΥ,2241056036,6947693422,,pavlosharteros@yahoo.gr,ΠΑΙΧΝΙΔΙΑ,EL101705074,ΡΟΔΟΥ,PMH Medium customers,2050-FZA,Other Toy Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411125,ΧΑΡΤΟΦΥΛΗ ΣΟΦΙΑ,ΝΙΣΥΡΟΣ,85303,ΝΙΣΥΡΟΣ,2242031388,6970800317,,sofiaxart@hotmail.gr,ΡΟΥΧΑ ΑΞΕΣΟΥΑΡ ΠΑΙΧΝΙΔΙΑ ΤΟΥΡΙΣΤΙΚΑ,EL067616403,ΚΩΣ,PMH Small customers,2050-WZA,Other Mixt Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1403673,ΧΑΣΑΠΗΣ ΜΙΛΤΙΑΔΗΣ,ΚΑΣΣΑΝΔΡΕΙΑ,63077,ΚΑΣΣΑΝΔΡΕΙΑ,2374025490,,,machassapis@hotmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ ΛΕΞΕΙΣ,EL061831325,Ν.ΜΟΥΔΑΝΙΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,25,Khalkidhiki,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1405008,ΧΑΣΙΩΤΗΣ Κ. & ΣΙΑ Ο.Ε.,ΠΕΡΙΟΧ.ΦΑΡΜΑΚΕΙΚΑ-Ν.ΡΥΚΙΟ,57001,ΘΕΡΜΗ,2310383693,2310487637,,,ΕΜΠΟΡΙΑ ΖΑΧΑΡ.ΠΡΟΙΟΝ,EL998971187,Ζ ΘΕΣ/ΝΙΚΗΣ,PMH Distrib./WSales,2050-GBB,Atlas,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410023,ΧΑΣΙΩΤΟΥ ΑΝΑΣΤΑΣΙΑ-ΤΑΝΙΑ,Μ.ΑΛΕΞΑΝΔΡΟΥ 5,59131,ΒΕΡΟΙΑ,2331022657,,,,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ-ΕΚΤΥΠ.,EL100813211,ΒΕΡΟΙΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,17,Imathia,8,Central Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410065,ΧΑΤΖΗΓΕΩΡΓΙΟΥ ΖΑΧΑΡΟΥΛΑ,ΚΑΛΥΜΝΟΣ,85200,ΚΑΛΥΜΝΟΣ,2243022500,,,papyrustore@yahoo.gr,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL077176542,ΚΩ,PMH Small customers,2050-ZAZ,Other Stationery Stores,7,Dhodhekanisos,11,Aegean Sea,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1403205,ΧΑΤΖΗΕΛΕΝΗΣ Α.Ε.Β.Ε.,ΕΘΝ. ΠΑΛΑΙΟΚΑΣΤΡΙΤΣΑΣ 62,49100,ΚΕΡΚΥΡΑ,2661040464,,,agapitos_c@msm.com,ΕΜΠΟΡΙΟ ΠΑΙΧΝΙΔΙΩΝ,EL094484628,Β ΚΕΡΚΥΡΑΣ,PMH Small customers,2050-FZA,Other Toy Stores,24,Kerkira,10,Ionian Islands,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1401873,ΧΑΤΖΗΙΩΣΗΦΙΔΟΥ Ν.ΕΥΑΓΓΕΛΙΑ,ΕΡΜΟΥ 12,65500,ΚΑΒΑΛΑ,2510233606,,,,ΠΑΙΧΝΙΔΙΑ-ΕΙΔΗ ΒΕΒΕ,EL045960829,Α ΚΑΒΑΛΑΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,22,Kavala,9,East Macedon./Th,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1403940,ΧΑΤΖΗΠΑΝΑΓΙΩΤΟΥ ΣΩΤΗΡΗΣ,ΛΙΜΕΝΑΡΙΑ ΘΑΣΟΥ,46002,ΛΙΜΕΝΑΡΙΑ,2593052303,2593052303,,topellis5@gmail.com,ΒΙΒΛΙΑ ΧΑΡΤΙΚΑ ΠΑΙΧΝΙΔΙΑ,EL045049792,ΚΑΒΑΛΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,22,Kavala,9,East Macedon./Th,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411183,ΧΑΤΖΗΠΕΤΡΟΥ ΔΗΜΗΤΡΑ,ΝΕΑ ΤΡΙΓΛΙΑ,63200,ΧΑΛΚΙΔΙΚΗ,2373051162,6948898421,,nkoumpakis@gmail.com,ΠΑΙΧΝΙΔΙΑ-ΔΩΡΑ-ΣΧΟΛΙΚΑ-ΕΠΟΧΙΑΚΑ,EL047614166,Ν.ΜΟΥΔΑΝΙΩΝ,PMH Small customers,2050-FZA,Other Toy Stores,25,Khalkidhiki,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411820,ΧΑΤΖΗΧΡΗΣΤΟΣ Ε.ΔΗΜΗΤΡΙΟΣ,ΠΟΛΥΤΕΧΝΕΙΟΥ 24,63100,ΠΟΛΥΓΥΡΟΣ,2371024228,,2371024995,dxatzixristos@yahoo.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL155688287,ΠΟΛΥΓΥΡΟΥ,PMH Small customers,2050-ZAZ,Other Stationery Stores,25,Khalkidhiki,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411462,ΧΑΤΤΑΡΙ ΝΑΕΛ,ΜΠΙΖΑΝΙΟΥ 227,48200,ΦΙΛΙΙΠΙΑΔΑ,2683024317,6971811053,,iosif.khattari@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ ΠΑΠΥΡΟΣ,EL044028381,ΠΡΕΒΕΖΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,42,Preveza,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404961,ΧΙΩΤΗΣ ΚΩΝ/ΝΟΣ,ΚΑΛΗ,58500,ΣΚΥΔΡΑ,2381041985,,,,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL079507590,ΕΔΕΣΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,39,Pella,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404203,ΧΟΛΙΔΗΣ ΚΩΝ.ΠΑΝΑΓΙΩΤΗΣ,ΠΑΠΑΓΟΥ 59,56224,ΕΥΟΣΜΟΣ,2310669089,,,,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL064980140,ΑΜΠΕΛΟΚΗΠΩΝ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404546,ΧΟΝΔΡΟΓΙΑΝΝΗΣ Κ.ΙΩΑΝΝΗΣ,ΑΧΑΡΑΒΗ,49100,ΚΕΡΚΥΡΑ,2663063924,,,zouzouniabebe@hotmail.gr,ΠΑΙΔΙΚΑ ΕΙΔΗ-ΕΝΔΥΜΑΤΑ-ΠΑΙΧΝΙΔΙΑ,EL074625291,ΚΕΡΚΥΡΑΣ,PMH Small customers,2050-WZA,Other Mixt Stores,24,Kerkira,10,Ionian Islands,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1403282,ΧΟΠΙΤΣΑΣ ΔΗΜΗΤΡΗΣ,ΧΑΡ ΤΡΙΚΟΥΠΗ 3,69100,ΚΟΜΟΤΗΝΗ,2531030029,6908095844,,dimitrishopitsas@yahoo.gr,ΠΑΙΧΝΙΔΙΑ,EL053600049,ΚΟΜΟΤΗΝΗΣ,PMH Tele Sales cust.,2050-FZA,Other Toy Stores,44,Rodhopi,9,East Macedon./Th,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1400047,ΧΟΧΟΡΑΣ ΙΩΑΝΝΗΣ & ΣΙΑ Ο.Ε.,ΑΝΔΡΕΑ ΠΑΠΑΝΔΡΕΟΥ 108,56728,ΝΕΑΠΟΛΗ,2310625953,,,hohorasjohn@gmail.com,ΠΑΙΧΝΙΔΙΑ-ΕΙΔΗ ΔΩΡΩΝ,EL081759142,Ε ΘΕΣ/ΝΙΚΗΣ ΝΕΑΠΟΛΕΩΣ,PMH Small customers,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411180,ΧΡΗΣΤΟΥ ΔΗΜΗΤΡΙΟΣ ΧΡΥΣΟΒΑΛΑΝΤΗΣ,ΦΙΛΙΚΗΣ ΕΤΑΙΡΙΑΣ 2Α ΚΑΡΔΑΜΙΤΣΙΑ,46500,ΙΩΑΝΝΙΝΑ,2651025577-26510,,,supply@komvosgnosis.gr,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL142507351,ΙΩΑΝΝΙΝΩΝ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,18,Ioannina,4,Epirus,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410295,ΧΡΙΣΤΙΔΟΥ Φ. ΚΩΝΣΤΑΝΤΙΝΙΑ,ΜΕΓ.ΑΛΕΞΑΝΔΡΟΥ 2,57001,Ν.ΡΑΙΔΕΣΤΟΣ,2310365985,,,vivliopoleio.papyros@hotmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL117636034,Ζ ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411650,ΧΡΙΣΤΟΔΟΥΛΟΥ ΑΝΑΣΤΑΣΙΑ συζ ΕΜΜΑΝ.,ΤΡΕΜΠΕΣΙΝΑΣ 12 & ΚΟΝΙΤΣΗΣ ΓΩΝΙΑ,59100,ΒΕΡΟΙΑ,2331024672,,,iliotropio.ver@gmail.com,ΒΙΒΛΙΑ-ΧΑΡΤΙΚΑ-ΓΡΑΦΙΚΑ-ΕΙΔΗ ΣΧΕΔΙΟΥ,EL044702462,ΒΕΡΟΙΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,17,Imathia,8,Central Macedoni,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1404997,ΧΡΙΣΤΟΦΟΡΙΔΗΣ ΑΝΑΣΤΑΣΙΟΣ ΑΕ,1οΧΛΜ ΣΕΡΡΩΝ-ΝΕΟΧΩΡΙΟΥ,62100,ΣΕΡΡΕΣ,2321023658,,,,ΕΜΠΟΡ.ΤΣΙΓΑΡ-ΖΑΧΑΡΩΔ,EL998747386,ΣΕΡΡΩΝ,PMH Distrib./WSales,2050-GBB,Atlas,46,Serrai,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1404859,ΧΩΛΙΔΗΣ ΑΝ.ΓΕΩΡΓΙΟΣ,ΑΜΦΙΠΟΛΕΩΣ 19,54454,ΚΑΤΩ ΤΟΥΜΠΑ,2313030530,,,info@stampon.gr,ΒΙΒΛ/ΠΩΛΕΙΟ-ΦΩΤΟΤΥΠΙΕΣ,EL047745283,Δ ΘΕΣ/ΝΙΚΗΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411709,ΨΑΘΑ-ΧΑΤΖΗΠΑΠΑ ΓΕΩΡΓΙΑ,ΕΘΝ.ΑΝΤΙΣΤΑΣΗΣ 33-Ν,63200,Ν.ΜΟΥΔΑΝΙΑ,2373025139,,,chatzipapa@gmail.com,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL123752326,Ν.ΜΟΥΔΑΝΙΩΝ,PMH Small customers,2050-ZAZ,Other Stationery Stores,25,Khalkidhiki,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1402781,ΨΑΛΤΗ Β. ΔΡΟΣΟΥΛΑ,21ης ΙΟΥΝΙΟΥ 201,61100,ΚΙΛΚΙΣ,2341022331,,,,ΒΙΒΛ/ΛΕΙΟ,EL048063626,ΚΙΛΚΙΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,29,Kilkis,8,Central Macedoni,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411475,ΨΥΡΡΑ ΘΕΟΔΩΡΑ,ΚΑΡΑΟΛΗ & ΔΗΜΗΤΡΙΟΥ 36,40100,ΤΥΡΝΑΒΟΣ,2492024151,,2492024151,psiras@otenet.gr,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL136593883,ΛΑΡΙΣΑΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,33,Larisa,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1403858,AG BEST ON WEB SMPC & ΣΙΑ ΟΕ,Μ.ΜΠΟΤΣΑΡΗ 126,54453,ΚΑΤΩ ΤΟΥΜΠΑ,2310949186,2310949187,,,ΒΙΒΛΙΟΠΩΛΕΙΟ,EL084169866,Η ΘΕΣ/ΚΗΣ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411702,EFANTASY GR GAMES N COMICS Ι.Κ.Ε.,ΙΑΣΩΝΙΔΟΥ ΛΕΩΝΙΔΑ 13,54635,ΘΕΣ/ΝΙΚΗ,2313021171,,,info@efantasy.gr,ΕΜΠΟΡΙΟ ΠΑΙΧΝΙΔΙΩΝ & ΒΙΒΛΙΩΝ,EL800794436,Δ ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404980,HAPPY MARKET I.K.E.,ΒΕΡΜΙΟΥ 24,50100,ΚΟΖΑΝΗ,2461027770,6906608656,,happy.market.kozani@gmail.com,ΕΜΠΟΡΙΑ ΠΑΙΧΝΙΔΙΩΝ & ΣΥΝ.ΕΙΔΩΝ,EL800638231,ΚΟΖΑΝΗΣ,PMH Medium customers,2050-WZA,Other Mixt Stores,31,Kozani,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411587,LUBONJA ALTIN,ΑΙΓΑΙΟΥ 22-24,54655,ΚΑΛΑΜΑΡΙΑ,2310263163,,,info@mathv.gr,ΠΑΙΧΝΙΔΙΑ- ΒΙΒΛΙΑ-ΕΚΔΟΣΕΙΣ,EL059527166,Ζ ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411448,MAG GROUP IKE,ΑΚΑΔΗΜΟΥ 99,56224,ΑΝΩ ΗΛΙΟΥΠΟΛΗ,2312133590,69783252949,,petros@maggroup.gr,ΛΙΑΝΙΚΟ & ΧΟΝΔΡΙΚΟ ΕΜΠΟΡΙΟ,EL801396167,ΑΜΠΕΛΟΚΗΠΩΝ,PMH Small customers,2050-WZA,Other Mixt Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1411144,MEGA MARKET IKE,13ΗΣ ΟΚΤΩΒΡΙΟΥ 151,51100,ΓΡΕΒΕΝΑ,2462028590,,,def@dnet.gr,ΛΙΑΝΙΚΟ ΕΜΠΟΡΙΟ,EL801139845,ΓΡΕΒΕΝΩΝ,PMH Small customers,2050-WZA,Other Mixt Stores,15,Grevena,6,Western Macedoni,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1404255,PLAYCORNER ΕΠΙΧ. ΕΚΜ/ΣΗΣ ΠΑΙΔΟΤ. Ε.,Ν.ΖΕΡΒΑ & ΣΠΑΡΤΗΣ 2,54640,ΘΕΣΣΑΛΟΝΙΚΗ,2310852212,2310852212,2310516103,info@playcornershop.gr,ΠΑΙΔΟΤΟΠΟΣ-ΕΜΠΟΡΙΟ ΠΑΙΧΝΙΔΙΩΝ,EL998074323,ΣΤ ΘΕΣ/ΚΗΣ,PMH Medium customers,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1410992,PLAYTIME TOYSHOP ΜΟΝΟΠΡΟΣΩΠΗ ΙΚΕ,ΑΝΤΩΝΗ ΤΡΙΤΣΗ 78,56224,ΝΕΑ ΠΟΛΙΤΕΙΑ ΕΥΟΣΜΟΥ,2310700501,,,info@play-time.gr,ΠΑΙΧΝΙΔΙΑ,EL800903530,ΑΜΠΕΛΟΚΗΠΩΝ,PMH Small customers,2050-FZA,Other Toy Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411232,PROMOTION COMPUTERS Α.Ε.,ΔΕΛΦΩΝ 4-6,54640,ΘΕΣΣΑΛΟΝΙΚΗ,2310868788,,2310854990,natasa@promotioncomputers.gr,ΗΛΕΚΤΡΟΝΙΚΟΙ ΥΠΟΛΟΓΙΣΤΕΣ,EL094411544,Φ.Α.Ε.Θ.,PMH Small customers,2050-WZA,Other Mixt Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1410593,SEVEN GROUP A.E.,ΤΡΙΠΟΤΑΜΟΥ 11,56430,ΣΤΑΥΡΟΥΠΟΛΗ ΘΕΣ/ΚΗΣ,2310587221,,,,ΕΚΜ/ΣΗ ΟΠΤ/ΚΩΝ ΜΕΣΩΝ ΔΙΑΝ. ΚΙΝ/ΚΩΝ,EL099772210,ΦΑΕ ΘΕΣΣΑΛΟΝΙΚΗΣ,PMH Medium customers,2050-ZAZ,Other Stationery Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1412025,THENEWORLD IKE,ΜΙΚΡΑΣ ΑΣΙΑΣ 39,57010,ΠΕΥΚΑ ΘΕΣ/ΝΙΚΗΣ,6972846341,,,vstouraitis@theneworld.gr,ΕΙΔΗ ΔΩΡΩΝ ΚΑΙ ΤΕΧΝΟΛΟΓΙΑΣ,EL802054872,Ε ΘΕΣ/ΝΙΚΗΣ,PMH Small customers,2050-WZA,Other Mixt Stores,48,Thessaloniki,7,Thessalonica,ΖΕΓΑΣ ΓΙΩΡΓΟΣ
+1411350,UNITUP ΕΜΠΟΡΙΚΗ ΕΕ,2ο ΧΛΜ ΣΤΡΟΦΗΣ ΩΡΑΙΟΚΑΣΤΡΟΥ,54629,ΘΕΣΣΑΛΟΝΙΚΗ,2311291098,,,info@unitup.gr,ΓΕΝΙΚΟ ΕΜΠΟΡΙΟ,EL800795918,Ε ΘΕΣ/ΝΙΚΗΣ,PMH Distrib./WSales,2050-WZA,Other Mixt Stores,48,Thessaloniki,7,Thessalonica,ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ
+1411047,ZACHOPOULOS LYNNE,Ρ.ΦΕΡΑΙΟΥ & Π.ΓΕΩΡΓΙΑΔΟΥ,37300,ΑΓΡΙΑ,2428091373,,,lynnezach@hotmail.com,ΒΙΒΛΙΟΧΑΡΤΟΠΩΛΕΙΟ,EL045754388,ΒΟΛΟΥ,PMH Tele Sales cust.,2050-ZAZ,Other Stationery Stores,37,Magnisia,5,Thessaly,ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ
+1411999,FOUR FOOD Ε.Π.Ε.,,,ΗΡΑΚΛΕΙΟ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Iraklion,,,ΚΡΗΤΗ
+1403297,HONDOS CENTER AEE ΠOΛΥΚΑΤΑΣΤΗΜΑΤΑ,,,ΑΘΗΝΑ,,,,,,,,PMH Strat. customers,2050-FZA,,,Attiki,,,ΚΡΗΤΗ
+1411865,THEODOROU Μ. & ΜΑΚΡΙΔΗΣ Π. &ΣΙΑ Ε.Ε,,,ΧΕΡΣΟΝΗΣΟΣ ΗΡΑΚΛΕΙΟ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Iraklion,,,ΚΡΗΤΗ
+1404295,ΑΝΑΣΤΑΣΑΚΗ ΓΕΩΡ. ΑΡΓΥΡΩ,,,ΗΡΑΚΛΕΙΟ,,,,,,,,PMH Small customers,2050-FZA,,,Iraklion,,,ΚΡΗΤΗ
+1404188,ΑΝΑΣΤΑΣΑΚΗΣ ΣΤ. ΠΕΤΡΟΣ,,,ΧΑΝΙΑ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Khania,,,ΚΡΗΤΗ
+1404143,ΒΑΡΑΝΑΚΗ ΑΡΓΥΡΩ & ΣΙΑ ΕΕ,,,ΧΑΝΙΑ,,,,,,,,PMH Strat. customers,2050-FZA,,,Khania,,,ΚΡΗΤΗ
+1404093,ΒΙΔΑΚΗΣ ΝΙΚΟΛΑΟΣ & ΣΙΑ ΟΕ,,,ΑΓΙΟΣ ΝΙΚΟΛΑΟΣ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Lasithi,,,ΚΡΗΤΗ
+1412077,ΒΟΛΑΝΑΚΗ ΚΑΛΛΙΟΠΗ,,,ΡΕΘΥΜΝΟ,,,,,,,,PMH Small customers,2050-FZA,,,Rethimni,,,ΚΡΗΤΗ
+1402003,ΓΑΒΑΛΑΣ Ν.ΝΙΚΟΛΑΟΣ,,,ΡΕΘΥΜΝΟ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Rethimni,,,ΚΡΗΤΗ
+1410802,ΓΕΩΡΓΙΛΑ ΒΑΣΙΛΙΚΗ,,,ΧΑΝΙΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Khania,,,ΚΡΗΤΗ
+1411060,ΓΕΩΡΓΙΤΣΗ Β. & ΣΙΑ Ο.Ε.,,,ΙΕΡΑΠΕΤΡΑ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Lasithi,,,ΚΡΗΤΗ
+1400965,ΔΑΝΑΣΑΚΗ ΜΑΡΙΑ & ΣΙΑ ΟΕ,,,ΗΡΑΚΛΕΙΟ ΚΡΗΤΗΣ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Iraklion,,,ΚΡΗΤΗ
+1411467,ΔΑΣΚΑΛΑΚΗ ΚΥΡΙΑΚΗ,,,ΡΕΘΥΜΝΟ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Rethimni,,,ΚΡΗΤΗ
+1404181,ΕΛΕΥΘΕΡΑΚΗ ΒΑΣ. & ΤΕΚΝΑ ΟΕ,,,ΗΡΑΚΛΕΙΟ ΚΡΗΤΗΣ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Iraklion,,,ΚΡΗΤΗ
+1404415,ΖΩΓΡΑΦΑΚΗ ΑΙΚ.ΣΥΖ.ΓΕΩ. ΜΟΝ/ΠΗ ΕΠΕ,,,ΧΑΝΙΑ,,,,,,,,PMH Small customers,2050-FZA,,,Khania,,,ΚΡΗΤΗ
+1410965,ΗΛΙΑΚΗΣ ΣΤ.ΣΤΥΛΙΑΝΟΣ,,,ΧΑΝΙΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Rethimni,,,ΚΡΗΤΗ
+1410260,ΘΕΟΔΟΣΑΚΗΣ ΕΜΜΑΝΟΥΗΛ,,,XANIA,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Khania,,,ΚΡΗΤΗ
+1402431,ΘΕΟΔΩΡΑΚΗΣ Γ.ΝΙΚΟΛΑΟΣ,,,ΜΟΙΡΕΣ,,,,,,,,PMH Small customers,2050-FZA,,,Iraklion,,,ΚΡΗΤΗ
+1410047,ΙΩΑΚΕΙΜΙΔΗΣ Α.Θ.Ι. Ο.Ε.,,,ΗΡΑΚΛΕΙΟ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Iraklion,,,ΚΡΗΤΗ
+1403038,ΚΑΜΠΑΞΗΣ ΙΩΑΝ.ΠΑΝΤΕΛΗΣ,,,ΗΡΑΚΛΕΙΟ ΚΡΗΤΗΣ,,,,,,,,PMH Small customers,2050-FZA,,,Iraklion,,,ΚΡΗΤΗ
+1404420,ΚΑΝΑΚΟΥΣΑΚΗΣ ΙΩΑΝ.ΚΩΝ/ΝΟΣ,,,ΑΡΚΑΛΟΧΩΡΙ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Iraklion,,,ΚΡΗΤΗ
+1404401,ΚΑΡΤΑΚΗ-ΤΣΑΚΙΡΑΚΗ ΑΝΑΣΤΑΣΙΑ,,,ΧΑΝΙΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Khania,,,ΚΡΗΤΗ
+1402194,ΚΛΑΨΙΝΑΚΗ ΑΦΟΙ Ο.Ε.,,,ΡΕΘΥΜΝΟ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Rethimni,,,ΚΡΗΤΗ
+1405009,ΚΟΣΜΑΣ ΕΜΜΑΝΟΥΗΛ,,,ΚΑΣΤΕΛΙ ΚΙΣΣΑΜΟΥ,,,,,,,,PMH Small customers,2050-FZA,,,Khania,,,ΚΡΗΤΗ
+1403717,ΚΟΥΜΑΔΩΡΑΚΗ ΣΟΦΙΑ,,,ΚΟΥΝΟΥΠΙΔΙΑΝΑ ΑΚΡΩΤΗΡΙΟΥ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Khania,,,ΚΡΗΤΗ
+1411617,ΚΟΥΜΙΩΤΑΚΗ Χ.ΕΛΕΝΗ,,,ΡΕΘΥΜΝΟ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Rethimni,,,ΚΡΗΤΗ
+1404543,ΚΟΥΡΓΙΑΝΤΑΚΗ ΓΕΩΡΓΙΑ,,,ΑΓΙΟΣ ΝΙΚΟΛΑΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Lasithi,,,ΚΡΗΤΗ
+1404922,ΚΟΥΡΤΙΔΟΥ ΕΥΑΓ. ΧΑΡΙΚΛΕΙΑ,,,ΗΡΑΚΛΕΙΟ ΚΡΗΤΗΣ,,,,,,,,PMH Strat. customers,2050-FZA,,,Iraklion,,,ΚΡΗΤΗ
+1405005,ΚΡΗΤΙΚΑ ΠΑΡΚΑ Α.E.,,,ΗΡΑΚΛΕΙΟ ΚΡΗΤΗΣ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Iraklion,,,ΚΡΗΤΗ
+1411378,ΚΩΣΤΑΚΗ ΕΛΕΝΗ,,,ΗΡΑΚΛΕΙΟ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Iraklion,,,ΚΡΗΤΗ
+1412038,ΛΑΠΠΑ ΕΙΡΗΝΗ,,,ΑΓ.ΝΙΚΟΛΑΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Lasithi,,,ΚΡΗΤΗ
+1410136,ΜΑΓΚΑΦΟΥΡΑΚΗΣ ΜΙΧΑΛΗΣ,,,ΗΡΑΚΛΕΙΟ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Iraklion,,,ΚΡΗΤΗ
+1412172,ΜΑΘΙΟΥΔΑΚΗ ΑΝΑΣΤΑΣΙΑ,,,ΡΕΘΥΜΝΟ,,,,,,,,PMH Small customers,2050-FZA,,,Rethimni,,,ΚΡΗΤΗ
+1400167,ΜΑΝΔΟΥΡΑΡΑΚΗ ΚΩΝ. ΣΟΥΛΑ,,,ΙΕΡΑΠΕΤΡΑ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Lasithi,,,ΚΡΗΤΗ
+1412034,ΜΑΝΙΑΔΗ ΜΑΤ.ΑΡΙΣΤΕΑ,,,ΓΑΖΙ ΗΡΑΚΛΕΙΟΥ,,,,,,,,PMH Small customers,2050-FZA,,,Iraklion,,,ΚΡΗΤΗ
+1412033,ΜΑΡΑΓΚΟΥΔΑΚΗ Γ. Π. Ι.Κ.Ε.,,,ΡΕΘΥΜΝΟ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Rethimni,,,ΚΡΗΤΗ
+1410585,ΜΑΡΚΑΚΗΣ Ι - ΧΡΙΣΤΟΔΟΥΛΑΚΗ Μ ΟΕ,,,ΤΥΜΠΑΚΙ ΗΡΑΚΛΕΙΟΥ ΚΡΗΤΗΣ,,,,,,,,PMH Small customers,2050-FZA,,,Iraklion,,,ΚΡΗΤΗ
+1402558,ΜΠΑΧΛΙΤΖΑΝΑΚΗ Κ.ΜΑΡΙΑ,,,ΛΙΜΕΝΑΣ ΧΕΡΣΟΝΗΣΟΥ,,,,,,,,PMH Small customers,2050-FZA,,,Iraklion,,,ΚΡΗΤΗ
+1412070,ΝΑΘΕΝΑΣ Α. & ΣΙΑ Ο.Ε.,,,ΗΡΑΚΛΕΙΟ,,,,,,,,PMH Small customers,2050-FZA,,,Iraklion,,,ΚΡΗΤΗ
+1404200,ΝΑΘΕΝΑΣ ΑΓΓΕΛΟΥ ΟΕ,,,ΗΡΑΚΛΕΙΟ ΚΡΗΤΗΣ,,,,,,,,PMH Small customers,2050-FZA,,,Iraklion,,,ΚΡΗΤΗ
+1404644,ΞΥΠΟΛΙΤΑΚΗ ΧΟΧΛΑΚΗ ΙΩΑΝΝΑ,,,ΚΙΣΑΜΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Khania,,,ΚΡΗΤΗ
+1402656,ΟΡΦΑΝΟΥΔΑΚΗΣ ΚΩΣΤΑΣ,,,ΙΕΡΑΠΕΤΡΑ,,,,,,,,PMH Small customers,2050-FZA,,,Lasithi,,,ΚΡΗΤΗ
+1410166,ΠΑΓΚΑΛΟΥ ΙΩΑΝ.ΜΑΡΙΑ,,,ΜΥΛΟΠΟΤΑΜΟΣ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Rethimni,,,ΚΡΗΤΗ
+1401578,ΠΑΛΜΕΡ-ΠΕΡΣΕΝ ΣΟΥΖΑΝΑ,,,ΠΑΛΑΙΟΧΩΡΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Khania,,,ΚΡΗΤΗ
+1404964,ΠΑΝΑΓΙΟΥΛΑΚΗΣ Γ.ΚΩΝΣΤΑΝΤΙΝΟΣ,,,ΓΑΖΙ,,,,,,,,PMH Small customers,2050-FZA,,,Iraklion,,,ΚΡΗΤΗ
+1404051,ΠΑΝΤΕΛΑΚΗ ΚΑΤΕΡΙΝΑ,,,ΗΡΑΚΛΕΙΟ ΚΡΗΤΗΣ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Iraklion,,,ΚΡΗΤΗ
+1411469,ΠΑΠΑΔΑΚΗΣ ΒΑΣΙΛΕΙΟΣ & ΣΙΑ Ο.Ε.,,,ΗΡΑΚΛΕΙΟ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Iraklion,,,ΚΡΗΤΗ
+1401488,ΠΑΠΑΔΑΚΗΣ ΚΩΝΣΤΑΝΤΙΝΟΣ,,,ΣΗΤΕΙΑ,,,,,,,,PMH Small customers,2050-FZA,,,Lasithi,,,ΚΡΗΤΗ
+1410822,ΠΑΤΣΟΥΡΑΚΗ ΠΑΓΩΝΑ,,,ΤΥΜΠΑΚΙ,,,,,,,,PMH Small customers,2050-FZA,,,Iraklion,,,ΚΡΗΤΗ
+1411485,ΠΕΔΙΑΔΙΤΗΣ ΕΜΜΑΝΟΥΗΛ,,,ΕΛΟΥΝΤΑ,,,,,,,,PMH Small customers,2050-FZA,,,Lasithi,,,ΚΡΗΤΗ
+1410139,ΠΕΛΕΚΑΝΑΚΗ ΠΑΝΑΓ.ΕΙΡΗΝΗ,,,ΧΑΝΙΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Khania,,,ΚΡΗΤΗ
+1411502,ΠΕΡΑΜΑΤΖΕΛΗ ΦΩΤΕΙΝΗ,,,ΧΑΝΙΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Khania,,,ΚΡΗΤΗ
+1404456,ΠΕΡΙΣΤΕΡΑΚΗ ΑΦΟΙ Α.Ε.,,,ΜΥΡΘΙΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Rethimni,,,ΚΡΗΤΗ
+1401600,ΠΕΤΡΑΝΤΩΝΑΚΗ ΑΝΑΣΤΑΣΙΑ,,,ΧΑΝΙΑ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Khania,,,ΚΡΗΤΗ
+1405027,ΠΡΟΕΣΤΑΚΗ ΕΙΡΗΝΗ,,,ΣΗΤΕΙΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Lasithi,,,ΚΡΗΤΗ
+1412062,ΠΥΡΟΒΟΛΑΚΗ ΧΡΙΣΤΙΝΑ,,,ΧΑΝΙΑ,,,,,,,,PMH Small customers,2050-FZA,,,Khania,,,ΚΡΗΤΗ
+1411666,ΡΟΥΣΣΟΓΙΑΝΝΗΣ Ι.Κ.Ε.,,,ΜΑΛΛΙΑ ΗΡΑΚΛΕΙΟ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Iraklion,,,ΚΡΗΤΗ
+1411150,ΣΑΜΑΡΙΤΑΚΗ ΑΡΙΣΤΕΑ,,,ΗΡΑΚΛΕΙΟ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Iraklion,,,ΚΡΗΤΗ
+1411756,ΣΑΡΙΚΑΣ ΕΥΑΓ. ΓΕΩΡΓΙΟΣ,,,ΣΗΤΕΙΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Lasithi,,,ΚΡΗΤΗ
+1403576,ΣΑΡΡΗΣ ΕΜΜ.ΓΕΩΡΓΙΟΣ,,,ΠΕΡΑΜΑ ΡΕΘΥΜΝΗΣ,,,,,,,,PMH Small customers,2050-FZA,,,Rethimni,,,ΚΡΗΤΗ
+1404990,ΣΗΦΑΚΗ ΕΛΕΥΘΕΡΙΑ,,,ΑΣΗΜΙ,,,,,,,,PMH Small customers,2050-FZA,,,Iraklion,,,ΚΡΗΤΗ
+1411486,ΣΜΥΡΝΑΚΗΣ ΕΜΜ. ΚΑΙ ΝΙΚ. Ο.Ε.,,,ΗΡΑΚΛΕΙΟ,,,,,,,,PMH Small customers,2050-FZA,,,Iraklion,,,ΚΡΗΤΗ
+1410509,ΣΤΑΥΡΑΚΑΚΗ ΜΑΡΙΑ,,,ΔΗΜΟΣ ΑΡΧΑΝΩΝ-ΑΣΤΕΡΟΥΣΙΩΝ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Iraklion,,,ΚΡΗΤΗ
+1404825,ΣΤΑΥΡΙΔΑΚΗΣ Ε.ΝΙΚΟΛΑΟΣ,,,ΡΕΘΥΜΝΟ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Rethimni,,,ΚΡΗΤΗ
+1411453,ΤΕΣΣΕΡΙΣ ΕΠΟΧΕΣ ΜΟΝ.ΙΚΕ,,,ΗΡΑΚΛΕΙΟ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Iraklion,,,ΚΡΗΤΗ
+1404225,ΤΙΤΑΚΗΣ ΙΩΑΝΝΗΣ,,,ΑΓΙΑ ΒΑΡΒΑΡΑ ΗΡΑΚΛΕΙΟ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Iraklion,,,ΚΡΗΤΗ
+1411325,ΤΟ ΚΑΝΙΣΚΙ ΜΟΝ.Ι.Κ.Ε.,,,ΚΙΣΑΜΟΣ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Khania,,,ΚΡΗΤΗ
+1404771,ΤΡΑΝΤΑΛΙΔΗ ΑΙΚΑΤΕΡΙΝΗ,,,ΡΕΘΥΜΝΟ,,,,,,,,PMH Small customers,2050-FZA,,,Rethimni,,,ΚΡΗΤΗ
+1410051,ΤΡΙΑΝΤΑΦΥΛΛΑΚΗΣ ΣΠΥΡΟΣ,,,ΗΡΑΚΛΕΙΟ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Iraklion,,,ΚΡΗΤΗ
+1403189,ΦΑΛΕΛΑΚΗ-ΖΟΥΡΙΔΗ ΑΛΕΞΙΑ,,,ΠΑΛΑΙΟΧΩΡΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Khania,,,ΚΡΗΤΗ
+1411409,ΦΑΝΟΥΡΑΚΗ ΜΑΡΙΑ,,,ΗΡΑΚΛΕΙΟ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Iraklion,,,ΚΡΗΤΗ
+1403965,ΦΡΑΓΚΑΚΗ ΜΑΡΙΑ,,,ΗΡΑΚΛΕΙΟ ΚΡΗΤΗΣ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Iraklion,,,ΚΡΗΤΗ
+1404578,ΧΛΩΜΟΥ ΚΩΝ. ΑΝΑΣΤΑΣΙΑ,,,ΑΓΙΟΣ ΝΙΚΟΛΑΟΣ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Lasithi,,,ΚΡΗΤΗ
+1405022,ΧΡΙΣΤΟΔΟΥΛΑΚΗ Α.ΖΑΦΕΙΡΙΑ,,,ΗΡΑΚΛΕΙΟ ΚΡΗΤΗΣ,,,,,,,,PMH Small customers,2050-FZA,,,Iraklion,,,ΚΡΗΤΗ
+1403004,ΧΡΙΣΤΟΔΟΥΛΑΚΗΣ ΑΝΤΑΛΚΙΔΑΣ,,,ΜΟΙΡΕΣ,,,,,,,,PMH Small customers,2050-FZA,,,Iraklion,,,ΚΡΗΤΗ
+1404550,ΧΡΟΝΑΚΗΣ ΕΜΜ. ΦΑΝΟΥΡΙΟΣ,,,ΜΟΙΡΕΣ,,,,,,,,PMH Small customers,2050-FZA,,,Iraklion,,,ΚΡΗΤΗ
+1404618,BOOOM ΕΜΠΟΡΙΑ ΠΑΙΔ.ΕΙΔΩΝ & ΠΑΙΧ ΜΟΝ,,,ΘΕΣΣΑΛΟΝΙΚΗ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Thessaloniki,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1412129,JONIK TOYS ΚΟΥΡΟΥΠΑΚΗΣ Ο.Ε.,,,ΒΟΛΟΣ,,,,,,,,PMH Strat. customers,2050-FZA,,,Magnisia,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1411879,JOYWORLD Ι.Κ.Ε.,,,ΝΑΟΥΣΑ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Imathia,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1412245,OLYMPUS FOREST PARK A.E.,,,ΛΑΡΙΣΑ,,,,,,,,PMH Small customers,2050-FZA,,,Larisa,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1404835,TOY WORLD P.C.,,,ΚΙΛΚΙΣ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Kilkis,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1403642,TOYS-SHOP ΜΟΝΟΠΡΟΣΩΠΗ Ι.Κ.Ε.,,,ΘΕΣΣΑΛΟΝΙΚΗ,,,,,,,,PMH Premium,,,,Thessaloniki,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1412206,ΑΠΟΣΤΟΛΗΣ ΙΩΑΝΝΗΣ,,,ΧΙΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Khios,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1411044,ΑΠΟΣΤΟΛΗΣ ΙΩΑΝΝΗΣ -ΑΠΟΣΤΟΛΗ ΜΑΡΙΑ,,,ΧΙΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Khios,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1411383,ΑΡΙΑΔΝΗ Ι.Κ.Ε.,,,ΜΥΤΙΛΗΝΗ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Lesvos,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1404881,ΑΣΛΑΝΙΔΗΣ ΧΑΡΙΛΑΟΣ,,,ΛΑΡΙΣΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Larisa,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1404802,ΒΑΦΕΙΔΗΣ ΕΥΑΓΓΕΛΟΣ & ΣΙΑ Ο.Ε.,,,ΧΡΥΣΟΥΠΟΛΗ,,,,,,,,PMH Small customers,2050-FZA,,,Kavala,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1400960,ΓΟΥΝΤΣΙΔΗΣ Α.Ε.,,,ΔΡΑΜΑ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Dhrama,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1403358,ΓΡΑΜΜΑΤΙΚΗΣ Δ. & ΣΙΑ Ο.Ε.,,,ΣΕΡΡΕΣ,,,,,,,,PMH Strat. customers,2050-FZA,,,Serrai,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1412113,ΓΡΗΓΟΡΙΑΔΟΥ ΔΕΣΠΟΙΝΑ,,,ΚΑΒΑΛΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Kavala,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1411776,ΔΗΜΗΤΡΙΟΥ ΧΡΗΣΤΟΣ,,,ΚΑΡΛΟΒΑΣΙ ΣΑΜΟΥ,,,,,,,,PMH Small customers,2050-FZA,,,Samos,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1404205,ΔΟΥΚΑΡΕΛΛΗΣ ΑΡΓ.ΠΑΝΑΓΙΩΤΗΣ,,,ΜΥΤΙΛΗΝΗ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Lesvos,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1412189,ΕΛΛΗΝΙΚΟ ΚΑΤΣΙΚΙΣΙΟ ΓΑΛΑ ΙΚΕ,,,ΘΕΣΣΑΛΟΝΙΚΗ,,,,,,,,PMH Small customers,2050-FZA,,,Thessaloniki,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1403746,ΘΕΡΜΑΙΚΟΣ ΕΙΔΗ ΠΟΛΥΚΑΤΑΣΤΗΜΑΤΟΣ ΑΕΒ,,,ΘΕΡΜΗ,,,,,,,,PMH Strat. customers,2050-FZA,,,Thessaloniki,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1402515,ΚΑΙΣΑ ΛΕΜΟΝΙΑ & ΣΙΑ Ε.Ε.,,,ΑΛΕΞΑΝΔΡΟΥΠΟΛΗ,,,,,,,,PMH Premium,,,,Evros,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1404632,ΚΑΛΑΜΠΑΚΑ ΕΛΕΝΗ,,,ΕΡΕΣΟΣ ΛΕΣΒΟΥ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Lesvos,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1410070,ΚΑΡΙΩΤΟΓΛΟΥΣ ΣΤΑΥΡΟΣ ΕΕ,,,ΠΥΘΑΓΟΡΕΙΟ ΣΑΜΟΥ,,,,,,,,PMH Small customers,2050-FZA,,,Samos,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1410986,ΚΑΡΛΕ ΗΛΙΑΝΝΑ,,,ΙΚΑΡΙΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Samos,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1411656,ΚΛΟΥΒΑ ΑΝΔΡΟΝΙΚΗ ΚΑΙ ΣΙΑ Ο.Ε.,,,ΧΙΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Khios,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1411390,ΚΟΛΟΒΟΣ ΧΡΥΣΟΣΤΟΜΟΣ,,,ΒΟΛΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Magnisia,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1412010,ΚΟΥΒΔΟΥ ΣΟΦΙΑ,,,ΙΚΑΡΙΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Samos,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1404362,ΚΟΥΜΗΣ ΟΕ,,,ΧΙΟΣ,,,,,,,,PMH Strat. customers,2050-FZA,,,Khios,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1411308,ΚΟΥΡΟΥΠΑΚΗΣ ΑΝΔ.ΙΩΑΝΝΗΣ,,,ΒΟΛΟΣ,,,,,,,,PMH Strat. customers,2050-FZA,,,Magnisia,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1404828,ΚΩΝΣΤΑΝΤΑΡΑΣ ΑΡΙΣΤΕΙΔΗΣ,,,ΠΥΘΑΓΟΡΕΙΟ ΣΑΜΟΥ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Samos,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1404619,ΛΑΖΑΡΟΥ ΒΑΣΙΛΕΙΟΣ,,,ΘΑΣΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Kavala,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1401837,ΛΙΜΝΙΔΗΣ ΑΕΒΕ,,,ΚΟΖΑΝΗ,,,,,,,,PMH Premium,,,,Kozani,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1404463,ΛΟΥΚΑ Γ.ΧΡΙΣΤΙΝΑ,,,ΑΓΙΟΣ ΚΗΡΥΚΟΣ ΙΚΑΡΙΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Samos,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1411657,ΜΑΝΤΖΟΣ ΑΝΤΩΝΙΟΣ,,,ΑΛΟΝΝΗΣΟΣ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Magnisia,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1401984,ΜΑΣΟΥΤΗΣ ΔΙΑΜΑΝΤΗΣ Α.Ε.,,,ΘΕΡΜΗ (109),,,,,,,,PMH Key accounts,,,,Thessaloniki,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1400064,ΜΕΤΑΞΑΣ ΣΤΑΥΡΟΣ & ΣΙΑ ΟΕ,,,ΚΑΒΑΛΑ,,,,,,,,PMH Strat. customers,2050-FZA,,,Kavala,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1402476,ΜΠΑΜΠΑΝΑΡΑΣ ΒΑΙΟΣ,,,ΤΡΙΚΑΛΑ,,,,,,,,PMH Small customers,2050-FZA,,,Trikala,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1402153,ΜΠΑΜΠΑΝΑΡΑΣ ΒΑΣΙΛΕΙΟΣ,,,ΤΡΙΚΑΛΑ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Trikala,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1402017,ΜΠΙΝΤΑΚΑΣ ΠΑΙΧΝΙΔΙΑ Ε.Π.Ε,,,ΒΟΛΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Magnisia,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1411050,ΝΑΡΛΗ ΒΑΣ.ΥΙΟΙ & ΣΙΑ Ο.Ε.,,,ΚΑΒΑΛΑ,,,,,,,,PMH Small customers,2050-FZA,,,Kavala,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1404944,ΝΕΑ ΑΕ,,,ΚΑΤΕΡΙΝΗ,,,,,,,,PMH Premium,,,,Pieria,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1411266,ΝΙΚΗΦΟΡΙΔΗ ΑΦΟΙ ΙΚΕ,,,ΣΕΡΡΕΣ,,,,,,,,PMH Strat. customers,2050-FZA,,,Serrai,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1404540,ΝΤΙΝΟΠΟΥΛΟΣ ΝΙΚΟΛΑΟΣ & ΣΙΑ ΟΕ,,,ΚΑΡΔΙΤΣΑ,,,,,,,,PMH Strat. customers,2050-FZA,,,Kardhitsa,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1404860,ΟΝΕΙΡΟΥΠΟΛΗ Ε.Π.Ε.,,,ΟΡΕΣΤΙΑΔΑ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Evros,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1404738,ΠΑΙΧΝΙΔΟΥΠΟΛΗ ΕΠΕ,,,ΘΑΣΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Kavala,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1404581,ΠΑΠΑΔΟΠΟΥΛΟΣ ΙΑΚΩΒΟΣ & ΣΙΑ ΕΕ,,,ΜΥΡΙΝΑ ΛΗΜΝΟΥ,,,,,,,,PMH Small customers,2050-FZA,,,Lesvos,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1410310,ΠΑΠΠΑΣ Δ. ΚΩΝΤΑΝΤΙΝΟΣ,,,ΒΟΛΟΣ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Magnisia,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1404700,ΠΟΛΙΤΗΣ ΚΛΗΜΗΣ ΕΠΕ,,,ΝΕΑ ΜΟΥΔΑΝΙΑ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Khalkidhiki,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1402945,ΠΡΟΚΟΠΙΟΥ Ο.Π. & ΣΙΑ Ο.Ε.,,,ΠΕΤΡΑ ΛΕΣΒΟΥ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Lesvos,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1404559,ΡΕΠΤΣΗΣ Η.ΦΙΛΙΠΠΟΣ,,,ΣΚΙΑΘΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Magnisia,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1404222,ΣΑΡΑΓΚΑ Ν. ΘΕΟΦΑΝΙΑ,,,ΜΟΥΔΡΟΣ ΛΗΜΝΟΥ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Lesvos,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1404344,ΣΟΥΡΑΦΗ ΧΡΥΣΑΝΘΗ & ΣΙΑ ΟΕ,,,ΣΑΜΟΣ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Samos,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1404517,ΣΥΛΛΟΓΙΣΤΟΣ ΑΝΤ.ΙΩΑΝΝΗΣ,,,ΒΟΛΟΣ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Magnisia,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1400113,ΤΡΙΑΝΤΑΦΥΛΛΟΥ Π.ΑΓΛΑΙΑ,,,ΛΑΡΙΣΑ,,,,,,,,PMH Small customers,2050-FZA,,,Larisa,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1404504,ΤΡΙΑΝΤΑΦΥΛΛΟΥ ΧΡ.ΚΩΝ/ΝΟΣ,,,ΛΑΡΙΣΑ,,,,,,,,PMH Premium,,,,Larisa,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1404532,ΥΙΟΙ Ρ.ΑΚΟΥΑΡΟΝΗ Ι.Κ.Ε.,,,ΤΘ 60604 ΘΕΡΜΗ ΘΕΣ/ΚΗΣ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Thessaloniki,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1410675,ΧΑΤΖΗΔΗΜΗΤΡΙΟΥ Μ. ΚΩΝΣΤΑΝΤΙΝΟΣ,,,Ν.ΙΩΝΙΑ ΒΟΛΟΥ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Magnisia,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1410765,ΧΟΥΤΟΣ Ι.ΠΑΝΑΓΙΩΤΗΣ,,,ΣΚΙΑΘΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Magnisia,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1404531,ΨΑΡΡΗ Α. ΕΥΘΥΜΙΑ,,,ΜΟΥΔΡΟΣ ΛΗΜΝΟΥ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Lesvos,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1402677,ΨΩΜΑΣ ΙΩΑΝΝΗΣ,,,ΜΑΡΑΘΟΚΑΜΠΟΣ ΣΑΜΟΥ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Samos,,,ΠΕΤΡΙΔΗΣ ΣΑΒΒΑΣ
+1411411,ACTIVATE Ι.Κ.Ε.,,,"ΘΕΣΗ ΠΟΥΣΙ ΧΑΤΖΗ,ΠΑΙΑΝΙΑ",,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1412210,ASTRO MARKET Ε.Ε.,,,ΔΑΛΑΜΑΝΑΡΑ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Argolis,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411517,DEMERTZIS THO.LINDA,,,ΣΠΕΤΣΕΣ,,,,,,,,PMH Small customers,2050-FZA,,,Piraievs,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411259,GAMESHERO O.E.,,,ΧΑΛΑΝΔΡΙ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1410538,GREEN THUMBS ΜΟΝΟΠΡΟΣΩΠΗ Ε.Π.Ε,,,ΠΛΑΚΑ ΑΘΗΝΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1410303,INFORAMA CENTER A.E.,,,ΑΝΩ ΠΑΤΗΣΙΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411126,BLABLATOYS I.K.E.,,,ΑΧΑΡΝΕΣ (LOGISTICS),,,,,,,,PMH Premium,,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404989,QUESTONLINE ΜΟΝΟΠΡΟΣΩΠΗ ΑΕ,,,ΚΑΛΛΙΘΕΑ,,,,,,,,PMH Strat. customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1410575,SHOPPING EXPERIENCE SMPC,,,ΝΕΟ ΗΡΑΚΛΕΙΟ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1410915,THEROS Α.Ε.,,,ΑΘΗΝΑ-ΠΛΑΚΑ,,,,,,,,PMH Small customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1412179,TOYCITY ΕΕ,,,ΠΕΡΙΣΤΕΡΙ,,,,,,,,PMH Strat. customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411100,WEB SUPPLIES ΜΟΝΟΠΡΟΣΩΠΗ Α.Ε.,,,ΑΙΓΑΛΕΩ,,,,,,,,PMH Small customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1403910,ΑΒΔΑΛΑΣ Κ. ΔΗΜΗΤΡΙΟΣ,,,ΚΥΠΑΡΙΣΣΙΑ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Messinia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411393,ΑΒΔΙΚΟΥ ΚΩΝ.ΣΟΦΙΑ,,,ΑΜΑΛΙΑΔΑ,,,,,,,,PMH Small customers,2050-FZA,,,Ilia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404170,ΑΒΡΑΝΤΙΝΗΣ ΚΩΝ. ΑΝΔΡΕΑΣ,,,ΠΑΤΡΑ,,,,,,,,PMH Strat. customers,2050-FZA,,,Akhaia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1402118,ΑΔΑΛΑΚΗΣ Δ.ΘΕΟΔΩΡΟΣ,,,ΞΥΛΟΚΑΣΤΡΟ,,,,,,,,PMH Small customers,2050-FZA,,,Korinthia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404549,ΑΔΑΜΟΠΟΥΛΟΣ ΠΕΤΡΟΣ (ADAMS TOYS),,,ΜΕΣΣΗΝΗ,,,,,,,,PMH Small customers,2050-FZA,,,Messinia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411940,ΑΘΑΝΑΣΙΟΥ ΔΗΜΗΤΡΙΟΣ,,,ΒΑΡΘΟΛΟΜΙΟ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Ilia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411667,ΑΛΚΥΟΝΑ Ο.Ε.,,,ΓΑΛΑΤΣΙ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1403301,ΑΝΔΡΙΚΟΠΟΥΛΟΥ Ι. ΑΣΗΜΙΝΑ,,,ΑΓΙΟΣ ΔΗΜΗΤΡΙΟΣ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1403885,ΑΝΕΔΗΚ ΚΡΗΤΙΚΟΣ Α.Ε.,,,ΑΙΓΙΝΑ,,,,,,,,PMH Strat. customers,2050-FZA,,,Piraievs,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411673,ΑΝΤΩΝΙΑΔΗΣ Γ. ΗΛΙΑΣ,,,ΗΛΙΟΥΠΟΛΗ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1402796,ΑΣΗΜΑΚΟΠΟΥΛΟΣ ΓΕΩΡΓΙΟΣ & ΠΑΡΑΣΚΕΥΗ,,,ΜΑΡΟΥΣΙ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1403034,ΑΣΗΜΑΚΟΠΟΥΛΟΥ ΑΣΗΜ.ΧΡΥΣΑΝΘΗ,,,ΠΥΡΓΟΣ ΗΛΕΙΑΣ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Ilia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1400462,ΑΥΓΟΥΣΤΑΚΗΣ Ν.-ΤΡΙΧΑΣ ΑΛ.&ΖΑΧ Ο.Ε.,,,ΛΑΜΠΡΙΝΗ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404971,ΒΑΛΣΑΜΙΔΗΣ ΕΜΜ. ΜΙΧΑΗΛ,,,ΓΚΥΖΗ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404657,ΒΑΣΙΛΟΠΟΥΛΟΥ ΜΑΡΙΑ,,,ΠΥΡΓΟΣ ΗΛΕΙΑΣ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Ilia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411522,ΒΟΥΛΤΣΟΥ Α. & ΡΑΨΟΜΑΝΙΚΗΣ Π. Ο.Ε.,,,ΖΑΚΥΝΘΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Zakinthos,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411075,ΓΑΛΑΝΟΠΟΥΛΟΣ ΓΕΡ.ΠΑΝΑΓΙΩΤΗΣ,,,ΠΕΙΡΑΙΑΣ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1402389,ΓΕΩΡΓΑΚΟΠΟΥΛΟΣ ΧΡΗΣΤΟΣ,,,ΜΕΓΑΛΟΠΟΛΗ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Arkadhia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404604,ΓΕΩΡΓΙΟΠΟΥΛΟΙ ΑΦΟΙ ΑΕΒΕ,,,ΧΟΛΑΡΓΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404938,ΓΕΩΡΓΙΟΥ ΑΝΑΣΤ.ΣΤΕΛΛΑ,,,ΠΑΤΡΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Akhaia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1403569,ΓΕΩΡΓΙΟΥ ΖΩΗ & ΣΙΑ ΕΕ,,,ΠΑΤΡΑ,,,,,,,,PMH Small customers,2050-FZA,,,Akhaia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1402355,ΓΚΙΩΝΗΣ Μ. ΓΕΩΡΓΙΟΣ,,,ΛΟΥΤΡΑΚΙ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Korinthia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1412007,ΓΟΥΛΑΝΔΡΗ ΝΙΚ.Π ΙΔΡΥΜΑ-ΜΟΥΣΕΙΟ ΚΥΚΛ,,,ΑΘΗΝΑ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1403187,ΓΩΛΕΓΟΥ Ν. ΑΦΡΟΔΙΤΗ,,,ΛΕΩΝΙΔΙΟ,,,,,,,,PMH Small customers,2050-FZA,,,Arkadhia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411270,ΔΑΝΙΗΛ Σ. & Σ. Ο.Ε.,,,ΧΟΛΑΡΓΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1400214,ΔΕΓΡΑΣ Μ. ΚΩΝ/ΝΟΣ & ΣΙΑ Ε.Ε.,,,ΜΕΓΑΛΟΠΟΛΗ,,,,,,,,PMH Small customers,2050-FZA,,,Arkadhia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411299,ΔΕΜΠΕΓΙΩΤΗΣ ΦΩΤΙΟΣ & ΣΙΑ ΕΕ,,,ΚΑΛΑΜΑΤΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Messinia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1401670,ΔΗΜΗΤΡΙΑΔΗΣ ΧΡΥΣ. ΚΩΝΣΤΑΝΤΙΝΟΣ,,,ΚΑΛΑΜΑΤΑ,,,,,,,,PMH Small customers,2050-FZA,,,Messinia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1412165,ΔΗΜΗΤΡΙΟΥ ΕΛΕΝΗ,,,ΜΑΡΟΥΣΙ,,,,,,,,PMH Small customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1410569,ΔΗΜΗΤΡΟΠΟΥΛΟΥ Γ. ΕΛΕΝΗ,,,ΓΑΛΑΤΣΙ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411671,ΔΟΥΛΟΣ ΝΙΚ.ΑΣΗΜΑΚΗΣ,,,ΑΜΑΛΙΑΔΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Ilia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1410133,ΔΡΙΛΛΙΑ Γ. ΑΝΘΗ,,,ΖΑΧΑΡΩ,,,,,,,,PMH Small customers,2050-FZA,,,Ilia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404934,ΕΜΠΟΡΙΚΗ Α.Ε.,,,ΖΑΚΥΝΘΟΣ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Zakinthos,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1412051,ΕΜΠΟΡΙΚΗ ΜΩΡΑΙΤΗΣ ΜΟΝΟΠΡΟΣΩΠΗ ΙΚΕ,,,ΖΑΚΥΝΘΟΣ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Zakinthos,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404489,ΕΥΡΙΠΙΔΗΣ ΒΙΒΛΙΑ Α.Ε.,,,ΧΑΛΑΝΔΡΙ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1400263,ΖΑΦΕΙΡΙΟΥ Δ.& Δ. Ο.Ε.,,,ΙΛΙΟΝ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404936,ΖΑΦΕΙΡΟΠΟΥΛΟΥ ΜΠΟΥΜΠΟΥΛΙΝΑ,,,ΠΑΛΟΥΚΙΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Piraievs,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1410297,ΘΕΟΔΩΡΑΤΟΥ ΣΤΕΦ. ΚΛΕΟΠΑΤΡΑ,,,ΚΕΦΑΛΛΗΝΙΑΣ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Kefallinia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411504,ΙΣΤΟΡ.& ΕΘΝΟΛ.ΕΤΑΙΡ. ΤΗΣ ΕΛΛΑΔΟΣ-ΜΟ,,,"ΜΕΓΑΡΟ ΠΑΛΑΙΑΣ ΒΟΥΛΗΣ,ΠΛ.ΚΟΛΟΚΟΤΡΩΝ",,,,,,,,PMH Small customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411658,ΚΑΖΙΑΝΗ ΜΑΡΙΑΝΘΗ,,,ΣΑΛΑΜΙΝΑ,,,,,,,,PMH Small customers,2050-FZA,,,Piraievs,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1402930,ΚΑΛΑΜΑΡΑΣ ΠΑΝΑΓΙΩΤΗΣ,,,ΑΙΓΙΝΑ,,,,,,,,PMH Small customers,2050-FZA,,,Piraievs,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411768,ΚΑΛΛΙΓΑ ΘΕΟΦ.ΑΜΑΛΙΑ,,,ΜΕΣΣΗΝΙΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Messinia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1403830,ΚΑΜΒΑΣ Γ. Ι.Κ.Ε.,,,ΤΡΙΠΟΛΗ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Arkadhia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404439,ΚΑΠΟΤΑΣ ΣΠΥΡ.ΚΩΝΣΤΑΝΤΙΝΟΣ,,,ΚΑΛΑΒΡΥΤΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Akhaia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1412118,ΚΑΡΑΒΑ ΓΕΩΡΓΙΑ,,,ΚΟΚΟΛΑΤΑ ΚΕΦΑΛΟΝΙΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Kefallinia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411455,ΚΑΡΑΓΙΑΝΝΗΣ ΝΙΚΟΛΑΟΣ,,,ΛΥΓΟΥΡΙΟ ΑΡΓΟΛΙΔΑΣ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Argolis,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404798,ΚΑΡΒΕΛΑΣ ΔΙΟΝΥΣΙΟΥ ΠΑΡΑΣΚΕΥΑΣ,,,ΠΥΡΓΟΣ ΗΛΕΙΑΣ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Ilia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404348,ΚΑΡΙΩΤΗΣ ΝΙΚ.ΙΩΑΝΝΗΣ,,,ΠΑΤΡΑ,,,,,,,,PMH Small customers,2050-FZA,,,Akhaia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404366,ΚΑΤΣΙΜΑΡΔΟΥ ΚΩΝ. ΒΑΣΙΛΙΚΗ,,,ΒΥΡΩΝΑΣ,,,,,,,,PMH Small customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404781,ΚΑΤΣΙΟΥΡΗΣ ΗΛ.ΑΛΕΞΑΝΔΡΟΣ,,,ΝΑΥΠΛΙΟ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Argolis,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411301,ΚΑΤΣΟΥΛΑΣ Χ. ΧΑΡΑΛΑΜΠΟΣ,,,ΚΑΛΑΜΑΤΑ,,,,,,,,PMH Small customers,2050-FZA,,,Messinia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1402160,ΚΕΦΑΛΟΠΟΥΛΟΥ - ΜΑΡΚΟΥΤΣΑΣ & ΣΙΑ Ο.Ε,,,ΣΠΑΡΤΗ,,,,,,,,PMH Small customers,2050-FZA,,,Lakonia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404674,ΚΛΙΝΑΚΗ ΑΙΚΑΤΕΡΙΝΗ,,,ΜΟΝΕΜΒΑΣΙΑ,,,,,,,,PMH Small customers,2050-FZA,,,Lakonia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1401546,ΚΟΜΠΟΓΙΩΡΓΑΣ ΣΤΑΥΡΟΣ,,,ΓΥΘΕΙΟ,,,,,,,,PMH Small customers,2050-FZA,,,Lakonia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1405023,ΚΟΥΓΕΜΗΤΡΟΥ ΠΑΝΑΓΙΩΤΑ,,,ΤΡΙΠΟΛΗ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Arkadhia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1402935,ΚΟΥΛΜΑΝΔΑΣ ΕΥΣΤΡ. ΔΗΜΗΤΡΙΟΣ,,,ΔΑΦΝΗ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1400725,ΚΟΥΤΑΣ Ι. ΕΥΑΓΓΕΛΟΣ,,,ΚΑΛΟΓΡΕΖΑ,,,,,,,,PMH Small customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404027,ΚΟΥΤΡΟΥΛΗ ΣΤΑΣ. ΒΑΣΙΛΙΚΗ,,,Σ. Σ. ΒΑΡΔΑΣ,,,,,,,,PMH Small customers,2050-FZA,,,Ilia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411149,ΚΟΥΤΣΙΚΟΝΑΣ Η. ΙΩΑΝΝΗΣ,,,ΙΛΙΟΝ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1403853,ΚΥΡΙΑΚΟΠΟΥΛΟΣ Κ.ΝΙΚΟΛΑΟΣ,,,ΠΑΤΡΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Akhaia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1403659,ΚΩΣΤΟΠΟΥΛΟΣ Ν. & ΣΙΑ Ο.Ε.,,,ΝΑΥΠΛΙΟ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Argolis,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1410621,ΚΩΣΤΟΠΟΥΛΟΣ ΧΑΡΑΛΑΜΠΟΣ,,,ΚΟΡΙΝΘΟΣ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Korinthia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1402269,ΛΑΓΑΝΗ ΗΛ. ΚΥΡΙΑΚΟΥΛΑ (ΚΥΒΟΣ),,,ΚΟΡΥΔΑΛΛΟΣ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Piraievs,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1400219,ΛΑΔΟΠΟΥΛΟΣ Ι.Κ.Ε.,,,ΣΚΑΛΑ,,,,,,,,PMH Small customers,2050-FZA,,,Lakonia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1402110,ΛΕΙΒΑΔΙΤΗΣ Γ. Ι.Κ.Ε.,,,ΤΡΙΠΟΛΗ,,,,,,,,PMH Small customers,2050-FZA,,,Arkadhia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404357,ΛΕΥΤΑΚΗ ΠΕΤ. ΕΙΡΗΝΗ ΧΡΥΣΟΒΑΛΑΝΤΗ,,,ΚΟΡΩΝΗ,,,,,,,,PMH Small customers,2050-FZA,,,Messinia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1410147,Μ.Κ. ΕΤΑΙΡΙΑ ΠΕΡΙΟΡΙΣΜΕΝΗΣ ΕΥΘΥΝΗΣ,,,ΑΡΓΟΣΤΟΛΙ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Kefallinia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1403770,ΜΑΝΕΣΙΩΤΗ Π. ΑΦΟΙ Ο.Ε.,,,ΚΑΛΑΜΑΤΑ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Messinia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404374,ΜΑΝΤΑΣ Γ. ΚΩΝΣΤΑΝΤΙΝΟΣ,,,ΠΕΡΑΜΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Piraievs,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1402315,ΜΑΝΤΖΟΥΡΑΝΗ ΓΕΩΡΓΙΑ,,,ΑΣΤΡΟΣ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Arkadhia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404646,ΜΑΡΚΟΥ Π.ΗΛΙΑΣ,,,ΣΠΑΡΤΗ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Lakonia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1400493,ΜΗΤΡΟΠΟΥΛΟΙ ΑΦΟΙ Ο.Ε.,,,ΖΩΓΡΑΦΟΥ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1410293,ΜΗΤΡΟΥΛΙΑΣ ΑΝ.ΔΗΜΗΤΡΙΟΣ,,,ΠΑΤΡΑ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Akhaia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404487,ΜΟΥΡΓΗ Π. ΑΔΕΛΦΟΙ Α.Ε.,,,ΚΑΛΑΜΑΤΑ,,,,,,,,PMH Small customers,2050-FZA,,,Messinia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1410274,ΜΟΥΣΕΙΟ ΑΚΡΟΠΟΛΗΣ,,,ΑΘΗΝΑ,,,,,,,,PMH Strat. customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1412123,ΜΠΑΛΛΙΟΣ ΚΩΝΣΤΑΝΤΙΝΟΣ,,,ΑΘΗΝΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1400719,ΜΠΑΜΠΑΛΙΑΡΟΥ Γ. ΑΦΟΙ κ ΣΙΑ Ο.Ε.,,,ΑΡΓΟΣ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Argolis,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411377,ΜΠΕΓΛΙΤΗΣ ΣΤΑΥΡΟΣ & ΣΙΑ Ε.Ε.,,,ΚΙΑΤΟ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Korinthia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411312,ΜΠΟΖΙΟΝΕΛΟΣ ΙΩΑΝΝΗΣ,,,ΔΑΛΑΜΑΝΑΡΑ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Argolis,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1410044,ΜΠΟΥΓΑΔΗ ΓΕΩΡΓΙΑ,,,ΣΠΑΡΤΗ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Lakonia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1402573,ΜΠΟΥΖΑΚΗ Ι.ΑΛΕΞ & ΣΙΑ ΕΕ,,,ΙΛΙΣΙΑ,,,,,,,,PMH Small customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404369,ΜΠΟΥΚΟΥΒΑΛΑ Δ. ΑΘΗΝΑ,,,ΕΡΜΙΟΝΗ,,,,,,,,PMH Small customers,2050-FZA,,,Argolis,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411447,ΜΠΟΥΝΟΣ Ε. & ΣΙΑ Ε.Ε.,,,ΤΟΛΟ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Argolis,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1403969,ΜΠΟΥΡΓΙΕΖΗΣ ΝΙΚΟΣ & ΣΙΑ ΕΕ,,,ΖΑΚΥΝΘΟΣ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Zakinthos,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411001,ΜΩΡΑΙΤΙΔΟΥ ΔΗΜΗΤΡΑ,,,Ν.ΙΩΝΙΑΣ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404382,ΝΙΚΑΣ Π.ΝΙΚΟΛΑΟΣ,,,ΝΙΚΑΙΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Piraievs,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404794,ΝΙΚΟΛΟΠΟΥΛΟΣ ΓΕΩΡΓΙΟΣ,,,ΓΑΡΓΑΛΙΑΝΟΙ,,,,,,,,PMH Small customers,2050-FZA,,,Messinia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404915,ΝΤΟΚΟΥ ΕΥΑΓΓ.ΘΕΟΔΩΡΑ-ΚΑΝΕΛΑ,,,ΠΑΤΡΑ,,,,,,,,PMH Small customers,2050-FZA,,,Akhaia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411445,ΟΙΚΟΝΟΜΟΥ ΧΡΙΣΤΙΝΑ ΜΟΝΟΠΡΟΣΩΠΗ ΙΚΕ,,,ΚΟΡΙΝΘΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Korinthia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404469,ΟΥΙΛΣ Κ. ΧΡΙΣΤΙΝΑ,,,"ΝΕΑΠΟΛΗ,ΑΘΗΝΑ",,,,,,,,PMH Small customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411836,ΠΑΓΟΥΛΑΤΟΥ ΧΡΗ ΓΕΩΡΓΙΑ,,,ΑΡΓΟΣΤΟΛΙ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Kefallinia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404958,ΠΑΝΑΓΙΩΤΟΠΟΥΛΟΙ ΑΦΟΙ Α.Ε.Β.Ε.,,,ΣΠΑΡΤΗ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Lakonia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1405019,ΠΑΝΑΓΙΩΤΟΠΟΥΛΟΣ Χ-A.ΠΑΝΑΓΙΩΤΟΠΟΥΛΟΥ,,,ΑΡΓΟΣ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Argolis,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1401359,ΠΑΠΑΒΑΣΙΛΕΙΟΥ Α.ΑΝΑΡΓΥΡΟΣ,,,ΕΡΜΙΟΝΗ,,,,,,,,PMH Small customers,2050-FZA,,,Argolis,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411175,ΠΑΠΑΔΟΠΟΥΛΟΥ ΠΑΝ.ΜΑΡΙΑ,,,ΠΑΤΡΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Akhaia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1412166,ΠΑΠΑΔΟΠΟΥΛΟΥ Π.ΜΑΡΙΑ & ΣΙΑ ΕΕ,,,ΠΑΤΡΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Akhaia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1400380,ΠΑΠΑΚΩΝΣΤΑΝΤΙΝΟΥ ΣΠ. & ΣΙΑ Ο.Ε.,,,ΜΟΣΧΑΤΟ,,,,,,,,PMH Small customers,2050-FZA,,,Piraievs,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1402356,ΠΑΠΑΚΩΣΤΑ ΜΑΡΙΑ,,,ΞΥΛΟΚΑΣΤΡΟ,,,,,,,,PMH Small customers,2050-FZA,,,Korinthia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404400,ΠΑΠΑΝΑΓΝΟΥ ΔΕΣΠΟΙΝΑ,,,ΑΓΙΟΣ ΔΗΜΗΤΡΙΟΣ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404192,ΠΑΠΑΝΑΣΤΑΣΙΟΥ Γ. & ΣΙΑ ΟΕ,,,ΑΙΓΙΟ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Akhaia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404373,ΠΑΠΑΝΔΡΕΟΥ Ι. ΑΡΓΥΡΗ,,,ΚΕΡΑΤΣΙΝΙ,,,,,,,,PMH Small customers,2050-FZA,,,Piraievs,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411200,ΠΑΠΑΣΤΑΘΟΠΟΥΛΟΥ ΙΩΑΝ. ΕΥΓΕΝΙΑ,,,ΠΑΤΡΑ,,,,,,,,PMH Small customers,2050-FZA,,,Akhaia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1410533,ΠΑΠΑΧΡΙΣΤΟΥ ΑΓΓΕΛΗΣ & ΣΙΑ ΟΕ,,,ΠΑΤΡΑ,,,,,,,,PMH Small customers,2050-FZA,,,Akhaia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404568,ΠΑΡΙΣΗ Γ. ΑΝΔΡΟΜΑΧΗ,,,ΚΑΛΑΜΑΤΑ,,,,,,,,PMH Strat. customers,2050-FZA,,,Messinia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404605,ΠΕΡΔΙΚΗ ΔΗΜ.ΟΥΡΑΝΙΑ,,,ΠΑΤΡΑ,,,,,,,,PMH Small customers,2050-FZA,,,Akhaia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404267,ΠΕΡΔΙΚΗ ΠΑΡΑΣΚΕΥΗ-ΑΔΑΜΑΝΤΙΑ,,,ΑΜΑΛΙΑΔΑ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Ilia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404488,ΠΕΤΟΥΣΗ Ε. & ΣΙΑ ΕΕ,,,ΚΥΨΕΛΗ,,,,,,,,PMH Small customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404229,ΠΕΤΣΟΥΚΗ Θ. ΓΕΩΡΓΙΑ,,,ΖΩΓΡΑΦΟΣ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1412120,ΠΛΕΣΣΑΣ ΑΛΟΙΣΙΟΣ ΚΑΙ ΣΙΑ ΕΕ,,,ΖΑΚΥΝΘΟΣ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Zakinthos,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1412201,ΠΕΡΔΙΚΗΣ ΠΕΡΙΚΛΗΣ,,,ΠΑΤΡΑ,,,,,,,,PMH Small customers,2050-FZA,,,Akhaia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411939,ΠΛΕΣΣΑΣ Δ.ΑΛΟΙΣΙΟΣ,,,ΖΑΚΥΝΘΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Zakinthos,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404736,ΠΟΛΥΜΕΝΑΚΟΣ Δ. ΙΩΑΝΝΗΣ,,,ΑΣΤΡΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Arkadhia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411698,ΠΟΥΛΟΠΟΥΛΟΣ Ν. & ΣΙΑ Ε.Ε.,,,ΣΠΑΡΤΗ,,,,,,,,PMH Small customers,2050-FZA,,,Lakonia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1403532,ΡΕΝΤΟΥΛΗ Κ.ΚΥΡΙΑΚΗ,,,ΛΕΩΝΙΔΙ,,,,,,,,PMH Small customers,2050-FZA,,,Arkadhia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411720,ΡΟΚΑΝΑΣ ΠΑΝ.ΕΥΑΓΓΕΛΟΣ,,,ΑΜΑΛΙΑΔΑ,,,,,,,,PMH Small customers,2050-FZA,,,Ilia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1410235,ΡΟΥΜΕΛΙΩΤΗΣ Γ. RSM MARKET Α.Ε.Β.Ε.,,,ΓΑΣΤΟΥΝΗ,,,,,,,,PMH Small customers,2050-FZA,,,Ilia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404982,ΡΟΥΣΣΗΣ ΘΩΜΑΣ,,,ΑΘΗΝΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411537,ΣΑΜΨΩΝ ΑΓΓΕΛΟΣ,,,ΚΟΡΥΔΑΛΛΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404427,ΣΑΝΙΔΑ ΑΙΚΑΤΕΡΙΝΗ,,,ΒΛΑΧΙΩΤΗΣ,,,,,,,,PMH Small customers,2050-FZA,,,Lakonia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1403835,ΣΑΠΟΥΝΤΖΑΚΗΣ ΑΝ. ΔΗΜΗΤΡΙΟΣ,,,ΧΟΛΑΡΓΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411722,ΣΕΡΑΦΙΝΟ ΤΟΥΣ Ε.Ε.,,,ΚΟΡΥΔΑΛΛΟΣ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411499,ΣΙΝΙΓΑΛΙΑ ΔΗΜΗΤΡΑ-ΣΠΥΡΙΔΟΥΛΑ,,,ΡΙΟ ΠΑΤΡΩΝ,,,,,,,,PMH Small customers,2050-FZA,,,Akhaia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1412225,ΣΜΥΡΝΟΓΛΟΥ ΑΦΟΙ Ο.Ε.,,,ΚΙΑΤΟ,,,,,,,,PMH Small customers,2050-FZA,,,Korinthia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1403498,ΣΜΥΡΝΟΓΛΟΥ ΓΕΩΡΓΙΟΣ,,,ΚΙΑΤΟ,,,,,,,,PMH Small customers,2050-FZA,,,Korinthia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411491,ΣΟΦΟΚΛΕΟΥΣ Α & Β Ο.Ε.,,,ΚΑΙΣΑΡΙΑΝΗ,,,,,,,,PMH Small customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404909,ΣΠΥΡΟΠΟΥΛΟΣ ΚΩΝΣΤΑΝΤΙΝΟΣ,,,ΠΑΤΡΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Akhaia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411490,ΣΠΥΡΟΠΟΥΛΟΥ ΑΙΚΑΤΕΡΙΝΗ,,,ΑΝΩ ΛΙΟΣΙΑ,,,,,,,,PMH Small customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404434,ΣΤΑΜΑΤΑΚΟΣ ΠΑΡΑΣΚ. & ΤΕΣΣΕΡΗ ΔΕΣΠΟΙ,,,ΜΟΛΑΟΙ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Lakonia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1403536,ΣΤΑΝΙΤΣAΣ ΣΠΥΡΟΣ & ΣΙΑ ΕΕ,,,ΑΡΓΟΣΤΟΛΙ,,,,,,,,PMH Small customers,2050-FZA,,,Kefallinia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1401084,ΣΤΑΥΡΟΠΟΥΛΟΥ ΔΗΜΗΤΡΑ,,,ΣΠΑΡΤΗ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Lakonia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404157,ΤΖΕΒΕΛΕΚΟΥ ΕΛΕΝΗ,,,ΙΛΙΟΝ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1403134,ΤΟ ΠΑΙΧΝΙΔΙ ΙΚΕ,,,ΑΘΗΝΑ (ΚΥΨΕΛΗ),,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411506,ΤΡΙΤΑΚΗΣ ΔΗΜ.ΜΑΡΙΟΣ,,,ΞΥΛΟΚΑΣΤΡΟ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Korinthia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1410763,ΤΣΟΛΑΚΙΔΗΣ ΚΩΝΣΤΑΝΤΙΝΟΣ,,,ΝΑΥΠΛΙΟ,,,,,,,,PMH Small customers,2050-FZA,,,Argolis,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1403743,ΤΣΩΝΗ ΜΑΙΡΗ & ΣΙΑ ΟΕ,,,ΠΑΤΡΑ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Akhaia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1402646,ΤΣΩΤΟΣ ΣΤΕΦΑΝΟΣ,,,ΚΟΡΙΝΘΟΣ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Korinthia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411345,ΦΑΝΟΥ ΑΡΤ.ΕΛΕΝΗ,,,ΑΘΗΝΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411145,ΦΙΛΗΣ ΙΩΑΝΝΗΣ,,,ΛΟΥΤΡΑΚΙ,,,,,,,,PMH Small customers,2050-FZA,,,Korinthia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404804,ΦΙΛΙΠΠΑΤΟΣ ΕΛ.ΛΕΩΝΙΔΑΣ,,,ΠΑΤΡΑ,,,,,,,,PMH Small customers,2050-FZA,,,Akhaia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404606,ΦΙΛΙΠΠΟΠΟΥΛΟΣ ΓΕΩΡΓ.ΒΑΣΙΛΕΙΟΣ,,,ΠΑΤΡΑ,,,,,,,,PMH Small customers,2050-FZA,,,Akhaia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411007,ΦΙΛΙΠΠΟΠΟΥΛΟΣ Ι.ΚΩΝ/ΝΟΣ,,,ΑΙΓΙΟ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Akhaia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1404342,ΦΩΤΙΑΔΗΣ Ν.ΙΩΑΝΝΗΣ,,,ΠΕΙΡΑΙΑΣ,,,,,,,,PMH Small customers,2050-FZA,,,Piraievs,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1411186,ΦΩΤΟΥ ΑΝΑΣΤΑΣΙΑ,,,ΑΝΔΡΑΒΙΔΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Ilia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1412011,ΧΑΜΗΛΟΘΩΡΗΣ ΑΝΤ.ΕΜΜΑΝΟΥΗΛ,,,ΚΟΡΥΔΑΛΛΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Piraievs,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1400209,ΧΑΤΖΗΔΗΜΗΤΡΙΟΥ Ε.-ΚΑΠΟΝΙKOΛΟΣ Φ. Ο.,,,ΣΠΑΡΤΗ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Lakonia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1410788,ΧΟΥΡΙ ΦΙΛΙΠΠΟΣ,,,ΠΛΑΚΑ,,,,,,,,PMH Small customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ 2
+1412215,ANOUSSAKIS MARKET Ε.Ε.,,,ΠΑΡΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Kikladhes,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1404480,ANSWER (HONTOS CENTER) ΑΕΕ,,,ΑΘΗΝΑ,,,,,,,,PMH Strat. customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1410975,HAPPY HOUSE ΙΚΕ,,,ΕΡΜΟΥΠΟΛΗ-ΣΥΡΟΣ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Kikladhes,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1410247,HAPPY TOYS E.E.,,,ΘΗΡΑ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Kikladhes,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1404054,HOBBY PLANET ΕΠΕ,,,ΠΑΛΛΗΝΗ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1403687,MAX STORES ABEE,,,ΑΛΙΜΟΣ (16),,,,,,,,PMH Key accounts,,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1411372,NTOLKAS GROUP E.Ε.,,,ΠΑΡΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Kikladhes,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1403847,OLYMPUS PLAZA Α.Ε.,,,ΚΟΡΙΝΟΣ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Pieria,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1411176,SMALL Μ.Ι.Κ.Ε.,,,ΟΡΧΟΜΕΝΟΣ ΒΟΙΩΤΙΑΣ,,,,,,,,PMH Small customers,2050-FZA,,,Voiotia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1411371,ΑΜΒΡΑΖΗ ΒΑΣΙΛΙΚΗ,,,ΜΑΡΚΟΠΟΥΛΟ,,,,,,,,PMH Small customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1400630,ΑΝΑΓΝΩΣΤΟΥ Α.ΠΑΝ.-ΑΝΑΓΝΩΣΤΟΥ ΧΡΥΣ.Ο,,,ΧΑΛΚΙΔΑ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Evvoia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1401071,ΑΝΟΥΣΑΚΗ ΜΑΡΓΑΡΙΤΑ,,,ΠΑΡΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Kikladhes,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1404343,ΑΠΕΡΓΗΣ Σ.ΦΡΑΓΚΙΣΚΟΣ,,,ΤΗΝΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Kikladhes,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1411317,ΑΡΒΑΝΙΤΗ Π. ΚΑΙ Α.Ο.Ε.,,,ΝΑΥΠΑΚΤΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Aitolia kai Akar,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1404251,ΑΡΓΥΡΟΠΟΥΛΟΣ ΘΕΟΔ.ΑΝΤΩΝΗΣ,,,ΝΕΑ ΙΩΝΙΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1410276,ΑΡΧΕΤΥΠΟΝ Α.Ε.,,,ΑΧΑΡΝΕΣ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1401996,ΑΤΗΝΗ ΧΟΝΤΟΣ Α.Ε.Ε.,,,ΓΛΥΦΑΔΑ,,,,,,,,PMH Strat. customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1404131,ΒΑΣΙΛΑΚΗΣ ΓΙΑΝΝΗΣ,,,ΤΗΝΟΣ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Kikladhes,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1411264,ΒΑΣΙΛΕΙΟΥ ΙΩΑΝΝΗΣ,,,ΙΛΙΟN,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1411497,ΒΑΣΙΛΕΙΟΥ ΝΙΚΟΛΑΟΣ,,,ΠΕΡΙΣΤΕΡΙ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1404527,ΒΕΡΓΙΝΗΣ Σ. & Ε. Ο.Ε.,,,ΛΕΥΚΑΔΑ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Levkas,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1411918,ΒΙΔΑΛΗ Π.ΣΤΑΜΑΤΙΚΗ,,,ΤΗΝΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Kikladhes,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1404906,ΓΑΛΑΝΑ ΕΜΠΟΡΙΚΗ Μ.Ε.Π.Ε.,,,ΛΙΒΑΔΕΙΑ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Voiotia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1410132,ΓΑΛΑΝΗ ΔΗΜ.ΔΗΜΗΤΡΑ,,,ΛΑΜΙΑ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Fthiotis,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1400001,ΓΑΡΥΦΑΛΛΟΥ ΣΟΦΙΑ,,,ΑΝΔΡΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Kikladhes,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1403726,ΓΙΑΝΝΙΤΣΗ Γ.ΕΙΡΗΝΗ,,,ΤΗΝΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Kikladhes,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1411996,ΔΕΛΗΚΑΡΗΣ ΚΥΡΙΑΚΟΣ,,,ΑΘΗΝΑ,,,,,,,,PMH Small customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1404658,ΔΕΝΑΞΑ ΠΑΡΑΣΚΕΥΗ,,,ΘΗΡΑ,,,,,,,,PMH Small customers,2050-FZA,,,Kikladhes,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1411472,ΔΕΣΙΠΡΗΣ ΑΝΤ.ΓΕΩΡΓΙΟΣ,,,ΧΑΛΚΙΔΑ,,,,,,,,PMH Small customers,2050-FZA,,,Evvoia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1410267,ΔΡΟΣΟΣ Μ.-ΔΕΝΑΞΑ Κ. & ΣΙΑ Ο.Ε.,,,ΘΗΡΑ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Kikladhes,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1412222,ΔΩΡΟΥΠΟΛΗ Ε.Ε,,,ΤΗΝΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Kikladhes,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1411595,ΕΠΙΧΕΙΡΕΙΝ ΝΑΥΠΑΚΤΟΥ ΑΕ,,,ΝΑΥΠΑΚΤΟΣ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Aitolia kai Akar,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1410753,ΕΥΑΓΓΕΛΟΠΟΥΛΟΥ ΒΑΣΙΛΙΚΗ,,,ΙΣΤΙΑΙΑ,,,,,,,,PMH Small customers,2050-FZA,,,Evvoia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1404091,ΕΥΘΥΜΙΟΥ Ι.ΓΕΩΡΓΙΑ,,,ΑΤΑΛΑΝΤΗ,,,,,,,,PMH Small customers,2050-FZA,,,Fthiotis,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1403868,ΖΑΧΑΡΙΑΣ Α.Ε.,,,ΠΕΡΙΣΤΕΡΙ,,,,,,,,PMH Strat. customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1411693,ΗΛΙΟΠΟΥΛΟΥ Κ.ΑΘΑΝΑΣΙΑ,,,ΧΑΙΔΑΡΙ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1403479,ΘΑΝΟΠΟΥΛΟΣ ΔΗΜ.ΕΜΠΟΡΙΟ ΤΡΟΦ.& ΟΙΚ.Ε,,,ΝΕΑ ΕΡΥΘΡΑΙΑ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1404403,ΘΕΟΔΟΣΙΟΥ ΔΗΜ.ΜΑΡΙΑ,,,ΑΜΑΡΥΝΘΟΣ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Evvoia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1412168,ΘΕΟΔΟΣΙΟΥ ΧΑΡ.ΖΑΧΑΡΟΥΛΑ,,,ΑΜΑΡΥΝΘΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Evvoia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1401392,ΚΑΒΒΑΔΑ ΟΛΓΑ,,,ΛΕΥΚΑΔΑ,,,,,,,,PMH Small customers,2050-FZA,,,Levkas,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1410013,ΚΑΛΟΓΗΡΟΥ ΑΛΕΞΑΝΔΡΟΣ,,,ΣΚΥΡΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Evvoia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1411017,ΚΑΛΟΥΤΑ ΦΡ.ΕΛΙΣΑΒΕΤ,,,ΣΥΡΟΣ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Kikladhes,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1404399,ΚΑΡΑΒΑΣΙΛΗ ΑΦΟΙ ΟΕ,,,ΑΣΠΡΟΠΥΡΓΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1412250,ΚΑΡΑΝΑΣΙΟΣ Κ.-ΓΑΛΑΝΗ Σ. Ε.Ε,,,ΛΑΜΙΑ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Fthiotis,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1402311,ΚΑΡΑΝΙΚΟΛΑΣ Π.ΓΡΗΓΟΡΗΣ,,,ΜΕΣΟΛΟΓΓΙ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Aitolia kai Akar,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1403723,ΚΑΤΣΟΥΡΗΣ ΜΙΧΑΛΗΣ,,,ΝΑΞΟΣ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Kikladhes,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1412219,ΚΕΔΡΟΣ Α.Ε. ΔΙΕΘΝΟΥΣ ΕΜΠΟΡΙΟΥ,,,ΒΟΥΛΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1412171,ΚΕΚΑ ΔΗΜ.ΒΑΣΙΛΕΙΑ,,,ΝΕΑ ΦΙΛΑΔΕΛΦΕΙΑ,,,,,,,,PMH Small customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1404538,ΚΕΦΑΛΑΣ ΗΛΙΑΣ & ΣΙΑ ΕΕ,,,ΛΑΜΙΑ,,,,,,,,PMH Strat. customers,2050-FZA,,,Fthiotis,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1412247,ΚΙΤΕΑΣ ΝΙΚΟΛΑΟΣ,,,ΑΙΤΩΛΙΚΟ,,,,,,,,PMH Small customers,2050-FZA,,,Aitolia kai Akar,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1412214,ΚΟΚΚΙΝΟΣ ΓΕΩΡΓΙΟΣ,,,ΠΑΛΑΙΟ ΦΑΛΗΡΟ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1411374,ΚΟΛΕΤΣΟΥ ΓΕΩΡΓΙΑ,,,ΜΑΡΚΟΠΟΥΛΟ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1404561,ΚΟΛΛΑΡΟΥ ΠΕΤΡΙΝΑ ΤΟΥ ΓΕΩΡΓΙΟΥ,,,ΤΗΝΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Kikladhes,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1412200,ΚΟΜΠΟΤΗΣ Δ.ΙΩΑΝΝΗΣ,,,ΛΙΒΑΔΕΙΑ,,,,,,,,PMH Small customers,2050-FZA,,,Voiotia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1411831,ΚΟΜΠΟΤΗΣ ΙΩΑΝ.ΔΗΜΗΤΡΙΟΣ,,,ΛΙΒΑΔΕΙΑ,,,,,,,,PMH Small customers,2050-FZA,,,Voiotia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1403373,ΚΟΥΤΣΑΓΓΕΛΗΣ ΚΩΝΣΤΑΝΤΙΝΟΣ,,,ΜΕΣΟΛΟΓΓΙ,,,,,,,,PMH Small customers,2050-FZA,,,Aitolia kai Akar,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1411470,ΚΩΝΣΤΑΝΤΙΝOY ΜΑΡΟΥΛΙΑ-ΑΓΓΕΛΙΚΗ,,,ΑΝΔΡΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Kikladhes,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1412174,ΚΩΝΣΤΑΝΤΙΝΟΥ ΓΕΩΡΓΙΟΣ,,,ΑΓΡΙΝΙΟ,,,,,,,,PMH Small customers,2050-FZA,,,Aitolia kai Akar,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1412199,ΛΑΖΑΡΟΥ ΑΝΤΩΝΙΟΣ Ε.Ε.,,,ΑΣΠΡΟΠΥΡΓΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1411132,ΛΑΖΑΡΟΥ ΝΙΚ.ΑΝΤΩΝΙΟΣ,,,ΑΣΠΡΟΠΥΡΓΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1403661,ΜΑΜΑΗΣ ΑΛΕΞ. ΝΙΚΟΛΑΟΣ,,,ΠΕΙΡΑΙΑΣ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Piraievs,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1401655,ΜΑΝΟΥΣΟΥ ΣΠΥΡ. ΑΝΑΣΤΑΣΙΑ,,,ΝΕΑ ΠΑΛΑΤΙΑ,,,,,,,,PMH Small customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1403357,ΜΑΡΓΩΝΗ ΑΝΑΣΤΑΣΙΑ,,,ΑΜΦΙΣΣΑ,,,,,,,,PMH Small customers,2050-FZA,,,Fokis,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1411095,ΜΑΣΤΟΡΙΔΟΥ ΑΝ. & ΣΙΑ Ο.Ε.,,,ΣΑΝΤΟΡΙΝΗ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Kikladhes,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1404711,ΜΑΥΡΟΖΟΥΜΗ Ι. ΣΤΑΥΡΟΥΛΑ,,,ΛΟΥΤΡΑ ΑΙΔΗΨΟΥ,,,,,,,,PMH Small customers,2050-FZA,,,Evvoia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1400028,ΜΙΚΕΛΗ ΤΕΡΕΖΑ,,,ΜΗΛΟΣ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Kikladhes,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1404669,ΜΟΙΡΑ ΜΑΡΙΑ,,,ΜΥΚΟΝΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Kikladhes,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1412184,ΜΟΙΡΑ ΜΑΡΙΑ & ΣΙΑ Ε.Ε,,,ΜΥΚΟΝΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Kikladhes,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1411343,ΜΟΝΙΑΡΟΣ Ι.ΣΤΥΛΙΑΝΟΣ,,,ΣΠΑΤΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1400283,ΜΟΝΙΟΥ ΔHM. ΑΓΓΕΛΙΚΗ,,,ΝΕΑ ΠΑΛΑΤΙΑ,,,,,,,,PMH Small customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1404037,ΜΟΥΖΑΚΗΣ Ν.ΠΑΝΑΓΙΩΤΗΣ,,,ΙΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Kikladhes,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1404263,ΜΠΑΜΠΑΡΑΚΟΥ Β.ΣΜΑΡΑΓΔΑ-ΠΑΦΡΑ,,,ΚΥΜΗ,,,,,,,,PMH Small customers,2050-FZA,,,Evvoia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1401735,ΜΠΕΚΙΡΗΣ Δ. & ΣΙΑ Ο.Ε.,,,ΠΕΡΙΣΤΕΡΙ,,,,,,,,PMH Distrib./WSales,2050-GBZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1411574,ΜΠΙΜΠΑ ΧΡΙΣΤΙΑΝΑ & ΣΙΑ Ε.Ε.,,,ΑΓΡΙΝΙΟ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Aitolia kai Akar,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1411040,ΜΠΟΥΓΑΣ ΑΝΤΩΝΙΟΣ,,,ΙΣΤΙΑΙΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Evvoia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1410041,ΜΠΟΥΡΑΤΖΗΣ Τ. & ΣΙΑ Ε.Ε.,,,ΑΝΔΡΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Kikladhes,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1410114,ΜΥΛΟΣ Ο.Ε.,,,ΜΥΚΟΝΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Kikladhes,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1411443,ΝΑΚΑΣ ΘΩΜΑΣ ΒΙΒΛΙΟΠΩΛΕΙΑ ΙΚΕ,,,ΡΑΦΗΝΑ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1404040,ΝΑΚΑΣ ΦΙΛΙΠΠΟΣ ΑΒΕΕΤΕ,,,ΠΑΙΑΝΙΑ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1404264,ΝΕΜΕΤ ΑΝΤΩΝΙΟΣ & ΣΙΑ ΟΕ,,,ΣΥΡΟΣ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Kikladhes,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1403013,ΝΙΚΗΤΑΣ ΝΙΚ. ΠΑΝΑΓΙΩΤΗΣ,,,ΘΗΒΑ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Voiotia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1400578,ΝΙΚΟΛΑΟΥ Χ.ΕΥΘΥΜΙΟΣ,,,ΝΑΥΠΑΚΤΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Aitolia kai Akar,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1404916,ΠΑΛΑΣΚΑ ΧΡ.ΑΘΗΝΑ,,,ΜΕΓΑΡΑ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1404378,ΠΑΝΤΕΛΑΙΟΥ ΝΙΚ.ΜΑΡΙΑΝΝΑ,,,ΠΑΡΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Kikladhes,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1400435,ΠΑΠΑΓΙΑΝΝΑΚΟΠΟΥΛΟΣ Κ. & ΣΙΑ Ο.Ε.,,,ΔΑΦΝΗ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1411080,ΠΑΠΑΛΥΜΠΕΡΗΣ ΚΩΝΣΤΑΝΤΙΝΟΣ,,,ΚΑΡΥΣΤΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Evvoia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1402064,ΠΑΠΑΝΙΚΟΛΑΟΥ ΘΕΟΔΩΡΑ & ΣΙΑ Ο.Ε.,,,ΝΕΑ ΣΜΥΡΝΗ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1404648,ΠΑΡΑΡΑΣ ΕΜΜΑΝΟΥΗΛ,,,ΧΑΛΚΕΙΟ ΝΑΞΟΥ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Kikladhes,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1411174,ΠΑΡΑΣΥΡΗΣ ΚΩΝΣΤΑΝΤΙΝΟΣ,,,ΑΥΛΩΝΑΡΙ ΕΥΒΟΙΑΣ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Evvoia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1404011,ΠΑΤΑΡΙΑΣ ΑΘΑΝΑΣΙΟΣ,,,ΙΤΕΑ ΦΩΚΙΔΑΣ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Fokis,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1400801,ΠΕΡΔΙΚΗ Ν.ΑΦΟΙ Ο.Ε.,,,ΚΑΛΛΙΘΕΑ,,,,,,,,PMH Small customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1412196,ΠΕΤΡΟΥ ΑΦΟΙ-ΗΛΙΟΠΟΥΛΟΙ ΗΛΙΟΜΕΤΑΛ ΟΕ,,,ΚΑΛΑΜΑΤΑ,,,,,,,,PMH Small customers,2050-FZA,,,Messinia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1404742,ΠΡΕΝΑΤΑΛ ΜΟΝΟΠΡΟΣΩΠΗ Α.Ε.Β.Ε.,,,ΠΕΙΡΑΙΑΣ (5041),,,,,,,,PMH Strat. customers,2050-FZA,,,Piraievs,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1404718,ΠΡΙΜΗΚΥΡΙΟΣ ΕΛΕΥΘΕΡΙΟΣ ΖΟΟΜ ΑΕ,,,ΝΑΞΟΣ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Kikladhes,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1403964,ΠΡΙΝΤΕΖΗΣ ΓΕΩΡΓΙΟΣ & ΣΙΑ ΟΕ,,,ΣΥΡΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Kikladhes,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1412242,ΡΑΠΑΚΟΥΛΙΑΣ ΣΤΥΛΙΑΝΟΣ,,,ΒΡΙΛΗΣΣΙΑ,,,,,,,,PMH Small customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1404912,ΣΑΜΙΩΤΗΣ Α.ΣΤΑΥΡΟΣ,,,ΚΑΛΛΙΘΕΑ,,,,,,,,PMH Small customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1412161,ΣΙΤΑΡΑ Δ.ΕΛΕΝΗ,,,ΜΑΡΚΟΠΟΥΛΟ,,,,,,,,PMH Small customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1410056,ΣΙΤΑΡΑΣ ΝΙΚ.ΔΗΜΗΤΡΙΟΣ,,,ΜΑΡΚΟΠΟΥΛΟ,,,,,,,,PMH Small customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1411352,ΣΟΦΙΑΝΟΣ Ν.,,,ΛΑΜΙΑ,,,,,,,,PMH Small customers,2050-FZA,,,Fthiotis,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1401736,ΣΟΦΡΩΝΗΣ Ε. κ ΣΙΑ Ο.Ε.,,,ΚΟΡΩΠΙ,,,,,,,,PMH Small customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1402570,ΣΠΑΝΟΥ ΙΩΑΝΝΑ,,,ΠΕΤΡΙΕΣ ΕΥΒΟΙΑΣ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Evvoia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1412249,ΣΠΥΡΙΔΑΚΟΣ ΜΙΧΑΗΛ,,,ΣΙΦΝΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Kikladhes,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1411924,ΣΤΑΥΡΟΠΟΥΛΟΣ ΧΑΡΙΛΑΟΣ,,,ΑΓΡΙΝΙΟ,,,,,,,,PMH Tele Sales cust.,2050-ZAZ,,,Aitolia kai Akar,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1404503,ΤΣΑΚΑΜΗ ΚΑΛΗ,,,ΣΚΥΡΟΣ,,,,,,,,PMH Small customers,2050-FZA,,,Evvoia,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1411230,ΤΣΑΟΥΣΟΓΛΟΥ ΑΝ.ΑΝΤΩΝΙΑΝΝΑ,,,ΝΕΑ ΙΩΝΙΑ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1404111,ΦΡΑΓΚΟΥ ΠΑΓΩΝΑ-ΧΡΥΣΟΥΛΑ,,,ΝΑΥΠΑΚΤΟΣ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Aitolia kai Akar,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1411941,ΦΥΤΡΟΣ ΔΗΜΗΤΡΙΟΣ ΜΟΝ.ΙΚΕ,,,ΣΑΝΤΟΡΙΝΗ,,,,,,,,PMH Small customers,2050-FZA,,,Kikladhes,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1401783,ΧΕΡΟΥΒΕΙΜ Π. ΚΩΝΣΤΑΝΤΙΝΟΣ,,,ΠΑΡΟΣ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Kikladhes,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1403958,ΧΙΟΣ TOYS ΕΜΠΟΡΙΑ ΕΙΔ.ΨΥΧΑΓ.ΜΟΝ.ΕΠΕ,,,ΜΑΡΟΥΣΙ,,,,,,,,PMH Strat. customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1403225,ΧΟΝΤΟΣ ΠΟΛΥΚΑΤΑΣΤΗΜΑ Α.Ε.Β.Ε.,,,ΚΑΛΛΙΘΕΑ,,,,,,,,PMH Strat. customers,2050-FZA,,,Attiki,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1404394,ΧΡΙΣΤΟΔΟΥΛΟΠΟΥΛΟΙ ΑΦΟΙ ΕΕ,,,ΑΓΡΙΝΙΟ,,,,,,,,PMH Small customers,2050-FZA,,,Aitolia kai Akar,,,ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ
+1411492,CORE INNOVATIONS ΜΟΝΟΠΡΟΣΩΠΗ Α.Ε.,,,ΠΕΡΙΣΣΟΣ,,,,,,,,PMH Medium customers,2050-ZAZ,,,Attiki,,,ΓΟΝΗΣ ΔΑΜΙΑΝΟΣ
+1400404,JUMBO ΑΝΩΝΥΜΗ ΕΜΠΟΡΙΚΗ ΕΤΑΙΡΕΙΑ,,,ΜΟΣΧΑΤΟ,,,,,,,,PMH Key accounts,,,,Piraievs,,,ΓΟΝΗΣ ΔΑΜΙΑΝΟΣ
+1411196,LIDL HELLAS & ΣΙΑ ΟΕ,,,ΣΙΝΔΟΣ ΘΕΣ/ΚΗ (SND),,,,,,,,PMH Key accounts,,,,Thessaloniki,,,ΓΟΝΗΣ ΔΑΜΙΑΝΟΣ
+1404062,PUBLIC RETAIL ΜΟΝΟΠΡΟΣΩΠΗ A.Ε.,,,Ν.ΚΗΦΙΣΙΑ,,,,,,,,PMH Key accounts,,,,Attiki,,,ΓΟΝΗΣ ΔΑΜΙΑΝΟΣ
+1404055,DREAMBOX ΕΜΠΟΡΙΚΗ ΟΕ,,,ΝΕΑ ΙΩΝΙΑ,,,,,,,,PMH Distrib./WSales,2050-GBZ,,,Attiki,,,ΓΟΝΗΣ ΔΑΜΙΑΝΟΣ
+1401738,ΜΟΥΣΤΑΚΑΣ Γ.Ν. ΑΕΒΕ,,,ΠΕΡΙΣΤΕΡΙ,,,,,,,,PMH Key accounts,,,,Attiki,,,ΓΟΝΗΣ ΔΑΜΙΑΝΟΣ
+1403934,ΠΑΝΤΑΖΟΠΟΥΛΟΣ ΔΗΜΗΤΡΙΟΣ ΜΟΝ. Α.Ε.,,,ΑΘΗΝΑ,,,,,,,,PMH Premium,,,,Attiki,,,ΓΟΝΗΣ ΔΑΜΙΑΝΟΣ
+1410063,ΠΛΑΙΣΙΟ COMPUTERS A.E.B.E.,,,ΜΑΓΟΥΛΑ,,,,,,,,PMH Strat. customers,2050-FZA,,,Attiki,,,ΓΟΝΗΣ ΔΑΜΙΑΝΟΣ
+1410813,ΦΙΛΝΤΙΣΗ ΑΦΟΙ ΓΕΩΡΓΙΟΥ ΙΚΕ,,,ΜΟΣΧΑΤΟ ΑΤΤΙΚΗΣ,,,,,,,,PMH Distrib./WSales,2050-GBZ,,,Attiki,,,ΓΟΝΗΣ ΔΑΜΙΑΝΟΣ
+1410173,ΧΑΛΚΙΑΔΑΚΗΣ Α.Ε.,,,ΗΡΑΚΛΕΙΟ,,,,,,,,PMH Key accounts,,,,Iraklion,,,ΓΟΝΗΣ ΔΑΜΙΑΝΟΣ
+1412213,FERRERO INTERNAT.SA GREECE ΜΟΝ.EΠΕ,,,ΜΑΡΟΥΣΙ,,,,,,,,PMH Others,,,,Attiki,,,PLAYMOBIL PROMO
+1411219,OSCAR ABEE,,,ΑΣΠΡΟΠΥΡΓΟΣ,,,,,,,,PMH Strat. customers,2050-FZA,,,Attiki,,,PLAYMOBIL PROMO
+1412134,PEOPLE DEVELOPMENT ΚΟΙΝ.Σ.ΕΠ.,,,ΒΡΙΛΗΣΣΙΑ,,,,,,,,PMH Others,,,,Attiki,,,PLAYMOBIL PROMO
+1412124,PESCANOVA HELLAS Ε.Π.Ε.,,,ΒΡΙΛΗΣΣΙΑ,,,,,,,,PMH Small customers,2050-FZA,,,Attiki,,,PLAYMOBIL PROMO
+1411523,TREASURE LAB IKE,,,ΝΕΟ ΨΥΧΙΚΟ,,,,,,,,PMH Others,,,,Attiki,,,PLAYMOBIL PROMO
+1411826,ΕΚΔΟΣΕΙΣ ANUBIS ΙΚΕ,,,ΑΘΗΝΑ,,,,,,,,PMH Strat. customers,2050-FZA,,,Attiki,,,PLAYMOBIL PROMO
+1412103,ΠΟΛΙΔΗΣ ΝΙΚΟΣ,,,ΘΥΜΑΡΙ Π.ΦΩΚΑΙΑ,,,,,,,,PMH Others,,,,Attiki,,,PLAYMOBIL PROMO
+1411779,AMAZON TURKEY PERAKENDE HIZMETLERI,,,SISLI / ISTANBUL,,,,,,,,PMH Strat. customers,2050-FZA,,,,,,TURKEY
+1412209,B SONMEZ GIDA TEKSTIL SANAYI TIC.LT,,,KADIKOY ISTANBUL,,,,,,,,PMH Distrib./WSales,2050-GBZ,,,,,,TURKEY
+1411107,TURKUVAZ AGT TANITIM VE PAZARLAMA A,,,EYUPSULTAN ISTANBUL,,,,,,,,PMH Strat. customers,2050-FZA,,,,,,TURKEY
+1411868,KRS DOO SKOPJE,,,SKOPJE,,,,,,,,PMH Strat. customers,2050-FZA,,,,,,REPUBLIC OF NORTH MACEDONIA
+1400003,MITSINKAS G.K.LTD,,,LIMASSOL,,,,,,,,PMH Distrib./WSales,2050-GBZ,,,,,,CYPRUS

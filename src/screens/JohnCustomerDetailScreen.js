@@ -133,7 +133,17 @@ const JohnCustomerDetailScreen = ({ route, navigation }) => {
   const vatInfo = customer?.vatInfo || {};
 
   return (
-    <SafeScreen style={styles.container}>
+    <SafeScreen 
+      style={styles.container}
+      headerLeft={
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="arrow-back" size={24} color="#1f4f8f" />
+        </TouchableOpacity>
+      }
+    >
       <ScrollView contentContainerStyle={styles.scrollInner}>
         <View style={styles.header}>
           <Image source={AVATAR} style={styles.avatar} resizeMode="cover" />
@@ -181,19 +191,42 @@ const JohnCustomerDetailScreen = ({ route, navigation }) => {
           <InfoRow label="Πωλητής" value={customer?.merch} icon="person-outline" />
         </View>
 
-        <TouchableOpacity
-          style={styles.summaryButton}
-          activeOpacity={0.8}
-          onPress={() =>
-            navigation.navigate('CustomerSalesSummary', {
-              customerId: customer?.customerCode || customerId,
-              brand: 'john',
-            })
-          }
-        >
-          <Ionicons name="stats-chart-outline" size={18} color="#fff" style={styles.summaryIcon} />
-          <Text style={styles.summaryText}>Προβολή πωλήσεων</Text>
-        </TouchableOpacity>
+        {/* Navigation Buttons */}
+        <View style={styles.modernNavContainer}>
+          <TouchableOpacity
+            style={styles.modernNavButton}
+            onPress={() =>
+              navigation.navigate('CustomerSalesSummary', {
+                customerId: customer?.customerCode || customerId,
+                brand: 'john',
+              })
+            }
+            activeOpacity={0.7}
+          >
+            <View style={styles.modernNavIconContainer}>
+              <Ionicons name="analytics-outline" color="#1f4f8f" size={24} />
+            </View>
+            <Text style={styles.modernNavButtonText}>Ανάλυση Πωλήσεων</Text>
+            <Ionicons name="chevron-forward" size={20} color="#1f4f8f" />
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={styles.modernNavButton}
+            onPress={() =>
+              navigation.navigate('CustomerMonthlySales', {
+                customerId: customer?.customerCode || customerId,
+                brand: 'john',
+              })
+            }
+            activeOpacity={0.7}
+          >
+            <View style={styles.modernNavIconContainer}>
+              <Ionicons name="calendar-outline" color="#1f4f8f" size={24} />
+            </View>
+            <Text style={styles.modernNavButtonText}>Μηνιαία Ανάλυση Πωλήσεων</Text>
+            <Ionicons name="chevron-forward" size={20} color="#1f4f8f" />
+          </TouchableOpacity>
+        </View>
 
         <View style={styles.bottomSpacer} />
       </ScrollView>
@@ -298,6 +331,43 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     fontWeight: '600',
+  },
+  backButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  modernNavContainer: {
+    marginTop: 24,
+    gap: 12,
+  },
+  modernNavButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#e5e7eb',
+  },
+  modernNavIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#e3f2fd',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  modernNavButtonText: {
+    flex: 1,
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1f2937',
   },
 });
 

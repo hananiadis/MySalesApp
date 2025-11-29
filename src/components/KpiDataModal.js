@@ -34,14 +34,37 @@ const formatDate = (dateValue) => {
   return String(dateValue);
 };
 
-export default function KpiDataModal({ visible, onClose, title, data, previousData = [], type, activeSalesmenIds = [], availableSalesmen = [] }) {
-  const [activeTab, setActiveTab] = useState('current'); // 'current' or 'previous'
+export default function KpiDataModal({ 
+  visible, 
+  onClose, 
+  title, 
+  data, 
+  previousData = [], 
+  year2023Data = [],
+  year2022Data = [],
+  type, 
+  activeSalesmenIds = [], 
+  availableSalesmen = [] 
+}) {
+  const [activeTab, setActiveTab] = useState('current'); // 'current', 'previous', 'year2023', 'year2022'
   
   const currentYear = new Date().getFullYear();
   const previousYear = currentYear - 1;
   
+  // Determine if we have 4-year data (Kivos) or 2-year data (Playmobil)
+  const has4Years = year2023Data?.length > 0 || year2022Data?.length > 0;
+  
   const { displayData, totalAmount } = useMemo(() => {
-    const sourceData = activeTab === 'current' ? data : previousData;
+    let sourceData;
+    if (activeTab === 'current') {
+      sourceData = data;
+    } else if (activeTab === 'previous') {
+      sourceData = previousData;
+    } else if (activeTab === 'year2023') {
+      sourceData = year2023Data;
+    } else if (activeTab === 'year2022') {
+      sourceData = year2022Data;
+    }
     
     console.log('[KpiDataModal] Processing data:', { 
       dataLength: sourceData?.length, 
@@ -135,7 +158,7 @@ export default function KpiDataModal({ visible, onClose, title, data, previousDa
     });
 
     return { displayData: processedData, totalAmount: total };
-  }, [data, previousData, type, activeTab]);
+  }, [data, previousData, year2023Data, year2022Data, type, activeTab]);
 
   if (!visible) return null;
 
@@ -168,7 +191,7 @@ export default function KpiDataModal({ visible, onClose, title, data, previousDa
             ) : null}
           </View>
 
-          {/* Year Tabs - only show if we have previous data */}
+          {/* Year Tabs - show 2 or 4 years depending on data */}
           {previousData && previousData.length > 0 && (
             <View style={styles.tabContainer}>
               <TouchableOpacity
@@ -187,6 +210,26 @@ export default function KpiDataModal({ visible, onClose, title, data, previousDa
                   {previousYear}
                 </Text>
               </TouchableOpacity>
+              {has4Years && year2023Data && year2023Data.length > 0 && (
+                <TouchableOpacity
+                  style={[styles.tab, activeTab === 'year2023' && styles.tabActive]}
+                  onPress={() => setActiveTab('year2023')}
+                >
+                  <Text style={[styles.tabText, activeTab === 'year2023' && styles.tabTextActive]}>
+                    2023
+                  </Text>
+                </TouchableOpacity>
+              )}
+              {has4Years && year2022Data && year2022Data.length > 0 && (
+                <TouchableOpacity
+                  style={[styles.tab, activeTab === 'year2022' && styles.tabActive]}
+                  onPress={() => setActiveTab('year2022')}
+                >
+                  <Text style={[styles.tabText, activeTab === 'year2022' && styles.tabTextActive]}>
+                    2022
+                  </Text>
+                </TouchableOpacity>
+              )}
             </View>
           )}
 
@@ -219,50 +262,91 @@ export default function KpiDataModal({ visible, onClose, title, data, previousDa
                 <Text style={styles.emptyText}>Δεν υπάρχουν δεδομένα</Text>
               </View>
             ) : (
-              displayData.map((record, index) => {
-                // For yearly view - show customer summary in compact format
-                if (type === 'yearly') {
-                  const customerName = record.customerCode || 'Unknown';
-                  const amount = formatCurrency(record.amount);
-                  const count = record.count ? ` (${record.count} συναλλαγές)` : '';
+              <>
+                {/* Header row for Kivos sales data */}
+                {type === 'sales' && displayData.length > 0 && displayData[0].amountWithVAT !== undefined && (
+                  <View style={[styles.compactRow, styles.headerRow]}>
+                    <Text style={[styles.compactDate, styles.headerText]}>Ημ/νία</Text>
+                    <Text style={[styles.compactAmount, styles.headerText]}>Καθαρό</Text>
+                    <Text style={[styles.compactAmount, styles.headerText]}>Τιμολ.</Text>
+                  </View>
+                )}
+                {displayData.map((record, index) => {
+                  // For yearly view - show customer summary in compact format
+                  if (type === 'yearly') {
+                    const customerName = record.customerCode || 'Unknown';
+                    const amount = formatCurrency(record.amount);
+                    const count = record.count ? ` (${record.count} συναλλαγές)` : '';
+                    
+                    return (
+                      <View key={index} style={styles.compactRow}>
+                        <Text style={styles.compactCustomer} numberOfLines={1}>
+                          {customerName}
+                        </Text>
+                        <Text style={styles.compactAmount}>{amount}</Text>
+                      </View>
+                    );
+                  }
+                  
+                  // For transaction view - show in single line: Date Customer Amount
+                  const date = formatDate(record.date || record.Date || record.documentDate || record.invoiceDate);
+                  const customer = type !== 'customer-sales' && type !== 'sales'
+                    ? (record.customerName || record.customerCode || record.Payer || record['Bill-to'] || 'N/A')
+                    : null;
+                  
+                  // Get handling salesman for badge
+                  const handledBy = record.handledBy || null;
+                  
+                  // For Kivos sales data, show both net and invoiced amounts
+                  const hasInvoicedAmount = record.amountWithVAT !== undefined;
+                  const netAmount = formatCurrency(
+                    record.amount || 
+                    record.netAmount ||
+                    record.total || 
+                    record.value || 
+                    record['Sales revenue'] || 
+                    0
+                  );
+                  const invoicedAmount = hasInvoicedAmount 
+                    ? formatCurrency(record.amountWithVAT)
+                    : null;
+                  
+                  console.log(`[KpiDataModal] Row ${index} customer:`, {
+                    customerName: record.customerName,
+                    customerCode: record.customerCode,
+                    selected: customer,
+                    hasInvoicedAmount,
+                    netAmount: record.amount,
+                    invoicedAmount: record.amountWithVAT,
+                    handledBy
+                  });
                   
                   return (
-                    <View key={index} style={styles.compactRow}>
-                      <Text style={styles.compactCustomer} numberOfLines={1}>
-                        {customerName}
-                      </Text>
-                      <Text style={styles.compactAmount}>{amount}</Text>
+                    <View key={index} style={styles.transactionRow}>
+                      <View style={styles.compactRow}>
+                        <Text style={styles.compactDate}>{date}</Text>
+                        {customer && <Text style={styles.compactCustomer} numberOfLines={1}>{customer}</Text>}
+                        {hasInvoicedAmount ? (
+                          <>
+                            <Text style={styles.compactAmount}>{netAmount}</Text>
+                            <Text style={styles.compactAmount}>{invoicedAmount}</Text>
+                          </>
+                        ) : (
+                          <Text style={styles.compactAmount}>{netAmount}</Text>
+                        )}
+                      </View>
+                      {handledBy && (
+                        <View style={styles.salesmanBadgeContainer}>
+                          <View style={styles.salesmanBadge}>
+                            <Ionicons name="person-outline" size={10} color="#6b7280" />
+                            <Text style={styles.salesmanBadgeText}>{handledBy}</Text>
+                          </View>
+                        </View>
+                      )}
                     </View>
                   );
-                }
-                
-                // For transaction view - show in single line: Date Customer Amount
-                const date = formatDate(record.date || record.Date || record.documentDate || record.invoiceDate);
-                const customer = type !== 'customer-sales' 
-                  ? (record.customerName || record.customerCode || record.Payer || record['Bill-to'] || 'N/A')
-                  : null;
-                const amount = formatCurrency(
-                  record.amount || 
-                  record.total || 
-                  record.value || 
-                  record['Sales revenue'] || 
-                  0
-                );
-                
-                console.log(`[KpiDataModal] Row ${index} customer:`, {
-                  customerName: record.customerName,
-                  customerCode: record.customerCode,
-                  selected: customer
-                });
-                
-                return (
-                  <View key={index} style={styles.compactRow}>
-                    <Text style={styles.compactDate}>{date}</Text>
-                    {customer && <Text style={styles.compactCustomer} numberOfLines={1}>{customer}</Text>}
-                    <Text style={styles.compactAmount}>{amount}</Text>
-                  </View>
-                );
-              })
+                })}
+              </>
             )}
           </ScrollView>
 
@@ -392,6 +476,15 @@ const styles = StyleSheet.create({
     borderBottomColor: colors.border,
     backgroundColor: colors.white,
   },
+  headerRow: {
+    backgroundColor: '#f5f5f5',
+    paddingVertical: 8,
+  },
+  headerText: {
+    fontWeight: '700',
+    fontSize: 13,
+    color: colors.textSecondary,
+  },
   compactDate: {
     fontSize: 14,
     color: colors.text,
@@ -412,6 +505,28 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'right',
     minWidth: 100,
+  },
+  transactionRow: {
+    marginBottom: 4,
+  },
+  salesmanBadgeContainer: {
+    paddingLeft: 8,
+    marginTop: 2,
+  },
+  salesmanBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#f3f4f6',
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 12,
+    alignSelf: 'flex-start',
+  },
+  salesmanBadgeText: {
+    fontSize: 10,
+    color: '#6b7280',
+    marginLeft: 4,
+    fontWeight: '500',
   },
   footer: {
     paddingHorizontal: 20,

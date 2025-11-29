@@ -604,6 +604,33 @@ export function getLocalProductImage(productCode) {
   return `file://${IMAGES_DIR}${productCode}.jpg`;
 }
 
+// ===== Brand Contacts =====
+
+export async function saveContactsToLocal(contacts, brand) {
+  const resolvedBrand = resolveBrandKey(brand);
+  await storePayload(dataKey('contacts', resolvedBrand), 'contacts', resolvedBrand, contacts);
+  await setActionState('contacts', resolvedBrand, 'updated');
+}
+
+export async function getContactsFromLocal(brand) {
+  const resolvedBrand = resolveBrandKey(brand);
+  const payload = await readPayload(dataKey('contacts', resolvedBrand), 'contacts', resolvedBrand);
+  return payload || [];
+}
+
+export async function clearContactsLocal(brand) {
+  const resolvedBrand = resolveBrandKey(brand);
+  await clearPayload(dataKey('contacts', resolvedBrand), 'contacts', resolvedBrand);
+  await setActionState('contacts', resolvedBrand, 'deleted');
+}
+
+export async function getContactsLastAction(brand) {
+  const resolvedBrand = resolveBrandKey(brand);
+  return readActionState('contacts', resolvedBrand);
+}
+
+// ===== General =====
+
 export async function clearAllLocalData() {
   await AsyncStorage.clear();
   if (STORAGE_ROOT) {

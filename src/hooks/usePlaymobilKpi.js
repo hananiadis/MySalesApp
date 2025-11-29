@@ -8,12 +8,17 @@ import {
   calculateAllKPIs,
   getCustomerSalesSummary 
 } from '../services/playmobilKpi';
+import { 
+  getCachedResults, 
+  setCachedResults 
+} from '../services/kpiCacheManager';
 
 console.log('[usePlaymobilKpi] Module loaded');
 
 const STATUS = {
   INITIAL: 'initial',
   LOADING: 'loading',
+  AWAITING_SELECTION: 'awaiting_selection',
   DONE: 'done',
   ERROR: 'error',
 };
@@ -48,6 +53,21 @@ export default function usePlaymobilKpi({
     verbose,
     reloadToken,
   });
+
+  // Stabilize selectedSalesmenIds to prevent infinite re-renders
+  // Only update when the actual IDs change, not when the array reference changes
+  // We stringify inside useMemo and use the length + first/last elements as primitive dependencies
+  const salesmenIdsKey = selectedSalesmenIds 
+    ? `${selectedSalesmenIds.length}-${selectedSalesmenIds[0]}-${selectedSalesmenIds[selectedSalesmenIds.length - 1]}`
+    : 'null';
+  
+  const stableSelectedIds = useMemo(() => {
+    if (!selectedSalesmenIds || !Array.isArray(selectedSalesmenIds)) {
+      return null;
+    }
+    // Sort to ensure consistent comparison
+    return [...selectedSalesmenIds].sort().join(',');
+  }, [salesmenIdsKey]);
 
   const [status, setStatus] = useState(STATUS.INITIAL);
   const [error, setError] = useState(null);
@@ -149,15 +169,36 @@ export default function usePlaymobilKpi({
           console.log('[usePlaymobilKpi] Using provided selectedSalesmenIds subset:', subsetIds);
         }
         if (!subsetIds.length) {
-          subsetIds = playmobilIds; // fallback to all
-          console.log('[usePlaymobilKpi] No subset provided (or invalid) -> using ALL playmobil salesmen');
+          // Smart default: single salesman = auto-select, multiple = require selection
+          if (playmobilIds.length === 1) {
+            // User has only 1 salesman - use it by default
+            subsetIds = playmobilIds;
+            console.log('[usePlaymobilKpi] User has 1 salesman, using as default:', playmobilIds[0]);
+          } else if (playmobilIds.length > 1) {
+            // User has multiple salesmen - require explicit selection
+            console.log('[usePlaymobilKpi] User has multiple salesmen, requiring explicit selection');
+            setStatus(STATUS.AWAITING_SELECTION);
+            setActiveSalesmenIds([]);
+            return; // Exit early, wait for user selection
+          } else {
+            // No salesmen available (shouldn't happen, but handle gracefully)
+            console.error('[usePlaymobilKpi] No playmobil salesmen found');
+            throw new Error('No Playmobil salesmen available');
+          }
         }
-        setActiveSalesmenIds(subsetIds);
+        const effectiveSubsetIds = subsetIds;
+        setActiveSalesmenIds(effectiveSubsetIds);
 
         // Get customer codes for active subset only
-        console.log('[usePlaymobilKpi] Fetching customer codes for active subset...', { count: subsetIds.length });
-        const customerCodes = await getCustomerCodes(subsetIds, 'playmobil');
+        console.log('[usePlaymobilKpi] Fetching customer codes for active subset...', { count: effectiveSubsetIds.length });
+        const result = await getCustomerCodes(effectiveSubsetIds, 'playmobil');
+        const customerCodes = result.customerCodes || result; // Support both new and legacy format
+        const customerMerchMap = result.customerMerchMap || {};
         console.log('[usePlaymobilKpi] Customer codes received (subset):', customerCodes.length);
+        console.log('[usePlaymobilKpi] Customers with single salesman:', 
+          Object.values(customerMerchMap).filter(v => !v.isMultiSalesman).length);
+        console.log('[usePlaymobilKpi] Customers with multiple salesmen:', 
+          Object.values(customerMerchMap).filter(v => v.isMultiSalesman).length);
 
         if (!customerCodes.length) {
           console.error('[usePlaymobilKpi] No customers found');
@@ -184,7 +225,14 @@ export default function usePlaymobilKpi({
           }
         }
 
-        // Load sheets data
+        // Extract merch names from active salesmen IDs for filtering
+        const activeMerchNames = effectiveSubsetIds.map(id => {
+          const parts = id.split('_');
+          return parts.length > 1 ? parts.slice(1).join('_') : id;
+        });
+        console.log('[usePlaymobilKpi] Active merch names for KPI filtering:', activeMerchNames);
+
+        // Load sheets data first (needed for both cached and fresh calculations)
         console.log('[usePlaymobilKpi] Loading sheets data...');
         const sheetsData = await getAllSheetsData();
         console.log('[usePlaymobilKpi] Sheets data loaded:', {
@@ -195,7 +243,6 @@ export default function usePlaymobilKpi({
         });
 
         // Determine reference date from sheet header dates
-        // Requirement: use the latest sales (invoiced) sheet header date when available
         const headerDates = sheetsData._headerDates || {};
         const invoicedHeader = headerDates.invoiced2025;
         const ordersHeader = headerDates.orders2025;
@@ -209,38 +256,71 @@ export default function usePlaymobilKpi({
         }
         console.log('[usePlaymobilKpi] Header reference date (sales-first) selected:', headerReferenceDate.toISOString());
 
-  // Calculate KPIs
-        console.log('[usePlaymobilKpi] Calculating KPIs...');
-  const kpiResult = calculateAllKPIs(sheetsData, customerCodes, { referenceDate: headerReferenceDate });
+        // Check cache for this specific filter combination
+        console.log('[usePlaymobilKpi] Checking cache for filter combination...');
+        const cachedResults = await getCachedResults('playmobil', activeMerchNames);
         
-        console.log('[usePlaymobilKpi] Getting customer summary...');
-        const summary = getCustomerSalesSummary(sheetsData, customerCodes);
-
-        // Cache only lightweight summary (not detailed records - they're too big)
-        console.log('[usePlaymobilKpi] Caching KPI summary metrics (lightweight)...');
-        try {
-          const lightweightCache = {
-            // Store only the metrics, not the detailed records
+        if (cachedResults) {
+          console.log('[usePlaymobilKpi] Cache HIT! Using cached calculation results');
+          
+          // Use cached metrics but provide access to raw records
+          setKpis(cachedResults.kpis);
+          setCustomers(cachedResults.customers || []);
+          
+          // Store records for modal access
+          const recordSetsFromCache = {
             invoiced: {
-              yearly: kpiResult?.invoiced?.yearly,
-              monthly: kpiResult?.invoiced?.monthly,
-              mtd: kpiResult?.invoiced?.mtd,
+              current: sheetsData.invoiced2025,
+              previous: sheetsData.invoiced2024,
             },
             orders: {
-              yearly: kpiResult?.orders?.yearly,
-              monthly: kpiResult?.orders?.monthly,
-              mtd: kpiResult?.orders?.mtd,
+              current: sheetsData.orders2025,
+              previous: sheetsData.orders2024,
             },
-            summary: summary.slice(0, 100), // Store only top 100 customers for summary
-            timestamp: new Date().toISOString(),
           };
+          setRecordSets(recordSetsFromCache);
           
-          await AsyncStorage.setItem('playmobil_kpi_results', JSON.stringify(lightweightCache));
-          await AsyncStorage.setItem('playmobil_kpi_timestamp', new Date().toISOString());
-          console.log('[usePlaymobilKpi] KPI summary cached (without heavy record details)');
+          setStatus(STATUS.DONE);
+          
+          return; // Exit early with cached results
+        }
+        
+        console.log('[usePlaymobilKpi] Cache MISS - calculating fresh results');
+
+        // Calculate KPIs
+        console.log('[usePlaymobilKpi] Calculating KPIs...');
+        const kpiResult = await calculateAllKPIs(sheetsData, customerCodes, { 
+          referenceDate: headerReferenceDate,
+          salesmenFilter: activeMerchNames, // Pass salesman filter
+          customerMerchMap // Pass customer-salesman mapping for multi-salesman attribution
+        });
+        
+        console.log('[usePlaymobilKpi] Getting customer summary...');
+        const summary = getCustomerSalesSummary(sheetsData, customerCodes, activeMerchNames);
+
+        // Create metric snapshot
+        const metricSnapshot = {
+          invoiced: kpiResult?.invoiced,
+          orders: kpiResult?.orders,
+          totals: {
+            invoicedCurrent: kpiResult?.invoiced?.yearly?.current?.amount || 0,
+            invoicedPrevious: kpiResult?.invoiced?.yearly?.previous?.amount || 0,
+            ordersCurrent: kpiResult?.orders?.yearly?.current?.amount || 0,
+            ordersPrevious: kpiResult?.orders?.yearly?.previous?.amount || 0,
+          },
+        };
+
+        // Cache the calculation results for this filter combination
+        console.log('[usePlaymobilKpi] Caching calculation results for filter combination...');
+        try {
+          await setCachedResults('playmobil', activeMerchNames, {
+            kpis: kpiResult,
+            metricSnapshot: metricSnapshot,
+            customers: summary,
+          });
+          console.log('[usePlaymobilKpi] Results cached successfully for filter:', activeMerchNames);
         } catch (cacheError) {
-          console.warn('[usePlaymobilKpi] Failed to cache KPI results:', cacheError.message);
-          console.warn('[usePlaymobilKpi] Continuing without cache - will recalculate on next load');
+          console.warn('[usePlaymobilKpi] Failed to cache results:', cacheError.message);
           // Don't throw - we have the data, just can't cache it
         }
 
@@ -312,7 +392,7 @@ export default function usePlaymobilKpi({
       console.log('[usePlaymobilKpi:useEffect] Cleanup - setting cancelled to true');
       cancelled = true;
     };
-  }, [enabled, referenceDate, verbose, reloadToken, selectedSalesmenIds]);
+  }, [enabled, referenceDate, verbose, reloadToken, stableSelectedIds]);
 
   const metricSnapshot = useMemo(() => {
     const base = kpis || {};

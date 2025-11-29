@@ -319,77 +319,43 @@ export default function PlaymobilKpiCards({
         onPress={onCardPress ? (dataset, metric) => onCardPress(dataset, 'mtd', metric) : undefined}
       />
       
-      {/* YTD Cards */}
+      {/* YTD Cards (Year-To-Date Comparison) */}
       <MetricCard
         dataset="invoiced"
-        metric={invoiced?.ytd}
+        metric={invoiced?.ytdComparison}
         totalMetric={invoiced?.yearly}
-        contextLabel={
-          invoicedLabels ? String(invoicedLabels.currentYear) : new Date().getFullYear().toString()
-        }
+        contextLabel="YTD"
         dateRangeLabel={invoicedLabels?.ytdRangeLabel}
         previousDateRangeLabel={
           invoicedLabels
-            ? `Τιμολογήσεις ${invoicedLabels.previousYear} (${invoicedLabels.ytdRangeLabel})`
+            ? `Τιμολογήσεις YTD ${invoicedLabels.previousYear} (${invoicedLabels.ytdRangeLabel})`
             : undefined
         }
         totalLabel={
-          invoicedLabels ? `Σύνολο ${invoicedLabels.previousYear}` : 'Σύνολο'
+          invoicedLabels
+            ? `Σύνολο ${invoicedLabels.previousYear} (Πλήρες Έτος)`
+            : 'Σύνολο'
         }
         onPress={onCardPress ? (dataset, metric) => onCardPress(dataset, 'ytd', metric) : undefined}
       />
       <MetricCard
         dataset="orders"
-        metric={orders?.ytd}
+        metric={orders?.ytdComparison}
         totalMetric={orders?.yearly}
-        contextLabel={
-          ordersLabels ? String(ordersLabels.currentYear) : new Date().getFullYear().toString()
-        }
+        contextLabel="YTD"
         dateRangeLabel={ordersLabels?.ytdRangeLabel}
         previousDateRangeLabel={
           ordersLabels
-            ? `Παραγγελίες ${ordersLabels.previousYear} (${ordersLabels.ytdRangeLabel})`
+            ? `Παραγγελίες YTD ${ordersLabels.previousYear} (${ordersLabels.ytdRangeLabel})`
             : undefined
         }
         totalLabel={
-          ordersLabels ? `Σύνολο ${ordersLabels.previousYear}` : 'Σύνολο'
+          ordersLabels
+            ? `Σύνολο ${ordersLabels.previousYear} (Πλήρες Έτος)`
+            : 'Σύνολο'
         }
         onPress={onCardPress ? (dataset, metric) => onCardPress(dataset, 'ytd', metric) : undefined}
       />
-      
-      {/* Yearly Cards - Commented out per user request */}
-      {/* <MetricCard
-        dataset="invoiced"
-        metric={invoiced?.yearly}
-        totalMetric={null}
-        contextLabel="Ετήσια"
-        dateRangeLabel={
-          invoicedLabels ? `${invoicedLabels.currentYear}` : new Date().getFullYear().toString()
-        }
-        previousDateRangeLabel={
-          invoicedLabels
-            ? `Τιμολογήσεις ${invoicedLabels.previousYear}`
-            : undefined
-        }
-        totalLabel="Σύγκριση ετών"
-        onPress={onCardPress ? (dataset, metric) => onCardPress(dataset, 'yearly', metric) : undefined}
-      />
-      <MetricCard
-        dataset="orders"
-        metric={orders?.yearly}
-        totalMetric={null}
-        contextLabel="Ετήσια"
-        dateRangeLabel={
-          ordersLabels ? `${ordersLabels.currentYear}` : new Date().getFullYear().toString()
-        }
-        previousDateRangeLabel={
-          ordersLabels
-            ? `Παραγγελίες ${ordersLabels.previousYear}`
-            : undefined
-        }
-        totalLabel="Σύγκριση ετών"
-        onPress={onCardPress ? (dataset, metric) => onCardPress(dataset, 'yearly', metric) : undefined}
-      /> */}
     </View>
   );
 }

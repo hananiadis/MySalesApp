@@ -35,6 +35,9 @@ import {
   getSuperMarketListingsLastAction,
   saveSuperMarketListingImagesLastAction,
   saveImagesLastAction,
+  saveContactsToLocal,
+  clearContactsLocal,
+  getContactsLastAction,
 } from '../utils/localData';
 import { trimOldCaches, trimLargeCaches, clearAllSheetCaches } from '../services/googleSheetsCache';
 import { downloadAndCacheImage } from '../utils/imageHelpers';
@@ -78,6 +81,39 @@ const fetchCustomersFromFirestore = async (collectionName, onProgress) => {
     `[DataScreen] fetchCustomersFromFirestore done collection=${collectionName} total=${docs.length}`
   );
   return out;
+};
+
+const fetchContactsFromFirestore = async (brand, onProgress) => {
+  console.log(`[DataScreen] fetchContactsFromFirestore START brand=${brand}`);
+  console.log(`[DataScreen] Querying collection: brand_contacts with brand=${brand}`);
+  
+  try {
+    const snapshot = await firestore()
+      .collection('brand_contacts')
+      .where('brand', '==', brand)
+      .where('active', '==', true)
+      .get();
+    
+    console.log(`[DataScreen] Query completed, snapshot.size=${snapshot.size}`);
+    
+    const docs = snapshot.docs;
+    const out = [];
+    for (let i = 0; i < docs.length; i += 1) {
+      out.push({ id: docs[i].id, ...docs[i].data() });
+      if (typeof onProgress === 'function') onProgress(i + 1, docs.length);
+    }
+    
+    console.log(`[DataScreen] fetchContactsFromFirestore SUCCESS brand=${brand} total=${docs.length}`);
+    return out;
+  } catch (error) {
+    console.error(`[DataScreen] fetchContactsFromFirestore ERROR brand=${brand}:`, error);
+    console.error('[DataScreen] Error details:', {
+      code: error.code,
+      message: error.message,
+      stack: error.stack
+    });
+    throw error;
+  }
 };
 
 const BRAND_ORDER = ['playmobil', 'john', 'kivos'];
@@ -136,6 +172,13 @@ const STRINGS = {
       downloadError: 'Η λήψη των εικόνων απέτυχε.',
       clearError: 'Η εκκαθάριση της cache εικόνων απέτυχε.',
     },
+    contacts: {
+      title: 'Επαφές Brand',
+      downloadBtn: 'Λήψη από Firestore',
+      clearBtn: 'Εκκαθάριση τοπικών δεδομένων',
+      downloadError: 'Η λήψη των επαφών απέτυχε.',
+      clearError: 'Η εκκαθάριση των επαφών απέτυχε.',
+    },
   },
   clearedMessages: {
     products: 'Η cache προϊόντων εκκαθαρίστηκε.',
@@ -143,6 +186,7 @@ const STRINGS = {
     supermarketStores: 'Η cache καταστημάτων SuperMarket εκκαθαρίστηκε.',
     supermarketListings: 'Η cache listings SuperMarket εκκαθαρίστηκε.',
     images: 'Η cache εικόνων εκκαθαρίστηκε.',
+    contacts: 'Η cache επαφών εκκαθαρίστηκε.',
   },
   notAvailable: 'Μη διαθέσιμο για αυτή τη μάρκα.',
 };
@@ -175,6 +219,7 @@ const PROGRESS_STATUS = {
 const MESSAGES = {
   productsSaved: (count) => `Αποθηκεύτηκαν ${count} προϊόντα.`,
   customersSaved: (count) => `Αποθηκεύτηκαν ${count} πελάτες.`,
+  contactsSaved: (count) => `Αποθηκεύτηκαν ${count} επαφές.`,
   supermarketStoresSaved: (count) => `Αποθηκεύτηκαν ${count} καταστήματα SuperMarket.`,
   supermarketListingsSaved: (count) => `Αποθηκεύτηκαν ${count} listings SuperMarket.`,
   imagesSummary: (success, failed, successListings, failedListings) =>
@@ -350,6 +395,7 @@ const DataScreen = () => {
 
   const [prodAction, setProdAction] = useState(STRINGS.statusPlaceholder);
   const [custAction, setCustAction] = useState(STRINGS.statusPlaceholder);
+  const [contactsAction, setContactsAction] = useState(STRINGS.statusPlaceholder);
   const [imgAction, setImgAction] = useState(STRINGS.statusPlaceholder);
   const [storeAction, setStoreAction] = useState(STRINGS.statusPlaceholder);
   const [listingAction, setListingAction] = useState(STRINGS.statusPlaceholder);
@@ -366,6 +412,8 @@ const DataScreen = () => {
     smListings: false,
     smListingsClear: false,
     updateAll: false,
+    contacts: false,
+    contactsClear: false,
   });
 
   const setBusy = (key, value) => setLoading((prev) => ({ ...prev, [key]: value }));
@@ -373,6 +421,7 @@ const DataScreen = () => {
   const [progress, setProgress] = useState({
     products: { current: 0, total: 0, label: 'Λήψη προϊόντων' },
     customers: { current: 0, total: 0, label: 'Λήψη πελατών' },
+    contacts: { current: 0, total: 0, label: 'Λήψη επαφών' },
     smStores: { current: 0, total: 0, label: 'Λήψη καταστημάτων' },
     smListings: { current: 0, total: 0, label: 'Λήψη listings' },
     imagesProducts: { current: 0, total: 0, label: 'Εικόνες προϊόντων' },
@@ -385,13 +434,15 @@ const DataScreen = () => {
   const refreshActions = useCallback(async () => {
     console.log(`[DataScreen] refreshActions start brand=${brand}`);
     try {
-      const [productsLast, customersLast] = await Promise.all([
+      const [productsLast, customersLast, contactsLast] = await Promise.all([
         getProductsLastAction(brand),
         getCustomersLastAction(brand),
+        getContactsLastAction(brand),
       ]);
 
       setProdAction(formatAction(productsLast));
       setCustAction(formatAction(customersLast));
+      setContactsAction(formatAction(contactsLast));
 
       if (showStores) {
         const storesLast = await getSuperMarketStoresLastAction(brand);
@@ -757,6 +808,55 @@ const DataScreen = () => {
       console.log('[DataScreen] handleClearImages end');
     }
   };
+
+  const handleDownloadContacts = async () => {
+    console.log('[DataScreen] handleDownloadContacts START brand:', brand);
+    setBusy('contacts', true);
+    try {
+      updateProgress('contacts', 0, 0);
+      console.log('[DataScreen] Fetching contacts from Firestore...');
+      
+      const contacts = await fetchContactsFromFirestore(brand, (current, total) => {
+        console.log(`[DataScreen] Progress: ${current}/${total}`);
+        updateProgress('contacts', current, total);
+      });
+      
+      console.log('[DataScreen] Contacts fetched, saving to local storage...');
+      await saveContactsToLocal(contacts, brand);
+      
+      console.log('[DataScreen] handleDownloadContacts SUCCESS, count:', contacts.length);
+      Alert.alert(STRINGS.alerts.success, MESSAGES.contactsSaved(contacts.length));
+    } catch (error) {
+      console.error('[DataScreen] handleDownloadContacts ERROR:', error);
+      console.error('[DataScreen] Error details:', {
+        message: error.message,
+        code: error.code,
+        brand: brand
+      });
+      Alert.alert(STRINGS.alerts.error, STRINGS.sections.contacts.downloadError + '\n' + error.message);
+    } finally {
+      setBusy('contacts', false);
+      refreshActions();
+      console.log('[DataScreen] handleDownloadContacts END');
+    }
+  };
+
+  const handleClearContacts = async () => {
+    console.log('[DataScreen] handleClearContacts start brand:', brand);
+    setBusy('contactsClear', true);
+    try {
+      await clearContactsLocal(brand);
+      console.log('[DataScreen] handleClearContacts success');
+      Alert.alert(STRINGS.alerts.cleared, STRINGS.clearedMessages.contacts);
+    } catch (error) {
+      console.error('[DataScreen] handleClearContacts error:', error);
+      Alert.alert(STRINGS.alerts.error, STRINGS.sections.contacts.clearError);
+    } finally {
+      setBusy('contactsClear', false);
+      refreshActions();
+      console.log('[DataScreen] handleClearContacts end');
+    }
+  };
   
   
 
@@ -878,6 +978,35 @@ const DataScreen = () => {
           />
           <Text style={styles.status}>{formatAction(custAction)}</Text>
         </Section>
+
+        {/* Brand Contacts - Only for Playmobil */}
+        {brand === 'playmobil' && (
+          <Section title={STRINGS.sections.contacts.title}>
+            <TouchableOpacity
+              style={styles.primaryButton}
+              onPress={handleDownloadContacts}
+              disabled={loading.contacts}
+            >
+              {loading.contacts ? <ActivityIndicator color="#fff" /> :
+                <Text style={styles.buttonText}>{STRINGS.sections.contacts.downloadBtn}</Text>}
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.primaryButton, styles.dangerButton]}
+              onPress={handleClearContacts}
+              disabled={loading.contactsClear}
+            >
+              {loading.contactsClear ? <ActivityIndicator color="#fff" /> :
+                <Text style={styles.buttonText}>{STRINGS.sections.contacts.clearBtn}</Text>}
+            </TouchableOpacity>
+            <ProgressRow
+              active={loading.contacts}
+              label={progress.contacts.label}
+              current={progress.contacts.current}
+              total={progress.contacts.total}
+            />
+            <Text style={styles.status}>{formatAction(contactsAction)}</Text>
+          </Section>
+        )}
 
         {/* SuperMarket stores */}
         {showStores && (

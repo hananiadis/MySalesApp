@@ -18,6 +18,9 @@ allprojects {
     google()
     mavenCentral()
     maven { url 'https://www.jitpack.io' }
+    jcenter() // Needed for com.google.android:cameraview used by expo-camera
+    maven { url 'https://raw.githubusercontent.com/google/cameraview/mvn-repo/' } // fallback for cameraview 1.0.0
+    maven { url "$rootDir/../node_modules/expo-camera/android/maven" } // local expo-camera maven (cameraview 1.0.0)
   }
 }
 

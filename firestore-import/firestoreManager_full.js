@@ -99,6 +99,18 @@ function parseBoolean(value) {
   const s = String(value).trim().toLowerCase();
   return ['true', '1', 'yes', 'x', 'ok', 'ναι'].includes(s);
 }
+function parsePackageCount(value) {
+  // Parse package count (pieces per box/pack) from various formats
+  if (typeof value === 'number' && value > 0) return Math.round(value);
+  if (!value) return null;
+  const str = String(value).trim();
+  if (!str) return null;
+  // Extract first number from strings like "12", "12 pcs", "12τεμ", etc.
+  const match = str.match(/\d+/);
+  if (!match) return null;
+  const num = parseInt(match[0], 10);
+  return num > 0 ? num : null;
+}
 // Keep this convenience wrapper for all numeric reads coming from sheets.
 function asNumber(value) {
   return normalizeDecimal(value);
@@ -147,6 +159,20 @@ const BRAND_CONFIG = {
   },
 };
 
+const CONTACTS_CONFIG = {
+  collectionName: 'brand_contacts',
+  csvUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSi-P7gMMVUVBTxzZv7zFotre9UY9G3c91-r_jW1vexoxiUoA7aMUMJJRgz7neY566qVtpv92CbVH9A/pub?gid=734595660&single=true&output=csv',
+  columns: {
+    department: 'Τμήμα',
+    fullName: 'ΟΝΟΜΑΤΕΠΩΝΥΜΟ',
+    mobile: 'ΚΙΝΗΤΟ',
+    pmh: 'PMH',
+    internal: 'Internal',
+    fullPhone: 'Πλήρες Τηλ.',
+    email: 'Email',
+  },
+};
+
 const SUPERMARKET_SHEETS = {
   LISTINGS: '1GPfMydqVMyDjjmhEIjWLP5kN2Vs21v8YdJgr15ins0c',
   STORES: '1pr6HRuTRbRUpqYVYKLuiV7qZ2uqR-bm0sObZom6_m1s',
@@ -167,10 +193,183 @@ async function fetchXlsxWorkbook(sheetId) {
 }
 
 // ---------------------------------------------------------------------------
+// BRAND CONTACTS IMPORT
+// ---------------------------------------------------------------------------
+async function importBrandContacts(brand) {
+  console.log(`\n📞 Importing contacts for brand: ${brand}...`);
+  
+  try {
+    // Fetch CSV
+    const response = await axios.get(CONTACTS_CONFIG.csvUrl);
+    const lines = response.data.split('\n');
+    
+    // Parse headers
+    const headers = lines[0].split(',').map(h => h.trim());
+    console.log(`📋 CSV Headers:`, headers);
+    
+    // Find column indices
+    const colIndices = {
+      department: headers.indexOf(CONTACTS_CONFIG.columns.department),
+      fullName: headers.indexOf(CONTACTS_CONFIG.columns.fullName),
+      mobile: headers.indexOf(CONTACTS_CONFIG.columns.mobile),
+      pmh: headers.indexOf(CONTACTS_CONFIG.columns.pmh),
+      internal: headers.indexOf(CONTACTS_CONFIG.columns.internal),
+      fullPhone: headers.indexOf(CONTACTS_CONFIG.columns.fullPhone),
+      email: headers.indexOf(CONTACTS_CONFIG.columns.email),
+    };
+    
+    console.log(`📊 Column indices:`, colIndices);
+    
+    // Parse contacts
+    const contacts = [];
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) continue;
+      
+      const values = line.split(',').map(v => v.trim());
+      
+      const department = values[colIndices.department] || '';
+      const fullName = values[colIndices.fullName] || '';
+      const mobile = values[colIndices.mobile] || '';
+      const pmh = values[colIndices.pmh] || '';
+      const internal = values[colIndices.internal] || '';
+      const fullPhone = values[colIndices.fullPhone] || '';
+      const email = values[colIndices.email] || '';
+      
+      // Skip empty rows
+      if (!fullName && !mobile && !email) continue;
+      
+      contacts.push({
+        department,
+        fullName,
+        mobile,
+        pmh,
+        internal,
+        fullPhone,
+        email,
+      });
+    }
+    
+    console.log(`✅ Parsed ${contacts.length} contacts from CSV`);
+    
+    // Clear existing contacts for this brand
+    console.log(`🗑️  Clearing existing contacts for brand: ${brand}...`);
+    const existingSnapshot = await db.collection(CONTACTS_CONFIG.collectionName)
+      .where('brand', '==', brand)
+      .get();
+    
+    const deleteBatch = db.batch();
+    existingSnapshot.forEach(doc => {
+      deleteBatch.delete(doc.ref);
+    });
+    await deleteBatch.commit();
+    console.log(`✅ Deleted ${existingSnapshot.size} existing contacts`);
+    
+    // Import new contacts in batches
+    const batchSize = 500;
+    let imported = 0;
+    
+    for (let i = 0; i < contacts.length; i += batchSize) {
+      const batch = db.batch();
+      const chunk = contacts.slice(i, i + batchSize);
+      
+      chunk.forEach((contact, index) => {
+        const docRef = db.collection(CONTACTS_CONFIG.collectionName).doc();
+        batch.set(docRef, {
+          ...contact,
+          brand: brand,
+          active: true,
+          sortOrder: i + index,
+          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        });
+      });
+      
+      await batch.commit();
+      imported += chunk.length;
+      console.log(`📝 Imported ${imported}/${contacts.length} contacts...`);
+    }
+    
+    console.log(`✅ Successfully imported ${imported} contacts for brand: ${brand}`);
+  } catch (error) {
+    console.error(`❌ Error importing contacts:`, error.message);
+    throw error;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // PLAYMOBIL IMPORTS
 // ---------------------------------------------------------------------------
+function normalizeBestSellerCode(value) {
+  if (value == null) return '';
+  // Convert to string, trim, remove leading zeros, uppercase
+  return String(value).trim().replace(/^0+/, '').toUpperCase();
+}
+
+async function fetchPlaymobilBestSellers() {
+  console.log(`📊 Fetching best sellers from published CSV...`);
+  try {
+    const response = await axios.get(
+      'https://docs.google.com/spreadsheets/d/e/2PACX-1vRDHaVXQoqGtSpHSQJLocIHU6sEOYZqKIMzF5NAFpJTGMuBY1SQgkPiQ40SVh8VOKoQ4fJpVfZmiX69/pub?gid=871274017&single=true&output=csv'
+    );
+    
+    const rows = [];
+    await new Promise((resolve, reject) => {
+      require('streamifier')
+        .createReadStream(response.data)
+        .pipe(csv({ headers: false })) // Parse without headers to get raw array data
+        .on('data', (r) => rows.push(r))
+        .on('end', resolve)
+        .on('error', reject);
+    });
+    
+    console.log(`📊 Total rows read from best sellers CSV: ${rows.length}`);
+    if (rows.length > 5) {
+      console.log('📄 Row 5 (index 4):', rows[4]);
+      console.log('📄 Row 6 (index 5):', rows[5]);
+      console.log('📄 Row 7 (index 6):', rows[6]);
+      console.log('📄 Row 8 (index 7):', rows[7]);
+    }
+    
+    // Extract product codes from B6:B105 (rows with index 5-104)
+    const bestSellerCodes = new Set();
+    
+    // Skip first 5 rows (indices 0-4), then take next 100 rows (indices 5-104)
+    const dataRows = rows.slice(5, 105);
+    console.log(`📊 Processing ${dataRows.length} best seller rows (B6:B105 range)`);
+    
+    dataRows.forEach((row, idx) => {
+      // When parsing without headers, row is an object with keys '0', '1', '2', etc.
+      // Column B is index 1
+      const rawCode = row['1']; // Column B (second column)
+      
+      const code = normalizeBestSellerCode(rawCode);
+      
+      if (code) {
+        bestSellerCodes.add(code);
+        if (idx < 10) {
+          console.log(`  Row ${idx + 6}: A="${row['0']}" B="${row['1']}" C="${row['2']}" -> code="${code}"`);
+        }
+      }
+    });
+    
+    console.log(`✅ Found ${bestSellerCodes.size} unique best seller product codes`);
+    if (bestSellerCodes.size > 0) {
+      console.log(`📋 First 10 codes:`, Array.from(bestSellerCodes).slice(0, 10).join(', '));
+    }
+    return bestSellerCodes;
+  } catch (error) {
+    console.error(`❌ Error fetching best sellers:`, error.message);
+    return new Set();
+  }
+}
+
 async function importPlaymobilProducts() {
   console.log('\n📦 Importing Playmobil products...');
+  
+  // First, fetch the best sellers list from published CSV
+  const bestSellerCodes = await fetchPlaymobilBestSellers();
+  
   const response = await axios.get(
     'https://docs.google.com/spreadsheets/d/101kDd35o6MBky5KYx0i8MNA5GxIUiNGgYf_01T_7I4c/export?format=csv&gid=0'
   );
@@ -184,22 +383,55 @@ async function importPlaymobilProducts() {
       .on('error', reject);
   });
 
+  console.log(`📊 Total rows read from CSV: ${rows.length}`);
+  if (rows.length > 0) {
+    console.log('🔑 Available columns:', Object.keys(rows[0]).join(', '));
+    console.log('📄 First row sample:', rows[0]);
+    console.log('📄 Last row sample:', rows[rows.length - 1]);
+  }
+
   const batchSize = 400;
   let processed = 0;
+  let skipped = 0;
   for (let i = 0; i < rows.length; i += batchSize) {
     const batch = db.batch();
     const chunk = rows.slice(i, i + batchSize);
-    chunk.forEach((row) => {
+    chunk.forEach((row, idx) => {
       const code = sanitizeText(row['Product Code'] || row['Code']);
-      if (!code) return;
+      if (!code) {
+        skipped++;
+        if (skipped <= 5) {
+          console.log(`⚠️ Skipping row ${i + idx + 1} (no product code):`, row);
+        }
+        return;
+      }
+      
+      // Normalize code for comparison with best sellers list
+      const normalizedCode = normalizeBestSellerCode(code);
+      const isBestSeller = bestSellerCodes.has(normalizedCode);
+      
+      if (isBestSeller && processed < 5) {
+        console.log(`⭐ Found best seller: ${code} (normalized: ${normalizedCode})`);
+      }
+      
       const ref = db.collection('products').doc(code);
       const data = {
         productCode: code,
+        barcode: sanitizeText(row['Barcode']),
+        playingTheme: sanitizeText(row['Playing Theme']),
         description: sanitizeText(row['Product Description']),
-        wholesalePrice: roundCurrency(normalizeDecimal(row['Wh Price'])),
+        launchDate: sanitizeText(row['Launch Date']),
+        packageInfo: sanitizeText(row['Package']),
+        wholesalePrice: roundCurrency(normalizeDecimal(row['Wholesales Price'] || row['Wh Price'])),
         srp: roundCurrency(normalizeDecimal(row['SRP'])),
+        cataloguePage: sanitizeText(row['Catalogue Page']),
+        suggestedAge: sanitizeText(row['Suggested playing Age']),
+        gender: sanitizeText(row['Gender']),
         frontCover: sanitizeUrl(row['Front Cover']),
-        launchDate: sanitizeText(row['Launch Month']),
+        availableStock: sanitizeText(row['Available Stock GR']),
+        isActive: parseBoolean(row['IsActive']),
+        year2025AA: sanitizeText(row['2025AA']),
+        bestSeller: isBestSeller, // Mark as best seller if in top 100
         brand: 'playmobil',
         lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
       };
@@ -210,7 +442,17 @@ async function importPlaymobilProducts() {
     printProgress(processed, rows.length, 'Playmobil');
   }
   process.stdout.write('\n');
-  console.log('✅ Playmobil products import done.');
+  
+  // Count how many best sellers were found
+  const bestSellersMarked = rows.filter(row => {
+    const code = sanitizeText(row['Product Code'] || row['Code']);
+    if (!code) return false;
+    const normalizedCode = normalizeBestSellerCode(code);
+    return bestSellerCodes.has(normalizedCode);
+  }).length;
+  
+  console.log(`✅ Playmobil products import done. Processed: ${processed}, Skipped: ${skipped}`);
+  console.log(`⭐ Best sellers marked: ${bestSellersMarked} out of ${bestSellerCodes.size} in list`);
 }
 // ---------------------------------------------------------------------------
 // KIVOS IMPORTS
@@ -220,21 +462,55 @@ async function importKivosProducts() {
   const wb = await fetchXlsxWorkbook('18qaTqILCUFuEvqcEM47gc-Ytj3GyNS1LI3Xkfx46Z48');
   const sheet = wb.SheetNames[0];
   const rows = XLSX.utils.sheet_to_json(wb.Sheets[sheet], { defval: null });
+  
+  console.log(`📊 Total rows read from Excel: ${rows.length}`);
+  if (rows.length > 0) {
+    console.log('🔑 Available columns:', Object.keys(rows[0]).join(', '));
+    console.log('📄 First row sample:', rows[0]);
+    console.log('📄 Last row sample:', rows[rows.length - 1]);
+  }
+  
   const batchSize = 300;
   let processed = 0;
+  let skipped = 0;
 
   for (let i = 0; i < rows.length; i += batchSize) {
     const batch = db.batch();
     const chunk = rows.slice(i, i + batchSize);
-    chunk.forEach((row) => {
+    chunk.forEach((row, idx) => {
       const code = sanitizeText(row['ΚΩΔΙΚΟΣ ΠΡΟΪΟΝΤΟΣ'] || row['Product Code']);
-      if (!code) return;
+      if (!code) {
+        skipped++;
+        if (skipped <= 5) {
+          console.log(`⚠️ Skipping row ${i + idx + 1} (no product code):`, row);
+        }
+        return;
+      }
       const ref = db.collection('products_kivos').doc(code);
       const data = {
         productCode: code,
+        supplierBrand: sanitizeText(row['Brand']),
+        category: sanitizeText(row['Κατηγορία είδους']),
         description: sanitizeText(row['ΠΕΡΙΓΡΑΦΗ']),
-        packaging: sanitizeText(row['ΣΥΣΚΕΥΑΣΙΑ']),
-        wholesalePrice: roundCurrency(normalizeDecimal(row['ΤΙΜΗ ΤΕΜΑΧΙΟΥ ΕΥΡΩ'])),
+        descriptionFull: sanitizeText(row['Description']),
+        mm: sanitizeText(row['MM']),
+        piecesPerBox: parsePackageCount(row['ΤΕΜΑΧΙΑ ΑΝΑ ΚΟΥΤΙ']) || 1,
+        piecesPerCarton: parsePackageCount(row['ΤΕΜΑΧΙΑ ΑΝΑ ΚΙΒΩΤΙΟ']) || null,
+        wholesalePrice: roundCurrency(normalizeDecimal(row['ΤΙΜΗ ΤΕΜΑΧΙΟΥ ΕΥΡΩ'] || row['ΤΙΜΗ ΤΕΜΑΧΙΟΥ\n  ΕΥΡΩ'])),
+        barcodeUnit: sanitizeText(row['BARCODE ΤΕΜΑΧΙΟΥ']),
+        barcodeBox: sanitizeText(row['BARCODE ΚΟΥΤΙΟΥ']),
+        barcodeCarton: sanitizeText(row['BARCODE ΚΙΒΩΤΙΟΥ']),
+        // Stationary channel (channel 1) offers
+        discount: normalizeDecimal(row['Discount']),
+        discountEndsAt: sanitizeText(row['Discount.End.Date']),
+        offerPrice: roundCurrency(normalizeDecimal(row['ΤΙΜΗ ΤΕΜΑΧΙΟΥ ΠΡΟΣΦΟΡΑΣ ΕΥΡΩ'] || row['ΤΙΜΗ ΤΕΜΑΧΙΟΥ\n  ΠΡΟΣΦΟΡΑΣ ΕΥΡΩ'])),
+        // Technical channel (channel 2) offers
+        technicalDiscount: normalizeDecimal(row['Technical.Discount']),
+        technicalDiscountEndsAt: sanitizeText(row['Technical.Discount.End.Date']),
+        technicalOfferPrice: roundCurrency(normalizeDecimal(row['Technical.ΤΙΜΗ ΤΕΜΑΧΙΟΥ ΠΡΟΣΦΟΡΑΣ ΕΥΡΩ'] || row['Technical.ΤΙΜΗ ΤΕΜΑΧΙΟΥ\n  ΠΡΟΣΦΟΡΑΣ ΕΥΡΩ'])),
+        // Product metadata
+        productUrl: sanitizeUrl(row['Product Url']),
+        frontCover: sanitizeUrl(row['Product Image Url'] || row['Cloudinary Image Url']),
         brand: 'kivos',
         lastUpdated: admin.firestore.FieldValue.serverTimestamp(),
       };
@@ -245,7 +521,7 @@ async function importKivosProducts() {
     printProgress(processed, rows.length, 'Kivos');
   }
   process.stdout.write('\n');
-  console.log('✅ Kivos products import done.');
+  console.log(`✅ Kivos products import done. Processed: ${processed}, Skipped: ${skipped}`);
 }
 
 // ---------------------------------------------------------------------------
@@ -265,7 +541,11 @@ async function importJohnProducts() {
   });
 
   console.log(`📊 Total rows read from workbook: ${allRows.length}`);
-  if (allRows[0]) console.log('🔑 Header keys sample:', Object.keys(allRows[0]));
+  if (allRows.length > 0) {
+    console.log('🔑 Header keys sample:', Object.keys(allRows[0]).join(', '));
+    console.log('📄 First row sample:', allRows[0]);
+    console.log('📄 Last row sample:', allRows[allRows.length - 1]);
+  }
 
   const batchSize = 400;
   let processed = 0;
@@ -289,7 +569,9 @@ async function importJohnProducts() {
       const code = sanitizeText(codeRaw);
       if (!code) {
         skipped++;
-        console.log(`⚠️ [Row ${i + idx + 1}] Skipped - no valid code`);
+        if (skipped <= 5) {
+          console.log(`⚠️ [Row ${i + idx + 1}] Skipped - no valid code. Row data:`, row);
+        }
         return;
       }
 
@@ -346,7 +628,12 @@ async function importPlaymobilCustomers() {
   await new Promise((resolve, reject) => {
     const { Readable } = require('stream');
     Readable.from(response.data)
-      .pipe(csv())
+      .pipe(csv({ 
+        separator: ',',
+        relax_column_count: true,  // Allow inconsistent column counts
+        skip_empty_lines: true,
+        trim: true
+      }))
       .on('data', (r) => rows.push(r))
       .on('end', resolve)
       .on('error', reject);
@@ -365,6 +652,10 @@ async function importPlaymobilCustomers() {
 
       const ref = db.collection('customers').doc(code);
 
+      // Convert merch to array format
+      const merchValue = sanitizeText(r['Merch']);
+      const merchArray = merchValue ? [merchValue] : [];
+
       const data = {
         customerCode: code,
         name: sanitizeText(r['Name']),
@@ -372,7 +663,8 @@ async function importPlaymobilCustomers() {
         address: sanitizeText(r['Street']),
         city: sanitizeText(r['City']),
         postalCode: sanitizeText(r['Postal Code']),
-        merch: sanitizeText(r['Merch']),
+        merch: merchArray,  // Array instead of string
+        primaryMerch: merchValue,  // Keep original for reference
         brand: 'playmobil',
         importedAt: admin.firestore.FieldValue.serverTimestamp(),
 
@@ -438,12 +730,18 @@ async function importKivosCustomers() {
       const code = sanitizeText(r['ΚΩΔΙΚΟΣ ΠΕΛΑΤΗ'] || r['Customer Code']);
       if (!code) return;
       const ref = db.collection('customers_kivos').doc(code);
+      
+      // Convert merch to array format
+      const merchValue = sanitizeText(r['Πωλητής']);
+      const merchArray = merchValue ? [merchValue] : [];
+      
       const data = {
         customerCode: code,
         name: sanitizeText(r['Επωνυμία']),
         city: sanitizeText(r['Πόλη']),
         vat: sanitizeText(r['Α.Φ.Μ.']),
-        merch: sanitizeText(r['Πωλητής']),
+        merch: merchArray,  // Array instead of string
+        primaryMerch: merchValue,  // Keep original for reference
         balance: asNumber(r['Υπόλοιπο']),
         brand: 'kivos',
         importedAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -472,11 +770,17 @@ async function importJohnCustomers() {
       const code = sanitizeText(r['ΚΩΔ.'] || r['Customer Code']);
       if (!code) return;
       const ref = db.collection('customers_john').doc(code);
+      
+      // Convert merch to array format
+      const merchValue = sanitizeText(r['Merch']);
+      const merchArray = merchValue ? [merchValue] : [];
+      
       const data = {
         customerCode: code,
         name: sanitizeText(r['Επωνυμία']),
         city: sanitizeText(r['Πόλη']),
-        merch: sanitizeText(r['Merch']),
+        merch: merchArray,  // Array instead of string
+        primaryMerch: merchValue,  // Keep original for reference
         vat: sanitizeText(r['Α.Φ.Μ.']),
         brand: 'john',
         importedAt: admin.firestore.FieldValue.serverTimestamp(),
@@ -1125,6 +1429,187 @@ async function inspectSalesmenCollection() {
     console.log(`  ${b}: ${names.length} salesmen`);
   });
 }
+
+// ---------------------------------------------------------------------------
+// MIGRATION: Convert merch from string to array
+// ---------------------------------------------------------------------------
+async function migrateCustomerMerchToArray(brandKey = 'playmobil') {
+  console.log(`\n🔄 Migrating customer merch field to array format for ${brandKey}...`);
+  
+  const collectionName = brandKey === 'playmobil' ? 'customers' : `customers_${brandKey}`;
+  
+  try {
+    const snapshot = await db.collection(collectionName).get();
+    console.log(`📋 Found ${snapshot.size} customers to process`);
+    
+    if (snapshot.empty) {
+      console.log('⚠️ No customers found.');
+      return;
+    }
+    
+    let migrated = 0;
+    let skipped = 0;
+    let batch = db.batch();
+    let batchCount = 0;
+    const commits = [];
+    
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      
+      // Only migrate if merch is still a string
+      if (typeof data.merch === 'string') {
+        const merchValue = data.merch;
+        
+        batch.update(doc.ref, {
+          merch: [merchValue],  // Convert to array
+          primaryMerch: merchValue  // Preserve original
+        });
+        
+        migrated++;
+        batchCount++;
+        
+        if (batchCount % 400 === 0) {
+          commits.push(batch.commit());
+          batch = db.batch();
+          printProgress(migrated, snapshot.size, 'Migrating');
+        }
+      } else if (Array.isArray(data.merch)) {
+        skipped++;
+      } else {
+        console.warn(`⚠️ Customer ${doc.id} has invalid merch field:`, data.merch);
+        skipped++;
+      }
+    });
+    
+    // Commit remaining
+    if (batchCount % 400 !== 0) {
+      commits.push(batch.commit());
+    }
+    
+    await Promise.all(commits);
+    process.stdout.write('\n');
+    
+    console.log(`✅ Migration complete!`);
+    console.log(`   Migrated: ${migrated} customers`);
+    console.log(`   Skipped: ${skipped} customers (already arrays or invalid)`);
+  } catch (error) {
+    console.error('❌ Migration failed:', error);
+    throw error;
+  }
+}
+
+// ---------------------------------------------------------------------------
+// HELPER: Add salesman to customer merch array
+// ---------------------------------------------------------------------------
+async function addSalesmanToCustomer(customerCode, salesmanName, brandKey = 'playmobil') {
+  console.log(`\n➕ Adding ${salesmanName} to customer ${customerCode}...`);
+  
+  const collectionName = brandKey === 'playmobil' ? 'customers' : `customers_${brandKey}`;
+  const ref = db.collection(collectionName).doc(customerCode);
+  
+  try {
+    const doc = await ref.get();
+    if (!doc.exists) {
+      console.log(`❌ Customer ${customerCode} not found.`);
+      return;
+    }
+    
+    const data = doc.data();
+    const currentMerch = data.merch || [];
+    
+    if (!Array.isArray(currentMerch)) {
+      console.log(`⚠️ Customer merch field is not an array. Run migration first!`);
+      return;
+    }
+    
+    if (currentMerch.includes(salesmanName)) {
+      console.log(`ℹ️ ${salesmanName} is already assigned to this customer.`);
+      return;
+    }
+    
+    await ref.update({
+      merch: admin.firestore.FieldValue.arrayUnion(salesmanName)
+    });
+    
+    console.log(`✅ Added ${salesmanName} to customer ${customerCode}`);
+    console.log(`   Previous: [${currentMerch.join(', ')}]`);
+    console.log(`   Updated: [${[...currentMerch, salesmanName].join(', ')}]`);
+  } catch (error) {
+    console.error('❌ Failed to add salesman:', error);
+  }
+}
+
+// HELPER: Link user to salesmen (add salesman IDs to user merchIds)
+// ---------------------------------------------------------------------------
+async function linkUserToSalesmen(userId, salesmanIds, replace = false) {
+  console.log(`\n🔗 ${replace ? 'Setting' : 'Adding'} salesmen to user ${userId}...`);
+  
+  try {
+    const userRef = db.collection('users').doc(userId);
+    const userDoc = await userRef.get();
+    
+    if (!userDoc.exists) {
+      console.log(`❌ User ${userId} not found.`);
+      return;
+    }
+    
+    const userData = userDoc.data();
+    const currentMerchIds = Array.isArray(userData.merchIds) ? userData.merchIds : [];
+    
+    let updates;
+    if (replace) {
+      // Replace entire merchIds array
+      updates = {
+        merchIds: salesmanIds,
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      };
+      console.log(`   Replacing merchIds: [${salesmanIds.join(', ')}]`);
+    } else {
+      // Add to existing merchIds (using arrayUnion to avoid duplicates)
+      const toAdd = salesmanIds.filter(id => !currentMerchIds.includes(id));
+      if (toAdd.length === 0) {
+        console.log(`ℹ️ All salesmen already linked to user.`);
+        return;
+      }
+      updates = {
+        merchIds: admin.firestore.FieldValue.arrayUnion(...toAdd),
+        updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+      };
+      console.log(`   Adding: [${toAdd.join(', ')}]`);
+    }
+    
+    await userRef.update(updates);
+    
+    const finalMerchIds = replace ? salesmanIds : [...currentMerchIds, ...salesmanIds.filter(id => !currentMerchIds.includes(id))];
+    console.log(`✅ User merchIds updated`);
+    console.log(`   Previous: [${currentMerchIds.join(', ')}]`);
+    console.log(`   Updated: [${finalMerchIds.join(', ')}]`);
+    
+    // Also update brands if needed
+    const linkedBrands = new Set();
+    for (const id of finalMerchIds) {
+      const parts = id.split('_');
+      if (parts.length > 1) {
+        linkedBrands.add(parts[0]); // Extract brand from salesman ID (e.g., "playmobil_JOHN" -> "playmobil")
+      }
+    }
+    
+    if (linkedBrands.size > 0) {
+      const currentBrands = Array.isArray(userData.brands) ? userData.brands : [];
+      const brandsToAdd = Array.from(linkedBrands).filter(b => !currentBrands.includes(b));
+      
+      if (brandsToAdd.length > 0) {
+        await userRef.update({
+          brands: admin.firestore.FieldValue.arrayUnion(...brandsToAdd),
+        });
+        console.log(`   Also added brands: [${brandsToAdd.join(', ')}]`);
+      }
+    }
+  } catch (error) {
+    console.error('❌ Failed to link user to salesmen:', error);
+  }
+}
+
 // ---------------------------------------------------------------------------
 // USER MANAGEMENT MENU
 // ---------------------------------------------------------------------------
@@ -1135,6 +1620,9 @@ async function userManagementMenu() {
   5.1 Update users collection
   5.2 Rebuild salesmen from customers
   5.3 Inspect salesmen collection
+  5.4 Migrate customer merch to array
+  5.5 Add salesman to customer
+  5.6 Link user to salesmen (merchIds)
   0. Back`);
     const choice = (await askQuestion('Select option: ')).trim();
     switch (choice) {
@@ -1149,6 +1637,52 @@ async function userManagementMenu() {
       case '3':
       case '5.3':
         await inspectSalesmenCollection();
+        break;
+      case '4':
+      case '5.4':
+        {
+          const brand = (await askQuestion('Enter brand (playmobil/kivos/john) [playmobil]: ')).trim().toLowerCase() || 'playmobil';
+          if (!BRAND_CONFIG[brand]) {
+            console.log('❎ Invalid brand');
+            break;
+          }
+          await migrateCustomerMerchToArray(brand);
+        }
+        break;
+      case '5':
+      case '5.5':
+        {
+          const brand = (await askQuestion('Enter brand (playmobil/kivos/john) [playmobil]: ')).trim().toLowerCase() || 'playmobil';
+          if (!BRAND_CONFIG[brand]) {
+            console.log('❎ Invalid brand');
+            break;
+          }
+          const customerCode = (await askQuestion('Enter customer code: ')).trim();
+          const salesmanName = (await askQuestion('Enter salesman name: ')).trim();
+          if (!customerCode || !salesmanName) {
+            console.log('❎ Both customer code and salesman name are required');
+            break;
+          }
+          await addSalesmanToCustomer(customerCode, salesmanName, brand);
+        }
+        break;
+      case '6':
+      case '5.6':
+        {
+          const userId = (await askQuestion('Enter user ID (uid from users collection): ')).trim();
+          const salesmanIdsInput = (await askQuestion('Enter salesman IDs (comma-separated, e.g., playmobil_JOHN,kivos_MARY): ')).trim();
+          const replaceStr = (await askQuestion('Replace existing merchIds? (y/n) [n]: ')).trim().toLowerCase();
+          
+          if (!userId || !salesmanIdsInput) {
+            console.log('❎ User ID and salesman IDs are required');
+            break;
+          }
+          
+          const salesmanIds = salesmanIdsInput.split(',').map(id => id.trim()).filter(Boolean);
+          const replace = replaceStr === 'y' || replaceStr === 'yes';
+          
+          await linkUserToSalesmen(userId, salesmanIds, replace);
+        }
         break;
       case '0':
         return;
@@ -1167,10 +1701,11 @@ async function playmobilMenu() {
 1. Playmobil
   1.1 Import Playmobil products
   1.2 Import Playmobil customers
-  1.3 Delete Playmobil products collection
-  1.4 Delete Playmobil customers collection
-  1.5 Delete Playmobil orders of a USER
-  1.6 Delete ALL Playmobil orders
+  1.3 Import Playmobil contacts
+  1.4 Delete Playmobil products collection
+  1.5 Delete Playmobil customers collection
+  1.6 Delete Playmobil orders of a USER
+  1.7 Delete ALL Playmobil orders
   0. Back`);
     const choice = (await askQuestion('Select option: ')).trim();
     switch (choice) {
@@ -1184,18 +1719,22 @@ async function playmobilMenu() {
         break;
       case '3':
       case '1.3':
-        await deleteAllInCollection(BRAND_CONFIG.playmobil.productCollection);
+        await importBrandContacts('playmobil');
         break;
       case '4':
       case '1.4':
-        await deleteAllInCollection(BRAND_CONFIG.playmobil.customerCollection);
+        await deleteAllInCollection(BRAND_CONFIG.playmobil.productCollection);
         break;
       case '5':
       case '1.5':
-        await deleteOrdersForUserFlow('playmobil');
+        await deleteAllInCollection(BRAND_CONFIG.playmobil.customerCollection);
         break;
       case '6':
       case '1.6':
+        await deleteOrdersForUserFlow('playmobil');
+        break;
+      case '7':
+      case '1.7':
         await confirmAndDeleteAllOrders('playmobil');
         break;
       case '0':
@@ -1212,10 +1751,11 @@ async function kivosMenu() {
 2. Kivos
   2.1 Import Kivos products
   2.2 Import Kivos customers
-  2.3 Delete Kivos products collection
-  2.4 Delete Kivos customers collection
-  2.5 Delete Kivos orders of a USER
-  2.6 Delete ALL Kivos orders
+  2.3 Import Kivos contacts
+  2.4 Delete Kivos products collection
+  2.5 Delete Kivos customers collection
+  2.6 Delete Kivos orders of a USER
+  2.7 Delete ALL Kivos orders
   0. Back`);
     const choice = (await askQuestion('Select option: ')).trim();
     switch (choice) {
@@ -1229,18 +1769,22 @@ async function kivosMenu() {
         break;
       case '3':
       case '2.3':
-        await deleteAllInCollection(BRAND_CONFIG.kivos.productCollection);
+        await importBrandContacts('kivos');
         break;
       case '4':
       case '2.4':
-        await deleteAllInCollection(BRAND_CONFIG.kivos.customerCollection);
+        await deleteAllInCollection(BRAND_CONFIG.kivos.productCollection);
         break;
       case '5':
       case '2.5':
-        await deleteOrdersForUserFlow('kivos');
+        await deleteAllInCollection(BRAND_CONFIG.kivos.customerCollection);
         break;
       case '6':
       case '2.6':
+        await deleteOrdersForUserFlow('kivos');
+        break;
+      case '7':
+      case '2.7':
         await confirmAndDeleteAllOrders('kivos');
         break;
       case '0':
@@ -1257,10 +1801,11 @@ async function johnMenu() {
 3. John
   3.1 Import John products
   3.2 Import John customers
-  3.3 Delete John products collection
-  3.4 Delete John customers collection
-  3.5 Delete John orders of a USER
-  3.6 Delete ALL John orders
+  3.3 Import John contacts
+  3.4 Delete John products collection
+  3.5 Delete John customers collection
+  3.6 Delete John orders of a USER
+  3.7 Delete ALL John orders
   0. Back`);
     const choice = (await askQuestion('Select option: ')).trim();
     switch (choice) {
@@ -1274,18 +1819,22 @@ async function johnMenu() {
         break;
       case '3':
       case '3.3':
-        await deleteAllInCollection(BRAND_CONFIG.john.productCollection);
+        await importBrandContacts('john');
         break;
       case '4':
       case '3.4':
-        await deleteAllInCollection(BRAND_CONFIG.john.customerCollection);
+        await deleteAllInCollection(BRAND_CONFIG.john.productCollection);
         break;
       case '5':
       case '3.5':
-        await deleteOrdersForUserFlow('john');
+        await deleteAllInCollection(BRAND_CONFIG.john.customerCollection);
         break;
       case '6':
       case '3.6':
+        await deleteOrdersForUserFlow('john');
+        break;
+      case '7':
+      case '3.7':
         await confirmAndDeleteAllOrders('john');
         break;
       case '0':

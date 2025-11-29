@@ -188,13 +188,18 @@ export const AuthProvider = ({ children }) => {
         .join(' ')
         .trim();
 
+      console.log('[AuthProvider] Starting sign up process for:', trimmedEmail);
+
       const credential = await auth().createUserWithEmailAndPassword(
         trimmedEmail,
         password
       );
 
+      console.log('[AuthProvider] User created in Firebase Auth:', credential.user.uid);
+
       if (displayName) {
         await credential.user.updateProfile({ displayName });
+        console.log('[AuthProvider] Display name updated:', displayName);
       }
 
       const { firestore: payload } = createDefaultProfilePayload(
@@ -208,10 +213,45 @@ export const AuthProvider = ({ children }) => {
         email: trimmedEmail,
       };
 
-      await firestore()
-        .collection('users')
-        .doc(credential.user.uid)
-        .set(profileOverride, { merge: true });
+      console.log('[AuthProvider] Creating Firestore user document:', credential.user.uid);
+      console.log('[AuthProvider] Profile data:', JSON.stringify(profileOverride, null, 2));
+
+      try {
+        const userRef = firestore()
+          .collection('users')
+          .doc(credential.user.uid);
+
+        await userRef.set(profileOverride, { merge: true });
+        
+        console.log('[AuthProvider] ✅ Firestore user document created successfully');
+        
+        // Verify the document was created
+        const verifyDoc = await userRef.get();
+        if (verifyDoc.exists) {
+          console.log('[AuthProvider] ✅ Verified: Document exists in Firestore');
+          console.log('[AuthProvider] Document data:', JSON.stringify(verifyDoc.data(), null, 2));
+        } else {
+          console.warn('[AuthProvider] ⚠️ Warning: Document was not found after creation');
+          // Try one more time with a delay
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          const retryDoc = await userRef.get();
+          if (retryDoc.exists) {
+            console.log('[AuthProvider] ✅ Document found on retry');
+          } else {
+            console.error('[AuthProvider] ❌ Document still not found after retry');
+            throw new Error('User profile was not created in Firestore');
+          }
+        }
+      } catch (firestoreError) {
+        console.error('[AuthProvider] ❌ Failed to create Firestore user document:', firestoreError);
+        console.error('[AuthProvider] Error details:', {
+          code: firestoreError.code,
+          message: firestoreError.message,
+          uid: credential.user.uid,
+        });
+        // Re-throw the error so the UI can handle it
+        throw new Error(`Failed to create user profile: ${firestoreError.message}`);
+      }
     },
     []
   );

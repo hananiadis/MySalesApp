@@ -232,8 +232,18 @@ function normalizeRecords(records, dataType) {
         }
         // Parse revenue (European format: 1.234.567,89 -> remove dots, replace comma with period)
         if (norm.revenue) {
-          norm.amount = parseFloat(norm.revenue.replace(/\./g, '').replace(',', '.')) || 0;
+          let amount = parseFloat(norm.revenue.replace(/\./g, '').replace(',', '.')) || 0;
+          // Apply negative multiplier for credit memos, cancellations, etc.
+          // Only "Invoice" adds to revenue, all other types subtract
+          const docType = (norm.documentType || '').toLowerCase();
+          if (docType && !docType.includes('invoice')) {
+            amount = -Math.abs(amount); // Make it negative
+          }
+          norm.amount = amount;
         }
+        // Keep original document type for filtering
+        norm.documentType = norm.documentType || null;
+        norm.documentNumber = norm.documentNumber || null;
       } else if (dataType === 'orders') {
         // Parse document date
         if (norm.documentDate) {

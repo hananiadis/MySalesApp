@@ -159,11 +159,7 @@ const ProductsScreen = ({ navigation }) => {
   const [expandedNodes, setExpandedNodes] = useState({}); // Start with all collapsed
   const searchInputRef = useRef(null);
   const handleGoBack = useCallback(() => {
-    if (navigation.canGoBack()) {
-      navigation.goBack();
-    } else {
-      navigation.navigate('BrandHome', { brand });
-    }
+    navigation.navigate('BrandHome', { brand });
   }, [brand, navigation]);
   const headerLeft = useMemo(
     () => (

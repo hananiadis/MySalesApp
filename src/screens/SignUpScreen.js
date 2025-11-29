@@ -11,6 +11,7 @@ import {
   View,
   BackHandler,
   Modal,
+  ScrollView,
 } from 'react-native';
 import { WebView } from 'react-native-webview';
 import SafeScreen from '../components/SafeScreen';
@@ -88,7 +89,7 @@ const SignUpScreen = ({ navigation }) => {
   };
 
   return (
-    <SafeScreen style={styles.safe} showUserMenu={false}>
+    <SafeScreen style={styles.safe} showUserMenu={true}>
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -100,21 +101,21 @@ const SignUpScreen = ({ navigation }) => {
           <TextInput
             style={styles.input}
             placeholder={STRINGS.firstName}
-            placeholderTextColor="#6b7280"
+            placeholderTextColor="#9ca3af"
             value={firstName}
             onChangeText={setFirstName}
           />
           <TextInput
             style={styles.input}
             placeholder={STRINGS.lastName}
-            placeholderTextColor="#6b7280"
+            placeholderTextColor="#9ca3af"
             value={lastName}
             onChangeText={setLastName}
           />
           <TextInput
             style={styles.input}
             placeholder={STRINGS.email}
-            placeholderTextColor="#6b7280"
+            placeholderTextColor="#9ca3af"
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
@@ -122,7 +123,7 @@ const SignUpScreen = ({ navigation }) => {
           <TextInput
             style={styles.input}
             placeholder={STRINGS.password}
-            placeholderTextColor="#6b7280"
+            placeholderTextColor="#9ca3af"
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -130,7 +131,7 @@ const SignUpScreen = ({ navigation }) => {
           <TextInput
             style={styles.input}
             placeholder={STRINGS.confirmPassword}
-            placeholderTextColor="#6b7280"
+            placeholderTextColor="#9ca3af"
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             secureTextEntry
@@ -173,35 +174,34 @@ const SignUpScreen = ({ navigation }) => {
       </KeyboardAvoidingView>
 
       <Modal visible={termsModalVisible} animationType="slide" presentationStyle="pageSheet">
-        <View style={styles.modalContainer}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>Όροι Χρήσης & Πολιτική Απορρήτου</Text>
+        <SafeScreen 
+          title="Όροι Χρήσης & Πολιτική Απορρήτου"
+          showUserMenu={false}
+          headerLeft={
             <TouchableOpacity
-              style={styles.closeButton}
+              style={styles.backButton}
               onPress={() => setTermsModalVisible(false)}
             >
-              <Text style={styles.closeButtonText}>✕</Text>
+              <Text style={styles.backButtonText}>← Πίσω</Text>
             </TouchableOpacity>
-          </View>
-
-          <WebView
-  originWhitelist={['*']}
-  source={
-    Platform.OS === 'android'
-      ? { uri: 'file:///android_asset/terms_mysalesapp_gr.html' }
-      : require('../../assets/terms_mysalesapp_gr.html')
-  }
-  allowFileAccess
-  allowFileAccessFromFileURLs
-  allowingReadAccessToURL={'file:///android_asset/'}
-  mixedContentMode="always"
-  javaScriptEnabled
-  domStorageEnabled
-  onError={(e) => console.warn('WebView error:', e.nativeEvent)}
-  onHttpError={(e) => console.warn('WebView HTTP error:', e.nativeEvent)}
-  style={styles.webView}
-/>
-        </View>
+          }
+        >
+          <ScrollView style={styles.termsContent}>
+            <WebView
+              originWhitelist={['*']}
+              source={
+                Platform.OS === 'android'
+                  ? { uri: 'file:///android_asset/terms_mysalesapp_gr.html' }
+                  : require('../../assets/terms_mysalesapp_gr.html')
+              }
+              style={{ flex: 1, minHeight: 600, backgroundColor: '#ffffff' }}
+              javaScriptEnabled
+              domStorageEnabled
+              scalesPageToFit={Platform.OS !== 'ios'}
+              startInLoadingState
+            />
+          </ScrollView>
+        </SafeScreen>
       </Modal>
     </SafeScreen>
   );
@@ -233,8 +233,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     marginBottom: 16,
     fontSize: 16,
-    color: '#1f2937',
-    backgroundColor: '#f8fafc',
+    color: '#111827',
+    backgroundColor: '#ffffff',
+    fontWeight: '500',
   },
   button: {
     backgroundColor: '#1976d2',
@@ -279,28 +280,22 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textDecorationLine: 'underline',
   },
-  modalContainer: { flex: 1, backgroundColor: '#fff' },
-  modalHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
-    backgroundColor: '#f9fafb',
+  backButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
   },
-  modalTitle: { fontSize: 18, fontWeight: '700', color: '#1f2937', flex: 1 },
-  closeButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#ef4444',
-    alignItems: 'center',
-    justifyContent: 'center',
+  backButtonText: {
+    fontSize: 16,
+    color: '#1976d2',
+    fontWeight: '600',
   },
-  closeButtonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
-  webView: { flex: 1 },
+  termsContent: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+  },
+  termsContentContainer: {
+    flexGrow: 1,
+  },
 });
 
 export default SignUpScreen;

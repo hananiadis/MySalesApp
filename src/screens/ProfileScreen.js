@@ -162,6 +162,7 @@ const ProfileScreen = () => {
             <TextInput
               style={styles.input}
               placeholder={STRINGS.firstName}
+              placeholderTextColor="#9ca3af"
               value={firstName}
               onChangeText={setFirstName}
               autoCapitalize="words"
@@ -170,6 +171,7 @@ const ProfileScreen = () => {
             <TextInput
               style={styles.input}
               placeholder={STRINGS.lastName}
+              placeholderTextColor="#9ca3af"
               value={lastName}
               onChangeText={setLastName}
               autoCapitalize="words"
@@ -178,6 +180,7 @@ const ProfileScreen = () => {
             <TextInput
               style={styles.input}
               placeholder={STRINGS.email}
+              placeholderTextColor="#9ca3af"
               value={email}
               onChangeText={setEmail}
               autoCapitalize="none"
@@ -187,6 +190,7 @@ const ProfileScreen = () => {
             <TextInput
               style={styles.input}
               placeholder={STRINGS.newPassword}
+              placeholderTextColor="#9ca3af"
               value={newPassword}
               onChangeText={setNewPassword}
               secureTextEntry
@@ -196,6 +200,7 @@ const ProfileScreen = () => {
             <TextInput
               style={styles.input}
               placeholder={STRINGS.confirmNewPassword}
+              placeholderTextColor="#9ca3af"
               value={confirmPassword}
               onChangeText={setConfirmPassword}
               secureTextEntry
@@ -279,14 +284,15 @@ const styles = StyleSheet.create({
   sectionSubtitle: { fontSize: 16, fontWeight: '600', color: '#1f2937', marginBottom: 12 },
   input: {
     borderWidth: 1,
-    borderColor: '#cbd5e1',
+    borderColor: '#d1d5db',
     borderRadius: 10,
     paddingVertical: 12,
     paddingHorizontal: 14,
-    marginBottom: 12,
+    marginBottom: 14,
     fontSize: 15,
     color: '#111827',
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#fff',
+    fontWeight: '500',
   },
   saveButton: {
     backgroundColor: '#1976d2',

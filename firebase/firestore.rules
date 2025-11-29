@@ -30,6 +30,10 @@ service cloud.firestore {
       return isAdmin() && brandIsAccessible(brand);
     }
 
+    function isWarehouseManagerForBrand(brand) {
+      return myRole() == 'warehouse_manager' && brand != null && brandIsAccessible(brand);
+    }
+
     function isOrderOwner(order) {
       return isSignedIn() && order.userId == request.auth.uid;
     }
@@ -43,7 +47,10 @@ service cloud.firestore {
     }
 
     function canReadOrder(order) {
-      return isOrderOwner(order) || isAdminForBrand(brandOrNull(order));
+      let brand = brandOrNull(order);
+      return isOrderOwner(order)
+        || isAdminForBrand(brand)
+        || isWarehouseManagerForBrand(brand);
     }
 
     function canCreateOrder(data) {
@@ -64,7 +71,11 @@ service cloud.firestore {
         brandIsAccessible(newBrand) &&
         brandIsAccessible(currentBrand);
       let adminGuard = isAdminForBrand(newBrand) && isAdminForBrand(currentBrand);
-      return ownerGuard || adminGuard;
+      let warehouseKivosGuard =
+        newBrand == 'kivos' &&
+        currentBrand == 'kivos' &&
+        isWarehouseManagerForBrand('kivos');
+      return ownerGuard || adminGuard || warehouseKivosGuard;
     }
 
     function canDeleteOrder(order) {
@@ -89,8 +100,21 @@ service cloud.firestore {
       allow write: if isAdminForBrand('john');
     }
     match /products_kivos/{docId} {
+      // Allow any signed-in user with kivos brand access to read product metadata (e.g., lowStockLimit)
       allow read: if isSignedIn() && brandIsAccessible('kivos');
-      allow write: if isAdminForBrand('kivos');
+      allow write: if isAdminForBrand('kivos') || isWarehouseManagerForBrand('kivos');
+    }
+
+    // --- WAREHOUSE (KIVOS) ---
+    match /stock_kivos/{docId} {
+      allow read: if isAdminForBrand('kivos') || isWarehouseManagerForBrand('kivos');
+      allow write: if isAdminForBrand('kivos') || isWarehouseManagerForBrand('kivos');
+    }
+
+    match /stock_kivos_history/{docId} {
+      allow create: if request.auth != null
+        && (isAdminForBrand('kivos') || isWarehouseManagerForBrand('kivos'))
+        && request.resource.data.keys().hasAll(['productCode','oldQty','newQty','delta','updatedBy','timestamp']);
     }
 
     // --- CUSTOMERS ---
@@ -117,19 +141,22 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // --- SUPERMARKETS ---
-    match /supermarket_stores/{docId} {
+    // --- BRAND CONTACTS ---
+    match /brand_contacts/{docId} {
       allow read: if isSignedIn() && (
-        // any signed-in user with at least one brand can read
-        myBrands().size() > 0
+        !('brand' in resource.data) || brandIsAccessible(resource.data.brand)
       );
       allow write: if isAdmin();
     }
 
+    // --- SUPERMARKETS ---
+    match /supermarket_stores/{docId} {
+      allow read: if isSignedIn() && myBrands().size() > 0;
+      allow write: if isAdmin();
+    }
+
     match /supermarket_listings/{docId} {
-      allow read: if isSignedIn() && (
-        myBrands().size() > 0
-      );
+      allow read: if isSignedIn() && myBrands().size() > 0;
       allow write: if isAdmin();
     }
 
@@ -139,7 +166,6 @@ service cloud.firestore {
     }
 
     // --- PLAYMOBIL KPI DASHBOARD ---
-    // Sheets cache collection - allows authenticated users to read/write cache
     match /sheetsCache/{sheetId} {
       allow read: if isSignedIn();
       allow write: if isSignedIn();
@@ -159,7 +185,7 @@ service cloud.firestore {
       allow delete: if canDeleteOrder(resource.data);
     }
     match /orders_kivos/{orderId} {
-      allow read: if canReadOrder(resource.data);
+      allow read: if canReadOrder(resource.data) || isWarehouseManagerForBrand('kivos');
       allow create: if canCreateOrder(request.resource.data);
       allow update: if canUpdateOrder(request.resource.data, resource.data);
       allow delete: if canDeleteOrder(resource.data);
@@ -175,6 +201,12 @@ service cloud.firestore {
       allow create: if canCreateOrder(request.resource.data);
       allow update: if canUpdateOrder(request.resource.data, resource.data);
       allow delete: if canDeleteOrder(resource.data);
+    }
+
+    // --- SUPPLIER ORDERS (KIVOS) ---
+    match /supplier_orders_kivos/{docId} {
+      allow read, create, update: if isAdminForBrand('kivos') || isWarehouseManagerForBrand('kivos');
+      allow delete: if isAdminForBrand('kivos');
     }
 
     // --- DEFAULT DENY ---

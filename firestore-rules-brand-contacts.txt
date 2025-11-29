@@ -1,0 +1,19 @@
+// Firestore Security Rules for brand_contacts collection
+// Add these rules to your firestore.rules file
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Brand Contacts Collection
+    match /brand_contacts/{contactId} {
+      // Read: Any authenticated user can read active contacts
+      allow read: if request.auth != null 
+                  && resource.data.active == true;
+      
+      // Write: Only admins can create/update/delete contacts
+      allow create, update, delete: if request.auth != null 
+                                    && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+  }
+}
