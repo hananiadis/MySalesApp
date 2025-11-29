@@ -13,6 +13,8 @@ let _memoryCache = {
   datasets: null,
   timestamp: null,
   headerDates: null,
+  storeMapping: null, // Store -> Salesman mapping
+  storeMappingTimestamp: null,
 };
 
 // AsyncStorage cache keys
@@ -22,6 +24,8 @@ const CACHE_KEYS = {
   SHEETS_HEADER_DATES: 'playmobil:sheets:headerDates',
   KPI_RESULTS: 'playmobil:kpi:results',
   KPI_TIMESTAMP: 'playmobil:kpi:timestamp',
+  STORE_MAPPING: 'playmobil:storeMapping:data',
+  STORE_MAPPING_TIMESTAMP: 'playmobil:storeMapping:timestamp',
   // Month-based chunk keys for smart caching
   MONTH_CHUNK_PREFIX: 'playmobil:month:',
   MONTH_INDEX: 'playmobil:month:index',
@@ -50,6 +54,211 @@ console.log('[playmobilKpi] Sheet key mapping:', PLAYMOBIL_SHEET_KEYS);
 console.log('[playmobilKpi] Additional sheets:', ADDITIONAL_PLAYMOBIL_SHEETS);
 
 /**
+ * Fetch and parse store mapping sheet
+ * Creates a lookup: { customerCode: { stores: { storeName: salesmanName } } }
+ * @returns {Promise<Object>} Store mapping data
+ */
+async function fetchStoreMapping() {
+  console.log('[fetchStoreMapping] START');
+  
+  try {
+    // Check memory cache first
+    const now = Date.now();
+    if (_memoryCache.storeMapping && _memoryCache.storeMappingTimestamp) {
+      const age = (now - _memoryCache.storeMappingTimestamp) / (1000 * 60 * 60);
+      if (age < CACHE_TTL_HOURS) {
+        console.log('[fetchStoreMapping] Using memory cache');
+        return _memoryCache.storeMapping;
+      }
+    }
+
+    // Check AsyncStorage cache
+    const cachedTimestamp = await AsyncStorage.getItem(CACHE_KEYS.STORE_MAPPING_TIMESTAMP);
+    if (cachedTimestamp) {
+      const age = (now - parseInt(cachedTimestamp, 10)) / (1000 * 60 * 60);
+      if (age < CACHE_TTL_HOURS) {
+        const cached = await AsyncStorage.getItem(CACHE_KEYS.STORE_MAPPING);
+        if (cached) {
+          const mapping = JSON.parse(cached);
+          _memoryCache.storeMapping = mapping;
+          _memoryCache.storeMappingTimestamp = parseInt(cachedTimestamp, 10);
+          console.log('[fetchStoreMapping] Using AsyncStorage cache');
+          return mapping;
+        }
+      }
+    }
+
+    // Fetch fresh data from 2025 sales sheet (current year as authoritative source)
+    console.log('[fetchStoreMapping] Fetching fresh data from 2025 sales sheet');
+    const records = await fetchGoogleSheetCSV(
+      PLAYMOBIL_CONFIG.sheetUrls.sales2025,
+      PLAYMOBIL_CONFIG.columnNames.sales
+    );
+
+    console.log(`[fetchStoreMapping] Fetched ${records.length} sales records from 2025 to build store mapping`);
+
+    // Build lookup structure: { customerCode: { stores: { store: salesman }, primaryMerch: string } }
+    const mapping = {};
+    
+    records.forEach((record, index) => {
+      const customerCode = (record.customerCode || '').trim();
+      const store = (record.shipToCity || '').trim();
+      const salesRep = (record.salesRep || '').trim();
+      const partnerZM = (record.partnerZM || '').trim();
+
+      if (!customerCode || !store) {
+        return; // Skip invalid rows
+      }
+
+      // Determine salesman name (handle special case)
+      let salesmanName;
+      if (salesRep === 'ΑΝΑΝΙΑΔΟΥ ΑΝΑΣΤΑΣΙΑ & ΣΙΑ ΟΕ') {
+        salesmanName = partnerZM || salesRep;
+      } else {
+        salesmanName = salesRep || partnerZM || '';
+      }
+
+      if (!salesmanName) {
+        return; // Skip if no salesman
+      }
+
+      // Initialize customer entry if needed
+      if (!mapping[customerCode]) {
+        mapping[customerCode] = {
+          stores: {},
+          salesmen: new Set(),
+        };
+      }
+
+      // Add store -> salesman mapping
+      mapping[customerCode].stores[store] = salesmanName;
+      mapping[customerCode].salesmen.add(salesmanName);
+
+      if (index < 3) {
+        console.log(`[fetchStoreMapping] Sample ${index + 1}:`, {
+          customerCode,
+          store,
+          salesmanName,
+        });
+      }
+    });
+
+    // Convert Sets to arrays for JSON serialization
+    Object.keys(mapping).forEach(customerCode => {
+      mapping[customerCode].salesmen = Array.from(mapping[customerCode].salesmen);
+      mapping[customerCode].isMultiSalesman = mapping[customerCode].salesmen.length > 1;
+    });
+
+    console.log(`[fetchStoreMapping] Built mapping for ${Object.keys(mapping).length} customers`);
+    console.log(`[fetchStoreMapping] Multi-salesman customers: ${Object.values(mapping).filter(m => m.isMultiSalesman).length}`);
+
+    // Cache the mapping
+    _memoryCache.storeMapping = mapping;
+    _memoryCache.storeMappingTimestamp = now;
+    
+    try {
+      await AsyncStorage.setItem(CACHE_KEYS.STORE_MAPPING, JSON.stringify(mapping));
+      await AsyncStorage.setItem(CACHE_KEYS.STORE_MAPPING_TIMESTAMP, now.toString());
+      console.log('[fetchStoreMapping] Cached store mapping');
+    } catch (cacheError) {
+      console.warn('[fetchStoreMapping] Failed to cache mapping:', cacheError);
+    }
+
+    console.log('[fetchStoreMapping] SUCCESS');
+    return mapping;
+
+  } catch (error) {
+    console.error('[fetchStoreMapping] ERROR:', error);
+    // Return empty mapping on error
+    return {};
+  }
+}
+
+/**
+ * Determine which salesman handled a transaction
+ * Two-tier logic for historical data preservation:
+ * 
+ * TIER 1: Single-salesman customers (merch array has 1 salesman)
+ * - Use that salesman for ALL years of data
+ * - This preserves complete historical context for each salesman
+ * 
+ * TIER 2: Multi-salesman customers (merch array has 2+ salesmen)
+ * - Examine store-level data from latest available year (2025)
+ * - Assign ALL years of sales/orders to the salesman responsible for each store
+ * - This reflects current responsibility while maintaining store-level accuracy
+ * 
+ * @param {Object} record - Transaction record with salesRep, partnerZM, shipToCity/shipToLocation
+ * @param {Object} storeMapping - Store mapping data (from latest year, e.g., 2025)
+ * @param {Object} customerData - Customer data from Firestore (contains merch array and primaryMerch)
+ * @returns {string} The salesman who handled the transaction
+ */
+function determineHandlingSalesman(record, storeMapping = {}, customerData = null) {
+  const salesRep = (record.salesRep || '').trim();
+  const partnerZM = (record.partnerZM || '').trim();
+  const customerCode = (record.customerCode || '').trim();
+  const store = (record.shipToCity || record.shipToLocation || '').trim();
+
+  // Get customer's merch array from Firestore to determine if single or multi-salesman
+  const customerMerch = customerData?.merch;
+  const merchArray = Array.isArray(customerMerch) ? customerMerch : [customerMerch].filter(Boolean);
+  const isSingleSalesmanCustomer = merchArray.length === 1;
+  const isMultiSalesmanCustomer = merchArray.length > 1;
+
+  // TIER 1: SINGLE-SALESMAN CUSTOMERS
+  // If customer has only ONE salesman in Firestore, use that salesman for ALL years
+  // This preserves historical data correctly - the single salesman gets credit for all past activity
+  if (isSingleSalesmanCustomer) {
+    const singleSalesman = merchArray[0];
+    
+    // Use the Firestore salesman consistently across all years
+    // Even if record has different salesRep/partnerZM, trust Firestore as source of truth
+    if (singleSalesman) {
+      return singleSalesman;
+    }
+    
+    // Fallback: If merch array exists but empty, try record data or primaryMerch
+    if (salesRep || partnerZM) {
+      return salesRep === 'ΑΝΑΝΙΑΔΟΥ ΑΝΑΣΤΑΣΙΑ & ΣΙΑ ΟΕ' ? (partnerZM || salesRep) : (salesRep || partnerZM);
+    }
+    
+    return customerData?.primaryMerch || '';
+  }
+
+  // TIER 2: MULTI-SALESMAN CUSTOMERS
+  // If customer has MULTIPLE salesmen, use store-level analysis from latest year (2025)
+  // Each store's sales/orders for ALL years go to the salesman currently responsible for that store
+  if (isMultiSalesmanCustomer) {
+    const customerMapping = storeMapping[customerCode];
+    
+    // Try to use store mapping from latest year
+    if (customerMapping && customerMapping.isMultiSalesman && store) {
+      const storeSalesman = customerMapping.stores[store];
+      
+      if (storeSalesman) {
+        // Use the current store assignment for all years of this store's data
+        return storeSalesman;
+      }
+    }
+
+    // Fallback for multi-salesman: Try record data if store mapping unavailable
+    if (salesRep || partnerZM) {
+      return salesRep === 'ΑΝΑΝΙΑΔΟΥ ΑΝΑΣΤΑΣΙΑ & ΣΙΑ ΟΕ' ? (partnerZM || salesRep) : (salesRep || partnerZM);
+    }
+
+    // Last resort: primaryMerch
+    return customerData?.primaryMerch || '';
+  }
+
+  // FALLBACK: Customer has no merch data in Firestore
+  // Use record data or primaryMerch as last resort
+  if (salesRep || partnerZM) {
+    return salesRep === 'ΑΝΑΝΙΑΔΟΥ ΑΝΑΣΤΑΣΙΑ & ΣΙΑ ΟΕ' ? (partnerZM || salesRep) : (salesRep || partnerZM);
+  }
+
+  return customerData?.primaryMerch || '';
+}
+
+/**
  * Get customer codes for given salesman IDs and brand
  */
 export async function getCustomerCodes(salesmanIds, brand = 'playmobil') {
@@ -74,7 +283,7 @@ export async function getCustomerCodes(salesmanIds, brand = 'playmobil') {
     
     console.log('[getCustomerCodes] All merch names:', JSON.stringify(merchNames));
     
-    // Firestore 'in' queries support max 10 items
+    // Firestore 'array-contains-any' supports max 10 items (same as 'in' operator)
     const batchSize = 10;
     const batches = [];
     
@@ -87,14 +296,16 @@ export async function getCustomerCodes(salesmanIds, brand = 'playmobil') {
     console.log(`[getCustomerCodes] Total batches to process: ${batches.length}`);
     
     const allCustomerCodes = [];
+    const customerMerchMap = {}; // Track which customers have single vs multiple salesmen
     
     for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
       const batch = batches[batchIndex];
       console.log(`[getCustomerCodes] Processing batch ${batchIndex + 1}/${batches.length}`);
       
+      // Use array-contains-any to support array-based merch field
       const snapshot = await firestore()
         .collection(collectionName)
-        .where('merch', 'in', batch)
+        .where('merch', 'array-contains-any', batch)
         .get();
       
       console.log(`[getCustomerCodes] Batch ${batchIndex + 1} returned ${snapshot.size} documents`);
@@ -102,17 +313,25 @@ export async function getCustomerCodes(salesmanIds, brand = 'playmobil') {
       snapshot.forEach((doc, docIndex) => {
         const data = doc.data();
         const customerCode = data.customerCode || doc.id;
+        const merchArray = Array.isArray(data.merch) ? data.merch : [data.merch].filter(Boolean);
         
         console.log(`[getCustomerCodes] Batch ${batchIndex + 1}, Doc ${docIndex + 1}:`, {
           docId: doc.id,
           customerCode,
           merch: data.merch,
+          merchCount: merchArray.length,
           name: data.name
         });
         
+        // Include all customers - filtering by handledBy happens in calculateAllKPIs
+        // This allows multi-salesman customers to show up with correct store attribution
         if (customerCode && !allCustomerCodes.includes(customerCode)) {
           allCustomerCodes.push(customerCode);
-          console.log(`[getCustomerCodes] Added customer code: ${customerCode} (total: ${allCustomerCodes.length})`);
+          customerMerchMap[customerCode] = {
+            salesmen: merchArray,
+            isMultiSalesman: merchArray.length > 1
+          };
+          console.log(`[getCustomerCodes] Added customer code: ${customerCode} (multi-salesman: ${merchArray.length > 1}, total: ${allCustomerCodes.length})`);
         } else if (allCustomerCodes.includes(customerCode)) {
           console.log(`[getCustomerCodes] Skipped duplicate customer code: ${customerCode}`);
         }
@@ -121,9 +340,11 @@ export async function getCustomerCodes(salesmanIds, brand = 'playmobil') {
     
     console.log(`[getCustomerCodes] SUCCESS - Found ${allCustomerCodes.length} unique customers`);
     console.log('[getCustomerCodes] Sample customer codes (first 10):', allCustomerCodes.slice(0, 10));
+    console.log('[getCustomerCodes] Customers with multiple salesmen:', 
+      Object.entries(customerMerchMap).filter(([, v]) => v.isMultiSalesman).length);
     console.log('[getCustomerCodes] END');
     
-    return allCustomerCodes;
+    return { customerCodes: allCustomerCodes, customerMerchMap };
   } catch (error) {
     console.error('[getCustomerCodes] ERROR:', error);
     console.error('[getCustomerCodes] Error code:', error.code);
@@ -508,6 +729,37 @@ export async function getAllSheetsData() {
       const datasets = await loadMonthBasedDatasets();
       
       if (datasets) {
+        console.log('[getAllSheetsData] Cache loaded - re-applying handledBy attribution with current store mapping');
+        
+        // Re-fetch store mapping and customer data to re-apply attribution
+        // This ensures historical data uses current (2025) salesman assignments
+        const storeMapping = await fetchStoreMapping();
+        console.log(`[getAllSheetsData] Store mapping loaded for ${Object.keys(storeMapping).length} customers`);
+        
+        const customersSnapshot = await firestore().collection('customers').get();
+        const customerDataMap = {};
+        customersSnapshot.forEach(doc => {
+          const data = doc.data();
+          const customerCode = data.customerCode || doc.id;
+          customerDataMap[customerCode] = {
+            merch: data.merch, // Full merch array for single vs multi-salesman logic
+            primaryMerch: data.primaryMerch || (Array.isArray(data.merch) ? data.merch[0] : data.merch) || '',
+          };
+        });
+        console.log(`[getAllSheetsData] Loaded customer data for ${Object.keys(customerDataMap).length} customers`);
+        
+        // Re-apply handledBy to cached data
+        ['invoiced2025', 'invoiced2024', 'orders2025', 'orders2024'].forEach(datasetKey => {
+          if (datasets[datasetKey]) {
+            datasets[datasetKey].forEach(record => {
+              const customerCode = (record.customerCode || '').trim();
+              const customerData = customerDataMap[customerCode] || null;
+              record.handledBy = determineHandlingSalesman(record, storeMapping, customerData);
+            });
+            console.log(`[getAllSheetsData] Re-applied handledBy to ${datasets[datasetKey].length} ${datasetKey} records`);
+          }
+        });
+        
         // Restore header dates
         const headerDatesStr = await AsyncStorage.getItem(CACHE_KEYS.SHEETS_HEADER_DATES);
         if (headerDatesStr) {
@@ -523,6 +775,8 @@ export async function getAllSheetsData() {
           datasets: datasets,
           timestamp: Date.now(),
           headerDates: datasets._headerDates,
+          storeMapping: storeMapping,
+          storeMappingTimestamp: Date.now(),
         };
         
         console.log('[getAllSheetsData] Cached data loaded from AsyncStorage:', {
@@ -532,7 +786,7 @@ export async function getAllSheetsData() {
           orders2024: datasets.orders2024?.length || 0,
           balance2025: datasets.balance2025?.length || 0,
         });
-        console.log('[getAllSheetsData] END (from month-based cache)');
+        console.log('[getAllSheetsData] END (from month-based cache with re-applied attribution)');
         return datasets;
       }
     }
@@ -575,11 +829,41 @@ async function fetchAndCacheAllSheets() {
   const headerDates = {};
 
   try {
+    // Fetch store mapping first
+    console.log('[fetchAndCacheAllSheets] Fetching store mapping...');
+    const storeMapping = await fetchStoreMapping();
+    console.log(`[fetchAndCacheAllSheets] Store mapping loaded for ${Object.keys(storeMapping).length} customers`);
+
+    // Fetch all customer data for salesman attribution
+    console.log('[fetchAndCacheAllSheets] Fetching customer data for salesman attribution...');
+    const customersSnapshot = await firestore().collection('customers').get();
+    const customerDataMap = {};
+    customersSnapshot.forEach(doc => {
+      const data = doc.data();
+      const customerCode = data.customerCode || doc.id;
+      customerDataMap[customerCode] = {
+        merch: data.merch, // Full merch array for single vs multi-salesman logic
+        primaryMerch: data.primaryMerch || (Array.isArray(data.merch) ? data.merch[0] : data.merch) || '',
+      };
+    });
+    console.log(`[fetchAndCacheAllSheets] Loaded customer data for ${Object.keys(customerDataMap).length} customers`);
+
     for (const [datasetKey, cfg] of Object.entries(PLAYMOBIL_SHEET_KEYS)) {
       const { sheetKey, dataType } = cfg;
       console.log(`[fetchAndCacheAllSheets] Fetching ${datasetKey} -> ${sheetKey} (${dataType})`);
       
       const rows = await fetchAndCacheSheet(datasetKey, sheetKey, dataType);
+      
+      // Add handledBy field to sales AND orders records
+      if (dataType === 'sales' || dataType === 'orders') {
+        rows.forEach(record => {
+          const customerCode = (record.customerCode || '').trim();
+          const customerData = customerDataMap[customerCode] || null;
+          record.handledBy = determineHandlingSalesman(record, storeMapping, customerData);
+        });
+        console.log(`[fetchAndCacheAllSheets] Added handledBy field to ${rows.length} ${dataType} records`);
+      }
+      
       datasets[datasetKey] = rows;
       
       if (rows && rows._headerDate) {
@@ -615,6 +899,8 @@ async function fetchAndCacheAllSheets() {
       datasets: datasets,
       timestamp: Date.now(),
       headerDates: headerDates,
+      storeMapping: storeMapping,
+      storeMappingTimestamp: Date.now(),
     };
     console.log('[fetchAndCacheAllSheets] In-memory cache populated');
 
@@ -639,7 +925,12 @@ export async function refreshAllSheetsAndCache() {
     await AsyncStorage.removeItem(CACHE_KEYS.KPI_RESULTS);
     await AsyncStorage.removeItem(CACHE_KEYS.KPI_TIMESTAMP);
     
-    console.log('[refreshAllSheetsAndCache] Cache cleared (including chunks)');
+    // Invalidate all KPI calculation caches since data has been refreshed
+    console.log('[refreshAllSheetsAndCache] Invalidating KPI calculation caches...');
+    const { invalidateAllCaches } = await import('./kpiCacheManager');
+    await invalidateAllCaches();
+    
+    console.log('[refreshAllSheetsAndCache] Cache cleared (including chunks and KPI results)');
 
     // Fetch fresh data for all KPI sheets
     const datasets = await fetchAndCacheAllSheets();
@@ -681,7 +972,12 @@ export async function clearAllPlaymobilCache() {
     await clearChunkedCache();
     await AsyncStorage.removeItem(CACHE_KEYS.KPI_RESULTS);
     await AsyncStorage.removeItem(CACHE_KEYS.KPI_TIMESTAMP);
-    console.log('[clearAllPlaymobilCache] All Playmobil cache cleared (including historical months)');
+    
+    // Clear all KPI calculation caches
+    const { clearAllCaches } = await import('./kpiCacheManager');
+    await clearAllCaches();
+    
+    console.log('[clearAllPlaymobilCache] All Playmobil cache cleared (including KPI results and historical months)');
   } catch (error) {
     console.error('[clearAllPlaymobilCache] ERROR:', error);
     throw error;
@@ -726,13 +1022,13 @@ export async function forceRefreshAllData() {
 /**
  * Calculate all KPI metrics for given customer codes
  */
-export function calculateAllKPIs(sheetsData, customerCodes, options = {}) {
+export async function calculateAllKPIs(sheetsData, customerCodes, options = {}) {
   console.log('[calculateAllKPIs] START');
   console.log('[calculateAllKPIs] Customer codes count:', customerCodes.length);
   console.log('[calculateAllKPIs] Sample customer codes (first 10):', customerCodes.slice(0, 10));
   console.log('[calculateAllKPIs] Options:', options);
   
-  const { referenceDate = new Date() } = options;
+  const { referenceDate = new Date(), salesmenFilter = null, customerMerchMap = {} } = options;
   
   const refYear = referenceDate.getFullYear();
   const refMonth = referenceDate.getMonth();
@@ -741,12 +1037,64 @@ export function calculateAllKPIs(sheetsData, customerCodes, options = {}) {
   
   console.log('[calculateAllKPIs] Reference date:', referenceDate.toISOString());
   console.log('[calculateAllKPIs] Reference breakdown:', { refYear, refMonth, refDay, previousYear });
+  console.log('[calculateAllKPIs] Salesmen filter:', salesmenFilter);
   
-  // Helper to filter records by customer codes
-  const filterByCustomers = (records) => {
-    const filtered = records.filter(r => {
+  // Fetch current store mapping for re-attributing previous year data
+  console.log('[calculateAllKPIs] Fetching current store mapping...');
+  const storeMapping = await fetchStoreMapping();
+  console.log('[calculateAllKPIs] Store mapping loaded:', {
+    customers: Object.keys(storeMapping).length,
+    multiSalesmanCustomers: Object.values(storeMapping).filter(c => c.isMultiSalesman).length
+  });
+  
+  // Helper to re-attribute previous year records based on CURRENT store assignments
+  // This ensures each salesman sees their currently assigned stores' historical data
+  const reattributePreviousYearRecord = (record) => {
+    const recordCode = record.customerCode || record.code;
+    const storeName = record.shipToCity || record.store || '';
+    
+    // Get current store mapping for this customer
+    const customerStores = storeMapping[recordCode];
+    if (!customerStores || !customerStores.stores) {
+      // No mapping available, keep original handledBy
+      return record;
+    }
+    
+    // Find current salesman for this store
+    const currentSalesman = customerStores.stores[storeName];
+    if (currentSalesman) {
+      // Re-attribute to current salesman
+      return { ...record, handledBy: currentSalesman };
+    }
+    
+    // Store not found in mapping, keep original
+    return record;
+  };
+  
+  // Helper to filter records by customer codes AND salesman (if filter provided)
+  const filterByCustomers = (records, isPreviousYear = false) => {
+    // For previous year data, re-attribute based on current store assignments
+    const recordsToFilter = isPreviousYear 
+      ? records.map(r => reattributePreviousYearRecord(r))
+      : records;
+    
+    const filtered = recordsToFilter.filter(r => {
       const recordCode = r.customerCode || r.code;
-      return customerCodes.includes(recordCode);
+      const matchesCustomer = customerCodes.includes(recordCode);
+      
+      // If no salesman filter, just check customer
+      if (!salesmenFilter || !Array.isArray(salesmenFilter) || salesmenFilter.length === 0) {
+        return matchesCustomer;
+      }
+      
+      // For sales/orders records with handledBy field (store-based attribution)
+      if (r.handledBy !== undefined && r.handledBy !== null && r.handledBy !== '') {
+        const matchesSalesman = salesmenFilter.includes(r.handledBy);
+        return matchesCustomer && matchesSalesman;
+      }
+      
+      // For balance records without handledBy, just use customer filtering
+      return matchesCustomer;
     });
     return filtered;
   };
@@ -773,8 +1121,8 @@ export function calculateAllKPIs(sheetsData, customerCodes, options = {}) {
       previousYear: previousYearData.length
     });
     
-    const currentFiltered = filterByCustomers(currentYearData);
-    const previousFiltered = filterByCustomers(previousYearData);
+    const currentFiltered = filterByCustomers(currentYearData, false); // Current year: use handledBy
+    const previousFiltered = filterByCustomers(previousYearData, true); // Previous year: use current assignment
     
     console.log(`[calculateAllKPIs:${datasetName}] After customer filter:`, {
       current: currentFiltered.length,
@@ -843,6 +1191,13 @@ export function calculateAllKPIs(sheetsData, customerCodes, options = {}) {
       return date.getFullYear() === previousYear;
     });
     
+    // Yearly: Full year (current year)
+    const yearlyCurrent = currentFiltered.filter(r => {
+      const date = parseDate(r.date);
+      if (!date) return false;
+      return date.getFullYear() === refYear;
+    });
+    
     // Helper to calculate totals
     const calculateTotals = (records) => {
       const amount = records.reduce((sum, r) => {
@@ -888,6 +1243,7 @@ export function calculateAllKPIs(sheetsData, customerCodes, options = {}) {
     
     const monthlyPreviousTotals = calculateTotals(monthlyPrevious);
     const yearlyPreviousTotals = calculateTotals(yearlyPrevious);
+    const yearlyCurrentTotals = calculateTotals(yearlyCurrent);
     
     // Context for labels: use the provided referenceDate to ensure
     // ranges (1/MM–DD/MM and 01/01–DD/MM) match header-derived date
@@ -916,10 +1272,17 @@ export function calculateAllKPIs(sheetsData, customerCodes, options = {}) {
       monthly: {
         previous: monthlyPreviousTotals,
       },
-      yearly: {
+      ytdComparison: {
         current: ytdCurrentTotals,
+        previous: ytdPreviousTotals,
+        diff: calcDiff(ytdCurrentTotals, ytdPreviousTotals),
+      },
+      yearly: {
+        current: yearlyCurrentTotals,
         previous: yearlyPreviousTotals,
-        diff: calcDiff(ytdCurrentTotals, yearlyPreviousTotals),
+        diff: calcDiff(yearlyCurrentTotals, yearlyPreviousTotals),
+        currentRecords: sortByAmount(yearlyCurrent),
+        previousRecords: sortByAmount(yearlyPrevious),
       },
       context: contextFromRef,
       allCurrentRecords: currentFiltered,
@@ -965,16 +1328,24 @@ export function calculateAllKPIs(sheetsData, customerCodes, options = {}) {
 /**
  * Get customer sales summary aggregated by customer
  */
-export function getCustomerSalesSummary(sheetsData, customerCodes) {
+export function getCustomerSalesSummary(sheetsData, customerCodes, salesmenFilter = null) {
   console.log('[getCustomerSalesSummary] START');
   console.log('[getCustomerSalesSummary] Customer codes count:', customerCodes.length);
+  console.log('[getCustomerSalesSummary] Salesmen filter:', salesmenFilter);
   
   const customerMap = new Map();
   
-  // Aggregate invoiced sales
+  // Aggregate invoiced sales (current year - filter by salesman)
   sheetsData.invoiced2025.forEach(record => {
     const recordCode = record.customerCode || record.code;
     if (!customerCodes.includes(recordCode)) return;
+    
+    // Filter by salesman if provided (only for current year)
+    if (salesmenFilter && Array.isArray(salesmenFilter) && salesmenFilter.length > 0) {
+      if (record.handledBy && !salesmenFilter.includes(record.handledBy)) {
+        return; // Skip this record, wrong salesman
+      }
+    }
     
     if (!customerMap.has(recordCode)) {
       customerMap.set(recordCode, {

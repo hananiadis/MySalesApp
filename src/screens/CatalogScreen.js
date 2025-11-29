@@ -86,11 +86,7 @@ const CatalogScreen = ({ navigation, route }) => {
   const { label: brandName, description, catalogs } = brandData;
 
   const handleGoBack = useCallback(() => {
-    if (navigation.canGoBack()) {
-      navigation.goBack();
-    } else {
-      navigation.navigate('BrandHome', { brand: brandParam });
-    }
+    navigation.navigate('BrandHome', { brand: brandParam });
   }, [brandParam, navigation]);
 
   useEffect(() => {

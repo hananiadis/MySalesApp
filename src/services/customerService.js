@@ -139,8 +139,13 @@ export async function fetchCustomersForSalesmen(fs, brand, salesmen) {
     const normalizedCode = normalizeCustomerCode(code);
     if (!normalizedCode) return;
 
+    // Handle merch as both array and string
+    const merchValues = Array.isArray(data.merch) 
+      ? data.merch.map(m => normaliseString(m)).filter(Boolean)
+      : [normaliseString(data.merch)].filter(Boolean);
+
     const merchantCandidates = [
-      data.merch,
+      ...merchValues,
       data.salesman,
       data.salesmanName,
       data.salesman_name,

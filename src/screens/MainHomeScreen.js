@@ -117,9 +117,9 @@ export default function MainHomeScreen({ navigation }) {
 
   const salesmanName =
     profile?.name?.trim() ||
-    `${profile?.firstName ?? DEFAULT_SALESMAN.firstName} ${
-      profile?.lastName ?? DEFAULT_SALESMAN.lastName
-    }`.trim();
+    [profile?.firstName, profile?.lastName].filter(Boolean).join(' ').trim() ||
+    profile?.email?.split('@')[0] ||
+    'User';
   
   // Get user role label in Greek
   const roleLabel = getRoleLabel(role, 'el');

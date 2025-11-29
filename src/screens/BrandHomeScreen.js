@@ -28,6 +28,8 @@ const STRINGS = {
   newOrder: '\u039d\u03ad\u03b1 \u03c0\u03b1\u03c1\u03b1\u03b3\u03b3\u03b5\u03bb\u03af\u03b1',
   orders: '\u0394\u03b9\u03b1\u03c7\u03b5\u03af\u03c1\u03b9\u03c3\u03b7 \u03c0\u03b1\u03c1\u03b1\u03b3\u03b3\u03b5\u03bb\u03b9\u03ce\u03bd',
   supermarket: '\u03a0\u03b1\u03c1\u03b1\u03b3\u03b3\u03b5\u03bb\u03af\u03b1 SuperMarket',
+  contacts: '\u0395\u03c0\u03b1\u03c6\u03ad\u03c2', // Επαφές
+  analytics: '\u0391\u03bd\u03b1\u03bb\u03c5\u03c4\u03b9\u03ba\u03ac', // Αναλυτικά
   back: '\u0395\u03c0\u03b9\u03c3\u03c4\u03c1\u03bf\u03c6\u03ae \u03c3\u03c4\u03b7\u03bd \u03ba\u03b5\u03bd\u03c4\u03c1\u03b9\u03ba\u03ae',
 };
 
@@ -35,6 +37,8 @@ const ICONS = {
   newOrder: 'add-circle-outline',
   orders: 'file-tray-full-outline',
   supermarket: 'cart-outline',
+  contacts: 'call-outline',
+  analytics: 'stats-chart-outline',
   back: 'arrow-back-circle-outline',
 };
 
@@ -75,6 +79,20 @@ const buildActions = ({
       onPress: () => navigateToStack('SuperMarketOrderFlow', { brand }),
     });
   }
+
+  actions.push({
+    key: 'analytics',
+    label: STRINGS.analytics,
+    icon: ICONS.analytics,
+    onPress: () => navigation.navigate('SalesAnalytics', { brand }),
+  });
+
+  actions.push({
+    key: 'contacts',
+    label: STRINGS.contacts,
+    icon: ICONS.contacts,
+    onPress: () => navigation.navigate('BrandContacts', { brand }),
+  });
 
   actions.push({
     key: 'back',
@@ -233,7 +251,9 @@ const BrandHomeScreen = ({ navigation, route }) => {
   const [reloadToken, setReloadToken] = useState(0);
   const [referenceDate] = useState(() => new Date());
   // Salesmen filter UI state (Playmobil only)
-  const [selectedSalesmenIds, setSelectedSalesmenIds] = useState(null); // null -> All
+  // Start as undefined to distinguish "not loaded yet" from "loaded as null (all)"
+  const [selectedSalesmenIds, setSelectedSalesmenIds] = useState(undefined);
+  const [userLinkedSalesmen, setUserLinkedSalesmen] = useState(null);
   
   // Modal state for KPI data display
   const [modalVisible, setModalVisible] = useState(false);
@@ -241,24 +261,70 @@ const BrandHomeScreen = ({ navigation, route }) => {
 
   const isPlaymobil = brand === 'playmobil';
 
-  // Persist salesman selection per brand (Playmobil)
+  // Load user's linked salesmen first (only for Playmobil)
   useEffect(() => {
+    if (!isPlaymobil) return;
+    
     (async () => {
       try {
+        const { getUserSalesmen } = await import('../services/userService');
+        const linkedSalesmen = await getUserSalesmen('playmobil');
+        
+        console.log('[BrandHomeScreen] User linked salesmen loaded:', linkedSalesmen.length);
+        setUserLinkedSalesmen(linkedSalesmen);
+      } catch (err) {
+        console.error('[BrandHomeScreen] Failed to load user salesmen:', err);
+        setUserLinkedSalesmen([]);
+      }
+    })();
+  }, [isPlaymobil]);
+
+  // Persist salesman selection per brand (Playmobil)
+  // Default to user's linked salesmen instead of showing ALL company data
+  useEffect(() => {
+    if (!isPlaymobil || userLinkedSalesmen === null) return;
+    
+    (async () => {
+      try {
+        // Check if passed via route params (takes precedence)
+        const routeSalesmenIds = route?.params?.selectedSalesmenIds;
+        if (Array.isArray(routeSalesmenIds) && routeSalesmenIds.length > 0) {
+          console.log('[BrandHomeScreen] Using salesmen from route params:', routeSalesmenIds);
+          setSelectedSalesmenIds(routeSalesmenIds);
+          return;
+        }
+        
+        // Try to load saved selection
         const saved = await AsyncStorage.getItem('playmobil:selectedSalesmenIds');
         if (saved) {
           const parsed = JSON.parse(saved);
           if (Array.isArray(parsed) && parsed.length) {
+            console.log('[BrandHomeScreen] Using saved salesmen selection:', parsed);
             setSelectedSalesmenIds(parsed);
+            return;
           }
         }
+        
+        // No saved selection - default to user's linked salesmen (not ALL)
+        if (userLinkedSalesmen.length > 0) {
+          const linkedIds = userLinkedSalesmen.map(s => s.name); // Use names since KPI uses names
+          console.log('[BrandHomeScreen] Defaulting to user linked salesmen:', linkedIds);
+          setSelectedSalesmenIds(linkedIds);
+        } else {
+          // User has no linked salesmen - show nothing (will display message)
+          console.log('[BrandHomeScreen] User has no linked salesmen');
+          setSelectedSalesmenIds([]);
+        }
       } catch (e) {
-        console.warn('[BrandHomeScreen] Failed to read saved salesman selection', e?.message);
+        console.warn('[BrandHomeScreen] Failed to initialize salesman selection', e?.message);
+        // On error, default to user's linked salesmen
+        const linkedIds = userLinkedSalesmen.map(s => s.name);
+        setSelectedSalesmenIds(linkedIds);
       }
     })();
-  }, []);
+  }, [isPlaymobil, userLinkedSalesmen, route?.params?.selectedSalesmenIds]);
 
-  // Use the KPI hook only for Playmobil
+  // Use the KPI hook only for Playmobil - wait for filter to initialize
   const {
     status,
     error,
@@ -271,9 +337,9 @@ const BrandHomeScreen = ({ navigation, route }) => {
     activeSalesmenIds = [],
   } = usePlaymobilKpi({
     referenceDate,
-    enabled: isPlaymobil,
+    enabled: isPlaymobil && selectedSalesmenIds !== undefined, // Wait for initialization
     reloadToken,
-    selectedSalesmenIds,
+    selectedSalesmenIds: selectedSalesmenIds === undefined ? null : selectedSalesmenIds,
   }) || {};
 
   const systemDateLabel = useMemo(() => {
@@ -518,12 +584,22 @@ const BrandHomeScreen = ({ navigation, route }) => {
       contentContainerStyle={styles.scrollContent}
       scroll
     >
-      <View style={styles.headerCard}>
+      <TouchableOpacity
+        style={styles.headerCard}
+        activeOpacity={0.85}
+        onPress={() => navigateToStack('CompanyInfo', { brand })}
+        accessibilityRole="button"
+      >
         <Image source={art} style={styles.brandArt} resizeMode="contain" />
         <View style={styles.headerInfo}>
           <Text style={styles.headerTitle}>{title}</Text>
+          <View style={styles.headerSubtitleRow}>
+            <Ionicons name="information-circle-outline" size={16} color={colors.primary} />
+            <Text style={styles.headerSubtitle}>Πληροφορίες εταιρείας & IBAN</Text>
+          </View>
         </View>
-      </View>
+        <Ionicons name="chevron-forward" size={22} color={colors.textSecondary} />
+      </TouchableOpacity>
 
       {isPlaymobil && (
         <>
@@ -536,14 +612,18 @@ const BrandHomeScreen = ({ navigation, route }) => {
                 <View style={styles.salesmenFilterWrap}>
                   <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                     <TouchableOpacity
-                      style={[styles.filterChip, !activeSalesmenIds?.length || !selectedSalesmenIds ? styles.filterChipActive : null]}
+                      style={[styles.filterChip, selectedSalesmenIds === null ? styles.filterChipActive : null]}
                       onPress={async () => {
+                        console.log('[BrandHomeScreen] Setting filter to ALL');
                         setSelectedSalesmenIds(null); // All
-                        try { await AsyncStorage.removeItem('playmobil:selectedSalesmenIds'); } catch {}
+                        try { 
+                          await AsyncStorage.removeItem('playmobil:selectedSalesmenIds'); 
+                          console.log('[BrandHomeScreen] Removed filter from storage');
+                        } catch {}
                         setReloadToken(t => t + 1);
                       }}
                     >
-                      <Text style={[styles.filterChipText, !activeSalesmenIds?.length || !selectedSalesmenIds ? styles.filterChipTextActive : null]}>Όλοι</Text>
+                      <Text style={[styles.filterChipText, selectedSalesmenIds === null ? styles.filterChipTextActive : null]}>Όλοι</Text>
                     </TouchableOpacity>
                     {(availableSalesmen || []).map(s => {
                       const isActive = Array.isArray(selectedSalesmenIds)
@@ -554,24 +634,32 @@ const BrandHomeScreen = ({ navigation, route }) => {
                           key={s.id}
                           style={[styles.filterChip, isActive && styles.filterChipActive]}
                           onPress={async () => {
-                            let next;
-                            setSelectedSalesmenIds(prev => {
-                              next = Array.isArray(prev) ? [...prev] : [];
-                              if (isActive) {
-                                next = next.filter(id => id !== s.id);
-                              } else {
-                                next.push(s.id);
-                              }
-                              if (!next.length) next = null;
-                              return next;
-                            });
-                            try {
-                              if (next && next.length) {
+                            console.log('[BrandHomeScreen] Toggle filter for:', s.id);
+                            const next = Array.isArray(selectedSalesmenIds) ? [...selectedSalesmenIds] : [];
+                            if (isActive) {
+                              // Remove from selection
+                              const filtered = next.filter(id => id !== s.id);
+                              const newSelection = filtered.length > 0 ? filtered : null;
+                              console.log('[BrandHomeScreen] New selection after remove:', newSelection);
+                              setSelectedSalesmenIds(newSelection);
+                              try {
+                                if (newSelection && newSelection.length) {
+                                  await AsyncStorage.setItem('playmobil:selectedSalesmenIds', JSON.stringify(newSelection));
+                                } else {
+                                  await AsyncStorage.removeItem('playmobil:selectedSalesmenIds');
+                                }
+                              } catch {}
+                              setReloadToken(t => t + 1); // Trigger data refresh
+                            } else {
+                              // Add to selection
+                              next.push(s.id);
+                              console.log('[BrandHomeScreen] New selection after add:', next);
+                              setSelectedSalesmenIds(next);
+                              try {
                                 await AsyncStorage.setItem('playmobil:selectedSalesmenIds', JSON.stringify(next));
-                              } else {
-                                await AsyncStorage.removeItem('playmobil:selectedSalesmenIds');
-                              }
-                            } catch {}
+                              } catch {}
+                              setReloadToken(t => t + 1); // Trigger data refresh
+                            }
                             setReloadToken(t => t + 1);
                           }}
                         >
@@ -603,7 +691,19 @@ const BrandHomeScreen = ({ navigation, route }) => {
             </View>
           </View>
 
-          {kpisLoading ? (
+          {status === 'awaiting_selection' ? (
+            <View style={styles.selectionPrompt}>
+              <Ionicons name="people-outline" size={64} color="#1976d2" />
+              <Text style={styles.promptTitle}>Επιλογή Πωλητών</Text>
+              <Text style={styles.promptText}>
+                Έχετε {availableSalesmen.length} πωλητές συνδεδεμένους.{'\n'}
+                Παρακαλώ επιλέξτε πωλητές για να δείτε τα KPIs.
+              </Text>
+              <Text style={styles.promptHint}>
+                Χρησιμοποιήστε τα φίλτρα παραπάνω ή επιλέξτε "ΟΛΑ"
+              </Text>
+            </View>
+          ) : kpisLoading ? (
             <View style={styles.kpiLoader}>
               <ActivityIndicator size="large" color={colors.primary} />
               <Text style={styles.kpiLoaderText}>Φόρτωση KPI...</Text>
@@ -697,6 +797,16 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.textPrimary,
     marginBottom: 6,
+  },
+  headerSubtitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  headerSubtitle: {
+    fontSize: 13,
+    color: colors.primary,
+    fontWeight: '600',
   },
   actionsTitle: {
     fontSize: 18,
@@ -826,9 +936,43 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   kpiErrorText: {
-    color: '#856404',
     fontSize: 14,
+    color: '#856404',
     textAlign: 'center',
+  },
+  selectionPrompt: {
+    backgroundColor: colors.white,
+    borderRadius: 16,
+    paddingVertical: 36,
+    paddingHorizontal: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 3,
+  },
+  promptTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: colors.textPrimary,
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  promptText: {
+    fontSize: 15,
+    color: colors.textSecondary,
+    textAlign: 'center',
+    lineHeight: 22,
+    marginBottom: 12,
+  },
+  promptHint: {
+    fontSize: 13,
+    color: '#1976d2',
+    textAlign: 'center',
+    fontStyle: 'italic',
   },
 });
 

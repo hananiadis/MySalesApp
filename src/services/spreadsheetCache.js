@@ -6,6 +6,7 @@ import { SPREADSHEETS } from '../config/spreadsheets';
 
 const DATA_PREFIX = 'sheetdata';
 const CACHE_DIR = `${FileSystem.documentDirectory}spreadsheet-cache/`;
+const inflightLoads = new Map();
 
 // Ensure cache directory exists
 async function ensureCacheDir() {
@@ -21,10 +22,28 @@ async function ensureCacheDir() {
 }
 
 /**
+ * Fetch and cache a spreadsheet with per-key deduping to avoid thundering herds.
+ */
+export function loadSpreadsheet(key, options = {}) {
+  const force = Boolean(options?.force);
+  const inflightKey = `${key}:${force ? '1' : '0'}`;
+  if (inflightLoads.has(inflightKey)) {
+    return inflightLoads.get(inflightKey);
+  }
+
+  const promise = loadSpreadsheetUncached(key, { force }).finally(() => {
+    inflightLoads.delete(inflightKey);
+  });
+
+  inflightLoads.set(inflightKey, promise);
+  return promise;
+}
+
+/**
  * Fetch and cache a spreadsheet.
  * Returns parsed rows (array of arrays for CSV, or JSON payload for gviz).
  */
-export async function loadSpreadsheet(key, { force = false } = {}) {
+async function loadSpreadsheetUncached(key, { force = false } = {}) {
   try {
     const entry = SPREADSHEETS[key];
     if (!entry) throw new Error(`Unknown spreadsheet key: ${key}`);
@@ -80,9 +99,11 @@ export async function loadSpreadsheet(key, { force = false } = {}) {
       // Filter columns if keepColumns is specified
       // Keep original indices but set unwanted columns to null to reduce size
       if (keepColumns && Array.isArray(keepColumns) && parsed && parsed.length > 0) {
-        const originalSize = JSON.stringify(parsed).length;
         const keepSet = new Set(keepColumns);
         const maxCol = Math.max(...keepColumns);
+        
+        // Calculate original size more safely for large datasets
+        const originalRowCount = parsed.length;
         
         parsed = parsed.map(row => {
           if (!Array.isArray(row)) return row;
@@ -93,8 +114,7 @@ export async function loadSpreadsheet(key, { force = false } = {}) {
           return filtered;
         });
         
-        const filteredSize = JSON.stringify(parsed).length;
-        console.log(`[loadSpreadsheet] ${key} - filtered columns, size: ${originalSize} -> ${filteredSize} bytes (${Math.round(filteredSize/originalSize*100)}%)`);
+        console.log(`[loadSpreadsheet] ${key} - filtered columns from ${originalRowCount} rows, keeping columns: ${keepColumns.join(',')}`);
       }
     } else if (type === 'gviz') {
       parsed = rowsText; // raw text → let caller parse gviz JSON (they already do)
@@ -104,9 +124,56 @@ export async function loadSpreadsheet(key, { force = false } = {}) {
 
     // Try to save to file storage
     try {
-      const jsonString = JSON.stringify(parsed);
+      // For large datasets, use streaming approach to avoid stack overflow
+      let jsonString;
+      
+      if (Array.isArray(parsed) && parsed.length > 1000) {
+        // Large dataset: build JSON string manually to avoid deep recursion
+        console.log(`[loadSpreadsheet] ${key} - large dataset (${parsed.length} rows), using manual JSON serialization`);
+        
+        const parts = ['['];
+        for (let i = 0; i < parsed.length; i++) {
+          if (i > 0) parts.push(',');
+          
+          const row = parsed[i];
+          if (Array.isArray(row)) {
+            // Manually serialize array to avoid JSON.stringify deep recursion
+            parts.push('[');
+            for (let j = 0; j < row.length; j++) {
+              if (j > 0) parts.push(',');
+              const cell = row[j];
+              if (cell === null || cell === undefined) {
+                parts.push('null');
+              } else if (typeof cell === 'string') {
+                // Escape quotes and backslashes
+                parts.push('"' + cell.replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"');
+              } else if (typeof cell === 'number' || typeof cell === 'boolean') {
+                parts.push(String(cell));
+              } else {
+                parts.push('null');
+              }
+            }
+            parts.push(']');
+          } else {
+            parts.push('null');
+          }
+        }
+        parts.push(']');
+        
+        jsonString = parts.join('');
+      } else {
+        // Normal dataset: use standard stringify
+        try {
+          jsonString = JSON.stringify(parsed);
+        } catch (stringifyError) {
+          console.warn(`[loadSpreadsheet] ${key} - JSON.stringify failed, using fallback:`, stringifyError.message);
+          // If stringify fails even on small dataset, skip caching but return data
+          return parsed;
+        }
+      }
+      
       await FileSystem.writeAsStringAsync(cacheFilePath, jsonString);
-      console.log(`[loadSpreadsheet] ${key} - saved to file cache (${jsonString.length} bytes)`);
+      console.log(`[loadSpreadsheet] ${key} - saved to file cache (${jsonString.length} bytes, ${parsed.length || 0} rows)`);
       
       // Clean up old AsyncStorage entry if exists
       try {
@@ -116,14 +183,7 @@ export async function loadSpreadsheet(key, { force = false } = {}) {
       }
     } catch (fileError) {
       console.warn(`[loadSpreadsheet] ${key} - failed to save to file cache:`, fileError.message);
-      // Try AsyncStorage as fallback
-      try {
-        await AsyncStorage.removeItem(`${DATA_PREFIX}:${key}`);
-        await AsyncStorage.setItem(`${DATA_PREFIX}:${key}`, JSON.stringify(parsed));
-        console.log(`[loadSpreadsheet] ${key} - saved to AsyncStorage fallback`);
-      } catch (storageError) {
-        console.warn(`[loadSpreadsheet] ${key} - cannot save to any storage:`, storageError.message);
-      }
+      // Don't try AsyncStorage for large datasets, just return the data uncached
     }
     
     // Return parsed data regardless of storage success
@@ -155,5 +215,131 @@ export async function loadSpreadsheet(key, { force = false } = {}) {
     }
     
     return null;
+  }
+}
+
+/**
+ * Get cache storage statistics
+ * Returns information about cache size and files
+ */
+export async function getCacheStats() {
+  try {
+    await ensureCacheDir();
+    
+    const files = await FileSystem.readDirectoryAsync(CACHE_DIR);
+    const stats = {
+      totalFiles: files.length,
+      totalSize: 0,
+      files: [],
+    };
+    
+    for (const file of files) {
+      try {
+        const filePath = `${CACHE_DIR}${file}`;
+        const info = await FileSystem.getInfoAsync(filePath);
+        
+        if (info.exists && info.size) {
+          stats.totalSize += info.size;
+          stats.files.push({
+            name: file,
+            size: info.size,
+            modificationTime: info.modificationTime,
+          });
+        }
+      } catch (fileError) {
+        console.warn(`[getCacheStats] Cannot read file ${file}:`, fileError.message);
+      }
+    }
+    
+    // Sort by size (largest first)
+    stats.files.sort((a, b) => b.size - a.size);
+    
+    console.log(`[getCacheStats] Total: ${stats.totalFiles} files, ${(stats.totalSize / 1024 / 1024).toFixed(2)} MB`);
+    return stats;
+  } catch (error) {
+    console.error('[getCacheStats] ERROR:', error.message);
+    return { totalFiles: 0, totalSize: 0, files: [] };
+  }
+}
+
+/**
+ * Clear specific cached spreadsheet
+ */
+export async function clearCache(key) {
+  try {
+    await ensureCacheDir();
+    const cacheFilePath = `${CACHE_DIR}${key}.json`;
+    
+    // Remove from file storage
+    const fileInfo = await FileSystem.getInfoAsync(cacheFilePath);
+    if (fileInfo.exists) {
+      await FileSystem.deleteAsync(cacheFilePath);
+      console.log(`[clearCache] Deleted file cache for ${key}`);
+    }
+    
+    // Remove from AsyncStorage
+    await AsyncStorage.removeItem(`${DATA_PREFIX}:${key}`);
+    console.log(`[clearCache] Cleared cache for ${key}`);
+    
+    return true;
+  } catch (error) {
+    console.error(`[clearCache] ERROR clearing ${key}:`, error.message);
+    return false;
+  }
+}
+
+/**
+ * Clear all cached spreadsheets
+ */
+export async function clearAllCache() {
+  try {
+    await ensureCacheDir();
+    
+    // Clear file storage
+    const files = await FileSystem.readDirectoryAsync(CACHE_DIR);
+    let deletedFiles = 0;
+    
+    for (const file of files) {
+      try {
+        const filePath = `${CACHE_DIR}${file}`;
+        await FileSystem.deleteAsync(filePath);
+        deletedFiles++;
+      } catch (fileError) {
+        console.warn(`[clearAllCache] Cannot delete ${file}:`, fileError.message);
+      }
+    }
+    
+    // Clear AsyncStorage
+    const allKeys = await AsyncStorage.getAllKeys();
+    const dataKeys = allKeys.filter(key => key.startsWith(DATA_PREFIX));
+    if (dataKeys.length > 0) {
+      await AsyncStorage.multiRemove(dataKeys);
+    }
+    
+    console.log(`[clearAllCache] Cleared ${deletedFiles} files and ${dataKeys.length} AsyncStorage entries`);
+    return { filesDeleted: deletedFiles, storageKeysDeleted: dataKeys.length };
+  } catch (error) {
+    console.error('[clearAllCache] ERROR:', error.message);
+    return { filesDeleted: 0, storageKeysDeleted: 0 };
+  }
+}
+
+/**
+ * Get list of all cached spreadsheet keys
+ */
+export async function getCachedKeys() {
+  try {
+    await ensureCacheDir();
+    
+    const files = await FileSystem.readDirectoryAsync(CACHE_DIR);
+    const keys = files
+      .filter(file => file.endsWith('.json'))
+      .map(file => file.replace('.json', ''));
+    
+    console.log(`[getCachedKeys] Found ${keys.length} cached spreadsheets`);
+    return keys;
+  } catch (error) {
+    console.error('[getCachedKeys] ERROR:', error.message);
+    return [];
   }
 }

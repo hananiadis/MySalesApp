@@ -7,11 +7,13 @@ import { useFocusEffect, useNavigation } from '@react-navigation/native';
 
 import CurvedBottomBar from '../components/CurvedBottomBar';
 import BrandHomeScreen from '../screens/BrandHomeScreen';
+import KivosHomeTab from '../screens/KivosHomeTab';
 import ProductsScreen from '../screens/ProductsScreen';
 import CustomersScreen from '../screens/CustomersScreen';
 import CataloguesScreen from '../screens/CataloguesScreen';
 import OrdersMgmtScreen from '../screens/OrdersMgmtScreen';
 import OrderScreen from '../screens/OrderScreen';
+import KivosWarehouseHome from '../screens/KivosWarehouseHome';
 import { normalizeBrandKey, SUPERMARKET_BRANDS } from '../constants/brands';
 
 const Tab = createBottomTabNavigator();
@@ -70,6 +72,10 @@ export default function BrandTabsNavigator({ navigation, route }) {
     () => SUPERMARKET_BRANDS.includes(brand),
     [brand]
   );
+  
+  // Check if we should use Kivos custom home tab
+  const useKivosHomeTab = route?.params?.useKivosHomeTab === true;
+  const HomeComponent = useKivosHomeTab ? KivosHomeTab : BrandHomeScreen;
 
   const handleFabPress = useCallback(() => {
     navigation.navigate('NewOrder', { brand });
@@ -83,34 +89,52 @@ export default function BrandTabsNavigator({ navigation, route }) {
   useFocusEffect(
     useCallback(() => {
       const onBackPress = () => {
-        const canNavigateTo = (navigatorRef, routeName) => {
-          const state = navigatorRef?.getState?.();
-          return state?.routeNames?.includes?.(routeName) ?? false;
-        };
+        // Get the current route name in the tab navigator
+        const state = navigation.getState();
+        const currentRoute = state?.routes?.[state?.index];
+        const currentRouteName = currentRoute?.name;
+        
+        console.log('[BrandTabsNavigator] Back pressed. Current route:', currentRouteName);
+        
+        // If on BrandHome tab, navigate back to MainHome
+        if (currentRouteName === 'BrandHome') {
+          console.log('[BrandTabsNavigator] On BrandHome - navigating to MainHome');
+          
+          const canNavigateTo = (navigatorRef, routeName) => {
+            const navState = navigatorRef?.getState?.();
+            return navState?.routeNames?.includes?.(routeName) ?? false;
+          };
 
-        const parentNavigator = navigation.getParent?.();
-        if (parentNavigator?.navigate) {
-          if (canNavigateTo(parentNavigator, 'MainHome')) {
-            parentNavigator.navigate('MainHome');
-            return true;
+          const parentNavigator = navigation.getParent?.();
+          if (parentNavigator?.navigate) {
+            if (canNavigateTo(parentNavigator, 'MainHome')) {
+              parentNavigator.navigate('MainHome');
+              return true;
+            }
           }
+          if (mainNavigation?.navigate) {
+            if (canNavigateTo(mainNavigation, 'MainHome')) {
+              mainNavigation.navigate('MainHome');
+              return true;
+            }
+            if (canNavigateTo(mainNavigation, 'Home')) {
+              mainNavigation.navigate('Home');
+              return true;
+            }
+          }
+          return false;
+        } else {
+          // If on any other tab (Products, Customers, Catalogues, OrdersMgmt, NewOrder)
+          // Navigate back to BrandHome tab
+          console.log('[BrandTabsNavigator] On sub-screen - navigating to BrandHome');
+          navigation.navigate('BrandHome', { brand });
+          return true;
         }
-        if (mainNavigation?.navigate) {
-          if (canNavigateTo(mainNavigation, 'MainHome')) {
-            mainNavigation.navigate('MainHome');
-            return true;
-          }
-          if (canNavigateTo(mainNavigation, 'Home')) {
-            mainNavigation.navigate('Home');
-            return true;
-          }
-        }
-        return false;
       };
 
       const subscription = BackHandler.addEventListener('hardwareBackPress', onBackPress);
       return () => subscription.remove();
-    }, [navigation, mainNavigation])
+    }, [navigation, mainNavigation, brand])
   );
 
   return (
@@ -137,7 +161,7 @@ export default function BrandTabsNavigator({ navigation, route }) {
     >
       <Tab.Screen
         name="BrandHome"
-        component={BrandHomeScreen}
+        component={HomeComponent}
         initialParams={{ brand, supportsSuperMarket }}
         options={{
           tabBarLabel: BRAND_LABELS.brandHome,
@@ -197,6 +221,19 @@ export default function BrandTabsNavigator({ navigation, route }) {
           }}
         />
       ) : null}
+      {brand === 'kivos' ? (
+        <Tab.Screen
+          name="KivosWarehouseHome"
+          component={KivosWarehouseHome}
+          initialParams={{ brand }}
+          options={{
+            tabBarLabel: 'Warehouse',
+            tabBarVisible: false,
+            tabBarButton: () => null,
+            unmountOnBlur: false,
+          }}
+        />
+      ) : null}
       <Tab.Screen
         name="NewOrder"
         component={OrderScreen}
@@ -211,4 +248,3 @@ export default function BrandTabsNavigator({ navigation, route }) {
     </Tab.Navigator>
   );
 }
-

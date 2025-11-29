@@ -167,13 +167,23 @@ export default function OrdersManagement() {
 
   // Check if user can filter orders by salesman
   const canFilterBySalesman = useMemo(() => {
-    return hasRole([ROLES.OWNER, ROLES.ADMIN, ROLES.DEVELOPER, ROLES.SALES_MANAGER]);
-  }, [hasRole, ROLES.OWNER, ROLES.ADMIN, ROLES.DEVELOPER, ROLES.SALES_MANAGER]);
+    const hasPermission = hasRole([ROLES.OWNER, ROLES.ADMIN, ROLES.DEVELOPER, ROLES.SALES_MANAGER]);
+    console.log('[OrdersManagement] canFilterBySalesman:', hasPermission, {
+      userRole: profile?.role,
+      requiredRoles: [ROLES.OWNER, ROLES.ADMIN, ROLES.DEVELOPER, ROLES.SALES_MANAGER]
+    });
+    return hasPermission;
+  }, [hasRole, profile?.role, ROLES.OWNER, ROLES.ADMIN, ROLES.DEVELOPER, ROLES.SALES_MANAGER]);
 
   // Check if user can access Firestore orders
   const canAccessFirestoreOrders = useMemo(() => {
-    return hasRole([ROLES.OWNER, ROLES.ADMIN, ROLES.DEVELOPER, ROLES.SALES_MANAGER]);
-  }, [hasRole, ROLES.OWNER, ROLES.ADMIN, ROLES.DEVELOPER, ROLES.SALES_MANAGER]);
+    const hasPermission = hasRole([ROLES.OWNER, ROLES.ADMIN, ROLES.DEVELOPER, ROLES.SALES_MANAGER]);
+    console.log('[OrdersManagement] canAccessFirestoreOrders:', hasPermission, {
+      userRole: profile?.role,
+      requiredRoles: [ROLES.OWNER, ROLES.ADMIN, ROLES.DEVELOPER, ROLES.SALES_MANAGER]
+    });
+    return hasPermission;
+  }, [hasRole, profile?.role, ROLES.OWNER, ROLES.ADMIN, ROLES.DEVELOPER, ROLES.SALES_MANAGER]);
 
   // Check if user should only see local orders
   const shouldOnlySeeLocalOrders = useMemo(() => {
@@ -275,28 +285,12 @@ export default function OrdersManagement() {
       if (!hasRole([ROLES.OWNER, ROLES.ADMIN, ROLES.DEVELOPER, ROLES.SALES_MANAGER])) {
         // Non-admin users: only their own orders
         filtered = filtered.filter(order => order.userId === profile?.uid);
-      } else if (hasRole([ROLES.SALES_MANAGER])) {
-        // Sales managers: orders from their managed salesmen
-        if (profile?.merchIds?.length > 0) {
-          const linkedUserIds = new Set();
-          
-          for (const merchId of profile.merchIds) {
-            if (typeof merchId === 'string' && merchId.includes('_')) {
-              // Find users linked to this salesman
-              const usersSnapshot = await firestore()
-                .collection('users')
-                .where('merchIds', 'array-contains', merchId)
-                .get();
-              
-              usersSnapshot.docs.forEach(doc => {
-                linkedUserIds.add(doc.data().uid || doc.id);
-              });
-            }
-          }
-          
-          filtered = filtered.filter(order => linkedUserIds.has(order.userId));
-        }
+      } else if (hasRole([ROLES.SALES_MANAGER]) && !hasRole([ROLES.OWNER, ROLES.ADMIN, ROLES.DEVELOPER])) {
+        // Sales managers (who are not also admins): only their own orders
+        // Note: Sales managers can use the salesman filter to view orders from linked salesmen
+        filtered = filtered.filter(order => order.userId === profile?.uid);
       }
+      // OWNER, ADMIN, DEVELOPER see all orders
       
       const cleaned = await purgeEmptyDrafts(filtered);
       cleaned.sort((a, b) => new Date(b?.updatedAt || b?.createdAt || 0) - new Date(a?.updatedAt || a?.createdAt || 0));
@@ -323,7 +317,6 @@ export default function OrdersManagement() {
           try {
             const snapshot = await firestore()
               .collection(collectionName)
-              .select('id', 'customerId', 'customer', 'userId', 'createdBy', 'createdAt', 'updatedAt', 'firestoreCreatedAt', 'status', 'sent', 'exportedAt', 'brand', 'netValue', 'finalValue', 'lines', 'orderType', 'storeName', 'storeCode', 'storeCategory')
               .orderBy('updatedAt', 'desc')
               .limit(100) // Limit for performance
               .get();
@@ -333,7 +326,6 @@ export default function OrdersManagement() {
               ...doc.data(),
               source: 'firestore',
               collection: collectionName,
-              isHeaderOnly: true // Flag to indicate we need to load full details later
             }));
             
             allFirestoreOrders.push(...collectionOrders);
@@ -341,8 +333,35 @@ export default function OrdersManagement() {
             console.log(`Error loading orders from ${collectionName}:`, error);
           }
         }
+      } else if (hasRole([ROLES.SALES_MANAGER]) && !hasRole([ROLES.OWNER, ROLES.ADMIN, ROLES.DEVELOPER])) {
+        // Sales managers (who are not also admins): only their own orders
+        // Note: They can use the salesman filter UI to view related orders (if they have admin role)
+        const collections = ['orders', 'orders_kivos', 'orders_john', 'orders_john_supermarket'];
+        
+        for (const collectionName of collections) {
+          try {
+            const snapshot = await firestore()
+              .collection(collectionName)
+              .where('userId', '==', profile.uid)
+              .orderBy('updatedAt', 'desc')
+              .limit(100)
+              .get();
+            
+            const collectionOrders = snapshot.docs.map(doc => ({
+              id: doc.id,
+              ...doc.data(),
+              source: 'firestore',
+              collection: collectionName,
+            }));
+            
+            allFirestoreOrders.push(...collectionOrders);
+          } catch (error) {
+            console.log(`[OrdersManagement] Error loading orders from ${collectionName}:`, error);
+          }
+        }
       } else if (hasRole([ROLES.SALES_MANAGER])) {
-        // Load orders from salesmen linked to this sales manager
+        // This case shouldn't happen, but keep it for backwards compatibility
+        // Sales managers with query access
         if (profile?.merchIds?.length > 0) {
           // Get all users linked to the salesmen this sales manager manages
           const linkedUserIds = new Set();
@@ -352,14 +371,20 @@ export default function OrdersManagement() {
               const salesmanName = merchId.split('_').slice(1).join('_');
               
               // Find users linked to this salesman
-              const usersSnapshot = await firestore()
-                .collection('users')
-                .where('merchIds', 'array-contains', merchId)
-                .get();
-              
-              usersSnapshot.docs.forEach(doc => {
-                linkedUserIds.add(doc.data().uid || doc.id);
-              });
+              try {
+                const usersSnapshot = await firestore()
+                  .collection('users')
+                  .where('merchIds', 'array-contains', merchId)
+                  .get();
+                
+                usersSnapshot.docs.forEach(doc => {
+                  linkedUserIds.add(doc.data().uid || doc.id);
+                });
+              } catch (error) {
+                console.warn('[OrdersManagement] Cannot query users collection:', error?.code);
+                // If we can't query users, skip this merchId
+                continue;
+              }
             }
           }
           
@@ -368,25 +393,25 @@ export default function OrdersManagement() {
           
           for (const collectionName of collections) {
             try {
-              const snapshot = await firestore()
-                .collection(collectionName)
-                .select('id', 'customerId', 'customer', 'userId', 'createdBy', 'createdAt', 'updatedAt', 'firestoreCreatedAt', 'status', 'sent', 'exportedAt', 'brand', 'netValue', 'finalValue', 'lines', 'orderType', 'storeName', 'storeCode', 'storeCategory')
-                .where('userId', 'in', Array.from(linkedUserIds))
-                .orderBy('updatedAt', 'desc')
-                .limit(100) // Limit for performance
-                .get();
-              
-              const collectionOrders = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data(),
-                source: 'firestore',
-                collection: collectionName,
-                isHeaderOnly: true // Flag to indicate we need to load full details later
-              }));
-              
-              allFirestoreOrders.push(...collectionOrders);
+              if (linkedUserIds.size > 0) {
+                const snapshot = await firestore()
+                  .collection(collectionName)
+                  .where('userId', 'in', Array.from(linkedUserIds))
+                  .orderBy('updatedAt', 'desc')
+                  .limit(100) // Limit for performance
+                  .get();
+                
+                const collectionOrders = snapshot.docs.map(doc => ({
+                  id: doc.id,
+                  ...doc.data(),
+                  source: 'firestore',
+                  collection: collectionName,
+                }));
+                
+                allFirestoreOrders.push(...collectionOrders);
+              }
             } catch (error) {
-              console.log(`Error loading orders from ${collectionName}:`, error);
+              console.log(`[OrdersManagement] Error loading orders from ${collectionName}:`, error);
             }
           }
         }
@@ -398,7 +423,6 @@ export default function OrdersManagement() {
           try {
             const snapshot = await firestore()
               .collection(collectionName)
-              .select('id', 'customerId', 'customer', 'userId', 'createdBy', 'createdAt', 'updatedAt', 'firestoreCreatedAt', 'status', 'sent', 'exportedAt', 'brand', 'netValue', 'finalValue', 'lines', 'orderType', 'storeName', 'storeCode', 'storeCategory')
               .where('userId', '==', profile.uid)
               .orderBy('updatedAt', 'desc')
               .limit(100) // Limit for performance
@@ -409,7 +433,6 @@ export default function OrdersManagement() {
               ...doc.data(),
               source: 'firestore',
               collection: collectionName,
-              isHeaderOnly: true // Flag to indicate we need to load full details later
             }));
             
             allFirestoreOrders.push(...collectionOrders);
@@ -431,6 +454,8 @@ export default function OrdersManagement() {
     
     setLoadingSalesmen(true);
     try {
+      console.log('[OrdersManagement] Loading salesmen for brands:', profile.brands);
+      
       // Get salesmen from the salesmen collection
       const salesmenSnapshot = await firestore()
         .collection('salesmen')
@@ -440,53 +465,117 @@ export default function OrdersManagement() {
       const salesmenData = salesmenSnapshot.docs.map(doc => ({
         id: doc.id,
         name: doc.data().name || doc.data().merch || 'Άγνωστος',
+        merch: doc.data().merch || doc.data().name || '',
         brand: doc.data().brand,
         ...doc.data()
       }));
       
-      // Get users who have these salesmen linked
-      const usersSnapshot = await firestore()
-        .collection('users')
-        .get();
+      console.log('[OrdersManagement] Loaded salesmen:', salesmenData.length);
+      console.log('[OrdersManagement] Sample salesmen:', salesmenData.slice(0, 3).map(s => ({ 
+        id: s.id, 
+        name: s.name, 
+        merch: s.merch, 
+        brand: s.brand 
+      })));
       
-      const usersData = usersSnapshot.docs.map(doc => ({
-        id: doc.id,
-        uid: doc.data().uid || doc.id,
-        name: doc.data().name || '',
-        email: doc.data().email || '',
-        merchIds: Array.isArray(doc.data().merchIds) ? doc.data().merchIds : [],
-        brands: Array.isArray(doc.data().brands) ? doc.data().brands : [],
-        ...doc.data()
-      }));
+      // For sales managers, we can only see current user's linked salesmen
+      // Build salesmen list with current user info only
+      const currentUserMerchIds = profile?.merchIds || [];
       
-      // Create a mapping of salesman names to user IDs
+      console.log('[OrdersManagement] Current user merchIds:', currentUserMerchIds);
+      
+      // Create a mapping of salesman identifiers using current user's merchIds
+      // merchId format: "brand_NAME" where NAME should match salesman.merch or salesman.name
       const salesmanToUsers = new Map();
       
-      usersData.forEach(user => {
-        if (user.merchIds && user.merchIds.length > 0) {
-          user.merchIds.forEach(merchId => {
-            // Extract salesman name from merchId (format: "brand_NAME")
-            if (typeof merchId === 'string' && merchId.includes('_')) {
-              const salesmanName = merchId.split('_').slice(1).join('_');
-              if (!salesmanToUsers.has(salesmanName)) {
-                salesmanToUsers.set(salesmanName, []);
-              }
-              salesmanToUsers.get(salesmanName).push(user);
-            }
+      currentUserMerchIds.forEach(merchId => {
+        if (typeof merchId === 'string' && merchId.includes('_')) {
+          const parts = merchId.split('_');
+          const brandPrefix = parts[0];
+          const salesmanName = parts.slice(1).join('_');
+          
+          // Create normalized keys for matching
+          const normalizedName = salesmanName.trim().toLowerCase();
+          
+          if (!salesmanToUsers.has(normalizedName)) {
+            salesmanToUsers.set(normalizedName, []);
+          }
+          salesmanToUsers.get(normalizedName).push({
+            uid: profile.uid,
+            name: profile.name || profile.email || 'Current User',
+            email: profile.email,
+          });
+          
+          console.log('[OrdersManagement] Mapping current user to salesman:', {
+            merchId,
+            brandPrefix,
+            salesmanName,
+            normalizedName,
           });
         }
       });
       
-      // Add user information to salesmen
-      const salesmenWithUsers = salesmenData.map(salesman => ({
-        ...salesman,
-        users: salesmanToUsers.get(salesman.name) || []
-      }));
+      console.log('[OrdersManagement] salesmanToUsers map size:', salesmanToUsers.size);
+      console.log('[OrdersManagement] salesmanToUsers keys:', Array.from(salesmanToUsers.keys()));
+      
+      // Add user information to salesmen with multiple matching strategies
+      const salesmenWithUsers = salesmenData.map(salesman => {
+        // Try multiple matching strategies
+        const normalizedName = (salesman.name || '').trim().toLowerCase();
+        const normalizedMerch = (salesman.merch || '').trim().toLowerCase();
+        
+        let users = [];
+        
+        // Strategy 1: Match by normalized name
+        if (salesmanToUsers.has(normalizedName)) {
+          users = salesmanToUsers.get(normalizedName);
+        }
+        // Strategy 2: Match by normalized merch field
+        else if (normalizedMerch && salesmanToUsers.has(normalizedMerch)) {
+          users = salesmanToUsers.get(normalizedMerch);
+        }
+        // Strategy 3: Try document ID
+        else if (salesmanToUsers.has(salesman.id.toLowerCase())) {
+          users = salesmanToUsers.get(salesman.id.toLowerCase());
+        }
+        
+        console.log('[OrdersManagement] Salesman matching:', {
+          salesmanId: salesman.id,
+          salesmanName: salesman.name,
+          salesmanMerch: salesman.merch,
+          normalizedName,
+          normalizedMerch,
+          foundUsers: users.length
+        });
+        
+        return {
+          ...salesman,
+          users
+        };
+      });
+      
+      console.log('[OrdersManagement] Final salesmen with users:', 
+        salesmenWithUsers.map(s => ({ 
+          name: s.name, 
+          merch: s.merch, 
+          userCount: s.users.length 
+        })));
       
       setSalesmen(salesmenWithUsers);
     } catch (error) {
-      console.error('Error loading salesmen:', error);
-      Alert.alert('Σφάλμα', 'Προέκυψε πρόβλημα κατά τη φόρτωση των πωλητών.');
+      console.error('[OrdersManagement] Error loading salesmen:', error);
+      console.error('[OrdersManagement] Error code:', error?.code);
+      console.error('[OrdersManagement] Error message:', error?.message);
+      
+      // If permission denied, it means user doesn't have access to salesmen collection
+      // This could be due to Firestore rules or authentication issues
+      if (error?.code === 'permission-denied') {
+        console.warn('[OrdersManagement] Permission denied - user may not have proper role or authentication');
+        // Set empty array but don't show error to user - they just won't see the filter
+        setSalesmen([]);
+      } else {
+        Alert.alert('Σφάλμα', 'Προέκυψε πρόβλημα κατά τη φόρτωση των πωλητών.');
+      }
     } finally {
       setLoadingSalesmen(false);
     }

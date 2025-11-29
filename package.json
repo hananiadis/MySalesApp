@@ -9,10 +9,13 @@
     "web": "expo start --web",
     "build:android": "eas build -p android --profile preview",
     "build:android-prod": "eas build -p android --profile production",
+    "build:release": "node scripts/update-version.js && cd android && gradlew assembleRelease",
+    "update-version": "node scripts/update-version.js",
     "prebuild": "expo prebuild",
     "prebuild:android": "expo prebuild --platform android",
     "test": "jest",
-    "eas:check": "eas build:configure"
+    "eas:check": "eas build:configure",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.2",
@@ -29,6 +32,9 @@
     "buffer": "^6.0.3",
     "exceljs": "^4.4.0",
     "expo": "~54.0.0",
+    "expo-barcode-scanner": "^13.0.1",
+    "expo-camera": "^15.0.16",
+    "expo-clipboard": "~6.0.3",
     "expo-file-system": "17.0.1",
     "expo-location": "~19.0.7",
     "expo-sharing": "~14.0.7",
@@ -38,6 +44,7 @@
     "lottie-react-native": "^7.3.4",
     "react": "19.1.0",
     "react-native": "0.81.4",
+    "react-native-chart-kit": "^6.12.0",
     "react-native-fs": "^2.20.0",
     "react-native-geolocation-service": "^5.3.1",
     "react-native-paper": "^5.12.3",
@@ -57,6 +64,7 @@
     "babel-preset-expo": "^54.0.4",
     "jest": "^29.7.0",
     "jest-expo": "~54.0.12",
+    "patch-package": "^8.0.1",
     "react-test-renderer": "19.1.0"
   },
   "private": true

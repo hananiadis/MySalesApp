@@ -75,6 +75,36 @@ sheet_playmobil_orders_2024: {
     type: 'gviz',
     ttlHours: 24,
   },
+  // Kivos KPI Sales Sheets
+  // Column structure: A=Date, B=DocType, C=CustomerCode, D=CustomerName, E=TotalAmount
+  kivosSales2025: {
+    key: 'sheet_kivos_sales_2025',
+    url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSiqthQnUaVTHPWjc3PNyQvFFV73dztRXxD2fXZM6WaAjD9H8CyP5OhwPKBOt9cHMknSm0GH-nmUIK3/pub?output=csv',
+    type: 'csv',
+    ttlHours: 12, // Refresh more frequently for current year
+    keepColumns: [0, 1, 2, 3, 4], // Date, DocType, CustomerCode, CustomerName, TotalAmount
+  },
+  kivosSales2024: {
+    key: 'sheet_kivos_sales_2024',
+    url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQpEzGDHsHJKXfyr3Z2z4PjCa7xpVX6JSafv1rDSNbpkp_8X1dXC-bHmMhyDdvgKxlfzlNVKprVQuAH/pub?output=csv',
+    type: 'csv',
+    ttlHours: 168, // Historical data, refresh weekly (7 days)
+    keepColumns: [0, 1, 2, 3, 4], // Date, DocType, CustomerCode, CustomerName, TotalAmount
+  },
+  kivosSales2023: {
+    key: 'sheet_kivos_sales_2023',
+    url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRL-wWy0sjpsaoPQpzBMhIhFiyDg2XGfS5VbHDjmvWPcJAQST0yxMKn_iPiDnhqmoZHzMgjAq4hfGG1/pub?output=csv',
+    type: 'csv',
+    ttlHours: 168, // Historical data, refresh weekly
+    keepColumns: [0, 1, 2, 3, 4], // Date, DocType, CustomerCode, CustomerName, TotalAmount
+  },
+  kivosSales2022: {
+    key: 'sheet_kivos_sales_2022',
+    url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQq3uY-Z-qCtjJ-RH-9bWfotaP1cPC-H-b5fDoyHRt4wcZ0QqT9Kw3e2pX0lGXO3Teew_gZ3y8uXbtu/pub?output=csv',
+    type: 'csv',
+    ttlHours: 720, // Historical data, refresh monthly (30 days)
+    keepColumns: [0, 1, 2, 3, 4], // Date, DocType, CustomerCode, CustomerName, TotalAmount
+  },
 
   // --- SUPERMARKET ---
   supermarketInventory: {

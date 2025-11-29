@@ -9,3 +9,6 @@ android/.gradle/
 firestore-import/node_modules/
 scripts/serviceAccountKey.json
 firestore-import/serviceAccountKey.json
+
+# Build counter (local build tracking)
+scripts/.build-counter.json

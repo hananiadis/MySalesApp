@@ -7,7 +7,7 @@ const KivosScreen = ({ navigation, route }) => {
   const mergedRoute = useMemo(
     () => ({
       ...route,
-      params: { ...(route?.params || {}), brand: 'kivos' },
+      params: { ...(route?.params || {}), brand: 'kivos', useKivosHomeTab: true },
     }),
     [route]
   );

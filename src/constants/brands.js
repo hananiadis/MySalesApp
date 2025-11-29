@@ -15,7 +15,7 @@ export const AVAILABLE_BRANDS = Object.keys(CUSTOMER_COLLECTIONS);
 export const BRAND_LABEL = {
   playmobil: 'Playmobil Hellas',
   john: 'John Hellas',
-  kivos: 'Ανανιάδου Αναστασία κ ΣΙΑ',
+  kivos: 'Kivos',
 };
 
 export const DEFAULT_BRAND = 'playmobil';

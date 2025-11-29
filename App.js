@@ -30,6 +30,7 @@ import CustomerDetailScreen from './src/screens/CustomerDetailScreen';
 import KivosCustomerDetailScreen from './src/screens/KivosCustomerDetailScreen';
 import JohnCustomerDetailScreen from './src/screens/JohnCustomerDetailScreen';
 import CustomerSalesSummary from './src/screens/CustomerSalesSummary';
+import CustomerMonthlySales from './src/screens/CustomerMonthlySales';
 import CustomerSalesDetail from './src/screens/CustomerSalesDetail';
 import OrdersManagementScreen from './src/screens/OrdersManagement';
 import OrderCustomerSelectScreen from './src/screens/OrderCustomerSelectScreen';
@@ -49,8 +50,15 @@ import SuperMarketProductSelectionScreen from './src/screens/SuperMarketProductS
 import SuperMarketOrderReviewScreen from './src/screens/SuperMarketOrderReviewScreen';
 import SuperMarketOrderSummaryScreen from './src/screens/SuperMarketOrderSummaryScreen';
 import SuperMarketStoreDetailsScreen from './src/screens/SuperMarketStoreDetailsScreen';
+import BrandContactsScreen from './src/screens/BrandContactsScreen';
+import SalesAnalyticsScreen from './src/screens/SalesAnalyticsScreen';
+import MonthlyComparisonScreen from './src/screens/MonthlyComparisonScreen';
+import KivosBrandStatisticsScreen from './src/screens/KivosBrandStatisticsScreen';
+import KivosCustomerHistoryScreen from './src/screens/KivosCustomerHistoryScreen';
+import CompanyInfoScreen from './src/screens/CompanyInfoScreen';
 import CustomerSalesSummaryTest from './src/screens/CustomerSalesSummaryTest';
 import TestKPI from './src/screens/TestKPI';
+import KivosWarehouseNavigator from './src/navigation/KivosWarehouseNavigator';
 
 // -------------------------------------------------------------
 const Stack = createNativeStackNavigator();
@@ -98,6 +106,7 @@ function AppNavigator() {
         <Stack.Screen name="KivosCustomerDetail" component={KivosCustomerDetailScreen} />
         <Stack.Screen name="JohnCustomerDetail" component={JohnCustomerDetailScreen} />
         <Stack.Screen name="CustomerSalesSummary" component={CustomerSalesSummary} />
+        <Stack.Screen name="CustomerMonthlySales" component={CustomerMonthlySales} />
         <Stack.Screen name="CustomerSalesDetail" component={CustomerSalesDetail} />
         <Stack.Screen name="OrdersManagement" component={OrdersManagementScreen} />
         <Stack.Screen name="OrderCustomerSelectScreen" component={OrderCustomerSelectScreen} />
@@ -110,6 +119,12 @@ function AppNavigator() {
         <Stack.Screen name="SuperMarketOrderReview" component={SuperMarketOrderReviewScreen} />
         <Stack.Screen name="SuperMarketOrderSummary" component={SuperMarketOrderSummaryScreen} />
         <Stack.Screen name="SuperMarketStoreDetails" component={SuperMarketStoreDetailsScreen} />
+        <Stack.Screen name="BrandContacts" component={BrandContactsScreen} />
+        <Stack.Screen name="SalesAnalytics" component={SalesAnalyticsScreen} />
+        <Stack.Screen name="MonthlyComparison" component={MonthlyComparisonScreen} />
+        <Stack.Screen name="KivosBrandStatistics" component={KivosBrandStatisticsScreen} />
+        <Stack.Screen name="KivosCustomerHistory" component={KivosCustomerHistoryScreen} />
+        <Stack.Screen name="CompanyInfo" component={CompanyInfoScreen} />
         <Stack.Screen name="Profile" component={ProfileScreen} />
         <Stack.Screen name="Settings" component={SettingsScreen} />
         <Stack.Screen name="UserManagement" component={UserManagementScreen} />
@@ -117,6 +132,7 @@ function AppNavigator() {
         <Stack.Screen name="Catalog" component={CataloguesScreen} />
         <Stack.Screen name="CustomerSalesSummaryTest" component={CustomerSalesSummaryTest} />
         <Stack.Screen name="TestKPI" component={TestKPI} />
+        <Stack.Screen name="KivosWarehouseNavigator" component={KivosWarehouseNavigator} />
       </Stack.Navigator>
     </>
   );

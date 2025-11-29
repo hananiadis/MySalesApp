@@ -67,11 +67,7 @@ export default function SuperMarketProductSelectionScreen({ navigation, route })
   const normalizedBrand = useMemo(() => normalizeBrandKey(brand || "john"), [brand]);
 
   const handleBackToStoreSelect = useCallback(() => {
-    if (navigation.canGoBack()) {
-      navigation.goBack();
-    } else {
-      navigation.navigate('SuperMarketStoreSelect', { brand: normalizedBrand });
-    }
+    navigation.navigate('BrandHome', { brand: normalizedBrand });
   }, [navigation, normalizedBrand]);
 
   useFocusEffect(
