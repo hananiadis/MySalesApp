@@ -242,50 +242,19 @@ export default function usePlaymobilKpi({
           orders2024: sheetsData.orders2024.length,
         });
 
-        // Determine reference date from sheet header dates
-        const headerDates = sheetsData._headerDates || {};
-        const invoicedHeader = headerDates.invoiced2025;
-        const ordersHeader = headerDates.orders2025;
+        // Determine reference date - use the one passed in by the user/component
+        // Do NOT override with sheet header dates - the user's selection takes priority
         let headerReferenceDate = referenceDate;
-        if (invoicedHeader) {
-          const d = invoicedHeader instanceof Date ? invoicedHeader : new Date(invoicedHeader);
-          if (!Number.isNaN(d.getTime())) headerReferenceDate = d;
-        } else if (ordersHeader) {
-          const d = ordersHeader instanceof Date ? ordersHeader : new Date(ordersHeader);
-          if (!Number.isNaN(d.getTime())) headerReferenceDate = d;
-        }
-        console.log('[usePlaymobilKpi] Header reference date (sales-first) selected:', headerReferenceDate.toISOString());
+        console.log('[usePlaymobilKpi] Using user-selected reference date:', headerReferenceDate.toISOString());
+        console.log('[usePlaymobilKpi] Reference date breakdown:', {
+          year: headerReferenceDate.getFullYear(),
+          month: headerReferenceDate.getMonth(),
+          day: headerReferenceDate.getDate(),
+          iso: headerReferenceDate.toISOString(),
+        });
 
         // Check cache for this specific filter combination
-        console.log('[usePlaymobilKpi] Checking cache for filter combination...');
-        const cachedResults = await getCachedResults('playmobil', activeMerchNames);
-        
-        if (cachedResults) {
-          console.log('[usePlaymobilKpi] Cache HIT! Using cached calculation results');
-          
-          // Use cached metrics but provide access to raw records
-          setKpis(cachedResults.kpis);
-          setCustomers(cachedResults.customers || []);
-          
-          // Store records for modal access
-          const recordSetsFromCache = {
-            invoiced: {
-              current: sheetsData.invoiced2025,
-              previous: sheetsData.invoiced2024,
-            },
-            orders: {
-              current: sheetsData.orders2025,
-              previous: sheetsData.orders2024,
-            },
-          };
-          setRecordSets(recordSetsFromCache);
-          
-          setStatus(STATUS.DONE);
-          
-          return; // Exit early with cached results
-        }
-        
-        console.log('[usePlaymobilKpi] Cache MISS - calculating fresh results');
+        console.log('[usePlaymobilKpi] Cache bypassed to respect reference date changes');
 
         // Calculate KPIs
         console.log('[usePlaymobilKpi] Calculating KPIs...');
@@ -310,21 +279,8 @@ export default function usePlaymobilKpi({
           },
         };
 
-        // Cache the calculation results for this filter combination
-        console.log('[usePlaymobilKpi] Caching calculation results for filter combination...');
-        try {
-          await setCachedResults('playmobil', activeMerchNames, {
-            kpis: kpiResult,
-            metricSnapshot: metricSnapshot,
-            customers: summary,
-          });
-          console.log('[usePlaymobilKpi] Results cached successfully for filter:', activeMerchNames);
-        } catch (cacheError) {
-          console.warn('[usePlaymobilKpi] Failed to cache results:', cacheError.message);
-          // Don't throw - we have the data, just can't cache it
-        }
-
-        console.log('[usePlaymobilKpi] KPI calculation complete');
+        // Cache disabled for Playmobil to ensure date changes take effect immediately
+        console.log('[usePlaymobilKpi] KPI calculation complete (no caching)');
         console.log('[usePlaymobilKpi] Final totals:', {
           invoiced: {
             yearly: kpiResult?.invoiced?.yearly?.current?.amount ?? 0,

@@ -4,11 +4,47 @@ google-services.plist
 .env
 config.js
 config.local.js
+
+# Secrets (never commit)
+serviceAccountKey.json
+**/serviceAccountKey.json
+
+# Dependencies
 node_modules/
+**/node_modules/
+
+# Expo / React Native
+.expo/
+**/.expo/
+
+# Android build / Gradle
 android/.gradle/
-firestore-import/node_modules/
-scripts/serviceAccountKey.json
-firestore-import/serviceAccountKey.json
+**/.gradle/
+android/app/build/
+**/android/app/build/
+android/build/
+**/android/build/
+**/.cxx/
+
+# Release/signing keys
+**/*.keystore
+**/*.jks
+**/*.p12
+
+# Build output
+dist/
+**/dist/
+build-output.log
+**/*.log
+
+# Local scratch / logs
+image_download_log.txt
+kpi-logs*.txt
+temp.txt
+tmp.txt
+
+# Editor
+.vscode/
 
 # Build counter (local build tracking)
 scripts/.build-counter.json

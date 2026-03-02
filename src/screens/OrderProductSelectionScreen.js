@@ -25,6 +25,10 @@ import { computeOrderTotals } from '../utils/orderTotals';
 import { getLocalImagePath } from '../utils/imageHelpers';
 import { calculateProductPrice, getOfferSummary } from '../services/kivosProductOffers';
 import { KIVOS_CHANNELS } from '../config/kivosChannels';
+import { useCustomerInventory } from '../hooks/useCustomerInventory';
+import CustomerInventoryBadge from '../components/CustomerInventoryBadge';
+import JOHN_CATEGORY_SORT_ORDER from '../constants/johnCategorySortOrder';
+
 
 export default function OrderProductSelectionScreen({ navigation, route }) {
   const insets = useSafeAreaInsets();
@@ -72,6 +76,10 @@ export default function OrderProductSelectionScreen({ navigation, route }) {
   const [search, setSearch] = useState('');
   const [kbPad, setKbPad] = useState(0);
   const [immediateStockMap, setImmediateStockMap] = useState(() => new Map());
+  
+  // Customer inventory integration
+  const customerId = orderCustomer?.id;
+  const { lines: inventoryLines, loading: inventoryLoading } = useCustomerInventory(customerId);
 
   useEffect(() => {
     let cancelled = false;
@@ -589,7 +597,24 @@ export default function OrderProductSelectionScreen({ navigation, route }) {
         generalNode.subs.get(subKey).items.push(product);
       }
 
-      const sheetNodes = Array.from(sheetMap.values()).sort((a, b) => a.title.localeCompare(b.title));
+      const customSort = (nodes, sortOrder) => {
+        if (!sortOrder || sortOrder.length === 0) {
+          return nodes.sort((a, b) => a.title.localeCompare(b.title));
+        }
+        return nodes.sort((a, b) => {
+          const indexA = sortOrder.indexOf(a.title);
+          const indexB = sortOrder.indexOf(b.title);
+          if (indexA !== -1 && indexB !== -1) return indexA - indexB;
+          if (indexA !== -1) return -1;
+          if (indexB !== -1) return 1;
+          return a.title.localeCompare(b.title);
+        });
+      };
+
+      const sheetNodes = customSort(
+        Array.from(sheetMap.values()),
+        JOHN_CATEGORY_SORT_ORDER.sheets
+      );
       for (const sheetNode of sheetNodes) {
         const sheetCollapsed = isCollapsed(sheetNode.id);
         rows.push({
@@ -604,42 +629,82 @@ export default function OrderProductSelectionScreen({ navigation, route }) {
           continue;
         }
 
-        const generalNodes = Array.from(sheetNode.generals.values()).sort((a, b) =>
-          a.title.localeCompare(b.title)
+        const generalSortOrder = JOHN_CATEGORY_SORT_ORDER.generalCategories[sheetNode.title] || [];
+        const generalNodes = customSort(
+          Array.from(sheetNode.generals.values()),
+          generalSortOrder
         );
+        
+        // Check if we should skip the general level (when sheet and only general have same name)
+        const shouldSkipGeneralLevel = generalNodes.length === 1 && generalNodes[0].title === sheetNode.title;
+        
         for (const generalNode of generalNodes) {
-          const generalCollapsed = isCollapsed(generalNode.id);
-          rows.push({
-            type: 'header',
-            id: generalNode.id,
-            title: generalNode.title,
-            count: generalNode.count,
-            collapsed: generalCollapsed,
-            level: 2,
-          });
-          if (generalCollapsed) {
-            continue;
-          }
-
-          const subNodes = Array.from(generalNode.subs.values()).sort((a, b) =>
-            a.title.localeCompare(b.title)
-          );
-          for (const subNode of subNodes) {
-            const subCollapsed = isCollapsed(subNode.id);
+          if (shouldSkipGeneralLevel) {
+            // Skip general level, show subcategories directly under sheet
+            const subSortOrder = JOHN_CATEGORY_SORT_ORDER.subCategories[generalNode.title] || [];
+            const subNodes = customSort(
+              Array.from(generalNode.subs.values()),
+              subSortOrder
+            );
+            
+            for (const subNode of subNodes) {
+              const subCollapsed = isCollapsed(subNode.id);
+              rows.push({
+                type: 'header',
+                id: subNode.id,
+                title: subNode.title,
+                count: subNode.items.length,
+                collapsed: subCollapsed,
+                level: 2, // Use level 2 since we skipped general
+              });
+              if (subCollapsed) {
+                continue;
+              }
+              
+              const sortedItems = subNode.items.slice().sort((a, b) => codeOf(a).localeCompare(codeOf(b)));
+              for (const product of sortedItems) {
+                rows.push({ type: 'item', parent: subNode.id, product });
+              }
+            }
+          } else {
+            // Normal flow: show general level
+            const generalCollapsed = isCollapsed(generalNode.id);
             rows.push({
               type: 'header',
-              id: subNode.id,
-              title: subNode.title,
-              count: subNode.items.length,
-              collapsed: subCollapsed,
-              level: 3,
+              id: generalNode.id,
+              title: generalNode.title,
+              count: generalNode.count,
+              collapsed: generalCollapsed,
+              level: 2,
             });
-            if (subCollapsed) {
+            if (generalCollapsed) {
               continue;
             }
-            const sortedItems = subNode.items.slice().sort((a, b) => codeOf(a).localeCompare(codeOf(b)));
-            for (const product of sortedItems) {
-              rows.push({ type: 'item', parent: subNode.id, product });
+
+            const subSortOrder = JOHN_CATEGORY_SORT_ORDER.subCategories[generalNode.title] || [];
+            const subNodes = customSort(
+              Array.from(generalNode.subs.values()),
+              subSortOrder
+            );
+            
+            for (const subNode of subNodes) {
+              const subCollapsed = isCollapsed(subNode.id);
+              rows.push({
+                type: 'header',
+                id: subNode.id,
+                title: subNode.title,
+                count: subNode.items.length,
+                collapsed: subCollapsed,
+                level: 3,
+              });
+              if (subCollapsed) {
+                continue;
+              }
+              
+              const sortedItems = subNode.items.slice().sort((a, b) => codeOf(a).localeCompare(codeOf(b)));
+              for (const product of sortedItems) {
+                rows.push({ type: 'item', parent: subNode.id, product });
+              }
             }
           }
         }
@@ -962,6 +1027,16 @@ export default function OrderProductSelectionScreen({ navigation, route }) {
                 </Text>
               )}
             </View>
+            {/* Customer Inventory Badge */}
+            {brand === 'playmobil' && inventoryLines && inventoryLines.length > 0 && (
+              <View style={{ marginTop: 6 }}>
+                <CustomerInventoryBadge 
+                  lines={inventoryLines}
+                  productId={product.id}
+                  variant="inline"
+                />
+              </View>
+            )}
           </TouchableOpacity>
         </View>
         <View style={styles.qtyRow}>

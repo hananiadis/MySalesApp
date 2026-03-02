@@ -15,7 +15,7 @@ import { normalizeBrandKey, BRAND_LABEL } from '../constants/brands';
 import PlaymobilKpiCards from '../components/PlaymobilKpiCards';
 import KpiDataModal from '../components/KpiDataModal';
 import usePlaymobilKpi from '../hooks/usePlaymobilKpi';
-import { refreshAllSheetsAndCache } from '../services/playmobilKpi';
+import { refreshAllSheetsAndCache, getAllSheetsData } from '../services/playmobilKpi';
 
 const BRAND_ART = {
   playmobil: require('../../assets/playmobil_logo.png'),
@@ -249,7 +249,26 @@ const BrandHomeScreen = ({ navigation, route }) => {
   // KPI state for Playmobil brand only
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [reloadToken, setReloadToken] = useState(0);
-  const [referenceDate] = useState(() => new Date());
+  // Date picker for KPI display (defaults to last update date: Jan 15, 2026)
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const defaultDate = new Date(2026, 0, 15);
+    console.log('[BrandHomeScreen] selectedDate initialized with:', {
+      date: defaultDate.toISOString(),
+      local: defaultDate.toString(),
+      year: defaultDate.getFullYear(),
+      month: defaultDate.getMonth(),
+      day: defaultDate.getDate(),
+    });
+    return defaultDate;
+  });
+  const referenceDate = selectedDate;
+  console.log('[BrandHomeScreen] Current referenceDate:', {
+    date: referenceDate.toISOString(),
+    local: referenceDate.toString(),
+    year: referenceDate.getFullYear(),
+    month: referenceDate.getMonth(),
+    day: referenceDate.getDate(),
+  });
   // Salesmen filter UI state (Playmobil only)
   // Start as undefined to distinguish "not loaded yet" from "loaded as null (all)"
   const [selectedSalesmenIds, setSelectedSalesmenIds] = useState(undefined);
@@ -324,6 +343,33 @@ const BrandHomeScreen = ({ navigation, route }) => {
     })();
   }, [isPlaymobil, userLinkedSalesmen, route?.params?.selectedSalesmenIds]);
 
+  // Initialize selectedDate from current year invoiced sheet header date (cell AD1)
+  useEffect(() => {
+    if (!isPlaymobil) return;
+    (async () => {
+      try {
+        const datasets = await getAllSheetsData();
+        const headerDates = datasets?._headerDates || null;
+        const currentYear = new Date().getFullYear();
+        const key = `invoiced${currentYear}`;
+        const headerDateValue = headerDates ? headerDates[key] : null;
+        if (headerDateValue) {
+          const parsed = toExcelDate(headerDateValue);
+          if (parsed) {
+            console.log('[BrandHomeScreen] Setting selectedDate from sheet header AD1:', {
+              key,
+              headerDateValue,
+              parsed: parsed.toISOString(),
+            });
+            setSelectedDate(parsed);
+          }
+        }
+      } catch (e) {
+        console.warn('[BrandHomeScreen] Failed to initialize selectedDate from header date:', e?.message);
+      }
+    })();
+  }, [isPlaymobil]);
+
   // Use the KPI hook only for Playmobil - wait for filter to initialize
   const {
     status,
@@ -379,10 +425,14 @@ const BrandHomeScreen = ({ navigation, route }) => {
       setIsRefreshing(true);
       const result = await refreshAllSheetsAndCache();
       console.log('[BrandHomeScreen] Sheets refreshed:', {
+        invoiced2026: result?.invoiced2026?.length,
         invoiced2025: result?.invoiced2025?.length,
         invoiced2024: result?.invoiced2024?.length,
+        orders2026: result?.orders2026?.length,
         orders2025: result?.orders2025?.length,
         orders2024: result?.orders2024?.length,
+        balance2026: result?.balance2026?.length,
+        balance2025: result?.balance2025?.length,
         headerDates: result?._headerDates,
       });
       // Write last sync timestamp
@@ -406,6 +456,7 @@ const BrandHomeScreen = ({ navigation, route }) => {
 
   const handleKpiCardPress = useCallback((dataset, periodType, metric) => {
     console.log('[BrandHomeScreen] KPI card pressed:', { dataset, periodType, metric });
+    console.log('[BrandHomeScreen] selectedDate:', selectedDate.toISOString(), selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
     console.log('[BrandHomeScreen] recordSets:', recordSets);
     console.log('[BrandHomeScreen] recordSets structure:', {
       hasRecordSets: !!recordSets,
@@ -413,8 +464,10 @@ const BrandHomeScreen = ({ navigation, route }) => {
       hasOrders: !!recordSets?.orders,
       invoicedCurrentLength: recordSets?.invoiced?.current?.length,
       invoicedPreviousLength: recordSets?.invoiced?.previous?.length,
+      invoicedTwoYearsAgoLength: recordSets?.invoiced?.twoYearsAgo?.length,
       orderCurrentLength: recordSets?.orders?.current?.length,
       orderPreviousLength: recordSets?.orders?.previous?.length,
+      orderTwoYearsAgoLength: recordSets?.orders?.twoYearsAgo?.length,
     });
     
     if (!recordSets) {
@@ -424,39 +477,48 @@ const BrandHomeScreen = ({ navigation, route }) => {
 
     const datasetTitle = dataset === 'invoiced' ? 'Τιμολογήσεις' : 'Παραγγελίες';
     
-    // Use sheet reference date instead of system date
-    const refDate = referenceMoment || new Date();
-    console.log('[BrandHomeScreen] Using reference date from sheet:', refDate.toISOString());
+    // Use the selectedDate from state, not referenceMoment
+    const refDate = selectedDate || new Date();
+    console.log('[BrandHomeScreen] Using reference date:', refDate.toISOString());
     
-    // Determine which records to show - include both current and previous year
+    // Determine which records to show - include all three years
     let currentRecords = [];
     let previousRecords = [];
+    let twoYearsAgoRecords = [];
     let title = '';
     let type = '';
 
     if (periodType === 'yearly') {
-      // For yearly cards, show top 25 from current year and previous year
+      // For yearly cards, show top 25 from current year and previous years
       type = 'yearly';
       const currentYearRecords = recordSets[dataset]?.current || [];
       const previousYearRecords = recordSets[dataset]?.previous || [];
+      const twoYearsAgoRecordsData = recordSets[dataset]?.twoYearsAgo || [];
       console.log('[BrandHomeScreen] Yearly - currentYearRecords length:', currentYearRecords.length);
       console.log('[BrandHomeScreen] Yearly - previousYearRecords length:', previousYearRecords.length);
+      console.log('[BrandHomeScreen] Yearly - twoYearsAgoRecords length:', twoYearsAgoRecordsData.length);
       currentRecords = currentYearRecords;
       previousRecords = previousYearRecords;
+      twoYearsAgoRecords = twoYearsAgoRecordsData;
       title = `${datasetTitle} - Top 25 Πελάτες (Ολόκληρο Έτος)`;
     } else if (periodType === 'ytd') {
-      // For YTD cards, filter to YTD range for both years using sheet reference date
+      // For YTD cards, filter to YTD range for all three years using selected reference date
       type = 'ytd';
       const currentYearRecords = recordSets[dataset]?.current || [];
       const previousYearRecords = recordSets[dataset]?.previous || [];
+      const twoYearsAgoRecordsData = recordSets[dataset]?.twoYearsAgo || [];
       console.log('[BrandHomeScreen] YTD - currentYearRecords length:', currentYearRecords.length);
       console.log('[BrandHomeScreen] YTD - previousYearRecords length:', previousYearRecords.length);
+      console.log('[BrandHomeScreen] YTD - twoYearsAgoRecords length:', twoYearsAgoRecordsData.length);
       
       // Filter to YTD (from Jan 1 to reference date)
       const currentMonth = refDate.getMonth();
       const currentDay = refDate.getDate();
       const currentYear = refDate.getFullYear();
       const previousYear = currentYear - 1;
+      const twoYearsAgoYear = currentYear - 2;
+      
+      console.log('[BrandHomeScreen] YTD - Years being used:', { currentYear, previousYear, twoYearsAgoYear, refDate: refDate.toISOString() });
       
       currentRecords = currentYearRecords.filter(record => {
         const recordDate = new Date(record.date || record.Date);
@@ -476,24 +538,39 @@ const BrandHomeScreen = ({ navigation, route }) => {
                (recordMonth === currentMonth && recordDay <= currentDay);
       });
       
+      twoYearsAgoRecords = twoYearsAgoRecordsData.filter(record => {
+        const recordDate = new Date(record.date || record.Date);
+        if (recordDate.getFullYear() !== twoYearsAgoYear) return false;
+        const recordMonth = recordDate.getMonth();
+        const recordDay = recordDate.getDate();
+        return (recordMonth < currentMonth) || 
+               (recordMonth === currentMonth && recordDay <= currentDay);
+      });
+      
       console.log('[BrandHomeScreen] YTD - filtered current records length:', currentRecords.length);
       console.log('[BrandHomeScreen] YTD - filtered previous records length:', previousRecords.length);
+      console.log('[BrandHomeScreen] YTD - filtered twoYearsAgo records length:', twoYearsAgoRecords.length);
       
       const monthName = refDate.toLocaleString('el-GR', { month: 'long' });
       title = `${datasetTitle} - YTD (1 Ιαν - ${currentDay} ${monthName})`;
     } else if (periodType === 'mtd') {
-      // For monthly cards, filter to current month for both years using sheet reference date
+      // For monthly cards, filter to current month for all three years using selected reference date
       type = 'monthly';
       const currentYearRecords = recordSets[dataset]?.current || [];
       const previousYearRecords = recordSets[dataset]?.previous || [];
+      const twoYearsAgoRecordsData = recordSets[dataset]?.twoYearsAgo || [];
       console.log('[BrandHomeScreen] MTD - currentYearRecords length:', currentYearRecords.length);
       console.log('[BrandHomeScreen] MTD - previousYearRecords length:', previousYearRecords.length);
+      console.log('[BrandHomeScreen] MTD - twoYearsAgoRecords length:', twoYearsAgoRecordsData.length);
       
       // Filter to current month only
       const currentMonth = refDate.getMonth();
       const currentDay = refDate.getDate();
       const currentYear = refDate.getFullYear();
       const previousYear = currentYear - 1;
+      const twoYearsAgoYear = currentYear - 2;
+      
+      console.log('[BrandHomeScreen] MTD - Years being used:', { currentYear, previousYear, twoYearsAgoYear, currentMonth, currentDay, refDate: refDate.toISOString() });
       
       currentRecords = currentYearRecords.filter(record => {
         const recordDate = new Date(record.date || record.Date);
@@ -509,8 +586,16 @@ const BrandHomeScreen = ({ navigation, route }) => {
                recordDate.getFullYear() === previousYear;
       });
       
+      twoYearsAgoRecords = twoYearsAgoRecordsData.filter(record => {
+        const recordDate = new Date(record.date || record.Date);
+        return recordDate.getMonth() === currentMonth && 
+               recordDate.getDate() <= currentDay &&
+               recordDate.getFullYear() === twoYearsAgoYear;
+      });
+      
       console.log('[BrandHomeScreen] MTD - filtered current records length:', currentRecords.length);
       console.log('[BrandHomeScreen] MTD - filtered previous records length:', previousRecords.length);
+      console.log('[BrandHomeScreen] MTD - filtered twoYearsAgo records length:', twoYearsAgoRecords.length);
       
       const monthName = refDate.toLocaleString('el-GR', { month: 'long' });
       title = `${datasetTitle} - ${monthName} MTD (1-${currentDay})`;
@@ -520,14 +605,19 @@ const BrandHomeScreen = ({ navigation, route }) => {
       title,
       currentRecordsLength: currentRecords.length,
       previousRecordsLength: previousRecords.length,
+      twoYearsAgoRecordsLength: twoYearsAgoRecords.length,
       type,
       sampleCurrentRecord: currentRecords[0],
-      samplePreviousRecord: previousRecords[0]
+      samplePreviousRecord: previousRecords[0],
+      sampleTwoYearsAgoRecord: twoYearsAgoRecords[0],
+      currentYear: refDate.getFullYear(),
+      previousYear: refDate.getFullYear() - 1,
+      twoYearsAgoYear: refDate.getFullYear() - 2,
     });
 
-    setModalData({ title, data: currentRecords, previousData: previousRecords, type });
+    setModalData({ title, data: currentRecords, previousData: previousRecords, twoYearsAgoData: twoYearsAgoRecords, type });
     setModalVisible(true);
-  }, [recordSets]);
+  }, [recordSets, selectedDate]);
 
   const navigateToStack = useCallback(
     (routeName, params) => {
@@ -721,6 +811,8 @@ const BrandHomeScreen = ({ navigation, route }) => {
               onCardPress={handleKpiCardPress}
               activeSalesmenIds={activeSalesmenIds}
               availableSalesmen={availableSalesmen}
+              selectedDate={selectedDate}
+              onDateChange={setSelectedDate}
             />
           )}
         </>
@@ -750,9 +842,11 @@ const BrandHomeScreen = ({ navigation, route }) => {
         title={modalData.title}
         data={modalData.data}
         previousData={modalData.previousData}
+        twoYearsAgoData={modalData.twoYearsAgoData}
         type={modalData.type}
         activeSalesmenIds={activeSalesmenIds}
         availableSalesmen={availableSalesmen}
+        selectedDate={selectedDate}
       />
     </SafeScreen>
   );

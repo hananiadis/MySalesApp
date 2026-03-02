@@ -13,6 +13,42 @@ const sortBy = (array, selector, direction = 'desc') =>
     return direction === 'asc' ? aVal - bVal : bVal - aVal;
   });
 
+const supplierExtraDiscount = (supplierBrandRaw) => {
+  if (!supplierBrandRaw) return 0;
+  const brand = String(supplierBrandRaw).toLowerCase();
+
+  const autofixBrands = ['logo', 'logo scripto', 'good', 'borg'];
+  const papazoglouBrands = ['artline', 'penac'];
+
+  if (autofixBrands.includes(brand)) return 0.2685; // 26.85%
+  if (papazoglouBrands.includes(brand)) return 0.2919; // 29.19%
+  if (brand === 'plus') return 0.2; // 20%
+
+  return 0;
+};
+
+const computeUnitCost = (product = {}, stock = {}) => {
+  // Prefer explicit unitCost if already set
+  const explicitCost = asNumber(stock.unitCost || product.unitCost);
+  if (explicitCost > 0) return explicitCost;
+
+  const basePrice =
+    asNumber(product.wholesalePrice) ||
+    asNumber(product.price) ||
+    asNumber(stock.price) ||
+    asNumber(stock.wholesalePrice);
+
+  if (!basePrice) return 0;
+
+  const discount = Math.max(asNumber(product.discount), asNumber(product.technicalDiscount), 0);
+  const supplierDiscount = supplierExtraDiscount(product.supplierBrand);
+
+  const afterProductDiscount = basePrice * (1 - Math.min(discount, 1));
+  const afterSupplierDiscount = afterProductDiscount * (1 - Math.min(supplierDiscount, 1));
+
+  return asNumber(afterSupplierDiscount);
+};
+
 export const getMergedStock = async () => {
   const [productsSnap, stockSnap] = await Promise.all([
     getDocs(query(collection(db, 'products_kivos'))),
@@ -41,12 +77,14 @@ export const getMergedStock = async () => {
       asNumber(product.rotationScore) ||
       (qtyOnHand > 0 ? velocity / Math.max(qtyOnHand, 1) : 0);
 
+    const unitCost = computeUnitCost(product, stock);
+
     return {
       productCode: product.productCode,
       name: product.name || product.title || product.productCode,
       lowStockLimit,
       qtyOnHand,
-      unitCost: asNumber(stock.unitCost || product.unitCost),
+      unitCost,
       outbound30d: asNumber(stock.outbound30d || product.outbound30d),
       velocity,
       rotationScore,

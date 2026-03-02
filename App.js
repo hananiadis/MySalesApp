@@ -12,12 +12,14 @@ import * as Font from 'expo-font';
 import { AuthProvider, useAuth } from './src/context/AuthProvider';
 import { OnlineStatusProvider } from './src/utils/OnlineStatusContext';
 import { OrderProvider } from './src/context/OrderContext';
+import { ExpenseProvider } from './src/context/ExpenseContext';
 
 // Components
 import OnlineStatusBanner from './src/utils/OnlineStatusBanner';
 import colors from './src/theme/colors';
 import AuthStack from './src/navigation/AuthStack';
 import MainTabsNavigator from './src/navigation/MainTabsNavigator';
+import InventoryService from './src/services/inventoryService';
 
 // Screens
 import PlaymobilScreen from './src/screens/PlaymobilScreen';
@@ -53,14 +55,22 @@ import SuperMarketStoreDetailsScreen from './src/screens/SuperMarketStoreDetails
 import BrandContactsScreen from './src/screens/BrandContactsScreen';
 import SalesAnalyticsScreen from './src/screens/SalesAnalyticsScreen';
 import MonthlyComparisonScreen from './src/screens/MonthlyComparisonScreen';
+import ScanInventoryScreen from './src/screens/ScanInventoryScreen';
+import InventoryUploadScreen from './src/screens/InventoryUploadScreen';
 import KivosBrandStatisticsScreen from './src/screens/KivosBrandStatisticsScreen';
 import KivosCustomerHistoryScreen from './src/screens/KivosCustomerHistoryScreen';
 import CompanyInfoScreen from './src/screens/CompanyInfoScreen';
 import CustomerSalesSummaryTest from './src/screens/CustomerSalesSummaryTest';
 import TestKPI from './src/screens/TestKPI';
 import KivosWarehouseNavigator from './src/navigation/KivosWarehouseNavigator';
-
-// -------------------------------------------------------------
+import FieldSalesProScreen from './src/screens/FieldSalesProScreen';
+import ExpenseTrackerScreen from './src/screens/ExpenseTrackerScreen';
+import ExpenseDetailScreen from './src/screens/ExpenseDetailScreen';
+import ExpenseReportsScreen from './src/screens/ExpenseReportsScreen';
+import WeeklyTrackingScreen from './src/screens/WeeklyTrackingScreen';
+import WeeklyReportScreen from './src/screens/WeeklyReportScreen';
+import ManagerWeeklyReportScreen from './src/screens/ManagerWeeklyReportScreen';
+import ManagerInboxScreen from './src/screens/ManagerInboxScreen';
 const Stack = createNativeStackNavigator();
 
 const loadFonts = async () => {
@@ -78,7 +88,21 @@ const loadFonts = async () => {
 
 // -------------------------------------------------------------
 function AppNavigator() {
-  const { init, user, loadingProfile } = useAuth();
+  const { init, user, loadingProfile, profile } = useAuth();
+
+  // Auto-sync inventory queue on user auth
+  useEffect(() => {
+    if (user?.uid) {
+      console.log('[AppNavigator] User authenticated → attempting inventory sync');
+      InventoryService.syncOfflineQueue(user.uid)
+        .then((result) => {
+          console.log('[AppNavigator] Inventory sync result:', result);
+        })
+        .catch((err) => {
+          console.error('[AppNavigator] Inventory sync error:', err);
+        });
+    }
+  }, [user?.uid]);
 
   if (init || loadingProfile) {
     console.log('⏳ [AppNavigator] Waiting for auth initialization...');
@@ -92,7 +116,7 @@ function AppNavigator() {
 
   console.log('✅ [AppNavigator] User authenticated → loading main app...');
   return (
-    <>
+    <ExpenseProvider userId={user?.uid} userRole={profile?.role || 'salesman'}>
       <OnlineStatusBanner />
       <Stack.Navigator screenOptions={{ headerShown: false }}>
         <Stack.Screen name="Home" component={MainTabsNavigator} />
@@ -133,8 +157,18 @@ function AppNavigator() {
         <Stack.Screen name="CustomerSalesSummaryTest" component={CustomerSalesSummaryTest} />
         <Stack.Screen name="TestKPI" component={TestKPI} />
         <Stack.Screen name="KivosWarehouseNavigator" component={KivosWarehouseNavigator} />
+        <Stack.Screen name="ScanInventory" component={ScanInventoryScreen} />
+        <Stack.Screen name="InventoryUpload" component={InventoryUploadScreen} />
+        <Stack.Screen name="FieldSalesPro" component={FieldSalesProScreen} />
+        <Stack.Screen name="ExpenseTracker" component={ExpenseTrackerScreen} />
+        <Stack.Screen name="ExpenseDetail" component={ExpenseDetailScreen} />
+        <Stack.Screen name="ExpenseReports" component={ExpenseReportsScreen} />
+        <Stack.Screen name="WeeklyTracking" component={WeeklyTrackingScreen} />
+        <Stack.Screen name="WeeklyReport" component={WeeklyReportScreen} />
+        <Stack.Screen name="ManagerWeeklyReport" component={ManagerWeeklyReportScreen} />
+        <Stack.Screen name="ManagerInbox" component={ManagerInboxScreen} />
       </Stack.Navigator>
-    </>
+    </ExpenseProvider>
   );
 }
 

@@ -2,7 +2,7 @@
   "expo": {
     "name": "MySalesApp",
     "slug": "mysalesapp",
-    "version": "0.4.48.2025.19",
+    "version": "0.4.6.2026.27",
     "orientation": "portrait",
     "userInterfaceStyle": "light",
     "icon": "./assets/app_icon.png",
@@ -39,7 +39,8 @@
         {
           "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location to capture order locations."
         }
-      ]
+      ],
+      "expo-asset"
     ]
   }
 }

@@ -95,18 +95,20 @@ export default function CustomerMonthlySales({ route, navigation }) {
           const { calculateCustomerMetrics } = await import('../services/playmobilCustomerMetrics');
           const metrics = await calculateCustomerMetrics(foundCustomer.customerCode);
           
+          const currentYear = new Date().getFullYear();
+          const previousYear = currentYear - 1;
+          
           console.log('[CustomerMonthlySales] Loaded Playmobil metrics:', {
-            hasInvoiced2025: !!metrics.records?.invoiced2025,
-            hasInvoiced2024: !!metrics.records?.invoiced2024,
-            hasOrders2025: !!metrics.records?.orders2025,
-            hasOrders2024: !!metrics.records?.orders2024,
-            invoiced2025Count: metrics.records?.invoiced2025?.length || 0,
-            invoiced2024Count: metrics.records?.invoiced2024?.length || 0,
+            [currentYear]: !!metrics.records?.[currentYear],
+            [previousYear]: !!metrics.records?.[previousYear],
+            [`orders${currentYear}`]: !!metrics.records?.[`orders${currentYear}`],
+            [`${currentYear}Count`]: metrics.records?.[currentYear]?.length || 0,
+            [`${previousYear}Count`]: metrics.records?.[previousYear]?.length || 0,
           });
           
           sales = {
-            current: metrics.records?.invoiced2025 || [],
-            previous: metrics.records?.invoiced2024 || []
+            current: metrics.records?.[currentYear] || [],
+            previous: metrics.records?.[previousYear] || []
           };
         } else if (brand === 'kivos') {
           const { getAllSheetsData } = await import('../services/kivosKpi');
@@ -115,19 +117,19 @@ export default function CustomerMonthlySales({ route, navigation }) {
           const sheetsData = await getAllSheetsData();
           
           console.log('[CustomerMonthlySales] Sheets data loaded:', {
-            sales2025Count: sheetsData.sales2025?.length || 0,
-            sales2024Count: sheetsData.sales2024?.length || 0,
+            [currentYear]: sheetsData[`sales${currentYear}`]?.length || 0,
+            [previousYear]: sheetsData[`sales${previousYear}`]?.length || 0,
           });
           
           // Filter records for this customer
           const customerCodeStr = String(foundCustomer.customerCode || foundCustomer.code || customerId).trim();
           
-          const current = (sheetsData.sales2025 || []).filter(record => {
+          const current = (sheetsData[`sales${currentYear}`] || []).filter(record => {
             const recordCode = String(record.customerCode || record.code || '').trim();
             return recordCode === customerCodeStr;
           });
           
-          const previous = (sheetsData.sales2024 || []).filter(record => {
+          const previous = (sheetsData[`sales${previousYear}`] || []).filter(record => {
             const recordCode = String(record.customerCode || record.code || '').trim();
             return recordCode === customerCodeStr;
           });

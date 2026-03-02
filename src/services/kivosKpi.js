@@ -121,8 +121,9 @@ export async function getAllSheetsData(options = {}) {
 
     console.log('[kivosKpi getAllSheetsData] Loading sheets from storage/network...');
 
-    // Load all 4 years of sales data
-    const [sales2025, sales2024, sales2023, sales2022] = await Promise.all([
+    // Load all years of sales data (including 2026)
+    const [sales2026, sales2025, sales2024, sales2023, sales2022] = await Promise.all([
+      loadSpreadsheet('kivosSales2026', { force: options.force }),
       loadSpreadsheet('kivosSales2025', { force: options.force }),
       loadSpreadsheet('kivosSales2024', { force: options.force }),
       loadSpreadsheet('kivosSales2023', { force: options.force }),
@@ -130,6 +131,7 @@ export async function getAllSheetsData(options = {}) {
     ]);
 
     console.log('[kivosKpi getAllSheetsData] Sheets loaded:', {
+      sales2026: sales2026?.length || 0,
       sales2025: sales2025?.length || 0,
       sales2024: sales2024?.length || 0,
       sales2023: sales2023?.length || 0,
@@ -138,27 +140,33 @@ export async function getAllSheetsData(options = {}) {
 
     // Parse and process each year's data
     const datasets = {
+      sales2026: parseKivosSalesData(sales2026, 2026),
       sales2025: parseKivosSalesData(sales2025, 2025),
       sales2024: parseKivosSalesData(sales2024, 2024),
       sales2023: parseKivosSalesData(sales2023, 2023),
       sales2022: parseKivosSalesData(sales2022, 2022),
     };
 
-    // Extract header date from 2025 sheet (first row, last cell)
+    // Extract header date from 2026 sheet (first row, last cell)
     let headerReferenceDate = null;
-    if (sales2025 && sales2025.length > 0 && sales2025[0].length > 0) {
-      const lastCell = sales2025[0][sales2025[0].length - 1];
+    if (sales2026 && sales2026.length > 0 && sales2026[0].length > 0) {
+      const lastCell = sales2026[0][sales2026[0].length - 1];
       if (lastCell) {
         const parsedDate = parseDate(lastCell);
         if (parsedDate) {
           headerReferenceDate = parsedDate;
-          console.log('[kivosKpi getAllSheetsData] Header reference date:', headerReferenceDate.toISOString());
+          console.log('[kivosKpi getAllSheetsData] Header reference date from 2026:', headerReferenceDate.toISOString());
         }
       }
     }
 
+    // Store all year header dates
     datasets._headerDates = {
+      sales2026: headerReferenceDate,
       sales2025: headerReferenceDate,
+      sales2024: headerReferenceDate,
+      sales2023: headerReferenceDate,
+      sales2022: headerReferenceDate,
     };
 
     // Store in memory cache
@@ -169,6 +177,7 @@ export async function getAllSheetsData(options = {}) {
     };
 
     console.log('[kivosKpi getAllSheetsData] Records:', {
+      sales2026: datasets.sales2026.length,
       sales2025: datasets.sales2025.length,
       sales2024: datasets.sales2024.length,
       sales2023: datasets.sales2023.length,
@@ -233,7 +242,7 @@ function parseKivosSalesData(rows, year) {
     if (!dateStr || !customerCode || !totalWithVAT) continue;
 
     // Parse date
-    const date = parseDate(dateStr);
+    const date = parseDate(dateStr, year);
     if (!date) {
       skippedDates++;
       if (dateIssues.length < 5) {
@@ -324,7 +333,7 @@ function parseKivosSalesData(rows, year) {
  * Parse date string in various formats
  * Tries to intelligently detect MM/DD/YYYY vs DD/MM/YYYY
  */
-function parseDate(dateStr) {
+function parseDate(dateStr, expectedYear = null) {
   if (!dateStr) return null;
   
   const str = String(dateStr).trim();
@@ -351,6 +360,24 @@ function parseDate(dateStr) {
                      dmyDate.getMonth() === secondNum - 1 && 
                      dmyDate.getFullYear() === yearNum;
     
+    // If an expectedYear is provided, prefer the interpretation matching it
+    if (expectedYear && Number.isFinite(expectedYear)) {
+      if (dmyValid && dmyDate.getFullYear() === expectedYear && !mdyValid) {
+        return dmyDate;
+      }
+      if (mdyValid && mdyDate.getFullYear() === expectedYear && !dmyValid) {
+        return mdyDate;
+      }
+      // If both are valid for the same year, apply year-specific preference:
+      // From 2026 onward, prefer DD/MM/YYYY due to sheet change.
+      if (dmyValid && mdyValid) {
+        if (expectedYear >= 2026) {
+          return dmyDate;
+        }
+        return mdyDate;
+      }
+    }
+
     // If both are valid, use heuristic: if first > 12, must be DD/MM/YYYY
     if (firstNum > 12) {
       return dmyValid ? dmyDate : null;
@@ -360,12 +387,13 @@ function parseDate(dateStr) {
       return mdyValid ? mdyDate : null;
     }
     // If both are valid and ambiguous, prefer MM/DD/YYYY for Kivos data
-    // (based on user's observation that Kivos uses MM/DD/YYYY)
-    if (mdyValid) {
-      return mdyDate;
-    }
-    if (dmyValid) {
-      return dmyDate;
+    // Prior to 2026. From 2026 onward, prefer DD/MM/YYYY.
+    if (expectedYear && expectedYear >= 2026) {
+      if (dmyValid) return dmyDate;
+      if (mdyValid) return mdyDate;
+    } else {
+      if (mdyValid) return mdyDate;
+      if (dmyValid) return dmyDate;
     }
   }
   
@@ -439,9 +467,9 @@ export async function calculateKPIs(customerCodes, referenceDate = new Date(), o
     
     // Get header reference date if available
     let refMoment = referenceDate;
-    if (sheetsData._headerDates?.sales2025) {
-      refMoment = sheetsData._headerDates.sales2025;
-      console.log('[kivosKpi calculateKPIs] Using header reference date:', refMoment.toISOString());
+    if (sheetsData._headerDates?.sales2026) {
+      refMoment = sheetsData._headerDates.sales2026;
+      console.log('[kivosKpi calculateKPIs] Using header reference date from 2026:', refMoment.toISOString());
     }
 
     const refYear = refMoment.getFullYear();
@@ -457,6 +485,10 @@ export async function calculateKPIs(customerCodes, referenceDate = new Date(), o
     console.log('[kivosKpi calculateKPIs] Looking for customer codes:', Array.from(customerSet));
     
     const filteredData = {
+      sales2026: sheetsData.sales2026.filter(r => {
+        const normalized = String(r.customerCode || '').trim().toUpperCase();
+        return customerSet.has(normalized);
+      }),
       sales2025: sheetsData.sales2025.filter(r => {
         const normalized = String(r.customerCode || '').trim().toUpperCase();
         return customerSet.has(normalized);
@@ -476,15 +508,16 @@ export async function calculateKPIs(customerCodes, referenceDate = new Date(), o
     };
 
     console.log('[kivosKpi calculateKPIs] Filtered records:', {
+      sales2026: filteredData.sales2026.length,
       sales2025: filteredData.sales2025.length,
       sales2024: filteredData.sales2024.length,
       sales2023: filteredData.sales2023.length,
       sales2022: filteredData.sales2022.length,
     });
     
-    // Log a sample of unmatched records from 2025 for debugging
-    if (filteredData.sales2025.length === 0 && sheetsData.sales2025.length > 0) {
-      const sampleCodes = sheetsData.sales2025
+    // Log a sample of unmatched records from 2026 for debugging
+    if (filteredData.sales2026.length === 0 && sheetsData.sales2026.length > 0) {
+      const sampleCodes = sheetsData.sales2026
         .slice(0, 10)
         .map(r => String(r.customerCode || '').trim().toUpperCase());
       console.log('[kivosKpi calculateKPIs] Sample customer codes in sheet (first 10):', sampleCodes);
@@ -493,10 +526,27 @@ export async function calculateKPIs(customerCodes, referenceDate = new Date(), o
     // Calculate YTD (Year-To-Date) metrics
     const ytdFilter = (record) => {
       const d = record.date;
-      return (d.getMonth() < refMonth) || 
+      const result = (d.getMonth() < refMonth) || 
              (d.getMonth() === refMonth && d.getDate() <= refDay);
+      return result;
     };
 
+    const ytd2026Records = filteredData.sales2026.filter(ytdFilter);
+    console.log('[kivosKpi] YTD 2026 filter:', {
+      refYear,
+      refMonth,
+      refDay,
+      totalRecords: filteredData.sales2026.length,
+      ytdRecords: ytd2026Records.length,
+      sampleDates: ytd2026Records.slice(0, 3).map(r => ({
+        date: r.date?.toISOString(),
+        month: r.date?.getMonth(),
+        day: r.date?.getDate(),
+        amount: r.amount
+      }))
+    });
+
+    const ytd2026 = sumRecords(ytd2026Records);
     const ytd2025 = sumRecords(filteredData.sales2025.filter(ytdFilter));
     const ytd2024 = sumRecords(filteredData.sales2024.filter(ytdFilter));
     const ytd2023 = sumRecords(filteredData.sales2023.filter(ytdFilter));
@@ -508,21 +558,37 @@ export async function calculateKPIs(customerCodes, referenceDate = new Date(), o
       return d.getMonth() === refMonth && d.getDate() <= refDay;
     };
 
+    const mtd2026Records = filteredData.sales2026.filter(mtdFilter);
+    console.log('[kivosKpi] MTD 2026 filter:', {
+      refMonth,
+      refDay,
+      totalRecords: filteredData.sales2026.length,
+      mtdRecords: mtd2026Records.length,
+      sampleDates: mtd2026Records.slice(0, 3).map(r => ({
+        date: r.date?.toISOString(),
+        month: r.date?.getMonth(),
+        day: r.date?.getDate(),
+        amount: r.amount
+      }))
+    });
+
+    const mtd2026 = sumRecords(mtd2026Records);
     const mtd2025 = sumRecords(filteredData.sales2025.filter(mtdFilter));
     const mtd2024 = sumRecords(filteredData.sales2024.filter(mtdFilter));
     const mtd2023 = sumRecords(filteredData.sales2023.filter(mtdFilter));
     const mtd2022 = sumRecords(filteredData.sales2022.filter(mtdFilter));
 
     // Calculate full year metrics
+    const yearly2026 = sumRecords(filteredData.sales2026);
     const yearly2025 = sumRecords(filteredData.sales2025);
     const yearly2024 = sumRecords(filteredData.sales2024);
     const yearly2023 = sumRecords(filteredData.sales2023);
     const yearly2022 = sumRecords(filteredData.sales2022);
 
-    // Calculate percentage changes
-    const ytdChange = calculatePercentageChange(ytd2025.amount, ytd2024.amount);
-    const mtdChange = calculatePercentageChange(mtd2025.amount, mtd2024.amount);
-    const yearlyChange = calculatePercentageChange(yearly2025.amount, yearly2024.amount);
+    // Calculate percentage changes (compare 2026 to 2025, 2025 to 2024, etc.)
+    const ytdChange = calculatePercentageChange(ytd2026.amount, ytd2025.amount);
+    const mtdChange = calculatePercentageChange(mtd2026.amount, mtd2025.amount);
+    const yearlyChange = calculatePercentageChange(yearly2026.amount, yearly2025.amount);
 
     const result = {
       referenceMoment: refMoment,
@@ -532,10 +598,15 @@ export async function calculateKPIs(customerCodes, referenceDate = new Date(), o
         day: refDay,
       },
       sales: {
+        year2026: {
+          ytd: { amount: ytd2026.amount, customers: ytd2026.customers, diff: { percent: ytdChange } },
+          mtd: { amount: mtd2026.amount, customers: mtd2026.customers, diff: { percent: mtdChange } },
+          yearly: { amount: yearly2026.amount, customers: yearly2026.customers, diff: { percent: yearlyChange } },
+        },
         year2025: {
-          ytd: { amount: ytd2025.amount, customers: ytd2025.customers, diff: { percent: ytdChange } },
-          mtd: { amount: mtd2025.amount, customers: mtd2025.customers, diff: { percent: mtdChange } },
-          yearly: { amount: yearly2025.amount, customers: yearly2025.customers, diff: { percent: yearlyChange } },
+          ytd: { amount: ytd2025.amount, customers: ytd2025.customers },
+          mtd: { amount: mtd2025.amount, customers: mtd2025.customers },
+          yearly: { amount: yearly2025.amount, customers: yearly2025.customers },
         },
         year2024: {
           ytd: { amount: ytd2024.amount, customers: ytd2024.customers },
@@ -554,6 +625,7 @@ export async function calculateKPIs(customerCodes, referenceDate = new Date(), o
         },
       },
       records: {
+        year2026: filteredData.sales2026,
         year2025: filteredData.sales2025,
         year2024: filteredData.sales2024,
         year2023: filteredData.sales2023,

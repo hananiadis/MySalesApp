@@ -471,7 +471,7 @@ const KivosStockAdjust = ({ navigation }) => {
       {scannerVisible ? (
         <View style={styles.scannerWrapper}>
           {scannerPermission === false ? (
-            <Text style={styles.statusText}>I"I�I� I'IOI,I�I�I� I�I'I�I1I� I�I�I�I�I?I�I,.</Text>
+            <Text style={styles.statusText}>Δεν έχει δοθεί άδεια κάμερας.</Text>
           ) : (
             <BarCodeScanner
               onBarCodeScanned={({ data }) => {

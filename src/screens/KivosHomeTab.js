@@ -342,32 +342,41 @@ const KivosHomeTab = ({ navigation, route }) => {
     // Use sheet reference date
     const refDate = referenceMoment || new Date();
     
-    // Determine which records to show - include all 4 years
-    let current2025 = [];
-    let previous2024 = [];
+    // Determine which records to show - include all 4 years (2026, 2025, 2024, 2023)
+    let current2026 = [];
+    let previous2025 = [];
+    let twoYearsAgo2024 = [];
     let year2023 = [];
-    let year2022 = [];
     let title = '';
     let type = '';
 
     if (periodType === 'yearly') {
       type = 'yearly';
-      current2025 = recordSets.sales?.year2025 || [];
-      previous2024 = recordSets.sales?.year2024 || [];
+      current2026 = recordSets.sales?.year2026 || [];
+      previous2025 = recordSets.sales?.year2025 || [];
+      twoYearsAgo2024 = recordSets.sales?.year2024 || [];
       year2023 = recordSets.sales?.year2023 || [];
-      year2022 = recordSets.sales?.year2022 || [];
       title = `${datasetTitle} - Top 25 Πελάτες (Ολόκληρο Έτος)`;
     } else if (periodType === 'ytd') {
       type = 'ytd';
+      const allRecords2026 = recordSets.sales?.year2026 || [];
       const allRecords2025 = recordSets.sales?.year2025 || [];
       const allRecords2024 = recordSets.sales?.year2024 || [];
       const allRecords2023 = recordSets.sales?.year2023 || [];
-      const allRecords2022 = recordSets.sales?.year2022 || [];
       
       const currentMonth = refDate.getMonth();
       const currentDay = refDate.getDate();
       
-      current2025 = allRecords2025.filter(record => {
+      current2026 = allRecords2026.filter(record => {
+        const recordDate = new Date(record.date);
+        if (recordDate.getFullYear() !== 2026) return false;
+        const recordMonth = recordDate.getMonth();
+        const recordDay = recordDate.getDate();
+        return (recordMonth < currentMonth) || 
+               (recordMonth === currentMonth && recordDay <= currentDay);
+      });
+      
+      previous2025 = allRecords2025.filter(record => {
         const recordDate = new Date(record.date);
         if (recordDate.getFullYear() !== 2025) return false;
         const recordMonth = recordDate.getMonth();
@@ -376,7 +385,7 @@ const KivosHomeTab = ({ navigation, route }) => {
                (recordMonth === currentMonth && recordDay <= currentDay);
       });
       
-      previous2024 = allRecords2024.filter(record => {
+      twoYearsAgo2024 = allRecords2024.filter(record => {
         const recordDate = new Date(record.date);
         if (recordDate.getFullYear() !== 2024) return false;
         const recordMonth = recordDate.getMonth();
@@ -394,35 +403,33 @@ const KivosHomeTab = ({ navigation, route }) => {
                (recordMonth === currentMonth && recordDay <= currentDay);
       });
       
-      year2022 = allRecords2022.filter(record => {
-        const recordDate = new Date(record.date);
-        if (recordDate.getFullYear() !== 2022) return false;
-        const recordMonth = recordDate.getMonth();
-        const recordDay = recordDate.getDate();
-        return (recordMonth < currentMonth) || 
-               (recordMonth === currentMonth && recordDay <= currentDay);
-      });
-      
       const monthName = refDate.toLocaleString('el-GR', { month: 'long' });
       title = `${datasetTitle} - YTD (1 Ιαν - ${currentDay} ${monthName})`;
     } else if (periodType === 'mtd') {
       type = 'monthly';
+      const allRecords2026 = recordSets.sales?.year2026 || [];
       const allRecords2025 = recordSets.sales?.year2025 || [];
       const allRecords2024 = recordSets.sales?.year2024 || [];
       const allRecords2023 = recordSets.sales?.year2023 || [];
-      const allRecords2022 = recordSets.sales?.year2022 || [];
       
       const currentMonth = refDate.getMonth();
       const currentDay = refDate.getDate();
       
-      current2025 = allRecords2025.filter(record => {
+      current2026 = allRecords2026.filter(record => {
+        const recordDate = new Date(record.date);
+        return recordDate.getMonth() === currentMonth && 
+               recordDate.getDate() <= currentDay &&
+               recordDate.getFullYear() === 2026;
+      });
+      
+      previous2025 = allRecords2025.filter(record => {
         const recordDate = new Date(record.date);
         return recordDate.getMonth() === currentMonth && 
                recordDate.getDate() <= currentDay &&
                recordDate.getFullYear() === 2025;
       });
       
-      previous2024 = allRecords2024.filter(record => {
+      twoYearsAgo2024 = allRecords2024.filter(record => {
         const recordDate = new Date(record.date);
         return recordDate.getMonth() === currentMonth && 
                recordDate.getDate() <= currentDay &&
@@ -436,23 +443,16 @@ const KivosHomeTab = ({ navigation, route }) => {
                recordDate.getFullYear() === 2023;
       });
       
-      year2022 = allRecords2022.filter(record => {
-        const recordDate = new Date(record.date);
-        return recordDate.getMonth() === currentMonth && 
-               recordDate.getDate() <= currentDay &&
-               recordDate.getFullYear() === 2022;
-      });
-      
       const monthName = refDate.toLocaleString('el-GR', { month: 'long' });
       title = `${datasetTitle} - ${monthName} MTD (1-${currentDay})`;
     }
 
     setModalData({ 
       title, 
-      data: current2025, 
-      previousData: previous2024,
+      data: current2026, 
+      previousData: previous2025,
+      twoYearsAgoData: twoYearsAgo2024,
       year2023Data: year2023,
-      year2022Data: year2022,
       type 
     });
     setModalVisible(true);
@@ -681,11 +681,12 @@ const KivosHomeTab = ({ navigation, route }) => {
         title={modalData.title}
         data={modalData.data}
         previousData={modalData.previousData}
+        twoYearsAgoData={modalData.twoYearsAgoData}
         year2023Data={modalData.year2023Data}
-        year2022Data={modalData.year2022Data}
         type={modalData.type}
         activeSalesmenIds={activeSalesmenIds}
         availableSalesmen={availableSalesmen}
+        selectedDate={referenceMoment || new Date()}
       />
     </SafeScreen>
   );

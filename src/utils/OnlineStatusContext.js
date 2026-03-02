@@ -4,6 +4,7 @@
 // -------------------------------------------------------------
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import NetInfo from '@react-native-community/netinfo';
+import InventoryService from '../services/inventoryService';
 
 const OnlineStatusContext = createContext({ isConnected: true });
 export const useOnlineStatus = () => useContext(OnlineStatusContext);
@@ -16,11 +17,24 @@ export const OnlineStatusProvider = ({ children }) => {
   useEffect(() => {
     console.log('🌍 [OnlineStatusProvider] Subscribing to NetInfo listener...');
     const unsubscribe = NetInfo.addEventListener((state) => {
+      const isOnline = !!state.isConnected;
       console.log(
         '📶 [OnlineStatusProvider] Connection changed:',
-        state.isConnected
+        isOnline
       );
-      setIsConnected(!!state.isConnected);
+      setIsConnected(isOnline);
+      
+      // Auto-sync inventory queue when coming online
+      if (isOnline) {
+        console.log('[OnlineStatusProvider] Network online → attempting inventory sync');
+        InventoryService.syncOfflineQueue()
+          .then((result) => {
+            console.log('[OnlineStatusProvider] Inventory sync result:', result);
+          })
+          .catch((err) => {
+            console.error('[OnlineStatusProvider] Inventory sync error:', err);
+          });
+      }
     });
 
     return () => {

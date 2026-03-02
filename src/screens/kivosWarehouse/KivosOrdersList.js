@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
   Modal,
   ScrollView,
@@ -21,8 +22,16 @@ import firestore from '@react-native-firebase/firestore';
 
 import SafeScreen from '../../components/SafeScreen';
 import colors from '../../theme/colors';
+import { computeOrderTotals } from '../../utils/orderTotals';
 
 const KivosOrdersList = ({ navigation }) => {
+  const statusOptions = [
+    { value: 'sent', label: 'Sent' },
+    { value: 'packed', label: 'Packed' },
+    { value: 'backorder', label: 'Backorder' },
+    { value: 'pending', label: 'Pending' },
+  ];
+
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -33,6 +42,12 @@ const KivosOrdersList = ({ navigation }) => {
   const [summaryLoading, setSummaryLoading] = useState(false);
   const [summaryError, setSummaryError] = useState(null);
   const [summaryOrder, setSummaryOrder] = useState(null);
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const [deleting, setDeleting] = useState(false);
+  const [statusFilters, setStatusFilters] = useState(
+    () => new Set(statusOptions.map((s) => s.value))
+  );
+  const [statusFilterOpen, setStatusFilterOpen] = useState(false);
 
   useLayoutEffect(() => {
     navigation.setOptions({ headerShown: false });
@@ -53,7 +68,8 @@ const KivosOrdersList = ({ navigation }) => {
             payload.customer?.name ||
             payload.customer?.displayName ||
             '';
-          const status = payload.status || 'Pending';
+          const statusLabel = payload.status || 'Pending';
+          const status = statusLabel.toLowerCase();
           const createdAtRaw =
             payload.createdAt ||
             payload.firestoreCreatedAt ||
@@ -66,31 +82,48 @@ const KivosOrdersList = ({ navigation }) => {
               : createdAtRaw
               ? new Date(createdAtRaw)
               : null;
+          const items = normalizeItems(payload);
+          const totals = computeOrderTotals({
+            lines: items.map((it) => ({ ...it, quantity: it.qty })),
+            brand: payload.brand || 'kivos',
+            paymentMethod: payload.paymentMethod,
+            customer: payload.customer || null,
+          });
+          const total = totals?.total ?? calculateTotal(payload, items);
 
           return {
             id: doc.id,
             orderId,
             customerName,
             status,
+            statusLabel,
             createdAt,
+            total,
           };
         })
-        .filter((order) => (order.status || '').toLowerCase() === 'sent');
+        .filter((order) => {
+          return statusFilters.has(order.status);
+        });
+      console.log('[KivosOrdersList] loaded orders', data.length);
       setOrders(data);
     } catch (e) {
       console.error('[KivosOrdersList] Failed to load orders', e);
       setError(
         e?.message ||
-          'I`I?I�I,I.I�I_I� I+IOI?I,I%I�I�I, I?I�I?I�I3I3I�I�I1IZI�'
+          'Σφάλμα φόρτωσης παραγγελιών.'
       );
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [calculateTotal, normalizeItems, statusFilters]);
 
   useEffect(() => {
     loadOrders();
-  }, [loadOrders]);
+    const unsubscribe = navigation.addListener('focus', loadOrders);
+    return () => {
+      unsubscribe?.();
+    };
+  }, [loadOrders, navigation]);
 
   const coerceToArray = (value) => {
     if (Array.isArray(value)) return value;
@@ -135,6 +168,20 @@ const KivosOrdersList = ({ navigation }) => {
             item?.orderedQuantity ??
             0
         ),
+        quantity: Number(
+          item?.quantity ??
+            item?.qty ??
+            item?.orderedQty ??
+            item?.orderedQuantity ??
+            0
+        ),
+        wholesalePrice: Number(
+          item?.wholesalePrice ??
+            item?.price ??
+            item?.unitPrice ??
+            item?.netPrice ??
+            0
+        ),
         price: Number(
           item?.wholesalePrice ??
             item?.price ??
@@ -142,6 +189,12 @@ const KivosOrdersList = ({ navigation }) => {
             item?.netPrice ??
             0
         ),
+        supplierBrand:
+          item?.supplierBrand ||
+          item?.brand ||
+          item?.supplier ||
+          item?.supplier_brand ||
+          '',
       }))
       .filter((it) => it.productCode);
   };
@@ -151,9 +204,38 @@ const KivosOrdersList = ({ navigation }) => {
       data?.finalValue ??
       (Number(data?.netValue ?? 0) + Number(data?.vat ?? 0) - Number(data?.discount ?? 0));
     if (!Number.isNaN(explicitTotal)) return Number(explicitTotal);
-    const sum = items.reduce((acc, it) => acc + it.qty * (it.price || 0), 0);
+    const sum = items.reduce(
+      (acc, it) =>
+        acc +
+        Number(it.qty || 0) *
+          (Number(it.price ?? it.wholesalePrice ?? 0) || 0),
+      0
+    );
     return Number(sum.toFixed(2));
   };
+
+  const fetchItemDescriptions = useCallback(async (orderItems = []) => {
+    const descriptions = {};
+    for (const item of orderItems) {
+      const code = item?.productCode;
+      if (!code || descriptions[code]) continue;
+      try {
+        const snap = await firestore().collection('products_kivos').doc(String(code)).get();
+        if (snap.exists) {
+          const data = snap.data() || {};
+          descriptions[code] =
+            data.description ||
+            data.name ||
+            data.title ||
+            data.productName ||
+            '';
+        }
+      } catch (e) {
+        console.warn('[KivosOrdersList] Failed to load product', code, e);
+      }
+    }
+    return descriptions;
+  }, []);
 
   const openSummary = useCallback(
     async (orderId) => {
@@ -169,7 +251,20 @@ const KivosOrdersList = ({ navigation }) => {
           return;
         }
         const data = snap.data() || {};
-        const items = normalizeItems(data);
+        let items = normalizeItems(data);
+        const descriptionMap = await fetchItemDescriptions(
+          items.filter((it) => !it.description)
+        );
+        items = items.map((it) => ({
+          ...it,
+          description: it.description || descriptionMap[it.productCode] || '',
+        }));
+        const totals = computeOrderTotals({
+          lines: items.map((it) => ({ ...it, quantity: it.qty })),
+          brand: data.brand || 'kivos',
+          paymentMethod: data.paymentMethod,
+          customer: data.customer || null,
+        });
         const total = calculateTotal(data, items);
         setSummaryOrder({
           id: snap.id,
@@ -183,7 +278,7 @@ const KivosOrdersList = ({ navigation }) => {
           contact: data.contact || data.customer?.contact || null,
           address: data.address || data.customer?.address || null,
           items,
-          total,
+          total: totals?.total ?? total,
           status: data.status || 'Pending',
         });
       } catch (e) {
@@ -196,6 +291,50 @@ const KivosOrdersList = ({ navigation }) => {
     [calculateTotal, normalizeItems]
   );
 
+
+  const toggleSelect = useCallback((id) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }, []);
+
+  const deleteSelected = useCallback(async () => {
+    if (!selectedIds.size || deleting) return;
+    const ids = Array.from(selectedIds);
+    setDeleting(true);
+    try {
+      const batch = firestore().batch();
+      ids.forEach((id) => {
+        batch.delete(firestore().collection('orders_kivos').doc(id));
+      });
+      await batch.commit();
+      setOrders((prev) => prev.filter((order) => !selectedIds.has(order.id)));
+      setSelectedIds(new Set());
+    } catch (e) {
+      console.error('[KivosOrdersList] Failed to delete orders', e);
+      Alert.alert('Σφάλμα', e?.message || 'Αποτυχία διαγραφής παραγγελιών.');
+    } finally {
+      setDeleting(false);
+    }
+  }, [deleting, selectedIds]);
+
+  const toggleStatusFilter = useCallback((value) => {
+    setStatusFilters((prev) => {
+      const next = new Set(prev);
+      if (next.has(value)) {
+        next.delete(value);
+      } else {
+        next.add(value);
+      }
+      return next.size ? next : new Set(prev);
+    });
+  }, []);
   const parseDateInput = useCallback((value) => {
     if (!value) return null;
     const date = new Date(`${value}T00:00:00`);
@@ -215,6 +354,7 @@ const KivosOrdersList = ({ navigation }) => {
     });
 
     return sorted.filter((order) => {
+      if (!statusFilters.has(order.status)) return false;
       const time = order.createdAt ? order.createdAt.getTime() : null;
       if (startDate && (time == null || time < startDate.getTime())) {
         return false;
@@ -224,34 +364,49 @@ const KivosOrdersList = ({ navigation }) => {
       }
       return true;
     });
-  }, [orders, sortDirection, startDateInput, endDateInput, parseDateInput]);
+  }, [orders, sortDirection, startDateInput, endDateInput, parseDateInput, statusFilters]);
 
   const renderItem = ({ item }) => {
     const dateLabel = item.createdAt
       ? item.createdAt.toLocaleDateString()
-      : '�?"';
+      : '-';
+    const isSelected = selectedIds.has(item.id);
+    const isPackable = item.status !== 'packed';
 
     return (
       <TouchableOpacity
         style={styles.row}
         onPress={() =>
-          navigation.navigate('KivosOrderDetail', {
+          navigation.navigate('KivosPackingList', {
             orderId: item.id,
-            displayId: item.orderId,
           })
         }
+        onLongPress={() => toggleSelect(item.id)}
         activeOpacity={0.85}
       >
         <View style={styles.rowHeader}>
-          <Text style={styles.orderId}>{item.orderId}</Text>
-          <Text style={styles.status}>{item.status}</Text>
+          <Text style={styles.status}>{item.statusLabel}</Text>
+          <TouchableOpacity
+            onPress={(e) => {
+              e?.stopPropagation?.();
+              toggleSelect(item.id);
+            }}
+            hitSlop={{ top: 6, right: 6, bottom: 6, left: 6 }}
+          >
+            <Ionicons
+              name={isSelected ? 'checkbox' : 'square-outline'}
+              size={18}
+              color={isSelected ? colors.primary : colors.textSecondary}
+            />
+          </TouchableOpacity>
         </View>
-        <Text style={styles.customer}>
-          {item.customerName || 'II%I?I_I, I?I�I�I�I,I�'}
-        </Text>
-        <View style={styles.metaRow}>
-          <Text style={styles.metaLabel}>Date</Text>
+        <View style={styles.infoBlock}>
+          <Text style={styles.customerName}>{item.customerName || 'Unknown customer'}</Text>
           <Text style={styles.metaValue}>{dateLabel}</Text>
+          <Text style={styles.metaValue}>
+            {item.total != null ? `${item.total.toFixed(2)}€` : '-'}
+          </Text>
+          <Text style={styles.orderNumberLabel}>{item.orderId}</Text>
         </View>
         <View style={styles.actionsRow}>
           <TouchableOpacity
@@ -267,16 +422,21 @@ const KivosOrdersList = ({ navigation }) => {
             <Text style={styles.actionButtonGhostLabel}>Summary</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.actionButton}
+            style={[styles.actionButton, !isPackable && styles.disabledButton]}
             activeOpacity={0.85}
             onPress={(e) => {
               e?.stopPropagation?.();
               e?.preventDefault?.();
-              navigation.navigate('KivosPackingList', { orderId: item.id });
+              if (isPackable) {
+                navigation.navigate('KivosPackingList', { orderId: item.id });
+              }
             }}
+            disabled={!isPackable}
           >
             <Ionicons name="cube-outline" size={16} color={colors.primary} />
-            <Text style={styles.actionButtonLabel}>Packing List</Text>
+            <Text style={[styles.actionButtonLabel, !isPackable && styles.disabledText]}>
+              Packing List
+            </Text>
           </TouchableOpacity>
         </View>
       </TouchableOpacity>
@@ -366,6 +526,53 @@ const KivosOrdersList = ({ navigation }) => {
             <Text style={styles.filterHint}>
               Showing {filteredOrders.length} of {orders.length} orders
             </Text>
+            <TouchableOpacity
+              style={styles.sortButton}
+              activeOpacity={0.85}
+              onPress={() => setStatusFilterOpen((prev) => !prev)}
+            >
+              <Text style={styles.sortButtonLabel}>
+                Status filters ({statusFilters.size})
+              </Text>
+              <Ionicons
+                name={statusFilterOpen ? 'chevron-up' : 'chevron-down'}
+                size={18}
+                color={colors.primary}
+              />
+            </TouchableOpacity>
+            {statusFilterOpen ? (
+              <View style={styles.statusFilterList}>
+                {statusOptions.map((opt) => {
+                  const active = statusFilters.has(opt.value);
+                  return (
+                    <TouchableOpacity
+                      key={opt.value}
+                      style={styles.statusFilterRow}
+                      activeOpacity={0.85}
+                      onPress={() => toggleStatusFilter(opt.value)}
+                    >
+                      <Ionicons
+                        name={active ? 'checkbox' : 'square-outline'}
+                        size={16}
+                        color={active ? colors.primary : colors.textSecondary}
+                      />
+                      <Text style={styles.statusFilterLabel}>{opt.label}</Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            ) : null}
+            <TouchableOpacity
+              style={[styles.deleteButton, (!selectedIds.size || deleting) && styles.disabledButton]}
+              disabled={!selectedIds.size || deleting}
+              activeOpacity={0.85}
+              onPress={deleteSelected}
+            >
+              <Ionicons name="trash" size={16} color={colors.white} />
+              <Text style={styles.deleteButtonLabel}>
+                {deleting ? 'Deleting...' : `Delete (${selectedIds.size})`}
+              </Text>
+            </TouchableOpacity>
           </View>
 
           <FlatList
@@ -564,6 +771,20 @@ const styles = StyleSheet.create({
     color: colors.textPrimary,
     fontWeight: '600',
   },
+  infoBlock: {
+    marginTop: 4,
+    gap: 2,
+    alignItems: 'flex-start',
+  },
+  customerName: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: colors.textPrimary,
+  },
+  orderNumberLabel: {
+    fontSize: 12,
+    color: colors.textSecondary,
+  },
   actionsRow: {
     marginTop: 10,
     flexDirection: 'row',
@@ -585,6 +806,9 @@ const styles = StyleSheet.create({
     color: colors.primary,
     fontWeight: '700',
   },
+  disabledText: {
+    opacity: 0.6,
+  },
   actionButtonGhost: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -598,6 +822,22 @@ const styles = StyleSheet.create({
   actionButtonGhostLabel: {
     fontSize: 13,
     color: colors.textPrimary,
+    fontWeight: '700',
+  },
+  deleteButton: {
+    marginTop: 8,
+    backgroundColor: '#c62828',
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+  },
+  deleteButtonLabel: {
+    color: colors.white,
+    fontSize: 14,
     fontWeight: '700',
   },
   filtersCard: {
@@ -651,6 +891,24 @@ const styles = StyleSheet.create({
   filterHint: {
     fontSize: 12,
     color: colors.textSecondary,
+  },
+  statusFilterList: {
+    marginTop: 8,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: '#d0d7de',
+    borderRadius: 10,
+    padding: 8,
+    backgroundColor: colors.white,
+    gap: 6,
+  },
+  statusFilterRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  statusFilterLabel: {
+    fontSize: 13,
+    color: colors.textPrimary,
   },
   modalBackdrop: {
     flex: 1,

@@ -1,0 +1,2742 @@
+{
+  "brands_contacts": [],
+  "customers": [
+    {
+      "id": "1400001",
+      "address": null,
+      "name3": null,
+      "city": "ΑΝΔΡΟΣ",
+      "postalCode": null,
+      "name": "ΓΑΡΥΦΑΛΛΟΥ ΣΟΦΙΑ",
+      "customerCode": "1400001",
+      "salesInfo": {
+        "description": "PMH Small customers",
+        "telephone1": null,
+        "groupKeyText": null,
+        "groupKey": "2050-FZA"
+      },
+      "region": {
+        "name": "Kikladhes",
+        "id": null
+      },
+      "brand": "playmobil",
+      "importedAt": {
+        "_seconds": 1763015647,
+        "_nanoseconds": 797000000
+      },
+      "merch": [
+        "ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ"
+      ],
+      "primaryMerch": "ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ"
+    },
+    {
+      "id": "1400003",
+      "address": null,
+      "name3": null,
+      "city": "LIMASSOL",
+      "postalCode": null,
+      "name": "MITSINKAS G.K.LTD",
+      "customerCode": "1400003",
+      "salesInfo": {
+        "description": "PMH Distrib./WSales",
+        "telephone1": null,
+        "groupKeyText": null,
+        "groupKey": "2050-GBZ"
+      },
+      "brand": "playmobil",
+      "importedAt": {
+        "_seconds": 1763015647,
+        "_nanoseconds": 797000000
+      },
+      "merch": [
+        "CYPRUS"
+      ],
+      "primaryMerch": "CYPRUS"
+    },
+    {
+      "id": "1400028",
+      "address": null,
+      "name3": null,
+      "city": "ΜΗΛΟΣ",
+      "postalCode": null,
+      "name": "ΜΙΚΕΛΗ ΤΕΡΕΖΑ",
+      "customerCode": "1400028",
+      "salesInfo": {
+        "description": "PMH Medium customers",
+        "telephone1": null,
+        "groupKeyText": null,
+        "groupKey": "2050-ZAZ"
+      },
+      "region": {
+        "name": "Kikladhes",
+        "id": null
+      },
+      "brand": "playmobil",
+      "importedAt": {
+        "_seconds": 1763015647,
+        "_nanoseconds": 797000000
+      },
+      "merch": [
+        "ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ"
+      ],
+      "primaryMerch": "ΣΤΑΥΡΟΠΟΥΛΟΣ ΙΩΑΝΝΗΣ"
+    }
+  ],
+  "customers_john": [
+    {
+      "id": "000023",
+      "customerCode": "000023",
+      "name": "ΓΕΩΡΓΑΛΗΣ ΔΗΜΗΤΡΗΣ",
+      "address": {
+        "street": "ΠΙΝΔΟΥ 2",
+        "postalCode": "59100",
+        "city": "ΒΕΡΟΙΑ"
+      },
+      "contact": {
+        "telephone1": "2331024403",
+        "telephone2": null,
+        "fax": null,
+        "email": null
+      },
+      "vatInfo": {
+        "registrationNo": "040776969",
+        "office": "ΒΕΡΟΙΑΣ"
+      },
+      "profession": "ΒΙΒΛΙΟΠΩΛΕΙΟ",
+      "brand": "john",
+      "importedAt": {
+        "_seconds": 1760628341,
+        "_nanoseconds": 767000000
+      },
+      "merch": [
+        "ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ"
+      ],
+      "primaryMerch": "ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ"
+    },
+    {
+      "id": "000059",
+      "customerCode": "000059",
+      "name": "ΑΓΓΕΛΟΠΟΥΛΟΣ -ΣΙΜΟΠΟΥΛΟΣ ΟΕ",
+      "address": {
+        "street": "Μ ΑΛΕΞΑΝΔΡΟΥ 3",
+        "postalCode": null,
+        "city": "ΑΜΠΕΛΟΚΗΠΟΙ"
+      },
+      "contact": {
+        "telephone1": "2310732132",
+        "telephone2": null,
+        "fax": "2,310,732,132.00",
+        "email": null
+      },
+      "vatInfo": {
+        "registrationNo": "084130032",
+        "office": "ΑΜΠΕΛ/ΠΩΝ"
+      },
+      "profession": "ΒΙΒΛΙΟΠΩΛΕΙΟ",
+      "brand": "john",
+      "importedAt": {
+        "_seconds": 1760628341,
+        "_nanoseconds": 767000000
+      },
+      "merch": [
+        "ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ"
+      ],
+      "primaryMerch": "ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ"
+    },
+    {
+      "id": "000061",
+      "customerCode": "000061",
+      "name": "ΜΠΟΥΤΣΗΣ ΒΑΣΙΛΕΙΟΣ",
+      "address": {
+        "street": "ΣΥΝ/ΧΟΥ ΠΑΠΑΠΕΤΡΟΥ 16",
+        "postalCode": "53200",
+        "city": "ΑΜΥΝΤΑΙΟ"
+      },
+      "contact": {
+        "telephone1": "23860-23974",
+        "telephone2": null,
+        "fax": null,
+        "email": null
+      },
+      "vatInfo": {
+        "registrationNo": "073898050",
+        "office": "ΑΜΥΝΤΑΙΟΥ"
+      },
+      "profession": "ΧΑΡΤΙΚΑ",
+      "brand": "john",
+      "importedAt": {
+        "_seconds": 1760628341,
+        "_nanoseconds": 767000000
+      },
+      "merch": [
+        "ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ"
+      ],
+      "primaryMerch": "ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ"
+    }
+  ],
+  "customers_kivos": [
+    {
+      "id": "000023",
+      "customerCode": "000023",
+      "name": "ΓΕΩΡΓΑΛΗΣ ΔΗΜΗΤΡΗΣ",
+      "address": {
+        "street": "ΠΙΝΔΟΥ 2",
+        "postalCode": "59100",
+        "city": "ΒΕΡΟΙΑ"
+      },
+      "contact": {
+        "telephone1": "2331024403",
+        "telephone2": null,
+        "fax": null,
+        "email": null
+      },
+      "vatInfo": {
+        "registrationNo": "040776969",
+        "office": "ΒΕΡΟΙΑΣ"
+      },
+      "profession": "ΒΙΒΛΙΟΠΩΛΕΙΟ",
+      "InvSales2022": null,
+      "InvSales2023": null,
+      "InvSales2024": null,
+      "isActive": "1",
+      "channel": "1",
+      "brand": "kivos",
+      "importedAt": {
+        "_seconds": 1760627488,
+        "_nanoseconds": 44000000
+      },
+      "merch": [
+        "ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ"
+      ],
+      "primaryMerch": "ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ"
+    },
+    {
+      "id": "000030",
+      "customerCode": "000030",
+      "name": "ΜΕΡΕΣΕΝΤΖΗ Σ Κ ΣΙΑ ΟΕ ****************************",
+      "address": {
+        "street": "ΛΑΧΑΝΑΓΟΡΑΣ 10",
+        "postalCode": "54628",
+        "city": "ΘΕΣ/ΝΙΚΗ"
+      },
+      "contact": {
+        "telephone1": "2310753694",
+        "telephone2": null,
+        "fax": "2310753693",
+        "email": null
+      },
+      "vatInfo": {
+        "registrationNo": "999305951",
+        "office": "Α' ΘΕΣΣΑΛΟΝΙΚΗΣ"
+      },
+      "profession": "ΣΥΝΕΡΓΕΙΟ ΑΥΤ/ΝΙΤΩΝ",
+      "InvSales2022": null,
+      "InvSales2023": null,
+      "InvSales2024": null,
+      "isActive": "1",
+      "channel": "2",
+      "brand": "kivos",
+      "importedAt": {
+        "_seconds": 1760627488,
+        "_nanoseconds": 44000000
+      },
+      "merch": [
+        "ΖΕΓΑΣ ΓΕΩΡΓΙΟΣ"
+      ],
+      "primaryMerch": "ΖΕΓΑΣ ΓΕΩΡΓΙΟΣ"
+    },
+    {
+      "id": "000059",
+      "customerCode": "000059",
+      "name": "ΑΓΓΕΛΟΠΟΥΛΟΣ -ΣΙΜΟΠΟΥΛΟΣ ΟΕ",
+      "address": {
+        "street": "Μ ΑΛΕΞΑΝΔΡΟΥ 3",
+        "postalCode": null,
+        "city": "ΑΜΠΕΛΟΚΗΠΟΙ"
+      },
+      "contact": {
+        "telephone1": "2310732132",
+        "telephone2": null,
+        "fax": "2310732132",
+        "email": null
+      },
+      "vatInfo": {
+        "registrationNo": "084130032",
+        "office": "ΑΜΠΕΛ/ΠΩΝ"
+      },
+      "profession": "ΒΙΒΛΙΟΠΩΛΕΙΟ",
+      "InvSales2022": "326",
+      "InvSales2023": "368.94",
+      "InvSales2024": "357.61",
+      "isActive": "1",
+      "channel": "1",
+      "brand": "kivos",
+      "importedAt": {
+        "_seconds": 1760627488,
+        "_nanoseconds": 44000000
+      },
+      "merch": [
+        "ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ"
+      ],
+      "primaryMerch": "ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ"
+    }
+  ],
+  "orders": [
+    {
+      "id": "1760562562249_7245",
+      "exported": false,
+      "deliveryInfo": "",
+      "notes": "",
+      "netValue": 0,
+      "startedLocation": null,
+      "vat": 0,
+      "discount": 0,
+      "startedAt": "2025-10-15T21:09:22.249Z",
+      "userId": "Y4EDCvu84wWUs4xOXrZWzpMsgdO2",
+      "firestoreUpdatedAt": {
+        "_seconds": 1760562562,
+        "_nanoseconds": 605000000
+      },
+      "number": "251016-5QSY",
+      "createdAt": "2025-10-15T21:09:22.249Z",
+      "exportedLocation": null,
+      "createdBy": "Y4EDCvu84wWUs4xOXrZWzpMsgdO2",
+      "customerId": "1400046",
+      "paymentMethod": "prepaid_cash",
+      "exportedAt": null,
+      "finalValue": 0,
+      "lines": [],
+      "brand": "playmobil",
+      "status": "draft",
+      "updatedAt": "2025-10-15T21:09:22.250Z",
+      "customer": {
+        "importedAt": {
+          "seconds": 1750167212,
+          "nanoseconds": 181000000
+        },
+        "address": {
+          "city": "ΚΟΥΦΑΛΙΑ",
+          "street": "ΤΖΙΒΑΡΟΠΟΥΛΟΥ 75",
+          "postalCode": "57100"
+        },
+        "customerCode": "1400046",
+        "transportation": {
+          "zone": "Thessalonica",
+          "zoneId": "7"
+        },
+        "merch": "ΖΕΓΑΣ ΓΙΩΡΓΟΣ",
+        "name3": "ΧΑΡΤΙΚΑ/ΠΑΙΧΝΙΔΙΑ",
+        "contact": {
+          "telephone2": "6976694655",
+          "telephone1": "2391053288",
+          "fax": null,
+          "email": "tv1990@otenet.gr"
+        },
+        "name": "ΒΑΦΕΙΑΔΗΣ ΑΝΑΣ.ΠΕΤΡΟΣ",
+        "id": "1400046",
+        "salesInfo": {
+          "description": "PMH Small customers",
+          "groupKeyText": "Other Stationery Stores",
+          "groupKey": "2050-ZAZ"
+        },
+        "region": {
+          "name": "Thessaloniki",
+          "id": "48"
+        },
+        "brand": "playmobil",
+        "vatInfo": {
+          "registrationNo": "EL032093810",
+          "office": "ΙΩΝΙΑΣ ΘΕΣ/ΝΙΚΗΣ"
+        }
+      }
+    },
+    {
+      "id": "1760562645662_4747",
+      "exported": false,
+      "deliveryInfo": "",
+      "notes": "",
+      "startedLocation": null,
+      "startedAt": "2025-10-15T21:10:45.663Z",
+      "userId": "Y4EDCvu84wWUs4xOXrZWzpMsgdO2",
+      "number": "251016-E7GJ",
+      "exportedLocation": null,
+      "createdBy": "Y4EDCvu84wWUs4xOXrZWzpMsgdO2",
+      "customerId": "1400047",
+      "paymentMethod": "prepaid_cash",
+      "exportedAt": null,
+      "brand": "playmobil",
+      "status": "draft",
+      "customer": {
+        "importedAt": {
+          "seconds": 1750167219,
+          "nanoseconds": 730000000
+        },
+        "address": {
+          "city": "ΝΕΑΠΟΛΗ",
+          "street": "ΑΝΔΡΕΑ ΠΑΠΑΝΔΡΕΟΥ 108",
+          "postalCode": "56728"
+        },
+        "customerCode": "1400047",
+        "transportation": {
+          "zone": "Thessalonica",
+          "zoneId": "7"
+        },
+        "merch": "ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ",
+        "name3": "ΠΑΙΧΝΙΔΙΑ-ΕΙΔΗ ΔΩΡΩΝ",
+        "contact": {
+          "telephone2": null,
+          "telephone1": "2310625953",
+          "fax": null,
+          "email": "hohorasjohn@gmail.com"
+        },
+        "name": "ΧΟΧΟΡΑΣ ΙΩΑΝΝΗΣ & ΣΙΑ Ο.Ε.",
+        "id": "1400047",
+        "salesInfo": {
+          "description": "PMH Small customers",
+          "groupKeyText": "Other Toy Stores",
+          "groupKey": "2050-FZA"
+        },
+        "region": {
+          "name": "Thessaloniki",
+          "id": "48"
+        },
+        "brand": "playmobil",
+        "vatInfo": {
+          "registrationNo": "EL081759142",
+          "office": "Ε ΘΕΣ/ΝΙΚΗΣ ΝΕΑΠΟΛΕΩΣ"
+        }
+      },
+      "createdAt": "2025-10-15T21:10:46.092Z",
+      "netValue": 20.9,
+      "vat": 4.86,
+      "discount": 0.63,
+      "finalValue": 25.13,
+      "lines": [
+        {
+          "supplierBrand": "????? Brand ???�??e?t?",
+          "srp": 34.99,
+          "originalWholesalePrice": 20.9,
+          "quantity": 1,
+          "productCode": "71650",
+          "barcodeUnit": "4008789716507",
+          "description": "Εργοτάξιο",
+          "wholesalePrice": 20.9
+        }
+      ],
+      "firestoreUpdatedAt": {
+        "_seconds": 1760562690,
+        "_nanoseconds": 597000000
+      },
+      "updatedAt": "2025-10-15T21:11:30.414Z"
+    },
+    {
+      "id": "1760562690413_4503",
+      "exported": false,
+      "deliveryInfo": "",
+      "notes": "",
+      "netValue": 0,
+      "startedLocation": null,
+      "vat": 0,
+      "discount": 0,
+      "startedAt": "2025-10-15T21:11:30.413Z",
+      "userId": "Y4EDCvu84wWUs4xOXrZWzpMsgdO2",
+      "firestoreUpdatedAt": {
+        "_seconds": 1760562690,
+        "_nanoseconds": 549000000
+      },
+      "number": "251016-CD08",
+      "createdAt": "2025-10-15T21:11:30.413Z",
+      "exportedLocation": null,
+      "createdBy": "Y4EDCvu84wWUs4xOXrZWzpMsgdO2",
+      "customerId": "1400047",
+      "paymentMethod": "prepaid_cash",
+      "exportedAt": null,
+      "finalValue": 0,
+      "lines": [],
+      "brand": "playmobil",
+      "status": "draft",
+      "updatedAt": "2025-10-15T21:11:30.413Z",
+      "customer": {
+        "importedAt": {
+          "seconds": 1750167219,
+          "nanoseconds": 730000000
+        },
+        "address": {
+          "city": "ΝΕΑΠΟΛΗ",
+          "street": "ΑΝΔΡΕΑ ΠΑΠΑΝΔΡΕΟΥ 108",
+          "postalCode": "56728"
+        },
+        "customerCode": "1400047",
+        "transportation": {
+          "zone": "Thessalonica",
+          "zoneId": "7"
+        },
+        "merch": "ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ",
+        "name3": "ΠΑΙΧΝΙΔΙΑ-ΕΙΔΗ ΔΩΡΩΝ",
+        "contact": {
+          "telephone2": null,
+          "telephone1": "2310625953",
+          "fax": null,
+          "email": "hohorasjohn@gmail.com"
+        },
+        "name": "ΧΟΧΟΡΑΣ ΙΩΑΝΝΗΣ & ΣΙΑ Ο.Ε.",
+        "id": "1400047",
+        "salesInfo": {
+          "description": "PMH Small customers",
+          "groupKeyText": "Other Toy Stores",
+          "groupKey": "2050-FZA"
+        },
+        "region": {
+          "name": "Thessaloniki",
+          "id": "48"
+        },
+        "brand": "playmobil",
+        "vatInfo": {
+          "registrationNo": "EL081759142",
+          "office": "Ε ΘΕΣ/ΝΙΚΗΣ ΝΕΑΠΟΛΕΩΣ"
+        }
+      }
+    }
+  ],
+  "orders_john": [
+    {
+      "id": "1761122632876_4497",
+      "deliveryInfo": "",
+      "notes": "",
+      "startedLocation": null,
+      "startedAt": "2025-10-22T08:43:52.876Z",
+      "userId": "Y4EDCvu84wWUs4xOXrZWzpMsgdO2",
+      "number": "251022-OM5N",
+      "createdAt": "2025-10-22T08:43:52.885Z",
+      "exportedLocation": null,
+      "createdBy": "Y4EDCvu84wWUs4xOXrZWzpMsgdO2",
+      "customerId": "003084",
+      "paymentMethod": "cash",
+      "brand": "john",
+      "customer": {
+        "profession": "ΛΙΑΝΙΚΟ ΕΜΠΟΡΙΟ ΠΑΙΧΝΙΔΙΩΝ ΚΑΘΕ ΕΙΔΟΥΣ",
+        "merch": "ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ",
+        "address": {
+          "city": "ΠΤΟΛΕΜΑΙΔΑ",
+          "street": "ΝΟΣΟΚΟΜΕΙΟΥ 5",
+          "postalCode": "50200"
+        },
+        "importedAt": {
+          "seconds": 1760628363,
+          "nanoseconds": 388000000
+        },
+        "contact": {
+          "telephone2": "6978889028",
+          "telephone1": "2463029442",
+          "fax": null,
+          "email": "lefterisfil@hotmail.com"
+        },
+        "name": "ΦΙΛΙΟΓΛΟΥ ΕΛΕΥΘΕΡΙΟΣ",
+        "customerCode": "003084",
+        "id": "003084",
+        "brand": "john",
+        "vatInfo": {
+          "registrationNo": "138119474",
+          "office": "ΠΤΟΛΕΜΑΙΔΑΣ"
+        }
+      },
+      "netValue": 112.9,
+      "vat": 26.28,
+      "discount": 3.39,
+      "finalValue": 135.79,
+      "lines": [
+        {
+          "supplierBrand": "john",
+          "srp": 35.01,
+          "originalWholesalePrice": 22.58,
+          "piecesPerBox": 6,
+          "quantity": 5,
+          "productCode": "21338",
+          "packageLabel": "6 τεμ.",
+          "barcodeUnit": "4005556213382",
+          "description": "Οικογενειακό Επιτραπέζιο Κατσαρίδα",
+          "packageSize": 6,
+          "wholesalePrice": 22.58
+        }
+      ],
+      "paymentMethodLabel": "Μετρητά",
+      "exported": true,
+      "exportedAt": "2025-10-22T08:44:17.485Z",
+      "sent": true,
+      "status": "sent",
+      "firestoreUpdatedAt": {
+        "_seconds": 1761122657,
+        "_nanoseconds": 54000000
+      },
+      "updatedAt": "2025-10-22T08:44:16.211Z"
+    },
+    {
+      "id": "1761130405653_8750",
+      "notes": "",
+      "startedLocation": null,
+      "startedAt": "2025-10-22T10:53:25.653Z",
+      "userId": "Y4EDCvu84wWUs4xOXrZWzpMsgdO2",
+      "createdAt": "2025-10-22T10:53:25.673Z",
+      "number": "251022-3HNQ",
+      "exportedLocation": null,
+      "createdBy": "Y4EDCvu84wWUs4xOXrZWzpMsgdO2",
+      "customerId": "002557",
+      "paymentMethod": "cash",
+      "brand": "john",
+      "customer": {
+        "merch": "ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ",
+        "profession": "ΒΙΒΛΙΟΠΩΛΕΙΟ",
+        "importedAt": {
+          "seconds": 1760628363,
+          "nanoseconds": 388000000
+        },
+        "address": {
+          "city": "ΚΑΛΥΜΝΟΣ",
+          "street": "ΧΡΙΣΤΟΣ - ΚΑΛΥΜΝΟΥ",
+          "postalCode": null
+        },
+        "contact": {
+          "telephone2": null,
+          "telephone1": "2243022809",
+          "fax": null,
+          "email": "k2903a@hotmail.com"
+        },
+        "name": "ΤΑΤΑΡΗ ΙΩΑΝ. ΑΙΚΑΤΕΡΙΝΗ",
+        "customerCode": "002557",
+        "id": "002557",
+        "brand": "john",
+        "vatInfo": {
+          "registrationNo": "108156970",
+          "office": "ΚΩΣ"
+        }
+      },
+      "netValue": 193.49,
+      "vat": 45.05,
+      "discount": 5.8,
+      "finalValue": 232.74,
+      "lines": [
+        {
+          "supplierBrand": "john",
+          "srp": 15,
+          "originalWholesalePrice": 8.11,
+          "piecesPerBox": 1,
+          "quantity": 1,
+          "productCode": "23553",
+          "packageLabel": "1 τεμ.",
+          "barcodeUnit": "4005556235537",
+          "description": "Creart Jr Paw Patrol",
+          "packageSize": 1,
+          "wholesalePrice": 8.11
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 15,
+          "originalWholesalePrice": 8.11,
+          "piecesPerBox": 1,
+          "quantity": 1,
+          "productCode": "23715",
+          "packageLabel": "1 τεμ.",
+          "barcodeUnit": "4005556237159",
+          "description": "Creart Jr Gabbys Dollhouse",
+          "packageSize": 1,
+          "wholesalePrice": 8.11
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 15,
+          "originalWholesalePrice": 8.11,
+          "piecesPerBox": 1,
+          "quantity": 1,
+          "productCode": "23887",
+          "packageLabel": "1 τεμ.",
+          "barcodeUnit": "4005556238873",
+          "description": "Creart Jr Spidey",
+          "packageSize": 1,
+          "wholesalePrice": 8.11
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 15,
+          "originalWholesalePrice": 8.11,
+          "piecesPerBox": 1,
+          "quantity": 1,
+          "productCode": "23961",
+          "packageLabel": "1 τεμ.",
+          "barcodeUnit": "4005556239610",
+          "description": "Creart Jr Bluey",
+          "packageSize": 1,
+          "wholesalePrice": 8.11
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 15,
+          "originalWholesalePrice": 8.11,
+          "piecesPerBox": 1,
+          "quantity": 1,
+          "productCode": "23570",
+          "packageLabel": "1 τεμ.",
+          "barcodeUnit": "4005556235704",
+          "description": "Creart Jr Peppa Pig",
+          "packageSize": 1,
+          "wholesalePrice": 8.11
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 18,
+          "originalWholesalePrice": 9.73,
+          "piecesPerBox": 10,
+          "quantity": 1,
+          "productCode": "12000058",
+          "packageLabel": "10 τεμ.",
+          "barcodeUnit": "4005555000587",
+          "description": "Παζλ 1000 τεμ. Art Collection Da Vinci: Μόνα Λίζα",
+          "packageSize": 10,
+          "wholesalePrice": 9.73
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 18,
+          "originalWholesalePrice": 9.73,
+          "piecesPerBox": 10,
+          "quantity": 2,
+          "productCode": "12000066",
+          "packageLabel": "10 τεμ.",
+          "barcodeUnit": "4005555000662",
+          "description": "Παζλ 1000 τεμ. Art Collection Klimt: Το Φιλί",
+          "packageSize": 10,
+          "wholesalePrice": 9.73
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 15,
+          "originalWholesalePrice": 8.11,
+          "piecesPerBox": 18,
+          "quantity": 2,
+          "productCode": "17581",
+          "packageLabel": "18 τεμ.",
+          "barcodeUnit": "4005556175819",
+          "description": "Παζλ 500 τεμ. Stitch & Angel",
+          "packageSize": 18,
+          "wholesalePrice": 8.11
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 23,
+          "originalWholesalePrice": 12.43,
+          "piecesPerBox": 10,
+          "quantity": 1,
+          "productCode": "12001076",
+          "packageLabel": "10 τεμ.",
+          "barcodeUnit": "4005555010760",
+          "description": "Παζλ 4x100 τεμ. Spiderman",
+          "packageSize": 10,
+          "wholesalePrice": 12.43
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 13,
+          "originalWholesalePrice": 7.02,
+          "piecesPerBox": 6,
+          "quantity": 1,
+          "productCode": "03156",
+          "packageLabel": "6 τεμ.",
+          "barcodeUnit": "4005556031566",
+          "description": "Παζλ 4 σε 1 Πριγκίπισσες",
+          "packageSize": 6,
+          "wholesalePrice": 7.02
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 13,
+          "originalWholesalePrice": 7.02,
+          "piecesPerBox": 6,
+          "quantity": 1,
+          "productCode": "12001069",
+          "packageLabel": "6 τεμ.",
+          "barcodeUnit": "4005555010692",
+          "description": "Παζλ 4 σε 1 Stitch",
+          "packageSize": 6,
+          "wholesalePrice": 7.02
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 13,
+          "originalWholesalePrice": 7.02,
+          "piecesPerBox": 18,
+          "quantity": 1,
+          "productCode": "12004101",
+          "packageLabel": "18 τεμ.",
+          "barcodeUnit": "4005555041016",
+          "description": "Παζλ 100XXL τεμ. Βαϊάνα ΙΙ",
+          "packageSize": 18,
+          "wholesalePrice": 7.02
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 13,
+          "originalWholesalePrice": 7.02,
+          "piecesPerBox": 18,
+          "quantity": 1,
+          "productCode": "12001074",
+          "packageLabel": "18 τεμ.",
+          "barcodeUnit": "4005555010746",
+          "description": "Παζλ 100XXL τεμ. Super Mario",
+          "packageSize": 18,
+          "wholesalePrice": 7.02
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 13,
+          "originalWholesalePrice": 7.02,
+          "piecesPerBox": 18,
+          "quantity": 1,
+          "productCode": "13333",
+          "packageLabel": "18 τεμ.",
+          "barcodeUnit": "4005556133338",
+          "description": "Παζλ 100XXL τεμ. Monster Minecraft",
+          "packageSize": 18,
+          "wholesalePrice": 7.02
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 65,
+          "originalWholesalePrice": 20,
+          "piecesPerBox": 4,
+          "quantity": 2,
+          "productCode": "120003A",
+          "packageLabel": "4 τεμ.",
+          "barcodeUnit": "8436547415847",
+          "description": "Τηλεκατευθυνόμενο Όχημα Flash Racer Blue - Black 1:12",
+          "packageSize": 4,
+          "wholesalePrice": 20
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 29.99,
+          "originalWholesalePrice": 10,
+          "piecesPerBox": 6,
+          "quantity": 2,
+          "productCode": "180000D",
+          "packageLabel": "6 τεμ.",
+          "barcodeUnit": "8436547415199",
+          "description": "Τηλεκατευθυνόμενο Όχημα Sand Cross Yellow 1:18",
+          "packageSize": 6,
+          "wholesalePrice": 10
+        }
+      ],
+      "deliveryInfo": "Μεταφορική Αιγαίο 2103421247",
+      "paymentMethodLabel": "Μετρητά",
+      "exported": true,
+      "exportedAt": "2025-10-22T11:03:57.769Z",
+      "sent": true,
+      "status": "sent",
+      "firestoreUpdatedAt": {
+        "_seconds": 1761131037,
+        "_nanoseconds": 485000000
+      },
+      "updatedAt": "2025-10-22T11:03:56.446Z"
+    },
+    {
+      "id": "1761146957433_5100",
+      "notes": "",
+      "startedLocation": null,
+      "startedAt": "2025-10-22T15:29:17.433Z",
+      "userId": "Y4EDCvu84wWUs4xOXrZWzpMsgdO2",
+      "createdAt": "2025-10-22T15:29:17.455Z",
+      "number": "251022-OT20",
+      "exportedLocation": null,
+      "createdBy": "Y4EDCvu84wWUs4xOXrZWzpMsgdO2",
+      "customerId": "002287",
+      "brand": "john",
+      "customer": {
+        "profession": "ΒΙΒΛΙΟΠΩΛΕΙΟ",
+        "merch": "ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ",
+        "address": {
+          "city": "ΚΑΛΥΜΝΟΣ",
+          "street": "ΕΜΠΟΡΙΚΟΣ ΔΡΟΜΟΣ",
+          "postalCode": "85200"
+        },
+        "importedAt": {
+          "seconds": 1760628341,
+          "nanoseconds": 767000000
+        },
+        "contact": {
+          "telephone2": null,
+          "telephone1": "2243051304",
+          "fax": null,
+          "email": "sxolokokentro@hotmail.com"
+        },
+        "name": "ΑΧΛΑΔΙΩΤΗΣ ΓΕΩΡ. ΙΩΑΝΝΗΣ",
+        "customerCode": "002287",
+        "id": "002287",
+        "brand": "john",
+        "vatInfo": {
+          "registrationNo": "108171197",
+          "office": "ΚΩΣ"
+        }
+      },
+      "netValue": 839.45,
+      "lines": [
+        {
+          "supplierBrand": "john",
+          "srp": 12,
+          "originalWholesalePrice": 7.74,
+          "piecesPerBox": 70,
+          "quantity": 2,
+          "productCode": "11246",
+          "packageLabel": "70 τεμ.",
+          "barcodeUnit": "4005556112463",
+          "description": "3D Puzzle Minis 54 τεμ. Big Ben",
+          "packageSize": 70,
+          "wholesalePrice": 7.74
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 12,
+          "originalWholesalePrice": 7.74,
+          "piecesPerBox": 70,
+          "quantity": 1,
+          "productCode": "11247",
+          "packageLabel": "70 τεμ.",
+          "barcodeUnit": "4005556112470",
+          "description": "3D Puzzle Minis 54 τεμ. Πύργος της Πίζας",
+          "packageSize": 70,
+          "wholesalePrice": 7.74
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 12,
+          "originalWholesalePrice": 7.74,
+          "piecesPerBox": 70,
+          "quantity": 1,
+          "productCode": "11271",
+          "packageLabel": "70 τεμ.",
+          "barcodeUnit": "4005556112715",
+          "description": "3D Puzzle Minis 54 τεμ. Empire State Building",
+          "packageSize": 70,
+          "wholesalePrice": 7.74
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 12,
+          "originalWholesalePrice": 7.74,
+          "piecesPerBox": 70,
+          "quantity": 2,
+          "productCode": "12536",
+          "packageLabel": "70 τεμ.",
+          "barcodeUnit": "4005556125364",
+          "description": "3D Puzzle Minis 54 τεμ. Πύργος του Άιφελ",
+          "packageSize": 70,
+          "wholesalePrice": 7.74
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 33,
+          "originalWholesalePrice": 21.29,
+          "piecesPerBox": 16,
+          "quantity": 1,
+          "productCode": "12008024",
+          "packageLabel": "16 τεμ.",
+          "barcodeUnit": "4005555080244",
+          "description": "3D Iconis Πύργος του Άιφελ Night Edition 216τμχ",
+          "packageSize": 16,
+          "wholesalePrice": 21.29
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 33,
+          "originalWholesalePrice": 21.29,
+          "piecesPerBox": 16,
+          "quantity": 1,
+          "productCode": "12008025",
+          "packageLabel": "16 τεμ.",
+          "barcodeUnit": "4005555080251",
+          "description": "3D Iconis Big Ben Night Edition 216τμχ",
+          "packageSize": 16,
+          "wholesalePrice": 21.29
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 33,
+          "originalWholesalePrice": 21.29,
+          "piecesPerBox": 16,
+          "quantity": 1,
+          "productCode": "12008026",
+          "packageLabel": "16 τεμ.",
+          "barcodeUnit": "4005555080268",
+          "description": "3D Iconis Empire State Puzzle Night Edition 216 τεμ.",
+          "packageSize": 16,
+          "wholesalePrice": 21.29
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 35.01,
+          "originalWholesalePrice": 22.58,
+          "piecesPerBox": 10,
+          "quantity": 1,
+          "productCode": "22590",
+          "packageLabel": "10 τεμ.",
+          "barcodeUnit": "4005556225903",
+          "description": "Επιτραπέζιο Λαβύρινθος Pokemon",
+          "packageSize": 10,
+          "wholesalePrice": 22.58
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 35.01,
+          "originalWholesalePrice": 22.58,
+          "piecesPerBox": 12,
+          "quantity": 1,
+          "productCode": "24771",
+          "packageLabel": "12 τεμ.",
+          "barcodeUnit": "4005556247714",
+          "description": "Οικογενειακό Επιτραπέζιο Λαβύρινθος Minecraft",
+          "packageSize": 12,
+          "wholesalePrice": 22.58
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 25,
+          "originalWholesalePrice": 16.13,
+          "piecesPerBox": 12,
+          "quantity": 1,
+          "productCode": "20799",
+          "packageLabel": "12 τεμ.",
+          "barcodeUnit": "4005556207992",
+          "description": "Οικογενειακό Επιτραπέζιο Λαβύρινθος Jr. Paw Patrol",
+          "packageSize": 12,
+          "wholesalePrice": 16.13
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 9.99,
+          "originalWholesalePrice": 5.4,
+          "piecesPerBox": 1,
+          "quantity": 1,
+          "productCode": "24810",
+          "packageLabel": "1 τεμ.",
+          "barcodeUnit": "4005556248100",
+          "description": "Βοήθησε τη Gabby! Ν",
+          "packageSize": 1,
+          "wholesalePrice": 5.4
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 9.99,
+          "originalWholesalePrice": 5.4,
+          "piecesPerBox": 1,
+          "quantity": 1,
+          "productCode": "24815",
+          "packageLabel": "1 τεμ.",
+          "barcodeUnit": "4005556248155",
+          "description": "Pokemon Labyrinth Ν",
+          "packageSize": 1,
+          "wholesalePrice": 5.4
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 9.99,
+          "originalWholesalePrice": 5.4,
+          "piecesPerBox": 1,
+          "quantity": 1,
+          "productCode": "24872",
+          "packageLabel": "1 τεμ.",
+          "barcodeUnit": "4005556248728",
+          "description": "Ομάδα Spidey Ν",
+          "packageSize": 1,
+          "wholesalePrice": 5.4
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 22,
+          "originalWholesalePrice": 11.89,
+          "piecesPerBox": 10,
+          "quantity": 2,
+          "productCode": "01957WD",
+          "packageLabel": "10 τεμ.",
+          "barcodeUnit": "8693830019575",
+          "description": "Κρεβάτι - Κούνια Minnie Mouse GR",
+          "packageSize": 10,
+          "wholesalePrice": 11.89
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 25,
+          "originalWholesalePrice": 13.51,
+          "piecesPerBox": 6,
+          "quantity": 2,
+          "productCode": "01972MT",
+          "packageLabel": "6 τεμ.",
+          "barcodeUnit": "8693830019728",
+          "description": "Καρότσι Αγορών Barbie",
+          "packageSize": 6,
+          "wholesalePrice": 13.51
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 26,
+          "originalWholesalePrice": 14.05,
+          "piecesPerBox": 8,
+          "quantity": 2,
+          "productCode": "01971WD",
+          "packageLabel": "8 τεμ.",
+          "barcodeUnit": "8693830019711",
+          "description": "Τρόλεϊ Καθαριότητας Minnie Mouse GR",
+          "packageSize": 8,
+          "wholesalePrice": 14.05
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 28,
+          "originalWholesalePrice": 15.13,
+          "piecesPerBox": 8,
+          "quantity": 2,
+          "productCode": "03759WD",
+          "packageLabel": "8 τεμ.",
+          "barcodeUnit": "8693830037593",
+          "description": "Στούντιο Ομορφιάς Minnie Mouse GR",
+          "packageSize": 8,
+          "wholesalePrice": 15.13
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 28,
+          "originalWholesalePrice": 15.13,
+          "piecesPerBox": 6,
+          "quantity": 2,
+          "productCode": "01503ΜΤ",
+          "packageLabel": "6 τεμ.",
+          "barcodeUnit": "8693830015034",
+          "description": "Κουζίνα Barbie",
+          "packageSize": 6,
+          "wholesalePrice": 15.13
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 15,
+          "originalWholesalePrice": 8.11,
+          "piecesPerBox": 12,
+          "quantity": 2,
+          "productCode": "03566WD",
+          "packageLabel": "12 τεμ.",
+          "barcodeUnit": "8693830035667",
+          "description": "Σετ Ομορφιάς Frozen GR",
+          "packageSize": 12,
+          "wholesalePrice": 8.11
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 20,
+          "originalWholesalePrice": 10.81,
+          "piecesPerBox": 8,
+          "quantity": 2,
+          "productCode": "04002ΜΤ",
+          "packageLabel": "8 τεμ.",
+          "barcodeUnit": "8693830040029",
+          "description": "Σετ Χάνρες Barbie GR",
+          "packageSize": 8,
+          "wholesalePrice": 10.81
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 21.01,
+          "originalWholesalePrice": 11.35,
+          "piecesPerBox": 8,
+          "quantity": 2,
+          "productCode": "03871PM",
+          "packageLabel": "8 τεμ.",
+          "barcodeUnit": "8693830038712",
+          "description": "Σετ επιδαπέδιο Μπάσκετ Paw Patrol GR",
+          "packageSize": 8,
+          "wholesalePrice": 11.35
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 34.99,
+          "originalWholesalePrice": 18.91,
+          "piecesPerBox": 4,
+          "quantity": 1,
+          "productCode": "03355",
+          "packageLabel": "4 τεμ.",
+          "barcodeUnit": "8693830033557",
+          "description": "Περπατούρα Τρακτέρ 2 χρ.",
+          "packageSize": 4,
+          "wholesalePrice": 18.91
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 34.99,
+          "originalWholesalePrice": 18.91,
+          "piecesPerBox": 4,
+          "quantity": 1,
+          "productCode": "03822PM",
+          "packageLabel": "4 τεμ.",
+          "barcodeUnit": "8693830038224",
+          "description": "Περπατούρα Paw Patrol GR",
+          "packageSize": 4,
+          "wholesalePrice": 18.91
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 9,
+          "originalWholesalePrice": 4.86,
+          "piecesPerBox": 24,
+          "quantity": 2,
+          "productCode": "03934",
+          "packageLabel": "24 τεμ.",
+          "barcodeUnit": "8693830039344",
+          "description": "Χελωνάκι με Σχήματα GR",
+          "packageSize": 24,
+          "wholesalePrice": 4.86
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 8,
+          "originalWholesalePrice": 4.32,
+          "piecesPerBox": 24,
+          "quantity": 2,
+          "productCode": "03935",
+          "packageLabel": "24 τεμ.",
+          "barcodeUnit": "8693830039351",
+          "description": "Πυραμίδα με Τρενάκια GR",
+          "packageSize": 24,
+          "wholesalePrice": 4.32
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 9.99,
+          "originalWholesalePrice": 5.4,
+          "piecesPerBox": 24,
+          "quantity": 2,
+          "productCode": "03936",
+          "packageLabel": "24 τεμ.",
+          "barcodeUnit": "8693830039368",
+          "description": "Εργαλειοθήκη με Σχήματα GR",
+          "packageSize": 24,
+          "wholesalePrice": 5.4
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 12,
+          "originalWholesalePrice": 6.49,
+          "piecesPerBox": 18,
+          "quantity": 2,
+          "productCode": "03937",
+          "packageLabel": "18 τεμ.",
+          "barcodeUnit": "8693830039375",
+          "description": "Σπιτάκι με Σχήματα GR",
+          "packageSize": 18,
+          "wholesalePrice": 6.49
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 12,
+          "originalWholesalePrice": 6.49,
+          "piecesPerBox": 24,
+          "quantity": 2,
+          "productCode": "03940",
+          "packageLabel": "24 τεμ.",
+          "barcodeUnit": "8693830039405",
+          "description": "Πύργος με Σχήματα σε Κουβαδάκι GR",
+          "packageSize": 24,
+          "wholesalePrice": 6.49
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 8,
+          "originalWholesalePrice": 4.32,
+          "piecesPerBox": 24,
+          "quantity": 2,
+          "productCode": "03941",
+          "packageLabel": "24 τεμ.",
+          "barcodeUnit": "8693830039412",
+          "description": "Κύβος με Σχήματα GR",
+          "packageSize": 24,
+          "wholesalePrice": 4.32
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 13,
+          "originalWholesalePrice": 7.02,
+          "piecesPerBox": 12,
+          "quantity": 2,
+          "productCode": "03986PM",
+          "packageLabel": "12 τεμ.",
+          "barcodeUnit": "8693830039863",
+          "description": "Paw Patrol Σετ Αριθμιτικής με Πλαστελίνες",
+          "packageSize": 12,
+          "wholesalePrice": 7.02
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 16,
+          "originalWholesalePrice": 8.64,
+          "piecesPerBox": 12,
+          "quantity": 2,
+          "productCode": "03985PM",
+          "packageLabel": "12 τεμ.",
+          "barcodeUnit": "8693830039856",
+          "description": "Paw Patrol Σπίτι με Πλαστελίνες",
+          "packageSize": 12,
+          "wholesalePrice": 8.64
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 13,
+          "originalWholesalePrice": 7.02,
+          "piecesPerBox": 12,
+          "quantity": 2,
+          "productCode": "03984PM",
+          "packageLabel": "12 τεμ.",
+          "barcodeUnit": "8693830039849",
+          "description": "Paw Patrol Σετ Σχήματα με Πλαστελίνες",
+          "packageSize": 12,
+          "wholesalePrice": 7.02
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 8,
+          "originalWholesalePrice": 4.32,
+          "piecesPerBox": 12,
+          "quantity": 2,
+          "productCode": "03983PM",
+          "packageLabel": "12 τεμ.",
+          "barcodeUnit": "8693830039832",
+          "description": "Paw Patrol Σετ Πλαστελίνες με Αξεσουάρ",
+          "packageSize": 12,
+          "wholesalePrice": 4.32
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 12,
+          "originalWholesalePrice": 6.49,
+          "piecesPerBox": 24,
+          "quantity": 2,
+          "productCode": "77354",
+          "packageLabel": "24 τεμ.",
+          "barcodeUnit": "8412842773547",
+          "description": "Make Up Frozen Κασετίνα",
+          "packageSize": 24,
+          "wholesalePrice": 6.49
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 28,
+          "originalWholesalePrice": 15.13,
+          "piecesPerBox": 6,
+          "quantity": 1,
+          "productCode": "48407",
+          "packageLabel": "6 τεμ.",
+          "barcodeUnit": "8412842484078",
+          "description": "Make Up Hello Kitty Μεγάλο Σετ",
+          "packageSize": 6,
+          "wholesalePrice": 15.13
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 12,
+          "originalWholesalePrice": 6.49,
+          "piecesPerBox": 24,
+          "quantity": 2,
+          "productCode": "77362",
+          "packageLabel": "24 τεμ.",
+          "barcodeUnit": "8412842773622",
+          "description": "Make Up Minnie Κασετίνα",
+          "packageSize": 24,
+          "wholesalePrice": 6.49
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 13,
+          "originalWholesalePrice": 7.02,
+          "piecesPerBox": 6,
+          "quantity": 2,
+          "productCode": "77197",
+          "packageLabel": "6 τεμ.",
+          "barcodeUnit": "8412842771970",
+          "description": "Make Up Minnie Λουλούδι",
+          "packageSize": 6,
+          "wholesalePrice": 7.02
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 12,
+          "originalWholesalePrice": 6.49,
+          "piecesPerBox": 6,
+          "quantity": 2,
+          "productCode": "77196",
+          "packageLabel": "6 τεμ.",
+          "barcodeUnit": "8412842771963",
+          "description": "Make Up Minnie Τηλέφωνο",
+          "packageSize": 6,
+          "wholesalePrice": 6.49
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 65,
+          "originalWholesalePrice": 20,
+          "piecesPerBox": 4,
+          "quantity": 3,
+          "productCode": "120003A",
+          "packageLabel": "4 τεμ.",
+          "barcodeUnit": "8436547415847",
+          "description": "Τηλεκατευθυνόμενο Όχημα Flash Racer Blue - Black 1:12",
+          "packageSize": 4,
+          "wholesalePrice": 20
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 29.99,
+          "originalWholesalePrice": 10,
+          "piecesPerBox": 6,
+          "quantity": 3,
+          "productCode": "180000D",
+          "packageLabel": "6 τεμ.",
+          "barcodeUnit": "8436547415199",
+          "description": "Τηλεκατευθυνόμενο Όχημα Sand Cross Yellow 1:18",
+          "packageSize": 6,
+          "wholesalePrice": 10
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 29.99,
+          "originalWholesalePrice": 10,
+          "piecesPerBox": 6,
+          "quantity": 3,
+          "productCode": "180002D",
+          "packageLabel": "6 τεμ.",
+          "barcodeUnit": "8436547415212",
+          "description": "Τηλεκατευθυνόμενο Όχημα Air Cross Red 1:18",
+          "packageSize": 6,
+          "wholesalePrice": 10
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 34.99,
+          "originalWholesalePrice": 12,
+          "piecesPerBox": 6,
+          "quantity": 3,
+          "productCode": "180010K",
+          "packageLabel": "6 τεμ.",
+          "barcodeUnit": "8436547415991",
+          "description": "Τηλεκατευθυνόμενο Όχημα Metal Racer - Green 1:18",
+          "packageSize": 6,
+          "wholesalePrice": 12
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 34.99,
+          "originalWholesalePrice": 12,
+          "piecesPerBox": 6,
+          "quantity": 3,
+          "productCode": "180010L",
+          "packageLabel": "6 τεμ.",
+          "barcodeUnit": "8436547416004",
+          "description": "Τηλεκατευθυνόμενο Όχημα Metal Racer - Silver 1:18",
+          "packageSize": 6,
+          "wholesalePrice": 12
+        },
+        {
+          "supplierBrand": "john",
+          "srp": 34.99,
+          "originalWholesalePrice": 12,
+          "piecesPerBox": 6,
+          "quantity": 3,
+          "productCode": "180012Β",
+          "packageLabel": "6 τεμ.",
+          "barcodeUnit": "8436547415915",
+          "description": "Τηλεκατευθυνόμενο Όχημα XT Racer - Red 1:18",
+          "packageSize": 6,
+          "wholesalePrice": 12
+        }
+      ],
+      "deliveryInfo": "Μεταφορική Δωδεκανήσου ",
+      "vat": 191.4,
+      "discount": 41.97,
+      "paymentMethod": "cash",
+      "finalValue": 988.88,
+      "paymentMethodLabel": "Μετρητά",
+      "exported": true,
+      "exportedAt": "2025-10-22T15:44:53.962Z",
+      "sent": true,
+      "status": "sent",
+      "firestoreUpdatedAt": {
+        "_seconds": 1761147894,
+        "_nanoseconds": 202000000
+      },
+      "updatedAt": "2025-10-22T15:44:52.780Z"
+    }
+  ],
+  "orders_john_supermarket": [
+    {
+      "id": "1761057073369_5870",
+      "orderType": "supermarket",
+      "notes": "",
+      "startedLocation": null,
+      "companyName": "MASOUTIS",
+      "startedAt": "2025-10-21T14:31:13.369Z",
+      "number": "251021-0I9M",
+      "createdAt": "2025-10-21T14:31:13.377Z",
+      "inventorySnapshot": {},
+      "customerId": "john_masoutis_362",
+      "storeName": "40 ΕΚΚΛΗΣΙΕΣ",
+      "brand": "john",
+      "deliveryInfo": "",
+      "storeCategory": "Δ",
+      "storeId": "john_masoutis_362",
+      "userId": "Y4EDCvu84wWUs4xOXrZWzpMsgdO2",
+      "exportedLocation": null,
+      "createdBy": "Y4EDCvu84wWUs4xOXrZWzpMsgdO2",
+      "paymentMethod": "cash",
+      "storeCode": "362",
+      "customer": {
+        "area": "ΚΕΝΤΡΟ",
+        "city": "ΘΕΣ/ΝΙΚΗ",
+        "companyName": "MASOUTIS",
+        "name": "40 ΕΚΚΛΗΣΙΕΣ",
+        "customerCode": "362",
+        "storeCategory": "Δ",
+        "id": "john_masoutis_362",
+        "type": "supermarket_store",
+        "brand": "john"
+      },
+      "netValue": 88.7,
+      "vat": 20.65,
+      "discount": 2.66,
+      "finalValue": 106.69,
+      "lines": [
+        {
+          "orderType": "supermarket",
+          "quantity": 1,
+          "code": "01833ΜΤ",
+          "suggestedQty": 0,
+          "description": "Σετ ιατρική Τσάντα Barbie",
+          "packaging": "24",
+          "isNew": false,
+          "listingId": "john_01833mt",
+          "srp": 9.99,
+          "photoUrl": "https://res.cloudinary.com/db9yukggu/image/upload/v1760874550/John%20Hellas/01833%CE%9C%CE%A4.png",
+          "productCode": "01833ΜΤ",
+          "currentStock": null,
+          "id": "supermarket_01833ΜΤ",
+          "wholesalePrice": 8.06,
+          "barcode": "8693830018332",
+          "brand": "john",
+          "storeStock": 0
+        },
+        {
+          "orderType": "supermarket",
+          "quantity": 4,
+          "code": "01753MT",
+          "suggestedQty": 0,
+          "description": "Σετ πιατοθήκη  Barbie",
+          "packaging": "16",
+          "isNew": false,
+          "listingId": "john_01753mt",
+          "srp": 12,
+          "photoUrl": "https://res.cloudinary.com/db9yukggu/image/upload/v1760874549/John%20Hellas/01753MT.png",
+          "productCode": "01753MT",
+          "currentStock": null,
+          "id": "supermarket_01753MT",
+          "wholesalePrice": 9.68,
+          "barcode": "8693830017533",
+          "brand": "john",
+          "storeStock": 0
+        },
+        {
+          "orderType": "supermarket",
+          "quantity": 4,
+          "code": "03821PM",
+          "suggestedQty": 0,
+          "description": "Σετ Bowling Paw Patrol GR",
+          "packaging": "12",
+          "isNew": false,
+          "listingId": "john_03821pm",
+          "srp": 13,
+          "photoUrl": "https://res.cloudinary.com/db9yukggu/image/upload/v1760874570/John%20Hellas/03821PM.png",
+          "productCode": "03821PM",
+          "currentStock": null,
+          "id": "supermarket_03821PM",
+          "wholesalePrice": 10.48,
+          "barcode": "8693830038217",
+          "brand": "john",
+          "storeStock": 0
+        }
+      ],
+      "paymentMethodLabel": "Μετρητά",
+      "exported": true,
+      "exportedAt": "2025-10-21T14:38:41.717Z",
+      "sent": true,
+      "status": "sent",
+      "firestoreUpdatedAt": {
+        "_seconds": 1761057526,
+        "_nanoseconds": 616000000
+      },
+      "updatedAt": "2025-10-21T14:34:02.589Z"
+    },
+    {
+      "id": "1761118037721_9702",
+      "orderType": "supermarket",
+      "notes": "",
+      "startedLocation": null,
+      "companyName": "MASOUTIS",
+      "discount": 0,
+      "startedAt": "2025-10-22T07:27:17.721Z",
+      "storeRegion": "ΘΕΣ/ΝΙΚΗΣ",
+      "number": "251022-U7QH",
+      "createdAt": "2025-10-22T07:27:17.741Z",
+      "inventorySnapshot": {},
+      "storePhone": "231 0 516206",
+      "customerId": "john_masoutis_101",
+      "storeName": "ΚΡΥΣΤΑΛΛΗ",
+      "finalValue": 0,
+      "brand": "john",
+      "deliveryInfo": "",
+      "netValue": 0,
+      "vat": 0,
+      "storeCategory": "Γ",
+      "storeId": "john_masoutis_101",
+      "userId": "Y4EDCvu84wWUs4xOXrZWzpMsgdO2",
+      "exportedLocation": null,
+      "storeAddress": "Κ. ΚΡΥΣΤΑΛΛΗ 4",
+      "createdBy": "Y4EDCvu84wWUs4xOXrZWzpMsgdO2",
+      "storeEmail": null,
+      "storeCity": "ΘΕΣ/ΝΙΚΗ",
+      "storePostalCode": "54630",
+      "storeCode": "101",
+      "customer": {
+        "area": "ΚΕΝΤΡΟ",
+        "rawStore": {
+          "area": "ΚΕΝΤΡΟ",
+          "storeNumber": "1",
+          "address": "Κ. ΚΡΥΣΤΑΛΛΗ 4",
+          "hasToys": "Γ",
+          "city": "ΘΕΣ/ΝΙΚΗ",
+          "postalCode": "54630",
+          "companyName": "MASOUTIS",
+          "hasSummerItems": "ΜΕΓΑΛΑ",
+          "storeCategory": "Γ",
+          "storeCodeNormalized": "101",
+          "typologyNotes": null,
+          "openingStatus": null,
+          "phone": "231 0 516206",
+          "companySlug": "masoutis",
+          "storeName": "ΚΡΥΣΤΑΛΛΗ",
+          "id": "john_masoutis_101",
+          "refId": "john_masoutis_101",
+          "category": "Μεγάλο",
+          "region": "ΘΕΣ/ΝΙΚΗΣ",
+          "brand": "john",
+          "storeCode": "101",
+          "updatedAt": {
+            "_seconds": 1760981860,
+            "_nanoseconds": 761000000
+          }
+        },
+        "address": {
+          "city": "ΘΕΣ/ΝΙΚΗ",
+          "street": "Κ. ΚΡΥΣΤΑΛΛΗ 4",
+          "postalCode": "54630"
+        },
+        "city": "ΘΕΣ/ΝΙΚΗ",
+        "companyName": "MASOUTIS",
+        "customerCode": "101",
+        "storeCategory": "Γ",
+        "type": "supermarket_store",
+        "companyVat": null,
+        "phone": "231 0 516206",
+        "name": "ΚΡΥΣΤΑΛΛΗ",
+        "storeName": "ΚΡΥΣΤΑΛΛΗ",
+        "id": "john_masoutis_101",
+        "region": "ΘΕΣ/ΝΙΚΗΣ",
+        "brand": "john",
+        "email": null,
+        "storeCode": "101"
+      },
+      "lines": [
+        {
+          "masterCode": "3924776",
+          "quantity": 2,
+          "productCode": "03823PM",
+          "price": 8.06,
+          "suggestedQty": 0,
+          "currentStock": 2,
+          "description": "Σετ Basket  τοίχου  Paw Patrol GR",
+          "packaging": "16",
+          "isNew": false,
+          "barcode": "8693830038231"
+        },
+        {
+          "quantity": 3,
+          "productCode": "01833ΜΤ",
+          "price": 8.06,
+          "suggestedQty": 0,
+          "currentStock": 0,
+          "description": "Σετ ιατρική Τσάντα Barbie",
+          "packaging": "24",
+          "isNew": false,
+          "barcode": "8693830018332"
+        }
+      ],
+      "paymentMethodLabel": null,
+      "paymentMethod": null,
+      "exported": true,
+      "sent": true,
+      "status": "sent",
+      "exportedAt": "2025-10-22T07:40:25.235Z",
+      "firestoreUpdatedAt": {
+        "_seconds": 1761118824,
+        "_nanoseconds": 765000000
+      },
+      "updatedAt": "2025-10-22T07:39:33.216Z"
+    },
+    {
+      "id": "1761210939844_2329",
+      "orderType": "supermarket",
+      "notes": "",
+      "startedLocation": null,
+      "companyName": "MASOUTIS",
+      "startedAt": "2025-10-23T09:15:39.844Z",
+      "discount": 0,
+      "storeRegion": "ΘΕΣ/ΝΙΚΗΣ",
+      "createdAt": "2025-10-23T09:15:39.850Z",
+      "number": "251023-Z7BI",
+      "inventorySnapshot": {},
+      "storePhone": "231 0 655629",
+      "customerId": "john_masoutis_119",
+      "exportedAt": null,
+      "storeName": "GRAND ΣΤΑΥΡΟΥΠΟΛΗΣ",
+      "finalValue": 0,
+      "brand": "john",
+      "exported": false,
+      "deliveryInfo": "",
+      "netValue": 0,
+      "vat": 0,
+      "storeCategory": "Α",
+      "storeId": "john_masoutis_119",
+      "userId": "Y4EDCvu84wWUs4xOXrZWzpMsgdO2",
+      "exportedLocation": null,
+      "createdBy": "Y4EDCvu84wWUs4xOXrZWzpMsgdO2",
+      "storeAddress": "4ο χλμ ΟΔΟΥ ΛΑΓΚΑΔΑ",
+      "paymentMethod": "cash",
+      "storeEmail": null,
+      "storeCity": "ΘΕΣ/ΝΙΚΗ",
+      "storePostalCode": "56533",
+      "storeCode": "119",
+      "status": "draft",
+      "customer": {
+        "area": "ΣΤΑΥΡΟΥΠΟΛΗ",
+        "rawStore": {
+          "area": "ΣΤΑΥΡΟΥΠΟΛΗ",
+          "storeNumber": "15",
+          "address": "4ο χλμ ΟΔΟΥ ΛΑΓΚΑΔΑ",
+          "city": "ΘΕΣ/ΝΙΚΗ",
+          "hasToys": "Α",
+          "companyName": "MASOUTIS",
+          "postalCode": "56533",
+          "hasSummerItems": "GRAND",
+          "storeCategory": "Α",
+          "storeCodeNormalized": "119",
+          "typologyNotes": null,
+          "openingStatus": null,
+          "phone": "231 0 655629",
+          "companySlug": "masoutis",
+          "storeName": "GRAND ΣΤΑΥΡΟΥΠΟΛΗΣ",
+          "refId": "john_masoutis_119",
+          "id": "john_masoutis_119",
+          "category": "Grand",
+          "region": "ΘΕΣ/ΝΙΚΗΣ",
+          "brand": "john",
+          "updatedAt": {
+            "_seconds": 1760981860,
+            "_nanoseconds": 761000000
+          },
+          "storeCode": "119"
+        },
+        "address": {
+          "city": "ΘΕΣ/ΝΙΚΗ",
+          "street": "4ο χλμ ΟΔΟΥ ΛΑΓΚΑΔΑ",
+          "postalCode": "56533"
+        },
+        "city": "ΘΕΣ/ΝΙΚΗ",
+        "companyName": "MASOUTIS",
+        "customerCode": "119",
+        "storeCategory": "Α",
+        "type": "supermarket_store",
+        "companyVat": null,
+        "phone": "231 0 655629",
+        "name": "GRAND ΣΤΑΥΡΟΥΠΟΛΗΣ",
+        "storeName": "GRAND ΣΤΑΥΡΟΥΠΟΛΗΣ",
+        "id": "john_masoutis_119",
+        "region": "ΘΕΣ/ΝΙΚΗΣ",
+        "brand": "john",
+        "email": null,
+        "storeCode": "119"
+      },
+      "lines": [
+        {
+          "quantity": 2,
+          "productCode": "11563",
+          "price": 13.71,
+          "suggestedQty": 0,
+          "currentStock": 0,
+          "description": "3D Puzzle 72 τεμ. Spiderman",
+          "packaging": "6",
+          "isNew": true
+        },
+        {
+          "quantity": 2,
+          "productCode": "11574",
+          "price": 18.55,
+          "suggestedQty": 0,
+          "currentStock": 0,
+          "description": "3D Puzzle 72 τεμ. Stitch",
+          "packaging": "6",
+          "isNew": true
+        },
+        {
+          "quantity": 4,
+          "productCode": "24695",
+          "price": 12.9,
+          "suggestedQty": 0,
+          "currentStock": 0,
+          "description": "Memory® + 3 Παζλ Stitch  Ν",
+          "packaging": "10",
+          "isNew": true
+        }
+      ],
+      "firestoreUpdatedAt": {
+        "_seconds": 1761210961,
+        "_nanoseconds": 494000000
+      },
+      "updatedAt": "2025-10-23T09:16:00.868Z"
+    }
+  ],
+  "orders_kivos": [
+    {
+      "id": "00s7yCErMZXo44ok2wi5"
+    },
+    {
+      "id": "1761126257470_2914",
+      "deliveryInfo": "",
+      "notes": "",
+      "startedLocation": null,
+      "startedAt": "2025-10-22T09:44:17.470Z",
+      "userId": "Y4EDCvu84wWUs4xOXrZWzpMsgdO2",
+      "createdAt": "2025-10-22T09:44:17.504Z",
+      "number": "251022-SLJP",
+      "exportedLocation": null,
+      "createdBy": "Y4EDCvu84wWUs4xOXrZWzpMsgdO2",
+      "paymentMethod": "cash",
+      "brand": "kivos",
+      "discount": 17.64,
+      "netValue": 184.45,
+      "vat": 40.03,
+      "finalValue": 206.84,
+      "lines": [
+        {
+          "supplierBrand": "Artline",
+          "srp": null,
+          "originalWholesalePrice": 0.98,
+          "piecesPerBox": 12,
+          "quantity": 120,
+          "productCode": "EK701",
+          "packageLabel": "12 τεμ.",
+          "barcodeUnit": "4974052801303",
+          "description": "ΜΑΡΚΑΔ.ΑRΤLΙΝΕ ΕΚ-70 ΑL ΑΝΕΞ.ΣΤΡΟΓΓ. 1.5ΜΜ ΜΑΥΡΟ",
+          "packageQuantity": 10,
+          "packageSize": 12,
+          "wholesalePrice": 0.98
+        },
+        {
+          "supplierBrand": "Artline",
+          "srp": null,
+          "originalWholesalePrice": 0.98,
+          "piecesPerBox": 12,
+          "quantity": 24,
+          "productCode": "EK702",
+          "packageLabel": "12 τεμ.",
+          "barcodeUnit": "4974052801532",
+          "description": "ΜΑΡΚΑΔ.ΑRΤLΙΝΕ ΕΚ-70 ΑL ΑΝΕΞ.ΣΤΡΟΓΓ. 1.5ΜΜ ΚΟΚΚΙΝΟ",
+          "packageQuantity": 2,
+          "packageSize": 12,
+          "wholesalePrice": 0.98
+        },
+        {
+          "supplierBrand": "Artline",
+          "srp": null,
+          "originalWholesalePrice": 0.98,
+          "piecesPerBox": 12,
+          "quantity": 24,
+          "productCode": "EK703",
+          "packageLabel": "12 τεμ.",
+          "barcodeUnit": "4974052801310",
+          "description": "ΜΑΡΚΑΔ.ΑRΤLΙΝΕ ΕΚ-70 ΑL ΑΝΕΞ.ΣΤΡΟΓΓ. 1.5ΜΜ ΜΠΛΕ",
+          "packageQuantity": 2,
+          "packageSize": 12,
+          "wholesalePrice": 0.98
+        },
+        {
+          "supplierBrand": "Artline",
+          "srp": null,
+          "originalWholesalePrice": 0.98,
+          "piecesPerBox": 12,
+          "quantity": 12,
+          "productCode": "EK901",
+          "packageLabel": "12 τεμ.",
+          "barcodeUnit": "4974052802300",
+          "description": "ΜΑΡΚΑΔ.ΑRΤLΙΝΕ ΕΚ-90 ΑL ΑΝΕΞ.ΠΛΑΚΕ 2,0-5,0 ΜΑΥΡΟ",
+          "packageQuantity": 1,
+          "packageSize": 12,
+          "wholesalePrice": 0.98
+        },
+        {
+          "supplierBrand": "LOGO",
+          "srp": null,
+          "originalWholesalePrice": 1.61,
+          "piecesPerBox": 1,
+          "quantity": 5,
+          "productCode": "65ΔΚ0081",
+          "packageLabel": "1 τεμ.",
+          "barcodeUnit": "5202456237817",
+          "description": "LOGO TAPE 2-OΨH AΦPΩΔHΣ 19x10",
+          "packageQuantity": 5,
+          "packageSize": 1,
+          "wholesalePrice": 1.61
+        }
+      ],
+      "paymentMethodLabel": "Μετρητά",
+      "sent": true,
+      "exported": false,
+      "exportedAt": null,
+      "status": "draft",
+      "customerId": "1404351",
+      "firestoreUpdatedAt": {
+        "_seconds": 1761128051,
+        "_nanoseconds": 214000000
+      },
+      "updatedAt": "2025-10-22T10:14:11.446Z",
+      "customer": {
+        "profession": "ΧΑΡΤΙΚΑ ΕΙΔΗ ΓΡΑΦΕΙΟΥ ΔΩΡΑ",
+        "channel": "1",
+        "isActive": "1",
+        "merch": "ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ",
+        "InvSales2024": "121.61",
+        "InvSales2023": null,
+        "InvSales2022": null,
+        "importedAt": {
+          "seconds": 1760947131,
+          "nanoseconds": 424000000
+        },
+        "address": {
+          "city": "ΚΑΛΥΜΝΟΣ",
+          "street": "Π.ΜΑΞΙΜΟΥ",
+          "postalCode": "85200"
+        },
+        "name3": "ΕΜΠΟΡΙΟ ΧΑΡΤΙΚΩΝ ΕΙΔΩΝ-ΒΙΒΛΙΩΝ-ΠΑΙΧ",
+        "contact": {
+          "fax": null,
+          "telephone2": null,
+          "telephone1": "2243022809",
+          "email": "k2903a@hotmail.com"
+        },
+        "name": "ΤΑΤΑΡΗ ΙΩΑΝ. ΑΙΚΑΤΕΡΙΝΗ",
+        "customerCode": "1404351",
+        "id": "1404351",
+        "salesInfo": {
+          "description": "PMH Small customers",
+          "groupKeyText": "Other Stationery Stores",
+          "groupKey": "2050-ZAZ"
+        },
+        "region": {
+          "name": "Dhodhekanisos",
+          "id": "7"
+        },
+        "brand": "playmobil",
+        "vatInfo": {
+          "registrationNo": "EL108156970",
+          "office": "ΚΩ"
+        },
+        "transportation": {
+          "zone": "Aegean Sea",
+          "zoneId": "11"
+        }
+      }
+    },
+    {
+      "id": "1761197070917_1377",
+      "deliveryInfo": "",
+      "notes": "",
+      "startedLocation": null,
+      "startedAt": "2025-10-23T05:24:30.917Z",
+      "discount": 0,
+      "userId": "Y4EDCvu84wWUs4xOXrZWzpMsgdO2",
+      "createdAt": "2025-10-23T05:24:30.932Z",
+      "number": "251023-254Z",
+      "exportedLocation": null,
+      "createdBy": "Y4EDCvu84wWUs4xOXrZWzpMsgdO2",
+      "customerId": "003296",
+      "paymentMethod": "cash",
+      "brand": "kivos",
+      "customer": {
+        "profession": "ΛΙΑΝΙΚΟ ΕΜΠΟΡΙΟ ΣΙΔΗΡΙΚΩΝ, ΧΡΩΜΑΤΩΝ ΚΑΙ ΤΖΑΜΙΩΝ ΣΕ ΕΞΕΙΔΙΚΕΥΜΕΝΑ ΚΑΤΑΣΤΗΜΑΤΑ",
+        "address": {
+          "city": "ΕΥΑΓΓΕΛΙΣΤΡΙΑ ΘΕΣΣΑΛΟΝΙΚΗ",
+          "street": "ΠΑΝΕΠΙΣΤΗΜΙΟΥ 23",
+          "postalCode": "54636"
+        },
+        "importedAt": {
+          "seconds": 1760627548,
+          "nanoseconds": 851000000
+        },
+        "channel": "2",
+        "customerCode": "003296",
+        "isActive": "1",
+        "merch": "ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ",
+        "InvSales2024": "464.87",
+        "InvSales2023": "423.19",
+        "InvSales2022": "46",
+        "contact": {
+          "telephone2": null,
+          "telephone1": "2310217252",
+          "fax": null,
+          "email": null
+        },
+        "name": "ΑΓΑΘΑΓΓΕΛΙΔΗΣ ΙΩΑ. ΔΑΜΙΑΝΟΣ",
+        "id": "003296",
+        "brand": "kivos",
+        "vatInfo": {
+          "registrationNo": "045382214",
+          "office": "Δ΄ ΘΕΣΣΑΛΟΝΙΚΗΣ"
+        }
+      },
+      "netValue": 125.76,
+      "vat": 30.18,
+      "finalValue": 155.94,
+      "lines": [
+        {
+          "supplierBrand": "LOGO",
+          "srp": null,
+          "originalWholesalePrice": 3.5,
+          "piecesPerBox": 12,
+          "quantity": 12,
+          "productCode": "65ΒΒ200",
+          "packageLabel": "12 τεμ.",
+          "barcodeUnit": "5202456213002",
+          "description": "SILIC ΦYΣΙΓΓΑ 300ml (ΜΟΝΤΑΖΟΚΟΛΛΑ) (ΔIAΦΑΝΗ )",
+          "packageQuantity": 1,
+          "packageSize": 12,
+          "wholesalePrice": 3.5
+        },
+        {
+          "supplierBrand": "LOGO",
+          "srp": null,
+          "originalWholesalePrice": 1.9,
+          "piecesPerBox": 24,
+          "quantity": 24,
+          "productCode": "65ΒΒ100",
+          "packageLabel": "24 τεμ.",
+          "barcodeUnit": "5202456213507",
+          "description": "SILIC ΣΩΛΗΝΑΡΙΟ 85ml (ΜΟΝΤΑΖΟΚΟΛΛΑ) (ΔIAΦΑΝΟ )",
+          "packageQuantity": 1,
+          "packageSize": 24,
+          "wholesalePrice": 1.9
+        },
+        {
+          "supplierBrand": "LOGO",
+          "srp": null,
+          "originalWholesalePrice": 1.59,
+          "piecesPerBox": 24,
+          "quantity": 24,
+          "productCode": "65ΒΖ500",
+          "packageLabel": "24 τεμ.",
+          "barcodeUnit": "5202456215020",
+          "description": "LOGO ECOΝΟΜΥ 900 ΣΩΛHN. 85ml (ΔIAΦΑΝΟ )",
+          "packageQuantity": 1,
+          "packageSize": 24,
+          "wholesalePrice": 1.59
+        }
+      ],
+      "paymentMethodLabel": "Μετρητά",
+      "exported": true,
+      "exportedAt": "2025-10-23T05:26:00.193Z",
+      "sent": true,
+      "firestoreUpdatedAt": {
+        "_seconds": 1761197159,
+        "_nanoseconds": 572000000
+      },
+      "updatedAt": "2025-10-23T05:26:00.207Z",
+      "packedAt": {
+        "_seconds": 1764588213,
+        "_nanoseconds": 405000000
+      },
+      "packedBy": "C0GAHzVuAmeXvWLkasihaFohCzt1",
+      "status": "packed"
+    }
+  ],
+  "products": [
+    {
+      "id": "210136",
+      "productCode": "210136",
+      "barcode": null,
+      "playingTheme": "PLAYMOBIL FIGURES",
+      "description": "Εκθέτης Figures 25 MIX (24x71455 + 24x71456)*",
+      "launchDate": null,
+      "package": null,
+      "srp": null,
+      "suggestedAge": null,
+      "gender": null,
+      "frontCover": null,
+      "isActive": true,
+      "brand": "playmobil",
+      "importedAt": {
+        "_seconds": 1760944289,
+        "_nanoseconds": 77000000
+      },
+      "aa2025": "0",
+      "cataloguePage": "999",
+      "bestSeller": false,
+      "year2025AA": "0",
+      "availableStock": "#Δ/Υ",
+      "packageInfo": null,
+      "wholesalePrice": 69.6,
+      "lastUpdated": {
+        "_seconds": 1763581822,
+        "_nanoseconds": 422000000
+      }
+    },
+    {
+      "id": "210264",
+      "productCode": "210264",
+      "barcode": null,
+      "playingTheme": "PLAYMOBIL FIGURES",
+      "description": "Εκθέτης Figures 27 MIX (24x71760 + 24x71761)",
+      "package": null,
+      "srp": null,
+      "suggestedAge": null,
+      "gender": null,
+      "frontCover": null,
+      "isActive": true,
+      "aa2025": "207",
+      "brand": "playmobil",
+      "importedAt": {
+        "_seconds": 1760944289,
+        "_nanoseconds": 77000000
+      },
+      "cataloguePage": "57",
+      "bestSeller": false,
+      "year2025AA": "207",
+      "availableStock": "#Δ/Υ",
+      "launchDate": "Ιαν-25",
+      "packageInfo": null,
+      "wholesalePrice": 84,
+      "lastUpdated": {
+        "_seconds": 1763581822,
+        "_nanoseconds": 422000000
+      }
+    },
+    {
+      "id": "210321",
+      "productCode": "210321",
+      "barcode": null,
+      "playingTheme": "PLAYMOBIL FIGURES",
+      "description": "Εκθέτης Figures 28 MIX (24x71889 + 24x71890)",
+      "package": null,
+      "srp": null,
+      "suggestedAge": "4-10",
+      "gender": "U",
+      "frontCover": null,
+      "isActive": true,
+      "aa2025": "210",
+      "brand": "playmobil",
+      "importedAt": {
+        "_seconds": 1760944289,
+        "_nanoseconds": 77000000
+      },
+      "cataloguePage": "52",
+      "bestSeller": false,
+      "year2025AA": "210",
+      "availableStock": "#Δ/Υ",
+      "launchDate": "Ιουλ-25",
+      "packageInfo": null,
+      "wholesalePrice": 84,
+      "lastUpdated": {
+        "_seconds": 1763581822,
+        "_nanoseconds": 422000000
+      }
+    }
+  ],
+  "products_john": [
+    {
+      "id": "007351",
+      "subCategory": "THINKFUN",
+      "sheetCategory": "ThinkFun",
+      "description": "Παιχνίδι Λογικής Escape The Room Manor",
+      "packaging": "6",
+      "frontCover": "https://res.cloudinary.com/db9yukggu/image/upload/v1760874542/John%20Hellas/007351.png",
+      "priceList": 22.58,
+      "srp": 28,
+      "lastUpdated": {
+        "_seconds": 1762965094,
+        "_nanoseconds": 420000000
+      },
+      "productCode": "007351",
+      "generalCategory": "ΕΠΙΤΡΑΠΕΖΙΑ",
+      "barcode": "019275073510",
+      "brand": "john",
+      "wholesalePrice": 15.13
+    },
+    {
+      "id": "007352",
+      "subCategory": "THINKFUN",
+      "sheetCategory": "ThinkFun",
+      "description": "Παιχνίδι Λογικής Escape The Room Retreat",
+      "packaging": "6",
+      "frontCover": "https://res.cloudinary.com/db9yukggu/image/upload/v1760874543/John%20Hellas/007352.png",
+      "priceList": 22.58,
+      "srp": 28,
+      "lastUpdated": {
+        "_seconds": 1762965094,
+        "_nanoseconds": 420000000
+      },
+      "productCode": "007352",
+      "generalCategory": "ΕΠΙΤΡΑΠΕΖΙΑ",
+      "barcode": "019275073527",
+      "brand": "john",
+      "wholesalePrice": 15.13
+    },
+    {
+      "id": "0076317",
+      "subCategory": "THINKFUN",
+      "sheetCategory": "ThinkFun",
+      "description": "Παιχνίδι Λογικής Math Dice",
+      "packaging": "12",
+      "frontCover": "https://res.cloudinary.com/db9yukggu/image/upload/v1760874543/John%20Hellas/0076317.png",
+      "priceList": 7.26,
+      "srp": 9,
+      "lastUpdated": {
+        "_seconds": 1762965094,
+        "_nanoseconds": 420000000
+      },
+      "productCode": "0076317",
+      "generalCategory": "ΕΠΙΤΡΑΠΕΖΙΑ",
+      "barcode": "4005556763177",
+      "brand": "john",
+      "wholesalePrice": 4.86
+    }
+  ],
+  "products_kivos": [
+    {
+      "id": "42339",
+      "productCode": "42339",
+      "description": "ΔΙΟΡΘΩΤΙΚΗ ΤΑΙΝΙΑ PLUS WHITE AWAY MINI 5mmX 7m WH-505",
+      "packaging": null,
+      "brand": "kivos",
+      "mm": "ΤΜΧ",
+      "discountEndsAt": null,
+      "piecesPerPack": "1",
+      "offerPrice": null,
+      "discount": null,
+      "frontCover": null,
+      "supplierBrand": "Plus",
+      "barcodeCarton": null,
+      "descriptionFull": null,
+      "barcodeUnit": "4977564183721",
+      "category": "ΔΙΟΡΘΩTΙΚΑ ΠΡΟΪΟΝΤΑ",
+      "productUrl": null,
+      "wholesalePrice": 0.82,
+      "barcodeBox": null,
+      "technicalDiscountEndsAt": null,
+      "technicalOfferPrice": null,
+      "technicalDiscount": null,
+      "lastUpdated": {
+        "_seconds": 1763722027,
+        "_nanoseconds": 997000000
+      },
+      "piecesPerBox": 1,
+      "piecesPerCarton": 10
+    },
+    {
+      "id": "51660",
+      "productCode": "51660",
+      "description": "ΔΙΟΡΘΩΤΙΚΗ ΤΑΙΝΙΑ PLUS MINI WH-505 5mmX6m (ΠΑΣΤΕΛ ΧΡΩΜΑΤΑ) 50TMX",
+      "packaging": null,
+      "brand": "kivos",
+      "mm": "STD",
+      "discountEndsAt": null,
+      "piecesPerPack": "1",
+      "offerPrice": null,
+      "piecesPerCarton": null,
+      "discount": null,
+      "frontCover": null,
+      "supplierBrand": "Plus",
+      "barcodeCarton": null,
+      "descriptionFull": null,
+      "barcodeUnit": null,
+      "category": "ΔΙΟΡΘΩTΙΚΑ ΠΡΟΪΟΝΤΑ",
+      "productUrl": null,
+      "wholesalePrice": 41,
+      "barcodeBox": null,
+      "technicalDiscountEndsAt": null,
+      "technicalOfferPrice": null,
+      "technicalDiscount": null,
+      "lastUpdated": {
+        "_seconds": 1763722027,
+        "_nanoseconds": 997000000
+      },
+      "piecesPerBox": 1
+    },
+    {
+      "id": "52181",
+      "productCode": "52181",
+      "description": "ΔΙΟΡΘΩΤΙΚΗ ΤΑΙΝΙΑ PLUS MINI WH-1804 4.2mmX12m (50τμχ.)",
+      "packaging": null,
+      "brand": "kivos",
+      "mm": "STD",
+      "discountEndsAt": null,
+      "piecesPerPack": "1",
+      "offerPrice": null,
+      "piecesPerCarton": null,
+      "discount": null,
+      "frontCover": null,
+      "supplierBrand": "Plus",
+      "barcodeCarton": null,
+      "descriptionFull": null,
+      "barcodeUnit": null,
+      "category": "ΔΙΟΡΘΩTΙΚΑ ΠΡΟΪΟΝΤΑ",
+      "productUrl": null,
+      "wholesalePrice": 60,
+      "barcodeBox": null,
+      "technicalDiscountEndsAt": null,
+      "technicalOfferPrice": null,
+      "technicalDiscount": null,
+      "lastUpdated": {
+        "_seconds": 1763722027,
+        "_nanoseconds": 997000000
+      },
+      "piecesPerBox": 1
+    }
+  ],
+  "salesmen": [
+    {
+      "id": "john_ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ",
+      "merch": "ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ",
+      "normalized": "ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ",
+      "name": "ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ",
+      "brand": "john",
+      "updatedAt": {
+        "_seconds": 1762463896,
+        "_nanoseconds": 334000000
+      }
+    },
+    {
+      "id": "john_ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ",
+      "merch": "ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ",
+      "normalized": "ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ",
+      "name": "ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ",
+      "brand": "john",
+      "updatedAt": {
+        "_seconds": 1762463896,
+        "_nanoseconds": 334000000
+      }
+    },
+    {
+      "id": "john_ΖΕΓΑΣ ΓΕΩΡΓΙΟΣ",
+      "merch": "ΖΕΓΑΣ ΓΕΩΡΓΙΟΣ",
+      "normalized": "ΖΕΓΑΣ ΓΕΩΡΓΙΟΣ",
+      "name": "ΖΕΓΑΣ ΓΕΩΡΓΙΟΣ",
+      "brand": "john",
+      "updatedAt": {
+        "_seconds": 1762463896,
+        "_nanoseconds": 334000000
+      }
+    }
+  ],
+  "sheetsCache": [
+    {
+      "id": "balance2025",
+      "rowCount": 2962,
+      "sheetKey": "balance2025",
+      "lastFetchedAt": {
+        "_seconds": 1762302353,
+        "_nanoseconds": 560000000
+      }
+    },
+    {
+      "id": "invoiced2024",
+      "cacheKey": "invoiced2024",
+      "dataType": "sales",
+      "rowCount": 14705,
+      "sheetKey": "sales2024",
+      "fetchDuration": 5002,
+      "lastFetchedAt": {
+        "_seconds": 1762380802,
+        "_nanoseconds": 633000000
+      },
+      "sheetHeaderDate": {
+        "_seconds": 1781211600,
+        "_nanoseconds": 0
+      }
+    },
+    {
+      "id": "invoiced2025",
+      "cacheKey": "invoiced2025",
+      "dataType": "sales",
+      "rowCount": 8460,
+      "sheetKey": "sales2025",
+      "fetchDuration": 3419,
+      "lastFetchedAt": {
+        "_seconds": 1762380797,
+        "_nanoseconds": 481000000
+      },
+      "sheetHeaderDate": {
+        "_seconds": 1762207200,
+        "_nanoseconds": 0
+      }
+    }
+  ],
+  "stock_kivos": [
+    {
+      "id": "42339",
+      "lastUpdated": {
+        "_seconds": 1763981447,
+        "_nanoseconds": 568000000
+      },
+      "productCode": "42339",
+      "updatedBy": "system_init",
+      "qtyOnHand": 0
+    },
+    {
+      "id": "51660",
+      "lastUpdated": {
+        "_seconds": 1763981447,
+        "_nanoseconds": 569000000
+      },
+      "productCode": "51660",
+      "updatedBy": "system_init",
+      "qtyOnHand": 0
+    },
+    {
+      "id": "52181",
+      "lastUpdated": {
+        "_seconds": 1763981447,
+        "_nanoseconds": 569000000
+      },
+      "productCode": "52181",
+      "updatedBy": "system_init",
+      "qtyOnHand": 0
+    }
+  ],
+  "stock_kivos_history": [
+    {
+      "id": "7oq6YyUs5wkFdfHPyfQN",
+      "updatedBy": "C0GAHzVuAmeXvWLkasihaFohCzt1",
+      "productCode": "66ΔΑ400",
+      "oldQty": 12,
+      "delta": -10,
+      "newQty": 2,
+      "timestamp": {
+        "_seconds": 1764274221,
+        "_nanoseconds": 742000000
+      }
+    },
+    {
+      "id": "9Z6F5ooBCRBnCxRxdnHE",
+      "updatedBy": "C0GAHzVuAmeXvWLkasihaFohCzt1",
+      "productCode": "66ΗΙ100",
+      "oldQty": 0,
+      "delta": 24,
+      "newQty": 24,
+      "timestamp": {
+        "_seconds": 1764412715,
+        "_nanoseconds": 927000000
+      }
+    },
+    {
+      "id": "H9jWyYNrURDzX2k7U9yD",
+      "productCode": "AMM-EDF-1-D",
+      "delta": 24,
+      "oldQty": 0,
+      "newQty": 24,
+      "reason": "manual_adjustment",
+      "notes": "Bulk adjustment from Stock Adjustment screen",
+      "updatedBy": "C0GAHzVuAmeXvWLkasihaFohCzt1",
+      "timestamp": {
+        "_seconds": 1764673702,
+        "_nanoseconds": 600000000
+      }
+    }
+  ],
+  "supermarket_listings": [
+    {
+      "id": "john_01753mt",
+      "description": "Σετ πιατοθήκη Barbie",
+      "packaging": "16",
+      "isNew": false,
+      "productCategory": "ROLE PLAY ΠΑΙΧΝΙΔΙΑ ΠΛΑΣΤΙΚΑ",
+      "isCActive": false,
+      "photoUrl": "https://res.cloudinary.com/db9yukggu/image/upload/v1760874549/John%20Hellas/01753MT.png",
+      "productCode": "01753MT",
+      "superMarket": "Masoutis",
+      "barcode": "8693830017533",
+      "categoryHierarchyTree": [
+        "5"
+      ],
+      "price": 9.68,
+      "brand": "john",
+      "isSummerActive": false,
+      "isSummerActiveGrand": false,
+      "isSummerActiveMegala": false,
+      "isSummerActiveMikra": false,
+      "isSummerActiveMesaia": false,
+      "isSummerActiveMegalaPlus": false,
+      "importedAt": {
+        "_seconds": 1761310812,
+        "_nanoseconds": 490000000
+      },
+      "isBActive": true,
+      "isAActive": true
+    },
+    {
+      "id": "john_01833",
+      "description": "Σετ ιατρική Τσάντα Barbie",
+      "packaging": "24",
+      "isNew": false,
+      "productCategory": "ROLE PLAY ΠΑΙΧΝΙΔΙΑ ΠΛΑΣΤΙΚΑ",
+      "photoUrl": "https://res.cloudinary.com/db9yukggu/image/upload/v1760874550/John%20Hellas/01833%CE%9C%CE%A4.png",
+      "productCode": "01833ΜΤ",
+      "superMarket": "Masoutis",
+      "barcode": "8693830018332",
+      "categoryHierarchyTree": [
+        "5"
+      ],
+      "price": 8.06,
+      "brand": "john",
+      "isSummerActive": false,
+      "isSummerActiveGrand": false,
+      "isSummerActiveMegala": false,
+      "isSummerActiveMikra": false,
+      "isSummerActiveMesaia": false,
+      "isSummerActiveMegalaPlus": false,
+      "isCActive": true,
+      "importedAt": {
+        "_seconds": 1761310812,
+        "_nanoseconds": 490000000
+      },
+      "isBActive": true,
+      "isAActive": true
+    },
+    {
+      "id": "john_01958wd",
+      "description": "Σετ Τσαγιού Minnie Mouse GR",
+      "packaging": "16",
+      "isNew": false,
+      "productCategory": "ROLE PLAY ΠΑΙΧΝΙΔΙΑ ΠΛΑΣΤΙΚΑ",
+      "photoUrl": "https://res.cloudinary.com/db9yukggu/image/upload/v1760874551/John%20Hellas/01958WD.png",
+      "productCode": "01958WD",
+      "superMarket": "Masoutis",
+      "barcode": "8693830019582",
+      "categoryHierarchyTree": [
+        "5"
+      ],
+      "price": 10.48,
+      "brand": "john",
+      "isSummerActive": false,
+      "isSummerActiveGrand": false,
+      "isSummerActiveMegala": false,
+      "isSummerActiveMikra": false,
+      "isSummerActiveMesaia": false,
+      "isSummerActiveMegalaPlus": false,
+      "isCActive": true,
+      "importedAt": {
+        "_seconds": 1761310812,
+        "_nanoseconds": 490000000
+      },
+      "isBActive": true,
+      "isAActive": true
+    }
+  ],
+  "supermarket_meta": [
+    {
+      "id": "category_order",
+      "order": [
+        "Παζλ 150XXL ΟΜΑΔΟΠΟΙΗΣΗ 1034",
+        "Επιτραπέζια Ταξιδίου New με Ελληνικούς τιτλους και οδηγίες ΝΕΑ",
+        "Επιτραπέζια καρτών Παρέας",
+        "3D PUZZLEBALLS",
+        "TV 3D Puzzles",
+        "ROLE PLAY ΠΑΙΧΝΙΔΙΑ ΠΛΑΣΤΙΚΑ",
+        "FUN ITEMS",
+        "Hoola hoops Disney 3 μεγέθη MIX"
+      ],
+      "updatedAt": {
+        "_seconds": 1761310812,
+        "_nanoseconds": 765000000
+      }
+    }
+  ],
+  "supermarket_stores": [
+    {
+      "id": "john_masoutis_101",
+      "area": "ΚΕΝΤΡΟ",
+      "storeNumber": "1",
+      "address": "Κ. ΚΡΥΣΤΑΛΛΗ 4",
+      "city": "ΘΕΣ/ΝΙΚΗ",
+      "hasToys": "Γ",
+      "companyName": "MASOUTIS",
+      "postalCode": "54630",
+      "hasSummerItems": "ΜΕΓΑΛΑ",
+      "storeCategory": "Γ",
+      "storeCodeNormalized": "101",
+      "typologyNotes": null,
+      "openingStatus": null,
+      "phone": "231 0 516206",
+      "companySlug": "masoutis",
+      "storeName": "ΚΡΥΣΤΑΛΛΗ",
+      "category": "Μεγάλο",
+      "region": "ΘΕΣ/ΝΙΚΗΣ",
+      "brand": "john",
+      "storeCode": "101",
+      "updatedAt": {
+        "_seconds": 1760981860,
+        "_nanoseconds": 761000000
+      }
+    },
+    {
+      "id": "john_masoutis_102",
+      "area": "ΚΕΝΤΡΟ",
+      "storeNumber": "2",
+      "address": "ΟΛΥΜΠΙΑΔΟΣ 113 & ΙΟΥΛΙΑΝΟΥ",
+      "city": "ΘΕΣ/ΝΙΚΗ",
+      "hasToys": "Β",
+      "companyName": "MASOUTIS",
+      "postalCode": "54634",
+      "hasSummerItems": "ΜΕΓΑΛΑ",
+      "storeCategory": "Β",
+      "storeCodeNormalized": "102",
+      "typologyNotes": null,
+      "openingStatus": null,
+      "phone": "231 0 208297",
+      "companySlug": "masoutis",
+      "storeName": "ΙΟΥΛΙΑΝΟΥ",
+      "category": "Μεγάλο",
+      "region": "ΘΕΣ/ΝΙΚΗΣ",
+      "brand": "john",
+      "storeCode": "102",
+      "updatedAt": {
+        "_seconds": 1760981860,
+        "_nanoseconds": 761000000
+      }
+    },
+    {
+      "id": "john_masoutis_104",
+      "area": "ΠΑΝΟΡΑΜΑ",
+      "storeNumber": "3",
+      "address": "ΙΩΑΝΝΙΔΟΥ 2",
+      "city": "ΘΕΣ/ΝΙΚΗ",
+      "hasToys": "Β",
+      "companyName": "MASOUTIS",
+      "postalCode": "55236",
+      "hasSummerItems": "ΜΙΚΡΑ",
+      "storeCategory": "Β",
+      "storeCodeNormalized": "104",
+      "typologyNotes": null,
+      "openingStatus": null,
+      "phone": "231 0 341402 & 231 0 344500",
+      "companySlug": "masoutis",
+      "storeName": "ΠΑΝΟΡΑΜΑ",
+      "category": "Μεγάλο",
+      "region": "ΘΕΣ/ΝΙΚΗΣ",
+      "brand": "john",
+      "storeCode": "104",
+      "updatedAt": {
+        "_seconds": 1760981860,
+        "_nanoseconds": 761000000
+      }
+    }
+  ],
+  "supplier_order_kivos": [],
+  "users": [
+    {
+      "id": "1S9Bu27TUWbjt22UVYNSrCc75rt2",
+      "firstName": "Χάρης",
+      "createdAt": {
+        "_seconds": 1762443610,
+        "_nanoseconds": 21000000
+      },
+      "isActive": true,
+      "email": "harry2@mykivos.gr",
+      "merchIds": [
+        "john_ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ",
+        "john_ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ",
+        "john_ΖΕΓΑΣ ΓΕΩΡΓΙΟΣ",
+        "kivos_ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ",
+        "kivos_ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ",
+        "kivos_ΖΕΓΑΣ ΓΕΩΡΓΙΟΣ",
+        "playmobil_ΑΝΑΝΙΑΔΗΣ ΒΑΣΙΛΗΣ",
+        "playmobil_ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ",
+        "playmobil_ΖΕΓΑΣ ΓΙΩΡΓΟΣ"
+      ],
+      "role": "sales_manager",
+      "brands": [
+        "playmobil",
+        "john",
+        "kivos"
+      ],
+      "lastName": "Ανανιάδης Area",
+      "name": "Χάρης Ανανιάδης Area",
+      "updatedAt": {
+        "_seconds": 1762965481,
+        "_nanoseconds": 785000000
+      }
+    },
+    {
+      "id": "7MdEbk7brQShVaM110xpTn47KFX2",
+      "uid": "7MdEbk7brQShVaM110xpTn47KFX2",
+      "createdAt": {
+        "_seconds": 1758818710,
+        "_nanoseconds": 736000000
+      },
+      "email": "harry3@mykivos.gr",
+      "role": "salesman",
+      "brands": [
+        "kivos",
+        "john",
+        "playmobil"
+      ],
+      "merchIds": [
+        "john_ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ",
+        "kivos_ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ",
+        "playmobil_ΑΝΑΝΙΑΔΗΣ ΧΑΡΗΣ"
+      ],
+      "firstName": "Χάρης",
+      "lastName": "Ανανιάδης",
+      "name": "Χάρης Ανανιάδης",
+      "updatedAt": {
+        "_seconds": 1763066912,
+        "_nanoseconds": 292000000
+      }
+    },
+    {
+      "id": "C0GAHzVuAmeXvWLkasihaFohCzt1",
+      "firstName": "Βασίλης",
+      "lastName": "Ανανιάδης",
+      "createdAt": {
+        "_seconds": 1763982392,
+        "_nanoseconds": 259000000
+      },
+      "merchIds": [],
+      "name": "Βασίλης Ανανιάδης",
+      "isActive": true,
+      "email": "vasilis@mykivos.gr",
+      "role": "warehouse_manager",
+      "brands": [
+        "kivos"
+      ],
+      "updatedAt": {
+        "_seconds": 1763982416,
+        "_nanoseconds": 685000000
+      }
+    }
+  ]
+}

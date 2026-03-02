@@ -3,6 +3,7 @@ import { useQuery } from 'react-query';
 import KpiCard from '../../components/KpiCard/KpiCard';
 import MonthlyAdjustmentsChart from '../../components/Charts/MonthlyAdjustmentsChart';
 import RotationChart from '../../components/Charts/RotationChart';
+import t from '../../utils/translations';
 import {
   getFastMovers,
   getLowStockStats,
@@ -13,6 +14,7 @@ import {
   getSlowMovers,
   getStockValue,
 } from '../../services/warehouseKpiService';
+import el from '../../utils/translations';
 
 const formatCurrency = (value) =>
   typeof value === 'number' ? value.toLocaleString('en-IE', { style: 'currency', currency: 'EUR' }) : '—';
@@ -38,23 +40,23 @@ const WarehouseDashboard = () => {
 
     return [
       {
-        title: 'Low Stock Count',
+        title: t.dashboard.lowStockCount,
         value: formatNumber(lowStockCount),
         variant: lowStockCount > 0 ? 'warning' : 'good',
-        hint: 'SKUs under threshold',
+        hint: t.dashboard.skusUnderThreshold,
       },
       {
-        title: 'Stock Value (€)',
+        title: t.dashboard.stockValue,
         value: formatCurrency(stockValue),
         variant: 'default',
       },
       {
-        title: 'Open Supplier Orders',
+        title: t.dashboard.openSupplierOrders,
         value: formatNumber(openOrders),
         variant: openOrders > 15 ? 'warning' : 'good',
       },
       {
-        title: 'Packed Orders Today',
+        title: t.dashboard.packedToday,
         value: formatNumber(packedToday),
         variant: packedToday < 10 ? 'warning' : 'good',
       },
@@ -79,10 +81,10 @@ const WarehouseDashboard = () => {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-wide text-sky-600">Dashboard</p>
-        <h1 className="text-2xl font-bold text-slate-900">Kivos Warehouse KPIs</h1>
+        <p className="text-xs font-semibold uppercase tracking-wide text-sky-600">{t.nav.dashboard}</p>
+        <h1 className="text-2xl font-bold text-slate-900">{t.dashboard.title}</h1>
         <p className="mt-2 text-sm text-slate-600">
-          Live stock health, supplier orders, and rotation performance.
+          {t.dashboard.subtitle}
         </p>
       </div>
 
@@ -97,15 +99,15 @@ const WarehouseDashboard = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-sky-600">
-                Stock Adjustments
+                {t.dashboard.monthlyAdjustments}
               </p>
-              <h2 className="text-lg font-bold text-slate-900">Monthly IN/OUT</h2>
+              <h2 className="text-lg font-bold text-slate-900">Μηνιαίες IN/OUT</h2>
             </div>
           </div>
           {adjustmentsQuery.data && adjustmentsQuery.data.length > 0 ? (
             <MonthlyAdjustmentsChart data={adjustmentsQuery.data} />
           ) : (
-            <p className="mt-4 text-sm text-slate-500">No adjustment data available.</p>
+            <p className="mt-4 text-sm text-slate-500">Δεν υπάρχουν διαθέσιμα δεδομένα προσαρμογής.</p>
           )}
         </div>
 
@@ -113,17 +115,17 @@ const WarehouseDashboard = () => {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-xs font-semibold uppercase tracking-wide text-sky-600">
-                Stock Rotation
+                {t.dashboard.rotationScore}
               </p>
               <h2 className="text-lg font-bold text-slate-900">
-                Top movers · Avg {rotationQuery.data?.average ?? '—'}
+                Κορυφαίοι · Μ.Ο {rotationQuery.data?.average ?? '—'}
               </h2>
             </div>
           </div>
           {rotationQuery.data?.items?.length ? (
             <RotationChart data={rotationQuery.data.items} />
           ) : (
-            <p className="mt-4 text-sm text-slate-500">No rotation data available.</p>
+            <p className="mt-4 text-sm text-slate-500">Δεν υπάρχουν διαθέσιμα δεδομένα κυκλοφορίας.</p>
           )}
         </div>
       </div>
@@ -131,8 +133,8 @@ const WarehouseDashboard = () => {
       <div className="grid gap-4 lg:grid-cols-2">
         <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-slate-900">Top 10 Fast Movers</h3>
-            <p className="text-xs text-slate-500">Velocity</p>
+            <h3 className="text-lg font-semibold text-slate-900">{t.dashboard.fastMovers} (Top 10)</h3>
+            <p className="text-xs text-slate-500">Ταχύτητα</p>
           </div>
           <ul className="mt-4 divide-y divide-slate-100">
             {fastMoversQuery.data?.map((item) => (
@@ -143,14 +145,14 @@ const WarehouseDashboard = () => {
                 </div>
                 <p className="font-semibold text-slate-800">{formatNumber(item.velocity)}</p>
               </li>
-            )) || <p className="mt-2 text-sm text-slate-500">No data.</p>}
+            )) || <p className="mt-2 text-sm text-slate-500">Δεν υπάρχουν δεδομένα.</p>}
           </ul>
         </div>
 
         <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-slate-900">Top 10 Slow Movers</h3>
-            <p className="text-xs text-slate-500">Velocity</p>
+            <h3 className="text-lg font-semibold text-slate-900">{t.dashboard.slowMovers} (Top 10)</h3>
+            <p className="text-xs text-slate-500">Ταχύτητα</p>
           </div>
           <ul className="mt-4 divide-y divide-slate-100">
             {slowMoversQuery.data?.map((item) => (
@@ -161,14 +163,15 @@ const WarehouseDashboard = () => {
                 </div>
                 <p className="font-semibold text-slate-800">{formatNumber(item.velocity)}</p>
               </li>
-            )) || <p className="mt-2 text-sm text-slate-500">No data.</p>}
+            )) || <p className="mt-2 text-sm text-slate-500">Δεν υπάρχουν δεδομένα.</p>}
           </ul>
         </div>
       </div>
 
-      {isLoading ? <p className="text-sm text-slate-500">Loading data…</p> : null}
+      {isLoading ? <p className="text-sm text-slate-500">Φόρτωση δεδομένων…</p> : null}
     </div>
   );
 };
 
 export default WarehouseDashboard;
+

@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as FileSystem from 'expo-file-system';
+import * as FileSystem from 'expo-file-system/legacy';
 import RNFS from 'react-native-fs';
 
 import { DEFAULT_BRAND, normalizeBrandKey } from '../constants/brands';
@@ -252,8 +252,8 @@ const storePointerReference = async (key, pointerPath) => {
 
 const storePayload = async (key, type, brand, payload, options = {}) => {
   const safePayload = Array.isArray(payload) ? payload : [];
-  const { forceFile = false } = options;
-  const shouldForceFile = forceFile || type === 'customers' || type === 'legacy_customers';
+  const { forceFile = false, fileOnly = false } = options;
+  const shouldForceFile = fileOnly || forceFile || type === 'customers' || type === 'legacy_customers';
 
   const json = JSON.stringify(safePayload);
 
@@ -262,6 +262,13 @@ const storePayload = async (key, type, brand, payload, options = {}) => {
     await pruneExisting(key, type, brand);
     const filePath = await writeJsonFile(type, brand, json);
     if (!filePath) return null;
+
+    // If we are in file-only mode, avoid any AsyncStorage writes entirely.
+    if (fileOnly) {
+      console.log(`[localData] stored ${type} for ${brand} as file (file-only)`, filePath);
+      return { strategy: 'file', pointer: filePath, pointerStored: false };
+    }
+
     try {
       await AsyncStorage.setItem(key, `${FILE_POINTER_PREFIX}${filePath}`);
       console.log(`[localData] stored ${type} for ${brand} as file pointer`, filePath);
@@ -273,22 +280,17 @@ const storePayload = async (key, type, brand, payload, options = {}) => {
         error?.message || error
       );
       if (String(error?.message || '').includes(SQLITE_FULL_CODE)) {
-        await freeAsyncStorageSpace();
-        try {
-          await AsyncStorage.setItem(key, `${FILE_POINTER_PREFIX}${filePath}`);
-          console.log(
-            `[localData] stored ${type} for ${brand} as file pointer (retry)`,
-            filePath
-          );
-          return { strategy: 'file', pointer: filePath };
-        } catch (retryError) {
-          console.error('[localData] pointer retry failed', retryError?.message || retryError);
-        }
+        // If storage is full, keep the file on disk and rely on the deterministic path
+        // (readPayload falls back to reading directly from file if no pointer is stored).
+        console.warn(
+          '[localData] pointer retry skipped due to SQLITE_FULL; keeping file without pointer'
+        );
+        return { strategy: 'file', pointer: filePath, pointerStored: false };
       }
       await removeJsonFile(type, brand, filePath);
       throw error;
     }
-    return { strategy: 'file', pointer: filePath };
+    return { strategy: 'file', pointer: filePath, pointerStored: true };
   };
 
   if (shouldForceFile && STORAGE_ROOT) {
@@ -296,6 +298,9 @@ const storePayload = async (key, type, brand, payload, options = {}) => {
     const result = await writeAsFile();
     if (result) {
       return result;
+    }
+    if (fileOnly) {
+      throw new Error('File storage unavailable for file-only payload');
     }
   }
 
@@ -307,11 +312,18 @@ const storePayload = async (key, type, brand, payload, options = {}) => {
         return fileResult;
       }
     } catch (error) {
-      // fall back to inline storage attempt
+      // fall back to inline storage attempt (unless fileOnly)
+      if (fileOnly) {
+        throw error;
+      }
     }
   }
 
   await pruneExisting(key, type, brand);
+
+  if (fileOnly) {
+    throw new Error('File storage unavailable for file-only payload');
+  }
 
   try {
     console.log(`[localData] stored ${type} for ${brand} inline (size ${json.length} bytes)`);
@@ -363,11 +375,26 @@ const clearPayload = async (key, type, brand) => {
 };
 
 const setActionState = async (type, brand, state) => {
-  await AsyncStorage.setItem(actionKey(type, brand), `${state} on ${formatNow()}`);
+  try {
+    await AsyncStorage.setItem(actionKey(type, brand), `${state} on ${formatNow()}`);
+  } catch (error) {
+    if (String(error?.message || '').includes(SQLITE_FULL_CODE)) {
+      // Ignore action write when storage is full; data is already persisted to file.
+      return;
+    }
+    throw error;
+  }
 };
 
 const legacySetAction = async (key) => {
-  await AsyncStorage.setItem(key, `updated on ${formatNow()}`);
+  try {
+    await AsyncStorage.setItem(key, `updated on ${formatNow()}`);
+  } catch (error) {
+    if (String(error?.message || '').includes(SQLITE_FULL_CODE)) {
+      return;
+    }
+    throw error;
+  }
 };
 
 const readActionState = async (type, brand, legacyKey) => {
@@ -387,14 +414,21 @@ const readActionState = async (type, brand, legacyKey) => {
 export async function saveProductsToLocal(products, brand) {
   const resolvedBrand = resolveBrandKey(brand);
   const key = dataKey('products', resolvedBrand);
-  const result = await storePayload(key, 'products', resolvedBrand, products);
+  const result = await storePayload(key, 'products', resolvedBrand, products, {
+    forceFile: true,
+    fileOnly: true,
+  });
   await setActionState('products', resolvedBrand, 'updated');
 
   if (resolvedBrand === DEFAULT_BRAND) {
-    if (result?.strategy === 'file' && result.pointer) {
+    if (result?.strategy === 'file' && result.pointer && result.pointerStored !== false) {
+      // If pointer cannot be stored due to SQLITE_FULL, readPayload will still use the deterministic path.
       await storePointerReference(LEGACY_KEYS.products, result.pointer);
     } else {
-      await storePayload(LEGACY_KEYS.products, 'legacy_products', resolvedBrand, products);
+      await storePayload(LEGACY_KEYS.products, 'legacy_products', resolvedBrand, products, {
+        forceFile: true,
+        fileOnly: true,
+      });
     }
     await legacySetAction(LEGACY_KEYS.productsAction);
   }
@@ -434,11 +468,12 @@ export async function saveCustomersToLocal(customers, brand) {
   const key = dataKey('customers', resolvedBrand);
   const result = await storePayload(key, 'customers', resolvedBrand, customers, {
     forceFile: true,
+    fileOnly: true,
   });
   await setActionState('customers', resolvedBrand, 'updated');
 
   if (resolvedBrand === DEFAULT_BRAND) {
-    if (result?.strategy === 'file' && result.pointer) {
+    if (result?.strategy === 'file' && result.pointer && result.pointerStored !== false) {
       await storePointerReference(LEGACY_KEYS.customers, result.pointer);
     } else {
       await storePayload(
@@ -446,7 +481,7 @@ export async function saveCustomersToLocal(customers, brand) {
         'legacy_customers',
         resolvedBrand,
         customers,
-        { forceFile: true }
+        { forceFile: true, fileOnly: true }
       );
     }
     await legacySetAction(LEGACY_KEYS.customersAction);
@@ -484,7 +519,13 @@ export async function getCustomersLastAction(brand) {
 
 export async function saveSuperMarketStoresToLocal(stores, brand) {
   const resolvedBrand = resolveBrandKey(brand);
-  await storePayload(dataKey('supermarket_stores', resolvedBrand), 'supermarket_stores', resolvedBrand, stores);
+  await storePayload(
+    dataKey('supermarket_stores', resolvedBrand),
+    'supermarket_stores',
+    resolvedBrand,
+    stores,
+    { forceFile: true, fileOnly: true }
+  );
   await setActionState('supermarket_stores', resolvedBrand, 'updated');
 }
 
@@ -507,7 +548,13 @@ export async function getSuperMarketStoresLastAction(brand) {
 
 export async function saveSuperMarketListingsToLocal(listings, brand) {
   const resolvedBrand = resolveBrandKey(brand);
-  await storePayload(dataKey('supermarket_listings', resolvedBrand), 'supermarket_listings', resolvedBrand, listings);
+  await storePayload(
+    dataKey('supermarket_listings', resolvedBrand),
+    'supermarket_listings',
+    resolvedBrand,
+    listings,
+    { forceFile: true, fileOnly: true }
+  );
   await setActionState('supermarket_listings', resolvedBrand, 'updated');
 }
 

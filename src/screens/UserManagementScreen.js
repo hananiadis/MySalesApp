@@ -82,6 +82,7 @@ const UserManagementScreen = ({ navigation }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [saving, setSaving] = useState(false);
   const [draftMerchIds, setDraftMerchIds] = useState([]);
+  const [draftManagerIds, setDraftManagerIds] = useState([]);
   const [allSalesmen, setAllSalesmen] = useState([]);
 
   const adminBrands = useMemo(
@@ -133,6 +134,7 @@ const UserManagementScreen = ({ navigation }) => {
               role: data.role || ROLES.CUSTOMER,
               brands: Array.isArray(data.brands) ? data.brands.filter(Boolean) : [],
               merchIds: Array.isArray(data.merchIds) ? data.merchIds.filter(Boolean) : [],
+              managers: Array.isArray(data.managers) ? data.managers.filter(Boolean) : [],
             };
           });
           setUsers(next);
@@ -252,6 +254,8 @@ const UserManagementScreen = ({ navigation }) => {
     setDraftEmail(user.email || '');
     const initialMerchIds = Array.isArray(user.merchIds) ? user.merchIds : [];
     setDraftMerchIds(initialMerchIds);
+    const initialManagers = Array.isArray(user.managers) ? user.managers : [];
+    setDraftManagerIds(initialManagers.filter(Boolean));
     setModalVisible(true);
   }, [canViewUser, manageableBrandSet]);
 
@@ -263,8 +267,43 @@ const UserManagementScreen = ({ navigation }) => {
     setDraftLastName('');
     setDraftEmail('');
     setDraftMerchIds([]);
+    setDraftManagerIds([]);
     setModalVisible(false);
   }, []);
+
+  const managerCandidates = useMemo(() => {
+    // Expense module expects 'manager' role; other modules use 'sales_manager'.
+    // Support both, plus admin/owner/developer as valid inbox recipients.
+    const managerRoles = new Set(['manager', ROLES.SALES_MANAGER, ROLES.ADMIN, ROLES.OWNER, ROLES.DEVELOPER]);
+
+    const requiredBrands = Array.isArray(draftBrands) && draftBrands.length
+      ? draftBrands.filter(Boolean)
+      : (Array.isArray(selectedUser?.brands) ? selectedUser.brands.filter(Boolean) : []);
+
+    const requiresBrandCoverage = requiredBrands.length > 0;
+
+    const canCoverBrands = (candidate) => {
+      if (!requiresBrandCoverage) return true;
+
+      // Owners/developers are effectively global.
+      if (candidate?.role === ROLES.OWNER || candidate?.role === ROLES.DEVELOPER) return true;
+
+      const candidateBrands = Array.isArray(candidate?.brands) ? candidate.brands.filter(Boolean) : [];
+      if (candidateBrands.length === 0) return false;
+      return requiredBrands.every((b) => candidateBrands.includes(b));
+    };
+
+    return users
+      .filter((u) => u && u.uid && managerRoles.has(u.role))
+      .filter((u) => !selectedUser?.uid || u.uid !== selectedUser.uid)
+      .filter(canCoverBrands)
+      .slice()
+      .sort((a, b) => {
+        const nameA = (a.name || a.email || '').toLocaleLowerCase('el-GR');
+        const nameB = (b.name || b.email || '').toLocaleLowerCase('el-GR');
+        return nameA.localeCompare(nameB, 'el-GR');
+      });
+  }, [users, selectedUser?.uid, selectedUser?.brands, draftBrands]);
 
   const saveChanges = useCallback(async () => {
     if (!selectedUser) return;
@@ -295,6 +334,8 @@ const UserManagementScreen = ({ navigation }) => {
     const safeBrands = Array.from(new Set(draftBrands.filter((brand) => manageableBrandSet.has(brand))));
     const displayName = [trimmedFirst, trimmedLast].filter(Boolean).join(' ');
     const nextRole = draftRole || selectedUser.role || ROLES.CUSTOMER;
+    const nextManagers = Array.from(new Set(draftManagerIds.filter(Boolean)));
+    const prevManagers = Array.isArray(selectedUser.managers) ? selectedUser.managers.filter(Boolean) : [];
 
     try {
       setSaving(true);
@@ -307,10 +348,47 @@ const UserManagementScreen = ({ navigation }) => {
           role: nextRole,
           brands: safeBrands,
           merchIds: Array.from(new Set(draftMerchIds.filter(Boolean))),
+          managers: nextManagers,
           updatedAt: firestore.FieldValue.serverTimestamp(),
         },
         { merge: true }
       );
+
+      // Maintain reverse index on manager docs (users collection only)
+      // managerDoc.assignedSalesmen: string[] (user ids)
+      // Always upsert for selected managers so existing links can be backfilled.
+      const removedManagers = prevManagers.filter((id) => !nextManagers.includes(id));
+      const batch = firestore().batch();
+
+      removedManagers.forEach((managerUid) => {
+        const ref = firestore().collection('users').doc(managerUid);
+        batch.set(
+          ref,
+          {
+            assignedSalesmen: firestore.FieldValue.arrayRemove(docId),
+            updatedAt: firestore.FieldValue.serverTimestamp(),
+          },
+          { merge: true }
+        );
+      });
+
+      nextManagers.forEach((managerUid) => {
+        const ref = firestore().collection('users').doc(managerUid);
+        batch.set(
+          ref,
+          {
+            assignedSalesmen: firestore.FieldValue.arrayUnion(docId),
+            updatedAt: firestore.FieldValue.serverTimestamp(),
+          },
+          { merge: true }
+        );
+      });
+
+      // Commit only if there is something to write.
+      if (removedManagers.length || nextManagers.length) {
+        await batch.commit();
+      }
+
       closeEditor();
     } catch (error) {
       console.error('UserManagement saveChanges error:', error);
@@ -318,7 +396,7 @@ const UserManagementScreen = ({ navigation }) => {
     } finally {
       setSaving(false);
     }
-  }, [closeEditor, draftBrands, draftEmail, draftFirstName, draftLastName, draftRole, draftMerchIds, manageableBrandSet, selectedUser, users]);
+  }, [closeEditor, draftBrands, draftEmail, draftFirstName, draftLastName, draftRole, draftMerchIds, draftManagerIds, manageableBrandSet, selectedUser, users]);
 
   useEffect(() => {
     if (!selectedUser) return;
@@ -365,6 +443,15 @@ const UserManagementScreen = ({ navigation }) => {
         return prev.filter((id) => id !== salesmanId);
       }
       return [...prev, salesmanId];
+    });
+  }, []);
+
+  const toggleManager = useCallback((managerId) => {
+    setDraftManagerIds((prev) => {
+      if (prev.includes(managerId)) {
+        return prev.filter((id) => id !== managerId);
+      }
+      return [...prev, managerId];
     });
   }, []);
 
@@ -713,6 +800,38 @@ const UserManagementScreen = ({ navigation }) => {
                 )}
               </View>
 
+              <Text style={[styles.subHeading, { marginTop: 18 }]}>Υπεύθυνος / Υπεύθυνοι (Manager)</Text>
+              <Text style={styles.helperText}>
+                Επιλέξτε ποιος/ποιοι θα λαμβάνουν τις εβδομαδιαίες αναφορές του χρήστη.
+              </Text>
+              <View style={styles.brandGrid}>
+                {managerCandidates.length ? (
+                  managerCandidates.map((mgr) => {
+                    const active = draftManagerIds.includes(mgr.uid);
+                    return (
+                      <TouchableOpacity
+                        key={mgr.uid}
+                        style={[styles.brandToggle, active && styles.brandToggleActive]}
+                        onPress={() => toggleManager(mgr.uid)}
+                        accessibilityRole="button"
+                      >
+                        <Ionicons
+                          name={active ? 'checkbox-outline' : 'square-outline'}
+                          size={18}
+                          color={active ? '#1f4f8f' : '#64748b'}
+                          style={{ marginRight: 8 }}
+                        />
+                        <Text style={[styles.brandToggleText, active && styles.brandToggleTextActive]}>
+                          {mgr.name || mgr.email || mgr.uid}
+                        </Text>
+                      </TouchableOpacity>
+                    );
+                  })
+                ) : (
+                  <Text style={styles.noBrandsNotice}>Δεν βρέθηκαν χρήστες με ρόλο Manager.</Text>
+                )}
+              </View>
+
               <Text style={[styles.subHeading, { marginTop: 18 }]}>Σύνδεση με Πελάτες (Merch)</Text>
               
               <TouchableOpacity
@@ -1057,6 +1176,12 @@ const styles = StyleSheet.create({
   },
   brandGrid: {
     gap: 8,
+  },
+  helperText: {
+    marginTop: 6,
+    fontSize: 12,
+    color: '#64748b',
+    lineHeight: 16,
   },
   brandToggle: {
     flexDirection: 'row',

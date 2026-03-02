@@ -6,20 +6,18 @@ This feature marks the top 100 selling Playmobil products with a trophy badge in
 ## Setup Instructions
 
 ### 1. Update Spreadsheet ID
-In `firestore-import/firestoreManager_full.js`, line ~215, update the spreadsheet ID:
+In [firestore-import/firestoreManager_full.js](firestore-import/firestoreManager_full.js), update the published CSV URL used by `fetchPlaymobilBestSellers()`.
 
-```javascript
-const bestSellersSpreadsheetId = 'YOUR_18MB_SPREADSHEET_ID_HERE';
+It looks like this:
+
+```js
+const response = await axios.get('https://docs.google.com/spreadsheets/d/e/.../pub?gid=...&single=true&output=csv');
 ```
 
-Replace with your large 18MB spreadsheet's Google Drive ID.
+Replace that URL with the published CSV link for your “Top 100” sheet.
 
 ### 2. Sheet Name Configuration
-The script looks for a sheet named **`Top 100`** by default. If your sheet has a different name:
-
-```javascript
-const bestSellerCodes = await fetchPlaymobilBestSellers(bestSellersSpreadsheetId, 'Your Sheet Name');
-```
+The import currently reads from a published CSV link (so the “sheet selection” is controlled by the `gid` inside the URL).
 
 ### 3. Column Name Requirements
 The sheet should have a column with product codes. The script checks for these column names (case-sensitive):

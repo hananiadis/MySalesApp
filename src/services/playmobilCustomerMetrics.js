@@ -64,23 +64,23 @@ export async function calculateCustomerMetrics(customerCode, referenceDate = new
       }, 0);
     };
 
-    // Filter customer records from all datasets
-    const customerInvoiced2025 = filterByCustomer(sheetsData.invoiced2025 || []);
-    const customerInvoiced2024 = filterByCustomer(sheetsData.invoiced2024 || []);
-    const customerOrders2025 = filterByCustomer(sheetsData.orders2025 || []);
+    // Filter customer records from all datasets (using dynamic years)
+    const customerInvoicedCurrent = filterByCustomer(sheetsData[`invoiced${currentYear}`] || []);
+    const customerInvoicedPrevious = filterByCustomer(sheetsData[`invoiced${previousYear}`] || []);
+    const customerOrdersCurrent = filterByCustomer(sheetsData[`orders${currentYear}`] || []);
 
     console.log('[calculateCustomerMetrics] Customer records:', {
-      invoiced2025: customerInvoiced2025.length,
-      invoiced2024: customerInvoiced2024.length,
-      orders2025: customerOrders2025.length,
+      [currentYear]: customerInvoicedCurrent.length,
+      [previousYear]: customerInvoicedPrevious.length,
+      [`orders${currentYear}`]: customerOrdersCurrent.length,
     });
 
     // Calculate full year totals
-    const fullYearInvoiced2024 = sumAmounts(customerInvoiced2024);
-    const fullYearInvoiced2025 = sumAmounts(customerInvoiced2025);
+    const fullYearInvoicedPrevious = sumAmounts(customerInvoicedPrevious);
+    const fullYearInvoicedCurrent = sumAmounts(customerInvoicedCurrent);
 
     // Calculate YTD (Year-to-Date) - from Jan 1 to reference date
-    const ytdInvoiced2024 = customerInvoiced2024
+    const ytdInvoicedPrevious = customerInvoicedPrevious
       .filter(record => {
         const recordDate = parseRecordDate(record);
         if (!recordDate) return true; // Include if date parsing fails
@@ -102,7 +102,7 @@ export async function calculateCustomerMetrics(customerCode, referenceDate = new
       }, 0);
 
     // Calculate MTD (Month-to-Date) for current month
-    const mtdInvoiced2025 = customerInvoiced2025
+    const mtdInvoicedCurrent = customerInvoicedCurrent
       .filter(record => {
         const recordDate = parseRecordDate(record);
         if (!recordDate) return false;
@@ -122,7 +122,7 @@ export async function calculateCustomerMetrics(customerCode, referenceDate = new
       }, 0);
 
     // Calculate full month for previous year (entire month)
-    const fullMonthInvoiced2024 = customerInvoiced2024
+    const fullMonthInvoicedPrevious = customerInvoicedPrevious
       .filter(record => {
         const recordDate = parseRecordDate(record);
         if (!recordDate) return false;
@@ -139,7 +139,7 @@ export async function calculateCustomerMetrics(customerCode, referenceDate = new
       }, 0);
 
     // Calculate MTD for previous year (same month, up to current day)
-    const mtdInvoiced2024 = customerInvoiced2024
+    const mtdInvoicedPrevious = customerInvoicedPrevious
       .filter(record => {
         const recordDate = parseRecordDate(record);
         if (!recordDate) return false;
@@ -159,7 +159,7 @@ export async function calculateCustomerMetrics(customerCode, referenceDate = new
       }, 0);
 
     // Calculate open orders totals
-    const openOrdersAmount = sumAmounts(customerOrders2025);
+    const openOrdersAmount = sumAmounts(customerOrdersCurrent);
 
     const result = {
       customerCode,
@@ -167,34 +167,34 @@ export async function calculateCustomerMetrics(customerCode, referenceDate = new
       previousYear,
       
       // Full year metrics
-      fullYearInvoiced2024,
-      fullYearInvoiced2025,
+      [`fullYearInvoiced${previousYear}`]: fullYearInvoicedPrevious,
+      [`fullYearInvoiced${currentYear}`]: fullYearInvoicedCurrent,
       
-      // YTD metrics
-      ytdInvoiced2024,
-      ytdInvoiced2025: fullYearInvoiced2025, // Current year is always YTD
+      // YTD metrics (with "Invoiced" for backward compatibility)
+      [`ytdInvoiced${previousYear}`]: ytdInvoicedPrevious,
+      [`ytdInvoiced${currentYear}`]: fullYearInvoicedCurrent, // Current year is always YTD
       
-      // MTD metrics
-      mtdInvoiced2024, // Previous year MTD
-      mtdInvoiced2025, // Current year MTD
-      fullMonthInvoiced2024, // Full month of previous year
+      // MTD metrics (with "Invoiced" for backward compatibility)
+      [`mtdInvoiced${previousYear}`]: mtdInvoicedPrevious, // Previous year MTD
+      [`mtdInvoiced${currentYear}`]: mtdInvoicedCurrent, // Current year MTD
+      [`fullMonthInvoiced${previousYear}`]: fullMonthInvoicedPrevious, // Full month of previous year
       
       // Orders
       openOrdersAmount,
       
       // Calculations
-      ytdChangePercent: ytdInvoiced2024 > 0 
-        ? ((fullYearInvoiced2025 - ytdInvoiced2024) / ytdInvoiced2024) * 100 
+      ytdChangePercent: ytdInvoicedPrevious > 0 
+        ? ((fullYearInvoicedCurrent - ytdInvoicedPrevious) / ytdInvoicedPrevious) * 100 
         : null,
-      mtdChangePercent: mtdInvoiced2024 > 0 
-        ? ((mtdInvoiced2025 - mtdInvoiced2024) / mtdInvoiced2024) * 100 
+      mtdChangePercent: mtdInvoicedPrevious > 0 
+        ? ((mtdInvoicedCurrent - mtdInvoicedPrevious) / mtdInvoicedPrevious) * 100 
         : null,
       
-      // Raw records for detailed view
+      // Raw records for detailed view (using dynamic year keys)
       records: {
-        invoiced2025: customerInvoiced2025,
-        invoiced2024: customerInvoiced2024,
-        orders2025: customerOrders2025,
+        [currentYear]: customerInvoicedCurrent,
+        [previousYear]: customerInvoicedPrevious,
+        [`orders${currentYear}`]: customerOrdersCurrent,
       },
     };
 

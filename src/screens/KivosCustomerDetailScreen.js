@@ -145,7 +145,8 @@ const mergeCustomerData = (customerDoc, sheetRow, creditBreakdown, fallbackCode)
     sales2022: toNumberOrNull(customerDoc?.InvSales2022),
     sales2023: toNumberOrNull(customerDoc?.InvSales2023),
     sales2024: toNumberOrNull(customerDoc?.InvSales2024),
-    sales2025: toNumberOrNull(sheetRow?.sales2025),
+    sales2025: toNumberOrNull(customerDoc?.InvSales2025),
+    sales2026: toNumberOrNull(sheetRow?.sales2026),
     balance: resolvedBalance,
 
     creditDays30,

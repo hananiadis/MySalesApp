@@ -40,7 +40,7 @@ import {
   getContactsLastAction,
 } from '../utils/localData';
 import { trimOldCaches, trimLargeCaches, clearAllSheetCaches } from '../services/googleSheetsCache';
-import { downloadAndCacheImage } from '../utils/imageHelpers';
+import { downloadAndCacheImage, getImagesDirPath, getImagesCacheSize, formatBytes, clearAllImageCache, getImagesCacheStats } from '../utils/imageHelpers';
 import { cacheImmediateAvailabilityMap, lookupImmediateStockValue } from '../utils/stockAvailability';
 import {
   CUSTOMER_COLLECTIONS,
@@ -699,13 +699,18 @@ const DataScreen = () => {
     }
   };
 
-  const safeDownload = async (code, url) => {
+  const safeDownload = async (code, url, brandParam = brand) => {
     try {
-      if (!url || !code) return false;
-      const cached = await downloadAndCacheImage(code, url);
+      if (!url || !code) {
+        console.warn(`[DataScreen] safeDownload skipped: code=${code}, url=${url}`);
+        return false;
+      }
+      console.log(`[DataScreen] safeDownload START code=${code}, url=${url.substring(0, 80)}...`);
+      const cached = await downloadAndCacheImage(code, url, brandParam);
+      console.log(`[DataScreen] safeDownload SUCCESS code=${code}, cached=${!!cached}`);
       return !!cached;
     } catch (error) {
-      console.warn(`[DataScreen] safeDownload failed code=${code}`, error);
+      console.warn(`[DataScreen] safeDownload FAILED code=${code}, url=${url?.substring(0, 80)}..., error=${error?.message}`, error);
       return false;
     }
   };
@@ -716,31 +721,75 @@ const DataScreen = () => {
       return;
     }
     console.log(`[DataScreen] handleDownloadImages start brand=${brand}`);
+    console.log(`\n${'='.repeat(80)}`);
+    console.log(`IMAGE DOWNLOAD LOG - Brand: ${brand} - Started: ${new Date().toISOString()}`);
+    console.log(`${'='.repeat(80)}\n`);
+    
     setBusy('images', true);
     updateProgress('imagesProducts', 0, 0);
     if (showListings) {
       updateProgress('imagesListings', 0, 0);
     }
+    
+    const successLog = [];
+    const failureLog = [];
+    
     try {
       // 1) products images
+      console.log(`[DataScreen] Loading products from local storage for brand=${brand}`);
       const products = await getProductsFromLocal(brand);
+      console.log(`[DataScreen] Loaded ${Array.isArray(products) ? products.length : 0} products from local storage\n`);
+      
       const productImageItems = Array.isArray(products)
         ? products
-            .map((p) => ({
-              productCode: p?.productCode,
-              imageUrl: resolveProductImageUrl(p),
-            }))
+            .map((p) => {
+              const imageUrl = resolveProductImageUrl(p);
+              return {
+                productCode: p?.productCode,
+                imageUrl,
+                description: p?.description || '',
+              };
+            })
             .filter((item) => item.productCode && item.imageUrl)
         : [];
+      
+      console.log(`[DataScreen] Filtered to ${productImageItems.length} products with valid productCode and imageUrl\n`);
+      console.log(`${'='.repeat(80)}`);
+      console.log(`PRODUCT IMAGES DOWNLOAD`);
+      console.log(`${'='.repeat(80)}\n`);
+      
       updateProgress('imagesProducts', 0, productImageItems.length);
 
       let success = 0;
       let failed = 0;
       for (let i = 0; i < productImageItems.length; i += 1) {
         const item = productImageItems[i];
-        const ok = await safeDownload(item.productCode, item.imageUrl);
-        if (ok) success += 1;
-        else failed += 1;
+        console.log(`[${i + 1}/${productImageItems.length}] Downloading: ${item.productCode}`);
+        console.log(`  Description: ${item.description}`);
+        console.log(`  URL: ${item.imageUrl}`);
+        
+        const ok = await safeDownload(item.productCode, item.imageUrl, brand);
+        
+        if (ok) {
+          success += 1;
+          successLog.push({
+            type: 'product',
+            code: item.productCode,
+            description: item.description,
+            url: item.imageUrl,
+          });
+          console.log(`  ✓ SUCCESS\n`);
+        } else {
+          failed += 1;
+          failureLog.push({
+            type: 'product',
+            code: item.productCode,
+            description: item.description,
+            url: item.imageUrl,
+          });
+          console.log(`  ✗ FAILED\n`);
+        }
+        
         updateProgress('imagesProducts', i + 1, productImageItems.length);
       }
 
@@ -748,17 +797,46 @@ const DataScreen = () => {
       let successListings = 0;
       let failedListings = 0;
       if (showListings) {
+        console.log(`\n${'='.repeat(80)}`);
+        console.log(`SUPERMARKET LISTING IMAGES DOWNLOAD`);
+        console.log(`${'='.repeat(80)}\n`);
+        
         const listings = await fetchSuperMarketListings(brand);
         const listItems = Array.isArray(listings)
           ? listings.filter((l) => l?.productCode && l?.photoUrl)
           : [];
+        
+        console.log(`[DataScreen] Found ${listItems.length} listings with valid productCode and photoUrl\n`);
         updateProgress('imagesListings', 0, listItems.length);
 
         for (let i = 0; i < listItems.length; i += 1) {
           const l = listItems[i];
-          const ok = await safeDownload(l.productCode, l.photoUrl);
-          if (ok) successListings += 1;
-          else failedListings += 1;
+          console.log(`[${i + 1}/${listItems.length}] Downloading listing: ${l.productCode}`);
+          console.log(`  Store: ${l.storeName || 'N/A'}`);
+          console.log(`  URL: ${l.photoUrl}`);
+          
+          const ok = await safeDownload(l.productCode, l.photoUrl, brand);
+          
+          if (ok) {
+            successListings += 1;
+            successLog.push({
+              type: 'listing',
+              code: l.productCode,
+              store: l.storeName || 'N/A',
+              url: l.photoUrl,
+            });
+            console.log(`  ✓ SUCCESS\n`);
+          } else {
+            failedListings += 1;
+            failureLog.push({
+              type: 'listing',
+              code: l.productCode,
+              store: l.storeName || 'N/A',
+              url: l.photoUrl,
+            });
+            console.log(`  ✗ FAILED\n`);
+          }
+          
           updateProgress('imagesListings', i + 1, listItems.length);
         }
         await saveSuperMarketListingImagesLastAction?.(brand);
@@ -771,6 +849,45 @@ const DataScreen = () => {
       const listingsSummary = showListings
         ? `${successListings}/${listingTotal || 0}`
         : 'n/a';
+      
+      // Print detailed summary
+      console.log(`\n${'='.repeat(80)}`);
+      console.log(`DOWNLOAD SUMMARY`);
+      console.log(`${'='.repeat(80)}`);
+      console.log(`Brand: ${brand}`);
+      console.log(`Completed: ${new Date().toISOString()}`);
+      console.log(`\nProducts: ${success}/${productTotal} successful (${failed} failed)`);
+      if (showListings) {
+        console.log(`Listings: ${successListings}/${listingTotal} successful (${failedListings} failed)`);
+      }
+      console.log(`\nTotal Success: ${successLog.length}`);
+      console.log(`Total Failures: ${failureLog.length}`);
+      
+      if (successLog.length > 0) {
+        console.log(`\n${'='.repeat(80)}`);
+        console.log(`SUCCESSFUL DOWNLOADS (${successLog.length})`);
+        console.log(`${'='.repeat(80)}`);
+        successLog.forEach((item, idx) => {
+          console.log(`${idx + 1}. [${item.type.toUpperCase()}] ${item.code}`);
+          if (item.description) console.log(`   Description: ${item.description}`);
+          if (item.store) console.log(`   Store: ${item.store}`);
+          console.log(`   URL: ${item.url}`);
+        });
+      }
+      
+      if (failureLog.length > 0) {
+        console.log(`\n${'='.repeat(80)}`);
+        console.log(`FAILED DOWNLOADS (${failureLog.length})`);
+        console.log(`${'='.repeat(80)}`);
+        failureLog.forEach((item, idx) => {
+          console.log(`${idx + 1}. [${item.type.toUpperCase()}] ${item.code}`);
+          if (item.description) console.log(`   Description: ${item.description}`);
+          if (item.store) console.log(`   Store: ${item.store}`);
+          console.log(`   URL: ${item.url}`);
+        });
+      }
+      
+      console.log(`\n${'='.repeat(80)}\n`);
       console.log(
         `[DataScreen] handleDownloadImages success brand=${brand} products=${success}/${productTotal} listings=${listingsSummary}`
       );
@@ -796,9 +913,9 @@ const DataScreen = () => {
     console.log('[DataScreen] handleClearImages start');
     setBusy('imgClear', true);
     try {
-      await clearProductImagesCache();
-      console.log('[DataScreen] handleClearImages success');
-      Alert.alert(STRINGS.alerts.cleared, STRINGS.clearedMessages.images);
+      const deletedCount = await clearAllImageCache();
+      console.log(`[DataScreen] handleClearImages success - deleted ${deletedCount} images`);
+      Alert.alert(STRINGS.alerts.cleared, `${deletedCount} εικόνες διαγράφηκαν.`);
     } catch (error) {
       console.error('[DataScreen] handleClearImages error', error);
       Alert.alert(STRINGS.alerts.error, STRINGS.sections.images.clearError);
@@ -806,6 +923,45 @@ const DataScreen = () => {
       setBusy('imgClear', false);
       refreshActions();
       console.log('[DataScreen] handleClearImages end');
+    }
+  };
+
+  const handleShowImageStorageInfo = async () => {
+    try {
+      const stats = await getImagesCacheStats();
+      const dirPath = getImagesDirPath();
+      
+      console.log('[DataScreen] Images storage info:');
+      console.log(`  Directory: ${dirPath}`);
+      console.log(`  Total size: ${stats.sizeFormatted} (${stats.totalSize} bytes)`);
+      console.log(`  Total count: ${stats.totalCount}`);
+      console.log(`  Last download: ${stats.lastDownloadTime ? stats.lastDownloadTime.toLocaleString('el-GR') : 'Ποτέ'}`);
+      
+      // Format last download time
+      const lastDownloadText = stats.lastDownloadTime 
+        ? stats.lastDownloadTime.toLocaleString('el-GR', { 
+            day: '2-digit', 
+            month: '2-digit', 
+            year: 'numeric',
+            hour: '2-digit', 
+            minute: '2-digit' 
+          })
+        : 'Ποτέ';
+      
+      // Build brand breakdown
+      let brandInfo = '';
+      if (Object.keys(stats.brands).length > 0) {
+        brandInfo = '\n\nΑνά Brand:';
+        for (const [brandName, brandStats] of Object.entries(stats.brands)) {
+          brandInfo += `\n  ${brandName}: ${brandStats.count} εικόνες (${formatBytes(brandStats.size)})`;
+        }
+      }
+      
+      const message = `Διαδρομή:\n${dirPath}\n\nΜέγεθος: ${stats.sizeFormatted}\n\nΑριθμός εικόνων: ${stats.totalCount}\n\nΤελευταία λήψη:\n${lastDownloadText}${brandInfo}`;
+      Alert.alert('Πληροφορίες αποθήκευσης εικόνων', message, [{ text: 'OK' }]);
+    } catch (error) {
+      console.error('[DataScreen] handleShowImageStorageInfo error', error);
+      Alert.alert(STRINGS.alerts.error, 'Αποτυχία ανάγνωσης πληροφοριών αποθήκευσης');
     }
   };
 
@@ -1082,6 +1238,12 @@ const DataScreen = () => {
             >
               {loading.imgClear ? <ActivityIndicator color="#fff" /> :
                 <Text style={styles.buttonText}>{STRINGS.sections.images.clearBtn}</Text>}
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.primaryButton, { backgroundColor: '#1976d2' }]}
+              onPress={handleShowImageStorageInfo}
+            >
+              <Text style={styles.buttonText}>Πληροφορίες αποθήκευσης</Text>
             </TouchableOpacity>
             <ProgressRow
               active={loading.images}

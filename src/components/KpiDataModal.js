@@ -40,18 +40,41 @@ export default function KpiDataModal({
   title, 
   data, 
   previousData = [], 
+  twoYearsAgoData = [],
   year2023Data = [],
   year2022Data = [],
   type, 
   activeSalesmenIds = [], 
-  availableSalesmen = [] 
+  availableSalesmen = [],
+  selectedDate = new Date(),
+  initialActiveTab = 'current'
 }) {
-  const [activeTab, setActiveTab] = useState('current'); // 'current', 'previous', 'year2023', 'year2022'
+  const [activeTab, setActiveTab] = useState(initialActiveTab); // 'current', 'previous', 'twoYearsAgo', 'year2023', 'year2022'
   
-  const currentYear = new Date().getFullYear();
+  // Use selectedDate year instead of current system date
+  const selectedYear = selectedDate instanceof Date ? selectedDate.getFullYear() : new Date().getFullYear();
+  const currentYear = selectedYear;
   const previousYear = currentYear - 1;
+  const twoYearsAgoYear = currentYear - 2;
   
-  // Determine if we have 4-year data (Kivos) or 2-year data (Playmobil)
+  console.log('[KpiDataModal] Year tabs:', {
+    currentYear,
+    previousYear,
+    twoYearsAgoYear,
+    dataLength: data?.length,
+    previousDataLength: previousData?.length,
+    twoYearsAgoDataLength: twoYearsAgoData?.length,
+    initialActiveTab,
+  });
+
+  // Reset to initialActiveTab when modal opens or initialActiveTab changes
+  React.useEffect(() => {
+    if (visible) {
+      setActiveTab(initialActiveTab);
+    }
+  }, [visible, initialActiveTab]);
+  // Determine if we have 3-year data (Playmobil) or 4-year data (Kivos)
+  const has3Years = twoYearsAgoData?.length > 0;
   const has4Years = year2023Data?.length > 0 || year2022Data?.length > 0;
   
   const { displayData, totalAmount } = useMemo(() => {
@@ -60,6 +83,8 @@ export default function KpiDataModal({
       sourceData = data;
     } else if (activeTab === 'previous') {
       sourceData = previousData;
+    } else if (activeTab === 'twoYearsAgo') {
+      sourceData = twoYearsAgoData;
     } else if (activeTab === 'year2023') {
       sourceData = year2023Data;
     } else if (activeTab === 'year2022') {
@@ -158,7 +183,7 @@ export default function KpiDataModal({
     });
 
     return { displayData: processedData, totalAmount: total };
-  }, [data, previousData, year2023Data, year2022Data, type, activeTab]);
+  }, [data, previousData, twoYearsAgoData, year2023Data, year2022Data, type, activeTab]);
 
   if (!visible) return null;
 
@@ -191,7 +216,7 @@ export default function KpiDataModal({
             ) : null}
           </View>
 
-          {/* Year Tabs - show 2 or 4 years depending on data */}
+          {/* Year Tabs - show 3-year data (Playmobil) or 4-year data (Kivos) */}
           {previousData && previousData.length > 0 && (
             <View style={styles.tabContainer}>
               <TouchableOpacity
@@ -210,6 +235,16 @@ export default function KpiDataModal({
                   {previousYear}
                 </Text>
               </TouchableOpacity>
+              {has3Years && twoYearsAgoData && twoYearsAgoData.length > 0 && (
+                <TouchableOpacity
+                  style={[styles.tab, activeTab === 'twoYearsAgo' && styles.tabActive]}
+                  onPress={() => setActiveTab('twoYearsAgo')}
+                >
+                  <Text style={[styles.tabText, activeTab === 'twoYearsAgo' && styles.tabTextActive]}>
+                    {twoYearsAgoYear}
+                  </Text>
+                </TouchableOpacity>
+              )}
               {has4Years && year2023Data && year2023Data.length > 0 && (
                 <TouchableOpacity
                   style={[styles.tab, activeTab === 'year2023' && styles.tabActive]}
@@ -274,7 +309,7 @@ export default function KpiDataModal({
                 {displayData.map((record, index) => {
                   // For yearly view - show customer summary in compact format
                   if (type === 'yearly') {
-                    const customerName = record.customerCode || 'Unknown';
+                    const customerName = record.customerName || record.customerCode || 'Unknown';
                     const amount = formatCurrency(record.amount);
                     const count = record.count ? ` (${record.count} συναλλαγές)` : '';
                     

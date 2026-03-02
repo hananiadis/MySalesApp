@@ -789,14 +789,16 @@ async function importKivosCustomers() {
           profession: sanitizeText(pick(row, ['?p???e?�a', 'Profession'])), // Column J
           merch: sanitizeText(pick(row, ['????t??', 'Merch'])), // Column M
           
-          // Sales Data (N-P) - Import to Firestore
+          // Sales Data (N-Q) - Import to Firestore
           InvSales2022: sanitizeText(pick(row, ['?????? ???S? 2022', 'Sales 2022'])), // Column N
           InvSales2023: sanitizeText(pick(row, ['?????? ???S? 2023', 'Sales 2023'])), // Column O
           InvSales2024: sanitizeText(pick(row, ['?????? ???S? 2024', 'Sales 2024'])), // Column P
+          InvSales2025: sanitizeText(pick(row, ['?????? ????? 2025', 'Sales 2025'])), // Column Q
+          // Note: InvSales2026 (Column R) is read live from sheet, not imported to Firestore
           
-          // Status Fields (S-T) - Updated column positions
-          isActive: sanitizeText(pick(row, ['??e????', 'Active'])), // Column S
-          channel: sanitizeText(pick(row, ['??????', 'Channel'])), // Column T
+          // Status Fields (T-U)
+          isActive: sanitizeText(pick(row, ['??e????', 'Active'])), // Column T
+          channel: sanitizeText(pick(row, ['??????', 'Channel'])), // Column U
           
           brand: 'kivos',
           importedAt: admin.firestore.FieldValue.serverTimestamp(),

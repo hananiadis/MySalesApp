@@ -212,6 +212,7 @@ export function useKivosKpi(
         });
         setRecordSets({ 
           sales: { 
+            year2026: [],
             year2025: [], 
             year2024: [], 
             year2023: [], 
@@ -227,7 +228,8 @@ export function useKivosKpi(
 
       console.log('[useKivosKpi] KPIs calculated:', {
         hasSales: !!kpiData.sales,
-        hasYear2025: !!kpiData.sales?.year2025,
+        hasYear2026: !!kpiData.sales?.year2026,
+        refMoment: kpiData.referenceMoment?.toISOString?.(),
       });
 
       setKpis(kpiData);
@@ -235,6 +237,7 @@ export function useKivosKpi(
       // Organize records for modal display
       setRecordSets({
         sales: {
+          year2026: kpiData.records?.year2026 || [],
           year2025: kpiData.records?.year2025 || [],
           year2024: kpiData.records?.year2024 || [],
           year2023: kpiData.records?.year2023 || [],

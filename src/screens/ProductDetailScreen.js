@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity, Linking } from 'react-native';
 import { useLocalOrRemoteImage } from '../utils/imageHelpers';
 import { getImmediateStockValue } from '../utils/stockAvailability';
@@ -30,19 +30,44 @@ const formatGender = (gender) => {
   return '—';
 };
 
+const GREEK_MONTHS = [
+  'Ιαν', 'Φεβ', 'Μαρ', 'Απρ', 'Μάϊ', 'Ιουν',
+  'Ιουλ', 'Αυγ', 'Σεπ', 'Οκτ', 'Νοε', 'Δεκ',
+];
+
 const formatDate = (date) => {
   if (!date) return '—';
   try {
-    let value = date;
-    if (value?.seconds) {
-      value = new Date(value.seconds * 1000);
-    } else if (typeof value === 'string' || typeof value === 'number') {
-      value = new Date(value);
+    let dateObj = null;
+
+    if (date?.seconds) {
+      dateObj = new Date(date.seconds * 1000);
+    } else if (typeof date === 'string') {
+      const trimmed = date.trim();
+      const slashMatch = trimmed.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+      if (slashMatch) {
+        const [, dayStr, monthStr, yearStr] = slashMatch;
+        const day = Number(dayStr);
+        const month = Number(monthStr);
+        const year = Number(yearStr.length === 2 ? `20${yearStr}` : yearStr);
+        dateObj = new Date(Date.UTC(year, month - 1, day, 12));
+      } else {
+        dateObj = new Date(trimmed);
+      }
+    } else if (typeof date === 'number') {
+      dateObj = new Date(date);
+    } else if (date instanceof Date) {
+      dateObj = date;
     }
-    if (Number.isNaN(value.getTime())) {
+
+    if (!dateObj || Number.isNaN(dateObj.getTime())) {
       return '—';
     }
-    return value.toLocaleDateString('el-GR');
+
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    const month = GREEK_MONTHS[dateObj.getMonth()];
+    const year = dateObj.getFullYear();
+    return `${day} ${month} ${year}`;
   } catch (error) {
     return '—';
   }
@@ -231,6 +256,29 @@ const ProductDetailScreen = ({ route, navigation }) => {
     }
   }, [product?.productUrl]);
 
+  useLayoutEffect(() => {
+    navigation.setOptions({
+      headerShown: true,
+      title: 'Πληροφορίες Προϊόντος',
+      headerTitleAlign: 'center',
+      headerTitleStyle: {
+        fontSize: 18,
+        fontWeight: '700',
+        color: '#1f4f8f',
+      },
+      headerLeft: () => (
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={{ paddingLeft: 16, paddingRight: 8, flexDirection: 'row', alignItems: 'center' }}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <Text style={{ fontSize: 28, color: '#1f4f8f', fontWeight: '600', marginRight: 4 }}>←</Text>
+          <Text style={{ fontSize: 16, color: '#1f4f8f', fontWeight: '600' }}>Πίσω</Text>
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation]);
+
   const renderPlaymobilDetails = () => (
     <>
     <BarcodeSection barcode={product.barcode} />
@@ -239,6 +287,7 @@ const ProductDetailScreen = ({ route, navigation }) => {
       <DetailRow label="Barcode" value={product.barcode} />
       <DetailRow label="Θεματική" value={product.playingTheme} />
       <DetailRow label="Συσκευασία" value={product.package} />
+      <DetailRow label="Τεμάχια/Συσκευασία" value={product.packageInfo ?? product.packageSize ?? product.piecesPerBox} />
       <DetailRow label="Χονδρική Τιμή" value={formatCurrency(product.wholesalePrice)} />
       <DetailRow label="Λιανική Τιμή" value={formatCurrency(product.srp)} />
     </Section>

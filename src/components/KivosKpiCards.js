@@ -18,7 +18,7 @@ const formatPercent = (value) => {
 
 /**
  * KivosKpiCards
- * Displays KPI metrics for Kivos brand with 4 years of data (2025/2024/2023/2022)
+ * Displays KPI metrics for Kivos brand with multi-year data (2026/2025/2024/2023)
  */
 const KivosKpiCards = ({ kpis, referenceMoment, onCardPress }) => {
   if (!kpis) {
@@ -44,17 +44,17 @@ const KivosKpiCards = ({ kpis, referenceMoment, onCardPress }) => {
 
   // YTD Cards
   const renderYtdCard = () => {
+    const ytd2026 = sales.year2026?.ytd;
     const ytd2025 = sales.year2025?.ytd;
     const ytd2024 = sales.year2024?.ytd;
     const ytd2023 = sales.year2023?.ytd;
     const ytd2022 = sales.year2022?.ytd;
 
-    if (!ytd2025) return null;
+    if (!ytd2026) return null;
 
-    const diff2025vs2024 = ytd2025.diff?.percent ?? null;
-    const diffColor = diff2025vs2024 > 0 ? '#2e7d32' : diff2025vs2024 < 0 ? '#c62828' : '#546e7a';
-    const accentColor = diff2025vs2024 > 0 ? '#66bb6a' : diff2025vs2024 < 0 ? '#ef5350' : '#90a4ae';
-    const arrowIcon = diff2025vs2024 > 0 ? 'arrow-up-outline' : diff2025vs2024 < 0 ? 'arrow-down-outline' : 'remove-outline';
+    const diff2026vs2025 = ytd2026.diff?.percent ?? null;
+    const accentColor = diff2026vs2025 > 0 ? '#66bb6a' : diff2026vs2025 < 0 ? '#ef5350' : '#90a4ae';
+    const arrowIcon = diff2026vs2025 > 0 ? 'arrow-up-outline' : diff2026vs2025 < 0 ? 'arrow-down-outline' : 'remove-outline';
 
     return (
       <TouchableOpacity
@@ -69,24 +69,37 @@ const KivosKpiCards = ({ kpis, referenceMoment, onCardPress }) => {
           <Ionicons name="trending-up-outline" size={28} color="#4b5563" />
         </View>
 
+        {/* Current Year (2026) - Prominent */}
         <View style={styles.metricPrimaryRow}>
-          <Text style={styles.metricPrimaryValue}>{formatCurrency(ytd2025.amount)}</Text>
-          <Text style={styles.metricYearLabel}>2025</Text>
+          <Text style={styles.metricPrimaryValue}>{formatCurrency(ytd2026.amount)}</Text>
+          <Text style={styles.metricYearLabel}>2026</Text>
         </View>
         
-        {ytd2025.customers > 0 && (
-          <Text style={styles.customersText}>{ytd2025.customers} πελάτες</Text>
+        {ytd2026.customers > 0 && (
+          <Text style={styles.customersText}>{ytd2026.customers} πελάτες</Text>
         )}
 
         <View style={styles.comparisonRow}>
           <View style={[styles.diffBadge, { backgroundColor: accentColor }]}>
             <Ionicons name={arrowIcon} size={16} color="#fff" />
-            <Text style={styles.diffText}>{formatPercent(diff2025vs2024)}</Text>
+            <Text style={styles.diffText}>{formatPercent(diff2026vs2025)}</Text>
           </View>
-          <Text style={styles.comparisonText}>vs 2024: {formatCurrency(ytd2024?.amount || 0)}</Text>
+          <Text style={styles.comparisonText}>vs 2025: {formatCurrency(ytd2025?.amount || 0)}</Text>
         </View>
 
+        {/* Divider */}
+        <View style={styles.metricDivider} />
+
+        {/* Historical Years */}
+        <Text style={styles.pastYearsTitle}>Ιστορικό</Text>
         <View style={styles.historicalRow}>
+          <View style={styles.historicalItem}>
+            <Text style={styles.historicalYear}>2025</Text>
+            <Text style={styles.historicalValue}>{formatCurrency(ytd2025?.amount || 0)}</Text>
+            {ytd2025?.customers > 0 && (
+              <Text style={styles.historicalCustomers}>{ytd2025.customers} πελάτες</Text>
+            )}
+          </View>
           <View style={styles.historicalItem}>
             <Text style={styles.historicalYear}>2024</Text>
             <Text style={styles.historicalValue}>{formatCurrency(ytd2024?.amount || 0)}</Text>
@@ -115,17 +128,17 @@ const KivosKpiCards = ({ kpis, referenceMoment, onCardPress }) => {
 
   // MTD Cards
   const renderMtdCard = () => {
+    const mtd2026 = sales.year2026?.mtd;
     const mtd2025 = sales.year2025?.mtd;
     const mtd2024 = sales.year2024?.mtd;
     const mtd2023 = sales.year2023?.mtd;
     const mtd2022 = sales.year2022?.mtd;
 
-    if (!mtd2025) return null;
+    if (!mtd2026) return null;
 
-    const diff2025vs2024 = mtd2025.diff?.percent ?? null;
-    const diffColor = diff2025vs2024 > 0 ? '#2e7d32' : diff2025vs2024 < 0 ? '#c62828' : '#546e7a';
-    const accentColor = diff2025vs2024 > 0 ? '#66bb6a' : diff2025vs2024 < 0 ? '#ef5350' : '#90a4ae';
-    const arrowIcon = diff2025vs2024 > 0 ? 'arrow-up-outline' : diff2025vs2024 < 0 ? 'arrow-down-outline' : 'remove-outline';
+    const diff2026vs2025 = mtd2026.diff?.percent ?? null;
+    const accentColor = diff2026vs2025 > 0 ? '#66bb6a' : diff2026vs2025 < 0 ? '#ef5350' : '#90a4ae';
+    const arrowIcon = diff2026vs2025 > 0 ? 'arrow-up-outline' : diff2026vs2025 < 0 ? 'arrow-down-outline' : 'remove-outline';
 
     return (
       <TouchableOpacity
@@ -140,24 +153,37 @@ const KivosKpiCards = ({ kpis, referenceMoment, onCardPress }) => {
           <Ionicons name="calendar-outline" size={28} color="#4b5563" />
         </View>
 
+        {/* Current Year (2026) - Prominent */}
         <View style={styles.metricPrimaryRow}>
-          <Text style={styles.metricPrimaryValue}>{formatCurrency(mtd2025.amount)}</Text>
-          <Text style={styles.metricYearLabel}>2025</Text>
+          <Text style={styles.metricPrimaryValue}>{formatCurrency(mtd2026.amount)}</Text>
+          <Text style={styles.metricYearLabel}>2026</Text>
         </View>
         
-        {mtd2025.customers > 0 && (
-          <Text style={styles.customersText}>{mtd2025.customers} πελάτες</Text>
+        {mtd2026.customers > 0 && (
+          <Text style={styles.customersText}>{mtd2026.customers} πελάτες</Text>
         )}
 
         <View style={styles.comparisonRow}>
           <View style={[styles.diffBadge, { backgroundColor: accentColor }]}>
             <Ionicons name={arrowIcon} size={16} color="#fff" />
-            <Text style={styles.diffText}>{formatPercent(diff2025vs2024)}</Text>
+            <Text style={styles.diffText}>{formatPercent(diff2026vs2025)}</Text>
           </View>
-          <Text style={styles.comparisonText}>vs 2024: {formatCurrency(mtd2024?.amount || 0)}</Text>
+          <Text style={styles.comparisonText}>vs 2025: {formatCurrency(mtd2025?.amount || 0)}</Text>
         </View>
 
+        {/* Divider */}
+        <View style={styles.metricDivider} />
+
+        {/* Historical Years */}
+        <Text style={styles.pastYearsTitle}>Ιστορικό</Text>
         <View style={styles.historicalRow}>
+          <View style={styles.historicalItem}>
+            <Text style={styles.historicalYear}>2025</Text>
+            <Text style={styles.historicalValue}>{formatCurrency(mtd2025?.amount || 0)}</Text>
+            {mtd2025?.customers > 0 && (
+              <Text style={styles.historicalCustomers}>{mtd2025.customers} πελάτες</Text>
+            )}
+          </View>
           <View style={styles.historicalItem}>
             <Text style={styles.historicalYear}>2024</Text>
             <Text style={styles.historicalValue}>{formatCurrency(mtd2024?.amount || 0)}</Text>
@@ -186,17 +212,17 @@ const KivosKpiCards = ({ kpis, referenceMoment, onCardPress }) => {
 
   // Yearly Cards
   const renderYearlyCard = () => {
+    const yearly2026 = sales.year2026?.yearly;
     const yearly2025 = sales.year2025?.yearly;
     const yearly2024 = sales.year2024?.yearly;
     const yearly2023 = sales.year2023?.yearly;
     const yearly2022 = sales.year2022?.yearly;
 
-    if (!yearly2025) return null;
+    if (!yearly2026) return null;
 
-    const diff2025vs2024 = yearly2025.diff?.percent ?? null;
-    const diffColor = diff2025vs2024 > 0 ? '#2e7d32' : diff2025vs2024 < 0 ? '#c62828' : '#546e7a';
-    const accentColor = diff2025vs2024 > 0 ? '#66bb6a' : diff2025vs2024 < 0 ? '#ef5350' : '#90a4ae';
-    const arrowIcon = diff2025vs2024 > 0 ? 'arrow-up-outline' : diff2025vs2024 < 0 ? 'arrow-down-outline' : 'remove-outline';
+    const diff2026vs2025 = yearly2026.diff?.percent ?? null;
+    const accentColor = diff2026vs2025 > 0 ? '#66bb6a' : diff2026vs2025 < 0 ? '#ef5350' : '#90a4ae';
+    const arrowIcon = diff2026vs2025 > 0 ? 'arrow-up-outline' : diff2026vs2025 < 0 ? 'arrow-down-outline' : 'remove-outline';
 
     return (
       <TouchableOpacity
@@ -211,24 +237,37 @@ const KivosKpiCards = ({ kpis, referenceMoment, onCardPress }) => {
           <Ionicons name="stats-chart-outline" size={28} color="#4b5563" />
         </View>
 
+        {/* Current Year (2026) - Prominent */}
         <View style={styles.metricPrimaryRow}>
-          <Text style={styles.metricPrimaryValue}>{formatCurrency(yearly2025.amount)}</Text>
-          <Text style={styles.metricYearLabel}>2025</Text>
+          <Text style={styles.metricPrimaryValue}>{formatCurrency(yearly2026.amount)}</Text>
+          <Text style={styles.metricYearLabel}>2026</Text>
         </View>
         
-        {yearly2025.customers > 0 && (
-          <Text style={styles.customersText}>{yearly2025.customers} πελάτες</Text>
+        {yearly2026.customers > 0 && (
+          <Text style={styles.customersText}>{yearly2026.customers} πελάτες</Text>
         )}
 
         <View style={styles.comparisonRow}>
           <View style={[styles.diffBadge, { backgroundColor: accentColor }]}>
             <Ionicons name={arrowIcon} size={16} color="#fff" />
-            <Text style={styles.diffText}>{formatPercent(diff2025vs2024)}</Text>
+            <Text style={styles.diffText}>{formatPercent(diff2026vs2025)}</Text>
           </View>
-          <Text style={styles.comparisonText}>vs 2024: {formatCurrency(yearly2024?.amount || 0)}</Text>
+          <Text style={styles.comparisonText}>vs 2025: {formatCurrency(yearly2025?.amount || 0)}</Text>
         </View>
 
+        {/* Divider */}
+        <View style={styles.metricDivider} />
+
+        {/* Historical Years */}
+        <Text style={styles.pastYearsTitle}>Ιστορικό</Text>
         <View style={styles.historicalRow}>
+          <View style={styles.historicalItem}>
+            <Text style={styles.historicalYear}>2025</Text>
+            <Text style={styles.historicalValue}>{formatCurrency(yearly2025?.amount || 0)}</Text>
+            {yearly2025?.customers > 0 && (
+              <Text style={styles.historicalCustomers}>{yearly2025.customers} πελάτες</Text>
+            )}
+          </View>
           <View style={styles.historicalItem}>
             <Text style={styles.historicalYear}>2024</Text>
             <Text style={styles.historicalValue}>{formatCurrency(yearly2024?.amount || 0)}</Text>
@@ -367,7 +406,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
-    paddingHorizontal: 8,
+    paddingHorizontal: 4,
   },
   historicalYear: {
     fontSize: 12,
@@ -383,6 +422,19 @@ const styles = StyleSheet.create({
     fontSize: 11,
     color: '#9ca3af',
     marginTop: 2,
+  },
+  metricDivider: {
+    height: 1,
+    backgroundColor: '#e5e7eb',
+    marginVertical: 12,
+  },
+  pastYearsTitle: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#9ca3af',
+    marginBottom: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
 });
 

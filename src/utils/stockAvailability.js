@@ -1,4 +1,4 @@
-﻿// src/utils/stockAvailability.js
+// src/utils/stockAvailability.js
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SHEET_ID = '1VG7QzMgj0Ib0jNXZM5dLFgDyyer8gvSmkkaVZzMZcEM';
@@ -7,7 +7,10 @@ const HEADER_RANGE = 'A2:U2';
 const DATA_RANGE = 'A3:U';
 
 const GVIZ_PREFIX = 47;
-const STORAGE_KEY = 'immediate_stock_map_v4';
+// Bump storage key to force rebuild of the immediate stock map with the new column mapping.
+const STORAGE_KEY = 'immediate_stock_map_v5';
+// Column N (zero-based index 13) holds: "Άμεσα Διαθέσιμα (για παραγγελίες προς άμεση εκτέλεση)"
+const IMMEDIATE_COLUMN_INDEX = 13;
 
 function normalizeCode(value) {
   if (value == null) return '';
@@ -57,13 +60,11 @@ function normalizeHeader(value) {
     .toLowerCase();
 }
 
+const IMMEDIATE_HEADER = 'Άμεσα Διαθέσιμα (για παραγγελίες προς άμεση εκτέλεση)';
 const IMMEDIATE_MATCHES = [
   'amesa diathesima',
   'amesa diathesima (gia paraggelies pros amesi ektelesi)',
-  'Î±Î¼ÎµÏƒÎ± Î´Î¹Î±Î¸ÎµÏƒÎ¹Î¼Î±',
-  'Î±Î¼ÎµÏƒÎ± Î´Î¹Î±Î¸ÎµÏƒÎ¹Î¼Î± (Î³Î¹Î± Ï€Î±ÏÎ±Î³Î³ÎµÎ»Î¹ÎµÏ‚ Ï€ÏÎ¿Ï‚ Î±Î¼ÎµÏƒÎ· ÎµÎºÏ„ÎµÎ»ÎµÏƒÎ·)',
-  'Î±Î¼ÎµÏƒÎ± Î´Î¹Î±Î¸Î­ÏƒÎ¹Î¼Î±',
-  'Î±Î¼ÎµÏƒÎ± Î´Î¹Î±Î¸ÎµÏƒÎ¹Î¼Î¿',
+  IMMEDIATE_HEADER,
 ];
 
 let memoryMap = null;
@@ -99,12 +100,20 @@ async function fetchImmediateMapFromNetwork() {
   );
   if (productCodeIndex < 0) productCodeIndex = 1;
 
-  let immediateIndex = headerRow.findIndex((header) => {
-    const normalized = normalizeHeader(header);
-    return IMMEDIATE_MATCHES.some((match) => normalized.includes(match));
-  });
-
-  if (immediateIndex < 0) immediateIndex = 13; // Column N (zero-based index)
+  // Force column N when available; fall back to header detection only if the sheet shape changed.
+  let immediateIndex =
+    headerRow.length > IMMEDIATE_COLUMN_INDEX ? IMMEDIATE_COLUMN_INDEX : -1;
+  if (immediateIndex < 0) {
+    immediateIndex = headerRow.findIndex(
+      (header) => typeof header === 'string' && header.trim() === IMMEDIATE_HEADER,
+    );
+  }
+  if (immediateIndex < 0) {
+    immediateIndex = headerRow.findIndex((header) => {
+      const normalized = normalizeHeader(header);
+      return IMMEDIATE_MATCHES.some((match) => normalized.includes(match));
+    });
+  }
 
   if (immediateIndex < 0 || immediateIndex >= headerRow.length) return new Map();
 
@@ -177,7 +186,6 @@ export async function loadImmediateAvailabilityFromCache() {
   return map;
 }
 
-
 export function lookupImmediateStockValue(map, code) {
   if (!map || typeof map.has !== 'function') return null;
   const variants = generateCodeVariants(code);
@@ -201,5 +209,3 @@ export async function getImmediateStockValue(code, { fallbackToNetwork = true } 
 export function normalizeStockCode(value) {
   return normalizeCode(value);
 }
-
-

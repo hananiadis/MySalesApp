@@ -18,6 +18,10 @@ admin.initializeApp({
 });
 const db = admin.firestore();
 
+// Debug flag to control verbose import logging
+// Enable by setting env DEBUG_IMPORT=1 or passing --debug
+const DEBUG_IMPORT = process.env.DEBUG_IMPORT === '1' || process.argv.includes('--debug');
+
 // --- CLI I/O ---
 const rl = readline.createInterface({ input: process.stdin, output: process.stdout });
 function askQuestion(question) {
@@ -32,6 +36,17 @@ function sanitizeText(value) {
   const invalid = ['#REF!', '#VALUE!', '#ERROR!', 'N/A', 'NULL', 'null', 'undefined'];
   if (invalid.includes(text)) return null;
   return text;
+}
+function sanitizeDocumentId(value) {
+  // Sanitize product codes or any value to be used as Firestore document ID
+  // Remove invalid characters: / \ . ~ * [ ] ( ) and spaces
+  if (value === null || value === undefined) return null;
+  const text = String(value).trim();
+  if (!text) return null;
+  const invalid = ['#REF!', '#VALUE!', '#ERROR!', 'N/A', 'NULL', 'null', 'undefined'];
+  if (invalid.includes(text)) return null;
+  // Replace invalid Firestore path characters with underscore
+  return text.replace(/[\/\\\.\~\*\[\]\(\)\s]/g, '_');
 }
 function sanitizeUrl(value) {
   const text = sanitizeText(value);
@@ -310,7 +325,7 @@ async function fetchPlaymobilBestSellers() {
   console.log(`📊 Fetching best sellers from published CSV...`);
   try {
     const response = await axios.get(
-      'https://docs.google.com/spreadsheets/d/e/2PACX-1vRDHaVXQoqGtSpHSQJLocIHU6sEOYZqKIMzF5NAFpJTGMuBY1SQgkPiQ40SVh8VOKoQ4fJpVfZmiX69/pub?gid=871274017&single=true&output=csv'
+      'https://docs.google.com/spreadsheets/d/e/2PACX-1vSwXf7TeWPg9Jo7Gl_SqvoJt7I0hxlsRWiv2206AKOmUZiiLtW6TFxFr3q2-IWF8AbJU0dIWY_eCm5Z/pub?gid=180068700&single=true&output=csv'
     );
     
     const rows = [];
@@ -529,14 +544,18 @@ async function importKivosProducts() {
 // ---------------------------------------------------------------------------
 async function importJohnProducts() {
   console.log('\n📦 Importing John products...');
+  console.log('ℹ️  All products will be set to isActive: true by default');
 
   const wb = await fetchXlsxWorkbook('18IFOPzzFvzXEgGOXNN0X1_mfZcxk2LlT_mRQj3Fqsv8');
 
   const allRows = [];
+  const sheetCounts = {}; // Track items per sheet
+  
   wb.SheetNames.forEach((sheetName) => {
     const sheet = wb.Sheets[sheetName];
     const rows = XLSX.utils.sheet_to_json(sheet, { defval: null });
     console.log(`📄 Loaded sheet "${sheetName}" with ${rows.length} rows`);
+    sheetCounts[sheetName] = { total: rows.length, processed: 0, skipped: 0 };
     rows.forEach((r) => allRows.push({ ...r, __sheetName: sheetName }));
   });
 
@@ -556,6 +575,8 @@ async function importJohnProducts() {
     const chunk = allRows.slice(i, i + batchSize);
 
     chunk.forEach((row, idx) => {
+      const sheetName = row.__sheetName || 'Unknown';
+      
       // --- tolerant product code field names ---
       const codeRaw =
         row['ΚΩΔ.'] ||
@@ -566,9 +587,10 @@ async function importJohnProducts() {
         row['Κωδικός'] ||
         row['Product Code'] ||
         row['Code'];
-      const code = sanitizeText(codeRaw);
+      const code = sanitizeDocumentId(codeRaw);
       if (!code) {
         skipped++;
+        if (sheetCounts[sheetName]) sheetCounts[sheetName].skipped++;
         if (skipped <= 5) {
           console.log(`⚠️ [Row ${i + idx + 1}] Skipped - no valid code. Row data:`, row);
         }
@@ -582,6 +604,7 @@ async function importJohnProducts() {
         productCode: code,
         barcode: sanitizeText(row['Κωδ.Barcode']),
         brand: 'john',
+        isActive: true,  // Default all John products to active
         generalCategory: sanitizeText(row['ΓΕΝΙΚΗ ΚΑΤΗΓΟΡΙΑ']),
         subCategory: sanitizeText(row['ΥΠΟΚΑΤΗΓΟΡΙΑ']),
         description: sanitizeText(row['Ελληνική Περιγραφή']),
@@ -607,6 +630,7 @@ async function importJohnProducts() {
 
       batch.set(ref, data, { merge: true });
       processed++;
+      if (sheetCounts[sheetName]) sheetCounts[sheetName].processed++;
     });
 
     await batch.commit();
@@ -614,6 +638,10 @@ async function importJohnProducts() {
   }
 
   console.log(`\n✅ John products import done. Processed ${processed}, skipped ${skipped}`);
+  console.log('\n📊 Import breakdown per sheet:');
+  Object.entries(sheetCounts).forEach(([sheetName, counts]) => {
+    console.log(`  📄 ${sheetName}: ${counts.processed} imported, ${counts.skipped} skipped (${counts.total} total)`);
+  });
 }
 // ---------------------------------------------------------------------------
 // CUSTOMER IMPORTS
@@ -721,31 +749,109 @@ async function importKivosCustomers() {
   console.log('\n👥 Importing Kivos customers...');
   const wb = await fetchXlsxWorkbook('1pCVVgFiutK92nZFYSCkQCQbedqaKgvQahnix6bHSRIU');
   const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { defval: null });
+  
+  // DEBUG: Log column headers from first row
+  if (DEBUG_IMPORT) {
+    console.log('\n🔍 DEBUG: Column headers found in sheet:');
+    if (rows.length > 0) {
+      const headers = Object.keys(rows[0]);
+      console.log('Available columns:', headers);
+      console.log('');
+    }
+  }
+  
   const batchSize = 300;
   let processed = 0;
+  let debugRowCount = 0;
+  
   for (let i = 0; i < rows.length; i += batchSize) {
     const batch = db.batch();
     const chunk = rows.slice(i, i + batchSize);
-    chunk.forEach((r) => {
-      const code = sanitizeText(r['ΚΩΔΙΚΟΣ ΠΕΛΑΤΗ'] || r['Customer Code']);
+    chunk.forEach((r, chunkIndex) => {
+      const code = sanitizeText(r['ΚΩΔΙΚΟΣ ΠΕΛΑΤΗ'] || r['Customer Code'] || r['Κωδικός']);
       if (!code) return;
+      
       const ref = db.collection('customers_kivos').doc(code);
       
       // Convert merch to array format
       const merchValue = sanitizeText(r['Πωλητής']);
       const merchArray = merchValue ? [merchValue] : [];
       
+      // Parse isActive field (Ενεργός: 1 = active, 0 = inactive)
+      const isActiveValue = asNumber(r['Ενεργός']);
+      const isActive = isActiveValue === 1;
+      
+      // Parse channel field (ΚΑΝΑΛΙ: 1 = Stationery, 2 = Technical, 0 = inactive/stopped)
+      const channelValue = asNumber(r['ΚΑΝΑΛΙ']);
+      
       const data = {
         customerCode: code,
         name: sanitizeText(r['Επωνυμία']),
-        city: sanitizeText(r['Πόλη']),
-        vat: sanitizeText(r['Α.Φ.Μ.']),
         merch: merchArray,  // Array instead of string
         primaryMerch: merchValue,  // Keep original for reference
         balance: asNumber(r['Υπόλοιπο']),
+        isActive: isActive,  // Boolean: true if Ενεργός = 1
+        channel: channelValue,  // Number: 0 = inactive, 1 = Stationery, 2 = Technical
+        
+        // Address (nested map)
+        address: {
+          street: sanitizeText(r['Διεύθυνση']),
+          city: sanitizeText(r['Πόλη']),
+          postalCode: sanitizeText(r['Τ.Κ.']),
+        },
+        
+        // Contact (nested map)
+        contact: {
+          telephone1: sanitizeText(r['Τηλ.1']),
+          telephone2: sanitizeText(r['Τηλ.2']),
+          fax: sanitizeText(r['Fax']),
+          email: sanitizeText(r['email']),
+        },
+        
+        // VAT Info (nested map)
+        vatInfo: {
+          registrationNo: sanitizeText(r['Α.Φ.Μ.']),
+          office: sanitizeText(r['Δ.Ο.Υ.']),
+        },
+        
+        // Profession
+        profession: sanitizeText(r['Επάγγελμα']),
+        
+        // Sales History Fields
+        InvSales2022: asNumber(r['Τζίρος ΧΡΗΣΗ 2022']),
+        InvSales2023: asNumber(r['Τζίρος ΧΡΗΣΗ 2023']),
+        InvSales2024: asNumber(r['Τζίρος ΧΡΗΣΗ 2024']),
+        InvSales2025: asNumber(r['Τζίρος ΧΡΗΣΗ 2025']),
+        // Note: InvSales2026 is read live from sheet, not imported to Firestore
+        
         brand: 'kivos',
         importedAt: admin.firestore.FieldValue.serverTimestamp(),
       };
+      
+      // DEBUG: Log first 10 rows to see what's being imported
+      if (DEBUG_IMPORT && debugRowCount < 10) {
+        console.log(`\n========================================`);
+        console.log(`🔍 DEBUG ROW ${debugRowCount + 1}:`);
+        console.log(`========================================`);
+        console.log('📥 ALL SOURCE COLUMNS FROM SHEET:');
+        Object.keys(r).forEach(key => {
+          console.log(`  "${key}": ${JSON.stringify(r[key])}`);
+        });
+        console.log('\n💾 ALL FIRESTORE FIELDS TO BE SAVED:');
+        console.log('  Collection: customers_kivos');
+        console.log('  Document ID:', code);
+        console.log('  Fields:');
+        Object.entries(data).forEach(([key, value]) => {
+          if (key === 'importedAt') {
+            console.log(`    ${key}: [SERVER_TIMESTAMP]`);
+          } else {
+            console.log(`    ${key}: ${JSON.stringify(value)}`);
+          }
+        });
+        console.log(`========================================\n`);
+        debugRowCount++;
+      }
+      
       batch.set(ref, data, { merge: true });
       processed++;
     });

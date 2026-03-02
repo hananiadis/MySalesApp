@@ -50,3 +50,14 @@ export const ROLE_ORDER = [
   ROLES.WAREHOUSE_MANAGER,
   ROLES.CUSTOMER,
 ];
+
+// Expense module approver roles (can review/approve weekly reports)
+export const isExpenseApproverRole = (role) => {
+  return (
+    role === 'manager' ||
+    role === ROLES.SALES_MANAGER ||
+    role === ROLES.OWNER ||
+    role === ROLES.ADMIN ||
+    role === ROLES.DEVELOPER
+  );
+};

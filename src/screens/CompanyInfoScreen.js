@@ -78,7 +78,7 @@ const COMPANY_DATA = {
     ],
   },
   john: {
-    name: 'John Hellas ΕΠΕ',
+    name: 'John Hellas ΙΚΕ',
     profession: 'Εισαγωγή και εμπορία παιχνιδιών',
     phone: '2310688653',
     email: 'info@johnhellas.gr',

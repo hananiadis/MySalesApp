@@ -1,26 +1,82 @@
 // /src/services/spreadsheetCache.js
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as FileSystem from 'expo-file-system';
-import { fetchSpreadsheetData, parseCSV } from '../utils/sheets';
+import * as FileSystem from 'expo-file-system/legacy';
+import { fetchSpreadsheetData, parseCSV, getSpreadsheetMetaEntry, clearSpreadsheetMeta, clearAllSpreadsheetMeta } from '../utils/sheets';
 import { SPREADSHEETS } from '../config/spreadsheets';
 
 const DATA_PREFIX = 'sheetdata';
 const CACHE_DIR = `${FileSystem.documentDirectory}spreadsheet-cache/`;
 const inflightLoads = new Map();
+let cacheDirInitialized = false;
+let asyncStorageCleanedUp = false;
 
-// Ensure cache directory exists
+// One-time cleanup: remove large sheetdata entries that are blocking new metadata writes
+async function cleanupOldSheetdata() {
+  if (asyncStorageCleanedUp) return;
+  asyncStorageCleanedUp = true;
+  
+  try {
+    console.log('[spreadsheetCache] Cleaning up old sheetdata entries...');
+    const keysToRemove = [
+      'sheetdata:sales2025',
+      'sheetdata:orders2025',
+      'sheetdata:sales2024',
+      'sheetdata:orders2024',
+      'sheetdata:playmobilSales',
+      'sheetdata:playmobilStock',
+    ];
+    
+    let removed = 0;
+    for (const key of keysToRemove) {
+      try {
+        const item = await AsyncStorage.getItem(key);
+        if (item) {
+          await AsyncStorage.removeItem(key);
+          const sizeKB = Math.round((item.length || 0) / 1024);
+          console.log(`[spreadsheetCache] Cleared ${key} (${sizeKB} KB)`);
+          removed++;
+        }
+      } catch (e) {
+        // Ignore individual removal errors
+      }
+    }
+    
+    if (removed > 0) {
+      console.log(`[spreadsheetCache] ✓ Cleaned up ${removed} sheetdata entries`);
+    }
+  } catch (error) {
+    console.warn('[spreadsheetCache] Cleanup failed:', error.message);
+  }
+}
+
+// Ensure cache directory exists (runs once per session)
 async function ensureCacheDir() {
+  if (cacheDirInitialized) return;
+  
   try {
     const dirInfo = await FileSystem.getInfoAsync(CACHE_DIR);
     if (!dirInfo.exists) {
       await FileSystem.makeDirectoryAsync(CACHE_DIR, { intermediates: true });
       console.log('[spreadsheetCache] Created cache directory:', CACHE_DIR);
     }
+    cacheDirInitialized = true;
+    // Also clean up old AsyncStorage entries on first cache dir check
+    await cleanupOldSheetdata();
   } catch (error) {
     console.warn('[spreadsheetCache] Cannot create cache directory:', error.message);
+    cacheDirInitialized = true; // Mark as attempted to avoid repeated failures
   }
 }
 
+export async function clearAllMetaEntries() {
+  try {
+    const res = await clearAllSpreadsheetMeta();
+    return res;
+  } catch (err) {
+    console.warn('[spreadsheetCache.clearAllMetaEntries] Failed:', err.message);
+    return { removed: 0 };
+  }
+}
 /**
  * Fetch and cache a spreadsheet with per-key deduping to avoid thundering herds.
  */
@@ -48,14 +104,19 @@ async function loadSpreadsheetUncached(key, { force = false } = {}) {
     const entry = SPREADSHEETS[key];
     if (!entry) throw new Error(`Unknown spreadsheet key: ${key}`);
 
-    const { url, type, keepColumns } = entry;
+    const { url, type, keepColumns, ttlHours, permanent } = entry;
     console.log(`[loadSpreadsheet] Loading ${key}, force=${force}, type=${type}, keepColumns=${keepColumns?.length || 'all'}`);
 
     await ensureCacheDir();
     const cacheFilePath = `${CACHE_DIR}${key}.json`;
 
-    // 1️⃣ try to fetch (or skip if fresh)
-    const { rowsText, refreshed } = await fetchSpreadsheetData(url, { force });
+    // 1️⃣ try to fetch (or skip if fresh/permanent)
+    const { rowsText, refreshed } = await fetchSpreadsheetData(url, {
+      force,
+      ttlHours,
+      sheetKey: key,
+      permanent,
+    });
     console.log(`[loadSpreadsheet] ${key} - refreshed=${refreshed}, hasText=${!!rowsText}`);
 
     // 2️⃣ if not refreshed, return cached data from file storage
@@ -172,14 +233,23 @@ async function loadSpreadsheetUncached(key, { force = false } = {}) {
         }
       }
       
-      await FileSystem.writeAsStringAsync(cacheFilePath, jsonString);
-      console.log(`[loadSpreadsheet] ${key} - saved to file cache (${jsonString.length} bytes, ${parsed.length || 0} rows)`);
-      
-      // Clean up old AsyncStorage entry if exists
       try {
-        await AsyncStorage.removeItem(`${DATA_PREFIX}:${key}`);
-      } catch (cleanupError) {
-        // Ignore cleanup errors
+        await FileSystem.writeAsStringAsync(cacheFilePath, jsonString);
+        console.log(`[loadSpreadsheet] ${key} - saved to file cache (${jsonString.length} bytes, ${parsed.length || 0} rows)`);
+        
+        // Clean up old AsyncStorage entry if exists
+        try {
+          await AsyncStorage.removeItem(`${DATA_PREFIX}:${key}`);
+        } catch (cleanupError) {
+          // Ignore cleanup errors
+        }
+      } catch (writeError) {
+        // Catch all write errors including stack overflow (swallow and continue)
+        if (String(writeError?.message || '').toLowerCase().includes('stack')) {
+          console.warn(`[loadSpreadsheet] ${key} - stack overflow on file write, data still in memory`);
+        } else {
+          console.warn(`[loadSpreadsheet] ${key} - file write error:`, writeError?.message);
+        }
       }
     } catch (fileError) {
       console.warn(`[loadSpreadsheet] ${key} - failed to save to file cache:`, fileError.message);
@@ -215,6 +285,91 @@ async function loadSpreadsheetUncached(key, { force = false } = {}) {
     }
     
     return null;
+  }
+}
+
+const hoursSince = (iso) => {
+  if (!iso) return null;
+  const then = new Date(iso).getTime();
+  return (Date.now() - then) / 36e5;
+};
+
+export async function getSpreadsheetMeta(key) {
+  console.log(`[spreadsheetCache.getSpreadsheetMeta] START for key: ${key}`);
+  const entry = SPREADSHEETS[key];
+  if (!entry) {
+    console.log(`[spreadsheetCache.getSpreadsheetMeta] No entry found for ${key}`);
+    return null;
+  }
+
+  const { url, ttlHours, permanent } = entry;
+  
+  let meta = null;
+  try {
+    meta = await getSpreadsheetMetaEntry({ sheetKey: key, url, ttlHours, permanent });
+  } catch (metaErr) {
+    console.warn(`[getSpreadsheetMeta] Error getting meta for ${key}:`, metaErr?.message);
+  }
+  
+  // Only log if meta was successfully retrieved to reduce console spam
+  if (meta) {
+    console.log(`[spreadsheetCache.getSpreadsheetMeta] Meta retrieved for ${key}:`, {
+      lastFetched: meta?.lastFetchedAt,
+      expiresAt: meta?.expiresAt,
+      permanent,
+      ttlHours,
+    });
+  }
+
+  // Skip file info retrieval to avoid stack overflow RangeErrors from FileSystem.getInfoAsync
+  // File cache existence is verified separately during load/refresh operations
+
+  const expiresInHours = meta?.expiresAt
+    ? (new Date(meta.expiresAt).getTime() - Date.now()) / 36e5
+    : null;
+
+  return {
+    key,
+    url,
+    ttlHours: permanent ? null : ttlHours,
+    permanent: Boolean(permanent),
+    meta,
+    cacheFile: null,
+    ageHours: meta?.lastFetchedAt ? hoursSince(meta.lastFetchedAt) : null,
+    expiresInHours,
+  };
+}
+
+let isListingMeta = false;
+
+export async function listSpreadsheetMeta() {
+  // Guard against concurrent/re-entrant calls
+  if (isListingMeta) {
+    console.log('[spreadsheetCache.listSpreadsheetMeta] Already in progress, returning early');
+    return [];
+  }
+  
+  isListingMeta = true;
+  try {
+    const keys = Object.keys(SPREADSHEETS);
+    const results = [];
+    
+    // Sequential processing to avoid stack overflow and re-entrancy
+    for (let i = 0; i < keys.length; i++) {
+      try {
+        const meta = await getSpreadsheetMeta(keys[i]);
+        if (meta) {
+          results.push(meta);
+        }
+      } catch (err) {
+        console.warn(`[spreadsheetCache.listSpreadsheetMeta] Failed to get meta for ${keys[i]}:`, err.message);
+      }
+    }
+    
+    console.log('[spreadsheetCache.listSpreadsheetMeta] Completed for', keys.length, 'sheets');
+    return results;
+  } finally {
+    isListingMeta = false;
   }
 }
 
@@ -277,8 +432,9 @@ export async function clearCache(key) {
       console.log(`[clearCache] Deleted file cache for ${key}`);
     }
     
-    // Remove from AsyncStorage
+    // Remove from AsyncStorage (data + meta)
     await AsyncStorage.removeItem(`${DATA_PREFIX}:${key}`);
+    await clearSpreadsheetMeta({ sheetKey: key, url: SPREADSHEETS[key]?.url });
     console.log(`[clearCache] Cleared cache for ${key}`);
     
     return true;
@@ -342,4 +498,34 @@ export async function getCachedKeys() {
     console.error('[getCachedKeys] ERROR:', error.message);
     return [];
   }
+}
+
+export async function refreshSpreadsheet(key) {
+  try {
+    console.log(`[spreadsheetCache.refreshSpreadsheet] START for key: ${key}`);
+    const result = await loadSpreadsheet(key, { force: true });
+    console.log(`[spreadsheetCache.refreshSpreadsheet] SUCCESS for key: ${key}, rows: ${Array.isArray(result) ? result.length : 'N/A'}`);
+    // Debug: read back meta to verify timestamp update
+    try {
+      const metaAfter = await getSpreadsheetMeta(key);
+      console.log('[spreadsheetCache.refreshSpreadsheet] Meta after refresh', {
+        key,
+        lastFetchedAt: metaAfter?.meta?.lastFetchedAt || metaAfter?.lastFetchedAt,
+        expiresAt: metaAfter?.meta?.expiresAt || metaAfter?.expiresAt,
+        ttlHours: metaAfter?.ttlHours,
+        permanent: metaAfter?.permanent,
+      });
+    } catch (e) {
+      console.warn('[spreadsheetCache.refreshSpreadsheet] Failed to read meta after refresh for', key, e?.message);
+    }
+    return true;
+  } catch (error) {
+    console.error(`[refreshSpreadsheet] ERROR refreshing ${key}:`, error.message);
+    return false;
+  }
+}
+
+export async function purgeSpreadsheet(key) {
+  await clearCache(key);
+  return clearSpreadsheetMeta({ sheetKey: key, url: SPREADSHEETS[key]?.url });
 }

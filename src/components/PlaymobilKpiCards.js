@@ -1,5 +1,5 @@
-import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, Modal, TextInput } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
 import colors from '../theme/colors';
@@ -42,6 +42,11 @@ function MetricCard({
   dateRangeLabel,
   previousDateRangeLabel,
   totalLabel,
+  // New: explicit year labels and two-years-ago totals
+  previousYearNumber,
+  twoYearsAgoYearNumber,
+  twoYearsTotalsLabel,
+  twoYearsTotalMetric,
   onPress,
 }) {
   console.log('[MetricCard] render', {
@@ -57,7 +62,13 @@ function MetricCard({
   const datasetTitle = DATASET_TITLES[dataset] || dataset;
   const iconName = DATASET_ICONS[dataset] || 'analytics-outline';
 
+  const current = metric?.current || { amount: 0, customers: null };
+  const previous = metric?.previous || { amount: 0, customers: null };
+  const twoYearsAgo = metric?.twoYearsAgo || { amount: 0, customers: null };
   const totalPrevious = totalMetric?.previous || { amount: 0, customers: null };
+  const totalTwoYearsAgo = twoYearsTotalMetric || { amount: 0, customers: null };
+  
+  // Diff between current and previous year
   const diffPercent = metric?.diff?.percent ?? null;
   const diffColor =
     diffPercent > 0 ? '#2e7d32' : diffPercent < 0 ? '#c62828' : '#546e7a';
@@ -65,6 +76,11 @@ function MetricCard({
     diffPercent > 0 ? '#66bb6a' : diffPercent < 0 ? '#ef5350' : '#90a4ae';
   const arrowIcon =
     diffPercent > 0 ? 'arrow-up-outline' : diffPercent < 0 ? 'arrow-down-outline' : 'remove-outline';
+  const diffTwoYearsPercent = metric?.diffTwoYears?.percent ?? null;
+  const diffTwoYearsColor =
+    diffTwoYearsPercent > 0 ? '#2e7d32' : diffTwoYearsPercent < 0 ? '#c62828' : '#546e7a';
+  const arrowTwoYearsIcon =
+    diffTwoYearsPercent > 0 ? 'arrow-up-outline' : diffTwoYearsPercent < 0 ? 'arrow-down-outline' : 'remove-outline';
 
   const handlePress = () => onPress?.(dataset, metric);
 
@@ -92,27 +108,65 @@ function MetricCard({
         <Ionicons name={iconName} size={28} color="#4b5563" />
       </View>
 
+      {/* Current Year Data - MAIN DISPLAY */}
       <View style={styles.metricPrimaryRow}>
         <Text style={styles.metricPrimaryValue}>
-          {formatCurrency(metric.current.amount)}
+          {formatCurrency(current.amount)}
         </Text>
         <View style={styles.metricCustomerBadge}>
           <Text style={styles.metricCustomerText}>
-            {formatCustomers(metric.current.customers)}
+            {formatCustomers(current.customers)}
           </Text>
         </View>
       </View>
 
+      {/* Diff vs Previous Year */}
+      <View style={styles.metricDiffRow}>
+        <Text style={styles.metricLabel}>Μεταβολή vs Προηγ.</Text>
+        <View style={styles.metricDiffValue}>
+          <Ionicons name={arrowIcon} size={16} color={diffColor} />
+          <Text style={[styles.metricDiffPercent, { color: diffColor }]}>
+            {formatPercent(diffPercent)}
+          </Text>
+        </View>
+      </View>
+
+      {/* Separator / Divider */}
+      <View style={styles.metricDivider} />
+
+      {/* Past Years Section */}
+      <Text style={styles.pastYearsTitle}>Ιστορικό</Text>
+
+      {/* Previous Year */}
       <View style={styles.metricRow}>
         <View style={{ flex: 1 }}>
-          <Text style={styles.metricLabel}>{previousDateRangeLabel}</Text>
+          <Text style={styles.metricLabel}>
+            {previousYearNumber ? `Προηγ. Έτος (${previousYearNumber})` : 'Προηγ. Έτος'}
+          </Text>
         </View>
         <View style={styles.metricValueGroup}>
           <Text style={styles.metricValue}>
-            {formatCurrency(metric.previous.amount)}
+            {formatCurrency(previous.amount)}
           </Text>
           <Text style={styles.metricCustomerMeta}>
-            {formatCustomers(metric.previous.customers)}
+            {formatCustomers(previous.customers)}
+          </Text>
+        </View>
+      </View>
+
+      {/* Two Years Ago */}
+      <View style={styles.metricRow}>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.metricLabel}>
+            {twoYearsAgoYearNumber ? `2 Έτη πριν (${twoYearsAgoYearNumber})` : '2 Έτη πριν'}
+          </Text>
+        </View>
+        <View style={styles.metricValueGroup}>
+          <Text style={styles.metricValue}>
+            {formatCurrency(twoYearsAgo.amount)}
+          </Text>
+          <Text style={styles.metricCustomerMeta}>
+            {formatCustomers(twoYearsAgo.customers)}
           </Text>
         </View>
       </View>
@@ -133,12 +187,30 @@ function MetricCard({
         </View>
       )}
 
+      {/* Two Years Ago Totals */}
+      {twoYearsTotalsLabel && (
+        <View style={styles.metricRow}>
+          <Text style={styles.metricLabel}>{twoYearsTotalsLabel}</Text>
+          <View style={styles.metricValueGroup}>
+            <Text style={styles.metricValue}>
+              {formatCurrency(totalTwoYearsAgo.amount)}
+            </Text>
+            {typeof totalTwoYearsAgo.customers === 'number' ? (
+              <Text style={styles.metricCustomerMeta}>
+                {formatCustomers(totalTwoYearsAgo.customers)}
+              </Text>
+            ) : null}
+          </View>
+        </View>
+      )}
+
+      {/* Diff vs Two Years Ago */}
       <View style={styles.metricDiffRow}>
-        <Text style={styles.metricLabel}>Μεταβολή %</Text>
+        <Text style={styles.metricLabel}>Μεταβολή vs 2 Έτη</Text>
         <View style={styles.metricDiffValue}>
-          <Ionicons name={arrowIcon} size={16} color={diffColor} />
-          <Text style={[styles.metricDiffPercent, { color: diffColor }]}>
-            {formatPercent(diffPercent)}
+          <Ionicons name={arrowTwoYearsIcon} size={16} color={diffTwoYearsColor} />
+          <Text style={[styles.metricDiffPercent, { color: diffTwoYearsColor }]}>
+            {formatPercent(diffTwoYearsPercent)}
           </Text>
         </View>
       </View>
@@ -173,8 +245,16 @@ const buildLabelsFromDate = (date) => {
   const monthLabel = capitalize(
     safeDate.toLocaleString('el-GR', { month: 'long' })
   );
+  // Greek month names in genitive case (for "Σύνολο Ιανουαρίου")
+  const monthsGenitive = [
+    'Ιανουαρίου', 'Φεβρουαρίου', 'Μαρτίου', 'Απριλίου', 'Μαΐου', 'Ιουνίου',
+    'Ιουλίου', 'Αυγούστου', 'Σεπτεμβρίου', 'Οκτωβρίου', 'Νοεμβρίου', 'Δεκεμβρίου'
+  ];
+  const monthLabelGenitive = monthsGenitive[safeDate.getMonth()];
+
   const currentYear = safeDate.getFullYear();
   const previousYear = currentYear - 1;
+  const twoYearsAgo = currentYear - 2;
   const currentDayDisplay = safeDate.getDate().toString();
   const monthNumber = (safeDate.getMonth() + 1).toString().padStart(2, '0');
   const monthRangeLabel = `1-${currentDayDisplay}/${monthNumber}`;
@@ -183,18 +263,22 @@ const buildLabelsFromDate = (date) => {
   console.log('[PlaymobilKpiCards] buildLabelsFromDate', {
     sourceDate: safeDate.toISOString(),
     monthLabel,
+    monthLabelGenitive,
     currentYear,
     previousYear,
+    twoYearsAgo,
     monthRangeLabel,
     ytdRangeLabel,
   });
 
   return {
     monthLabel,
+    monthLabelGenitive,
     monthRangeLabel,
     ytdRangeLabel,
     currentYear,
     previousYear,
+    twoYearsAgo,
     monthNumber,
     currentDay: currentDayDisplay,
   };
@@ -206,14 +290,61 @@ export default function PlaymobilKpiCards({
   referenceMoment,
   error,
   onCardPress,
+  selectedDate = new Date(),
+  onDateChange,
 }) {
+  const [datePickerVisible, setDatePickerVisible] = useState(false);
+  const [dateInput, setDateInput] = useState('');
+  
+  console.log('[PlaymobilKpiCards] render with selectedDate:', {
+    date: selectedDate.toISOString(),
+    local: selectedDate.toString(),
+    year: selectedDate.getFullYear(),
+    month: selectedDate.getMonth(),
+    day: selectedDate.getDate(),
+  });
+  
+  const handleDatePress = () => {
+    const formattedDate = selectedDate.toLocaleDateString('el-GR', { 
+      day: '2-digit', 
+      month: '2-digit', 
+      year: 'numeric' 
+    });
+    setDateInput(formattedDate);
+    setDatePickerVisible(true);
+  };
+  
+  const handleDateSubmit = () => {
+    console.log('[PlaymobilKpiCards] Date picker submitted:', dateInput);
+    if (dateInput) {
+      // Parse DD/MM/YYYY format
+      const parts = dateInput.trim().split('/');
+      if (parts.length === 3) {
+        const day = parseInt(parts[0], 10);
+        const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed
+        const year = parseInt(parts[2], 10);
+        console.log('[PlaymobilKpiCards] Parsed date:', { day, month, year });
+        const date = new Date(year, month, day);
+        if (!isNaN(date.getTime())) {
+          console.log('[PlaymobilKpiCards] Valid date created:', date.toISOString());
+          console.log('[PlaymobilKpiCards] Calling onDateChange');
+          onDateChange?.(date);
+          setDatePickerVisible(false);
+        } else {
+          console.log('[PlaymobilKpiCards] Invalid date');
+          Alert.alert('Invalid Date', 'Please enter a valid date');
+        }
+      } else {
+        console.log('[PlaymobilKpiCards] Wrong date format');
+        Alert.alert('Invalid Format', 'Please use DD/MM/YYYY format');
+      }
+    }
+  };
+
   console.log('[PlaymobilKpiCards] render', {
     status,
     hasSnapshot: !!metricSnapshot,
-    referenceMoment:
-      referenceMoment instanceof Date && !Number.isNaN(referenceMoment.getTime())
-        ? referenceMoment.toISOString()
-        : referenceMoment,
+    selectedDate: selectedDate.toISOString(),
     hasError: !!error,
   });
 
@@ -279,8 +410,29 @@ export default function PlaymobilKpiCards({
     ordersLabels,
   });
 
+  const dateDisplay = selectedDate.toLocaleDateString('el-GR', {
+    weekday: 'short',
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+
   return (
     <View style={styles.cardStack}>
+      {/* Date Picker */}
+      {onDateChange && (
+        <View style={styles.datePickerContainer}>
+          <TouchableOpacity
+            style={styles.datePickerButton}
+            onPress={handleDatePress}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="calendar-outline" size={20} color={colors.primary} />
+            <Text style={styles.datePickerButtonText}>{dateDisplay}</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       {/* Monthly MTD Cards */}
       <MetricCard
         dataset="invoiced"
@@ -298,6 +450,14 @@ export default function PlaymobilKpiCards({
             ? `Σύνολο ${invoicedLabels.monthLabel} ${invoicedLabels.previousYear}`
             : 'Σύνολο'
         }
+        previousYearNumber={invoicedLabels?.previousYear}
+        twoYearsAgoYearNumber={invoicedLabels?.twoYearsAgo}
+        twoYearsTotalsLabel={
+          invoicedLabels
+            ? `Σύνολο ${invoicedLabels.monthLabelGenitive} ${invoicedLabels.twoYearsAgo}`
+            : undefined
+        }
+        twoYearsTotalMetric={invoiced?.monthly?.twoYearsAgo}
         onPress={onCardPress ? (dataset, metric) => onCardPress(dataset, 'mtd', metric) : undefined}
       />
       <MetricCard
@@ -316,13 +476,21 @@ export default function PlaymobilKpiCards({
             ? `Σύνολο ${ordersLabels.monthLabel} ${ordersLabels.previousYear}`
             : 'Σύνολο'
         }
+        previousYearNumber={ordersLabels?.previousYear}
+        twoYearsAgoYearNumber={ordersLabels?.twoYearsAgo}
+        twoYearsTotalsLabel={
+          ordersLabels
+            ? `Σύνολο ${ordersLabels.monthLabelGenitive} ${ordersLabels.twoYearsAgo}`
+            : undefined
+        }
+        twoYearsTotalMetric={orders?.monthly?.twoYearsAgo}
         onPress={onCardPress ? (dataset, metric) => onCardPress(dataset, 'mtd', metric) : undefined}
       />
       
       {/* YTD Cards (Year-To-Date Comparison) */}
       <MetricCard
         dataset="invoiced"
-        metric={invoiced?.ytdComparison}
+        metric={invoiced?.ytd}
         totalMetric={invoiced?.yearly}
         contextLabel="YTD"
         dateRangeLabel={invoicedLabels?.ytdRangeLabel}
@@ -336,11 +504,19 @@ export default function PlaymobilKpiCards({
             ? `Σύνολο ${invoicedLabels.previousYear} (Πλήρες Έτος)`
             : 'Σύνολο'
         }
+        previousYearNumber={invoicedLabels?.previousYear}
+        twoYearsAgoYearNumber={invoicedLabels?.twoYearsAgo}
+        twoYearsTotalsLabel={
+          invoicedLabels
+            ? `Σύνολο ${invoicedLabels.twoYearsAgo} (Πλήρες Έτος)`
+            : undefined
+        }
+        twoYearsTotalMetric={invoiced?.yearly?.twoYearsAgo}
         onPress={onCardPress ? (dataset, metric) => onCardPress(dataset, 'ytd', metric) : undefined}
       />
       <MetricCard
         dataset="orders"
-        metric={orders?.ytdComparison}
+        metric={orders?.ytd}
         totalMetric={orders?.yearly}
         contextLabel="YTD"
         dateRangeLabel={ordersLabels?.ytdRangeLabel}
@@ -354,8 +530,57 @@ export default function PlaymobilKpiCards({
             ? `Σύνολο ${ordersLabels.previousYear} (Πλήρες Έτος)`
             : 'Σύνολο'
         }
+        previousYearNumber={ordersLabels?.previousYear}
+        twoYearsAgoYearNumber={ordersLabels?.twoYearsAgo}
+        twoYearsTotalsLabel={
+          ordersLabels
+            ? `Σύνολο ${ordersLabels.twoYearsAgo} (Πλήρες Έτος)`
+            : undefined
+        }
+        twoYearsTotalMetric={orders?.yearly?.twoYearsAgo}
         onPress={onCardPress ? (dataset, metric) => onCardPress(dataset, 'ytd', metric) : undefined}
       />
+      
+      {/* Date Picker Modal */}
+      <Modal
+        visible={datePickerVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setDatePickerVisible(false)}
+      >
+        <TouchableOpacity 
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setDatePickerVisible(false)}
+        >
+          <View style={styles.modalContent} onStartShouldSetResponder={() => true}>
+            <Text style={styles.modalTitle}>Select Date</Text>
+            <Text style={styles.modalHint}>Enter date (DD/MM/YYYY)</Text>
+            <TextInput
+              style={styles.dateInput}
+              value={dateInput}
+              onChangeText={setDateInput}
+              placeholder="DD/MM/YYYY"
+              keyboardType="numbers-and-punctuation"
+              autoFocus
+            />
+            <View style={styles.modalButtons}>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => setDatePickerVisible(false)}
+              >
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.modalButton, styles.submitButton]}
+                onPress={handleDateSubmit}
+              >
+                <Text style={styles.submitButtonText}>OK</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 }
@@ -450,4 +675,119 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   metricAccent: { height: 4, borderRadius: 999, marginTop: 4 },
+  // Divider between current and past years
+  metricDivider: {
+    height: 1,
+    backgroundColor: '#e5e7eb',
+    marginVertical: 12,
+  },
+  pastYearsTitle: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#6b7280',
+    marginBottom: 8,
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
+  },
+  // Date Picker Styles
+  datePickerContainer: {
+    marginBottom: 16,
+  },
+  datePickerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.white,
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderWidth: 2,
+    borderColor: colors.primary || '#1d4ed8',
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+    gap: 8,
+  },
+  datePickerButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.primary || '#1d4ed8',
+  },
+  // Date Picker Modal Styles
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: colors.white,
+    borderRadius: 16,
+    padding: 24,
+    width: '100%',
+    maxWidth: 400,
+    shadowColor: '#000',
+    shadowOpacity: 0.25,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 10,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1f2937',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  modalHint: {
+    fontSize: 14,
+    color: '#6b7280',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  dateInput: {
+    borderWidth: 2,
+    borderColor: colors.primary || '#1d4ed8',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1f2937',
+    backgroundColor: colors.white,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  cancelButton: {
+    backgroundColor: '#f3f4f6',
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#374151',
+  },
+  submitButton: {
+    backgroundColor: colors.primary || '#1d4ed8',
+  },
+  submitButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.white,
+  },
 });

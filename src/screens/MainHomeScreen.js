@@ -137,6 +137,10 @@ export default function MainHomeScreen({ navigation }) {
     return `${dd}/${mm} ${hh}:${mins}`;
   }, [lastSyncISO]);
 
+  const openFieldSalesPro = useCallback(() => {
+    navigation.navigate('FieldSalesPro');
+  }, [navigation]);
+
   // Single status dot is shown inside SalesmanInfoCard status row; do not append extra dots in the meta line
 
   useFocusEffect(
@@ -188,6 +192,34 @@ export default function MainHomeScreen({ navigation }) {
           }))}
         />
       </TouchableOpacity>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Διαχείριση Επισκέψεων</Text>
+        <TouchableOpacity
+          style={styles.ctaButton}
+          activeOpacity={0.85}
+          onPress={openFieldSalesPro}
+        >
+          <Text style={styles.ctaTitle}>Διαχείριση Επισκέψεων</Text>
+          <Text style={styles.ctaSubtitle}>
+            Προγραμματισμός εξορμήσεων και επισκέψεων
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Άλλες Λειτουργίες</Text>
+        <TouchableOpacity
+          style={styles.ctaButton}
+          activeOpacity={0.85}
+          onPress={() => navigation.navigate('ExpenseTracker')}
+        >
+          <Text style={styles.ctaTitle}>Εξοδολόγιο</Text>
+          <Text style={styles.ctaSubtitle}>
+            Καταγραφή εξόδων, ταξιδιών, καυσίμων κ.α.
+          </Text>
+        </TouchableOpacity>
+      </View>
     </SafeScreen>
   );
 }
@@ -218,6 +250,28 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginLeft: 6,
     alignSelf: 'center',
+  },
+  ctaButton: {
+    backgroundColor: colors.primary,
+    borderRadius: 12,
+    paddingVertical: 16,
+    paddingHorizontal: 18,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  ctaTitle: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom: 6,
+  },
+  ctaSubtitle: {
+    color: '#f0f4ff',
+    fontSize: 13,
+    lineHeight: 18,
   },
 });
 

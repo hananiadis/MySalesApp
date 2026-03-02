@@ -240,6 +240,30 @@ const CustomerDetailScreen = ({ route, navigation }) => {
             <Text style={styles.modernNavButtonText}>Μηνιαία Ανάλυση Πωλήσεων</Text>
             <Ionicons name="chevron-forward" size={20} color="#007AFF" />
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.modernNavButton}
+            onPress={() => navigation.navigate('InventoryUpload', { customerId, brand })}
+            activeOpacity={0.7}
+          >
+            <View style={styles.modernNavIconContainer}>
+              <Ionicons name="cloud-upload-outline" color="#007AFF" size={24} />
+            </View>
+            <Text style={styles.modernNavButtonText}>Upload Inventory</Text>
+            <Ionicons name="chevron-forward" size={20} color="#007AFF" />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.modernNavButton}
+            onPress={() => navigation.navigate('ScanInventory', { customerId, brand })}
+            activeOpacity={0.7}
+          >
+            <View style={styles.modernNavIconContainer}>
+              <Ionicons name="barcode-outline" color="#007AFF" size={24} />
+            </View>
+            <Text style={styles.modernNavButtonText}>Scan Inventory</Text>
+            <Ionicons name="chevron-forward" size={20} color="#007AFF" />
+          </TouchableOpacity>
         </View>
 
         <View style={{ height: 30 }} />

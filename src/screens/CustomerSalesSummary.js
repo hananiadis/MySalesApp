@@ -221,15 +221,15 @@ function PlaymobilSalesSummary({ customerId, navigation }) {
     };
 
     // Use the exact column names from the sheet:
-    // Column N (user index 14, array index 13): "TTL BDG 2025"
+    // Column N (user index 14, array index 13): "TTL BDG 2026"
     // Column T (user index 20, array index 19): "Open Orders"
     // Column U (user index 21, array index 20): "Open Dlv's"
-    // Column V (user index 22, array index 21): "Total Orders 2025"
+    // Column V (user index 22, array index 21): "Total Orders 2026"
     // Column W (user index 23, array index 22): "%O/B"
-    const rawBudget = readByHeader(['TTL BDG 2025', 'ttl bdg 2025'], [13]);
+    const rawBudget = readByHeader([`TTL BDG ${currentYear}`, 'ttl bdg 2026'], [13]);
     const rawOpenOrders = readByHeader(['Open Orders', 'open orders'], [19]);
     const rawOpenDlv = readByHeader(["Open Dlv's", "open dlv's", 'Open Dlvs'], [20]);
-    const rawTotalOrders = readByHeader(['Total Orders 2025', 'total orders 2025'], [21]);
+    const rawTotalOrders = readByHeader([`Total Orders ${currentYear}`, 'total orders 2026'], [21]);
     const rawOB = readByHeader(['%O/B', '%o/b'], [22]);
 
     console.log('[CustomerSalesSummary] Raw values extracted from sheet:', {
@@ -276,13 +276,13 @@ function PlaymobilSalesSummary({ customerId, navigation }) {
       vOpenDlv,
       vTotalOrders,
       vOB,
-      hasOrderRecords: !!metrics?.records?.orders2025?.length,
-      orderRecordsCount: metrics?.records?.orders2025?.length || 0
+      hasOrderRecords: !!metrics?.records?.[`orders${currentYear}`]?.length,
+      orderRecordsCount: metrics?.records?.[`orders${currentYear}`]?.length || 0
     });
 
     // Calculate Inv/Bdg percentage
     const invBdgPercent = vBudgetCurr > 0 
-      ? (metrics.fullYearInvoiced2025 / vBudgetCurr) * 100 
+      ? (metrics[`fullYearInvoiced${currentYear}`] / vBudgetCurr) * 100 
       : null;
 
     // Calculate YTD change percentage
@@ -299,17 +299,17 @@ function PlaymobilSalesSummary({ customerId, navigation }) {
       let title = '';
       
       if (cardType === 'year-comparison') {
-        // Card 1: Show 2024 invoiced data vs 2025 budget
-        // Display 2024 invoiced records (most recent 25)
-        data = metrics.records.invoiced2024;
+        // Card 1: Show previous year invoiced data vs current year budget
+        // Display previous year invoiced records (most recent 25)
+        data = metrics.records[previousYear];
         title = `Τιμολογήσεις ${previousYear} - Τελευταίες 25`;
       } else if (cardType === 'ytd') {
-        // Card 2: Show YTD 2025 invoiced data
-        // Filter for YTD (from Jan 1 to current date in 2025)
+        // Card 2: Show YTD current year invoiced data
+        // Filter for YTD (from Jan 1 to current date)
         const currentMonth = now.getMonth();
         const currentDay = now.getDate();
         
-        data = metrics.records.invoiced2025.filter(record => {
+        data = (metrics.records[currentYear] || []).filter(record => {
           const recordDate = new Date(record.date || record.invoiceDate);
           if (recordDate.getFullYear() !== currentYear) return false;
           
@@ -323,12 +323,12 @@ function PlaymobilSalesSummary({ customerId, navigation }) {
         
         title = `YTD Τιμολογήσεις ${currentYear} (έως ${currentDay}/${currentMonth + 1})`;
       } else if (cardType === 'mtd') {
-        // Card 3: Show MTD (Month-to-Date) 2025 invoiced data
+        // Card 3: Show MTD (Month-to-Date) current year invoiced data
         // Filter for current month only, up to current day
         const currentMonth = now.getMonth();
         const currentDay = now.getDate();
         
-        data = metrics.records.invoiced2025.filter(record => {
+        data = (metrics.records[currentYear] || []).filter(record => {
           const recordDate = new Date(record.date || record.invoiceDate);
           return recordDate.getFullYear() === currentYear &&
                  recordDate.getMonth() === currentMonth && 
@@ -341,7 +341,7 @@ function PlaymobilSalesSummary({ customerId, navigation }) {
         const currentMonth = now.getMonth();
         const currentDay = now.getDate();
         
-        data = metrics.records.invoiced2024.filter(record => {
+        data = (metrics.records[previousYear] || []).filter(record => {
           const recordDate = new Date(record.date || record.invoiceDate);
           if (recordDate.getFullYear() !== previousYear) return false;
           
@@ -359,7 +359,7 @@ function PlaymobilSalesSummary({ customerId, navigation }) {
         const currentMonth = now.getMonth();
         const currentDay = now.getDate();
         
-        data = metrics.records.invoiced2024.filter(record => {
+        data = (metrics.records[previousYear] || []).filter(record => {
           const recordDate = new Date(record.date || record.invoiceDate);
           return recordDate.getFullYear() === previousYear &&
                  recordDate.getMonth() === currentMonth && 
@@ -371,7 +371,7 @@ function PlaymobilSalesSummary({ customerId, navigation }) {
         // Card 3 - Full month of previous year
         const currentMonth = now.getMonth();
         
-        data = metrics.records.invoiced2024.filter(record => {
+        data = (metrics.records[previousYear] || []).filter(record => {
           const recordDate = new Date(record.date || record.invoiceDate);
           return recordDate.getFullYear() === previousYear &&
                  recordDate.getMonth() === currentMonth;
@@ -395,27 +395,27 @@ function PlaymobilSalesSummary({ customerId, navigation }) {
           const salesmenSplit = {};
           let hasMultipleSalesmen = false;
           
-          // Process 2025 data
-          if (metrics?.records?.invoiced2025) {
-            metrics.records.invoiced2025.forEach(record => {
+          // Process current year data
+          if (metrics?.records?.[currentYear]) {
+            metrics.records[currentYear].forEach(record => {
               const salesman = record.handledBy || 'Άγνωστος';
               const amount = parseFloat(record.amount || record.total || record.value || 0);
               
               if (!salesmenSplit[salesman]) {
                 salesmenSplit[salesman] = { 
-                  amount: 0,           // YTD 2025
-                  count: 0,            // Transaction count 2025
-                  ytd2024: 0,          // YTD 2024
-                  fullYear2024: 0,     // Full year 2024
-                  mtd2025: 0,          // MTD current month 2025
-                  mtd2024: 0,          // MTD current month 2024
-                  fullMonth2024: 0,    // Full previous month 2024
+                  amount: 0,           // YTD current year
+                  count: 0,            // Transaction count current year
+                  ytd2024: 0,          // YTD previous year
+                  fullYear2024: 0,     // Full year previous year
+                  mtd2025: 0,          // MTD current month current year
+                  mtd2024: 0,          // MTD current month previous year
+                  fullMonth2024: 0,    // Full previous month previous year
                 };
               }
               salesmenSplit[salesman].amount += amount;
               salesmenSplit[salesman].count += 1;
               
-              // Calculate MTD 2025
+              // Calculate MTD current year
               const recordDate = new Date(record.date || record.invoiceDate);
               if (recordDate.getFullYear() === currentYear && 
                   recordDate.getMonth() === currentMonth &&
@@ -427,17 +427,17 @@ function PlaymobilSalesSummary({ customerId, navigation }) {
             hasMultipleSalesmen = Object.keys(salesmenSplit).length > 1;
           }
           
-          // Process 2024 data for historical comparisons
-          // Note: handledBy in 2024 records is already set to the CURRENT (2025) salesman
+          // Process previous year data for historical comparisons
+          // Note: handledBy in previous year records is already set to the CURRENT salesman
           // This ensures historical comparison uses current ownership
-          if (metrics?.records?.invoiced2024) {
-            console.log('[CustomerSalesSummary] Processing 2024 data with current salesman attribution');
-            metrics.records.invoiced2024.forEach(record => {
+          if (metrics?.records?.[previousYear]) {
+            console.log(`[CustomerSalesSummary] Processing ${previousYear} data with current salesman attribution`);
+            metrics.records[previousYear].forEach(record => {
               const salesman = record.handledBy || 'Άγνωστος';
               const amount = parseFloat(record.amount || record.total || record.value || 0);
               const recordDate = new Date(record.date || record.invoiceDate);
               
-              console.log('[CustomerSalesSummary] 2024 record:', { salesman, amount, date: recordDate });
+              console.log(`[CustomerSalesSummary] ${previousYear} record:`, { salesman, amount, date: recordDate });
               
               if (!salesmenSplit[salesman]) {
                 salesmenSplit[salesman] = { 
@@ -540,7 +540,7 @@ function PlaymobilSalesSummary({ customerId, navigation }) {
                     activeOpacity={0.7}
                   >
                     <Text style={styles.label}>{`Τιμολογήσεις ${previousYear}`}</Text>
-                    <Text style={styles.value}>{formatCurrency(metrics.fullYearInvoiced2024)}</Text>
+                    <Text style={styles.value}>{formatCurrency(metrics[`fullYearInvoiced${previousYear}`])}</Text>
                     <Text style={styles.cardHintSmall}>Πατήστε για λεπτομέρειες</Text>
                   </TouchableOpacity>
                   <View style={styles.metricHalf}>
@@ -572,7 +572,7 @@ function PlaymobilSalesSummary({ customerId, navigation }) {
                     activeOpacity={0.7}
                   >
                     <Text style={styles.label}>{`Τιμολογημένα YTD ${previousYear}`}</Text>
-                    <Text style={styles.value}>{formatCurrency(metrics.ytdInvoiced2024)}</Text>
+                    <Text style={styles.value}>{formatCurrency(metrics[`ytdInvoiced${previousYear}`])}</Text>
                     <Text style={styles.cardHintSmall}>Πατήστε για λεπτομέρειες</Text>
                   </TouchableOpacity>
                   <TouchableOpacity 
@@ -584,7 +584,7 @@ function PlaymobilSalesSummary({ customerId, navigation }) {
                     activeOpacity={0.7}
                   >
                     <Text style={styles.label}>{`Τιμολογημένα ${currentYear}`}</Text>
-                    <Text style={styles.value}>{formatCurrency(metrics.ytdInvoiced2025)}</Text>
+                    <Text style={styles.value}>{formatCurrency(metrics[`ytdInvoiced${currentYear}`])}</Text>
                     {ytdChangePercent != null && (
                       <Text style={[
                         styles.percentText,
@@ -604,11 +604,11 @@ function PlaymobilSalesSummary({ customerId, navigation }) {
                   <View style={styles.metricHalf}>
                     <Text style={styles.label}>{`Τιμολογημένα ${currentMonthName} ${previousYear}`}</Text>
                     <TouchableOpacity onPress={() => handleCardPress('mtd-2024')} activeOpacity={0.7}>
-                      <Text style={styles.valueSmall}>MTD: {formatCurrency(metrics.mtdInvoiced2024)}</Text>
+                      <Text style={styles.valueSmall}>MTD: {formatCurrency(metrics[`mtdInvoiced${previousYear}`])}</Text>
                       <Text style={styles.cardHintSmall}>Πατήστε για λεπτομέρειες</Text>
                     </TouchableOpacity>
                     <TouchableOpacity onPress={() => handleCardPress('month-full-2024')} activeOpacity={0.7}>
-                      <Text style={styles.valueSmall}>Μήνας: {formatCurrency(metrics.fullMonthInvoiced2024)}</Text>
+                      <Text style={styles.valueSmall}>Μήνας: {formatCurrency(metrics[`fullMonthInvoiced${previousYear}`])}</Text>
                       <Text style={styles.cardHintSmall}>Πατήστε για λεπτομέρειες</Text>
                     </TouchableOpacity>
                   </View>
@@ -621,7 +621,7 @@ function PlaymobilSalesSummary({ customerId, navigation }) {
                     activeOpacity={0.7}
                   >
                     <Text style={styles.label}>{`Τιμολογημένα ${currentMonthName} ${currentYear}`}</Text>
-                    <Text style={styles.value}>{formatCurrency(metrics.mtdInvoiced2025)}</Text>
+                    <Text style={styles.value}>{formatCurrency(metrics[`mtdInvoiced${currentYear}`])}</Text>
                     {mtdChangePercent != null && (
                       <Text style={[
                         styles.percentText,
@@ -852,9 +852,11 @@ function KivosSalesSummary({ customerId, navigation }) {
     title: '', 
     data: [], 
     previousData: [],
+    twoYearsAgoData: [],
     year2023Data: [],
     year2022Data: [],
-    type: '' 
+    type: '',
+    activeTab: 'current'
   });
 
   useEffect(() => {
@@ -944,18 +946,14 @@ function KivosSalesSummary({ customerId, navigation }) {
               hasRecords: !!salesData.records,
               hasSales: !!salesData.sales,
               years: Object.keys(salesData.records || {}),
-              recordCounts: {
-                year2025: salesData.records?.year2025?.length || 0,
-                year2024: salesData.records?.year2024?.length || 0,
-                year2023: salesData.records?.year2023?.length || 0,
-                year2022: salesData.records?.year2022?.length || 0,
-              },
-              salesAmounts: {
-                year2025: salesData.sales?.year2025?.yearly?.amount || 0,
-                year2024: salesData.sales?.year2024?.yearly?.amount || 0,
-                year2023: salesData.sales?.year2023?.yearly?.amount || 0,
-                year2022: salesData.sales?.year2022?.yearly?.amount || 0,
-              }
+              recordCounts: Object.keys(salesData.records || {}).reduce((acc, key) => {
+                acc[key] = salesData.records[key]?.length || 0;
+                return acc;
+              }, {}),
+              salesAmounts: Object.keys(salesData.sales || {}).reduce((acc, key) => {
+                acc[key] = salesData.sales[key]?.yearly?.amount || 0;
+                return acc;
+              }, {})
             });
             
             // Log detailed sales structure
@@ -1038,20 +1036,17 @@ function KivosSalesSummary({ customerId, navigation }) {
     
     const yearKey = `year${year}`;
     const records = salesData.records[yearKey] || [];
-    const previousYear = year - 1;
-    const previousYearKey = `year${previousYear}`;
-    const previousRecords = salesData.records[previousYearKey] || [];
     
-    const year2023Records = salesData.records.year2023 || [];
-    const year2022Records = salesData.records.year2022 || [];
-    
+    // Show only the clicked year's data (no tabs for other years)
     setModalData({
       title: `Πωλήσεις ${year}`,
       data: records,
-      previousData: previousRecords,
-      year2023Data: year2023Records,
-      year2022Data: year2022Records,
+      previousData: [], // Empty to hide tabs
+      twoYearsAgoData: [],
+      year2023Data: [],
+      year2022Data: [],
       type: 'sales',
+      activeTab: 'current',
     });
     setModalVisible(true);
   };
@@ -1087,7 +1082,8 @@ function KivosSalesSummary({ customerId, navigation }) {
   });
   
   if (salesData?.sales) {
-    const years = [2025, 2024, 2023, 2022];
+    const currentYear = new Date().getFullYear();
+    const years = [currentYear, currentYear - 1, currentYear - 2, currentYear - 3, currentYear - 4];
     
     years.forEach(year => {
       const yearKey = `year${year}`;
@@ -1178,17 +1174,27 @@ function KivosSalesSummary({ customerId, navigation }) {
           <View style={styles.kivosColumn}>
             {sortedSales.map((item, index) => {
               const reference = sortedSales[index + 1];
+              const isCurrentYear = item.year === new Date().getFullYear();
+              const hasRecords = item.recordCount > 0;
               const yearlyValue = item.yearly || 0;
               const referenceValue = reference?.yearly || 0;
               
-              const delta = Number.isFinite(yearlyValue) && Number.isFinite(referenceValue) && referenceValue !== 0
-                  ? ((yearlyValue - referenceValue) / referenceValue) * 100
-                  : null;
+              // For current year, compare YTD vs previous year's YTD for side border color
+              // For past years, keep yearly vs previous year's yearly
+              let delta = null;
+              if (isCurrentYear) {
+                const currYtd = Number.isFinite(item.ytd) ? item.ytd : null;
+                const prevYtd = Number.isFinite(reference?.ytd) ? reference.ytd : null;
+                if (currYtd != null && prevYtd != null && prevYtd !== 0) {
+                  delta = ((currYtd - prevYtd) / prevYtd) * 100;
+                }
+              } else {
+                if (Number.isFinite(yearlyValue) && Number.isFinite(referenceValue) && referenceValue !== 0) {
+                  delta = ((yearlyValue - referenceValue) / referenceValue) * 100;
+                }
+              }
               
               const trendColor = delta == null ? colors.textPrimary : delta >= 0 ? '#4caf50' : '#f44336';
-              
-              const isCurrentYear = item.year === new Date().getFullYear();
-              const hasRecords = item.recordCount > 0;
               
               return (
                 <TouchableOpacity 
@@ -1214,7 +1220,7 @@ function KivosSalesSummary({ customerId, navigation }) {
                   </View>
                   
                   <View style={styles.kivosMetricsRow}>
-                    {isCurrentYear && Number.isFinite(item.ytd) && (
+                    {Number.isFinite(item.ytd) && (
                       <View style={styles.kivosMetricBox}>
                         <Text style={styles.kivosMetricLabel}>YTD</Text>
                         <Text style={styles.kivosMetricValue}>{formatCurrency(item.ytd)}</Text>
@@ -1228,7 +1234,7 @@ function KivosSalesSummary({ customerId, navigation }) {
                       </View>
                     )}
                     
-                    {isCurrentYear && Number.isFinite(item.mtd) && (
+                    {Number.isFinite(item.mtd) && (
                       <View style={styles.kivosMetricBox}>
                         <Text style={styles.kivosMetricLabel}>MTD</Text>
                         <Text style={styles.kivosMetricValue}>{formatCurrency(item.mtd)}</Text>
@@ -1293,9 +1299,11 @@ function KivosSalesSummary({ customerId, navigation }) {
         title={modalData.title}
         data={modalData.data}
         previousData={modalData.previousData}
+        twoYearsAgoData={modalData.twoYearsAgoData}
         year2023Data={modalData.year2023Data}
         year2022Data={modalData.year2022Data}
         type={modalData.type}
+        initialActiveTab={modalData.activeTab}
       />
     </SafeScreen>
   );

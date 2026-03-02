@@ -15,28 +15,48 @@ import SafeScreen from '../components/SafeScreen';
 import { BRAND_LABEL } from '../constants/brands';
 
 const BRAND_CATALOGS = {
-  playmobil: {
+    playmobil: {
     label: BRAND_LABEL.playmobil || 'Playmobil',
     description: 'Ενημερωθείτε για τους πιο πρόσφατους καταλόγους προϊόντων Playmobil.',
     catalogs: [
       {
-        title: 'Playmobil Κατάλογος 2025 (Excel)',
-        url: 'https://www.dropbox.com/scl/fi/r1nw149vzgzlll69kr76d/2025_.xlsx?rlkey=hhe57zlsayw65ha5a9ee6p8dd&st=m02z5lzu&dl=0',
-        type: 'Excel',
+        title: 'Playmobil Novelties 2026 Α΄ Εξάμηνο',
+        url: 'https://online.fliphtml5.com/gtcjg/Novelties-A-2026/#p=1',
+        type: 'Online',
       },
       {
-        title: 'Playmobil Βασικός Κατάλογος 2025 (PDF)',
-        url: 'https://playmobil.a.bigcontent.io/v1/static/85684_CC_25-2_GR_Web-250623',
+        title: 'Playmobil Novelties 2026 Β΄ Εξάμηνο',
+        url: 'https://online.fliphtml5.com/gtcjg/Novelties-B-2026/#p=1',
+        type: 'Online',
+      },
+      {
+        title: 'Playmobil Βασικός Κατάλογος 2026 (PDF)',
+        url: 'https://playmobil.a.bigcontent.io/v1/static/CC_26-1_GR_Web',
         type: 'PDF',
       },
       {
-        title: 'Playmobil Exclusives 2025 (Online)',
-        url: 'https://online.fliphtml5.com/gtcjg/vtzx/',
+        title: 'Playmobil SkyTrails 2026 (PDF)',
+        url: 'https://online.fliphtml5.com/gtcjg/jlhl/',
+        type: 'PDF',
+      },
+      {
+        title: 'Playmobil Exclusives 2026 (Online)',
+        url: 'https://online.fliphtml5.com/gtcjg/scxg/',
         type: 'Online',
       },
       {
         title: 'Playmobil Junior (PDF)',
         url: 'https://playmobil.a.bigcontent.io/v1/static/FINAL_WEB_GR_Junior_Katalog_2024_ONLINE_mit_Tinti_1',
+        type: 'PDF',
+      },
+      {
+        title: 'Δελτίο Παραγγελίας Ιανουάριος 2026 (excel)',
+        url: 'https://www.dropbox.com/scl/fi/5gcaluvfn97upokxq78wv/PLAYMOBIL_-2026_.xlsx?rlkey=8pdry9ykl7abmkz4pc2qqw69n&st=3mj1i2cw&dl=0',
+        type: 'XLSX',
+      },
+      {
+        title: 'Lechuza Κατάλογος - Τιμοκατάλογος2026 (PDF)',
+        url: 'https://cloud.geobra.info/ssf/s/readFile/share/68026/-6095013465967845026/publicLink/%CE%A8%CE%97%CE%A6%CE%99%CE%91%CE%9A%CE%9F%CE%A3_LECHUZA_2026_NEW.pdf',
         type: 'PDF',
       },
     ],
@@ -62,13 +82,13 @@ const BRAND_CATALOGS = {
     description: 'Κατάλογοι John Hellas και συνεργαζόμενων brands (Ravensburger, κ.ά.).',
     catalogs: [
       {
-        title: 'John Hellas 2025 (PDF)',
-        url: 'https://johnhellas.gr/show_pdf/?file=https://johnhellas.gr/download_catalogue?download_id=69',
+        title: 'John Hellas 2026 (PDF)',
+        url: 'https://johnhellas.gr/show_pdf/?file=https://johnhellas.gr/download_catalogue?download_id=72',
         type: 'PDF',
       },
       {
-        title: 'Ravensburger 2025 (PDF)',
-        url: 'https://johnhellas.gr/show_pdf/?file=https://johnhellas.gr/download_catalogue?download_id=70',
+        title: 'Ravensburger 2026 (PDF)',
+        url: 'https://johnhellas.gr/show_pdf/?file=https://johnhellas.gr/download_catalogue?download_id=71',
         type: 'PDF',
       },
       {

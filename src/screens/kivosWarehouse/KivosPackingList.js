@@ -124,6 +124,26 @@ const KivosPackingList = ({ route, navigation }) => {
               item?.orderedQuantity ??
               0
           ),
+          quantity: Number(
+            item?.quantity ??
+              item?.qty ??
+              item?.orderedQty ??
+              item?.orderedQuantity ??
+              0
+          ),
+          wholesalePrice: Number(
+            item?.wholesalePrice ??
+              item?.price ??
+              item?.unitPrice ??
+              item?.netPrice ??
+              0
+          ),
+          supplierBrand:
+            item?.supplierBrand ||
+            item?.brand ||
+            item?.supplier ||
+            item?.supplier_brand ||
+            '',
           description:
             item?.description ||
             item?.name ||
@@ -161,7 +181,7 @@ const KivosPackingList = ({ route, navigation }) => {
   }, [loadOrder]);
 
   const totalItems = items.length;
-  const packedItems = useMemo(
+  const packedCount = useMemo(
     () =>
       items.reduce(
         (count, item) => count + (packedState[item.productCode] ? 1 : 0),
@@ -169,7 +189,7 @@ const KivosPackingList = ({ route, navigation }) => {
       ),
     [items, packedState]
   );
-  const progress = totalItems ? packedItems / totalItems : 0;
+  const progress = totalItems ? packedCount / totalItems : 0;
 
   const togglePacked = useCallback((code) => {
     setPackedState((prev) => ({
@@ -190,35 +210,234 @@ const KivosPackingList = ({ route, navigation }) => {
 
   const markOrderPacked = useCallback(async () => {
     if (saving) return;
-    if (!packedItems) {
-      Alert.alert('Δεν υπάρχουν συσκευασμένα', 'Επιλέξτε τουλάχιστον ένα είδος πριν την ολοκλήρωση.');
+    if (!packedCount) {
+      Alert.alert(
+        'Δεν έχουν επιλεγεί είδη',
+        'Παρακαλώ επιλέξτε τουλάχιστον ένα είδος για συσκευασία.'
+      );
       return;
     }
     if (!user?.uid) {
-      Alert.alert('Αποτυχία', 'Δεν βρέθηκε χρήστης. Συνδεθείτε ξανά.');
+      Alert.alert('Σφάλμα', 'Δεν βρέθηκε χρήστης. Παρακαλώ συνδεθείτε ξανά.');
       return;
     }
     try {
       setSaving(true);
-      await firestore().collection('orders_kivos').doc(orderId).update({
+      console.log('[KivosPackingList] markOrderPacked start', { orderId, packedCount });
+
+      const packedItemsPayload = items
+        .map((item) => {
+          const packedValue = packedState[item.productCode];
+          const candidatePackedQty =
+            typeof packedValue === 'number' && !Number.isNaN(packedValue)
+              ? packedValue
+              : packedValue
+              ? Number(item.qty ?? 0)
+              : 0;
+          const packedQty = Math.max(0, Math.min(Number(item.qty ?? 0), Number(candidatePackedQty) || 0));
+          return {
+            productCode: item.productCode,
+            description: item.description || '',
+            qty: packedQty,
+            quantity: packedQty,
+            wholesalePrice: Number(
+              item.wholesalePrice ??
+                item.price ??
+                item.unitPrice ??
+                item.netPrice ??
+                0
+            ),
+            supplierBrand:
+              item.supplierBrand ||
+              item.brand ||
+              item.supplier ||
+              item.supplier_brand ||
+              '',
+          };
+        })
+        .filter((entry) => entry.qty > 0);
+
+      const orderRef = firestore().collection('orders_kivos').doc(orderId);
+      const orderSnap = await orderRef.get();
+      if (!orderSnap.exists) {
+        throw new Error('Order not found.');
+      }
+      const orderData = orderSnap.data() || {};
+      const pickItems = () => {
+        const sources = [
+          coerceToArray(orderData.items),
+          coerceToArray(orderData.lines),
+          coerceToArray(orderData.orderItems),
+        ];
+        for (const source of sources) {
+          if (source.length) return source;
+        }
+        return [];
+      };
+
+      const rawOrderItems = pickItems();
+      const normalizedOrderItems = (rawOrderItems.length ? rawOrderItems : items)
+        .map((item) => ({
+          productCode:
+            item?.productCode ||
+            item?.code ||
+            item?.id ||
+            item?.product?.code ||
+            item?.product?.productCode ||
+            item?.product_code ||
+            item?.productcode ||
+            '',
+          qty: Number(
+            item?.qty ??
+              item?.quantity ??
+              item?.orderedQty ??
+              item?.orderedQuantity ??
+              item?.originalQty ??
+              0
+          ),
+          description:
+            item?.description ||
+            item?.name ||
+            item?.product?.description ||
+            item?.product?.name ||
+            '',
+        }))
+        .filter((item) => item.productCode);
+
+      console.log('[KivosPackingList] packedItemsPayload', packedItemsPayload);
+      console.log('[KivosPackingList] normalizedOrderItems', normalizedOrderItems);
+
+      const remainingItems = normalizedOrderItems
+        .map((item) => {
+          const packed = packedItemsPayload.find(
+            (p) => p.productCode === item.productCode
+          );
+          const originalQty = Number(item.qty ?? 0);
+          const packedQty = Math.min(packed?.qty ?? 0, originalQty);
+          const remainingQty = originalQty - packedQty;
+          return {
+            productCode: item.productCode,
+            qty: remainingQty,
+            quantity: remainingQty,
+            description: item.description || '',
+            wholesalePrice:
+              packed?.wholesalePrice ??
+              Number(
+                item.wholesalePrice ??
+                  item.price ??
+                  item.unitPrice ??
+                  item.netPrice ??
+                  0
+              ),
+            supplierBrand:
+              item.supplierBrand ||
+              item.brand ||
+              item.supplier ||
+              item.supplier_brand ||
+              '',
+          };
+        })
+        .filter((i) => i.qty > 0);
+
+      console.log('[KivosPackingList] remainingItems', remainingItems);
+
+      await orderRef.update({
         status: 'packed',
         packedAt: firestore.FieldValue.serverTimestamp(),
         packedBy: user.uid,
+        items: packedItemsPayload,
+        lines: packedItemsPayload,
+        orderItems: packedItemsPayload,
       });
-      setOrder((prev) => (prev ? { ...prev, status: 'packed' } : prev));
-      Alert.alert('Η παραγγελία μαρκαρίστηκε ως συσκευασμένη', '', [
+
+      let backorderId = null;
+      if (remainingItems.length > 0) {
+        const backorderPayload = {
+          status: 'backorder',
+          parentOrderId: orderId,
+          parentOrderNumber: orderData.number || orderData.orderId || orderId,
+          createdAt: new Date().toISOString(),
+          createdBy: user.uid,
+          items: remainingItems,
+          brand: orderData.brand || 'kivos',
+          channel: orderData.channel,
+          customer: orderData.customer || null,
+          customerName:
+            orderData.customerName ||
+            orderData.customer?.name ||
+            orderData.customer?.displayName ||
+            '',
+          customerCode:
+            orderData.customer?.customerCode ||
+            orderData.customerCode ||
+            orderData.customer?.code ||
+            '',
+          customerId:
+            orderData.customer?.id ||
+            orderData.customerId ||
+            orderData.customer_id ||
+            orderData.customerCode ||
+            '',
+          contact: orderData.contact || orderData.customer?.contact || null,
+          address: orderData.address || orderData.customer?.address || null,
+          deliveryInfo: orderData.deliveryInfo || null,
+          paymentMethod: orderData.paymentMethod || null,
+          paymentMethodLabel: orderData.paymentMethodLabel || null,
+          exported: false,
+        };
+
+        console.log('[KivosPackingList] creating backorder doc', backorderPayload);
+        try {
+          const backorderRef = await firestore()
+            .collection('orders_kivos')
+            .add(backorderPayload);
+          backorderId = backorderRef.id;
+          console.log('[KivosPackingList] backorder created', backorderId);
+        } catch (backorderErr) {
+          console.error('[KivosPackingList] Failed to create backorder', backorderErr);
+          throw new Error(backorderErr?.message || 'Failed to create backorder');
+        }
+      } else {
+        console.log('[KivosPackingList] no remaining items, skipping backorder');
+      }
+
+      setOrder((prev) =>
+        prev
+          ? {
+              ...prev,
+              status: 'packed',
+              packedAt: new Date(),
+              items: packedItemsPayload,
+              lines: packedItemsPayload,
+              orderItems: packedItemsPayload,
+            }
+          : prev
+      );
+
+      const result = {
+        success: true,
+        backorderCreated: !!backorderId,
+        backorderId: backorderId || null,
+      };
+
+      const message = backorderId
+        ? `Δημιουργήθηκε backorder για τα μη συσκευασμένα είδη (ID: ${backorderId}).`
+        : 'Η παραγγελία μαρκαρίστηκε ως συσκευασμένη.';
+      Alert.alert('Παραγγελία ενημερώθηκε', message, [
         {
           text: 'OK',
           onPress: () => navigation.goBack(),
         },
       ]);
+      return result;
     } catch (e) {
       console.error('[KivosPackingList] Failed to mark order packed', e);
-      Alert.alert('Αποτυχία', e?.message || 'Please try again.');
+      Alert.alert('Σφάλμα', e?.message || 'Please try again.');
+      return { success: false, error: e?.message };
     } finally {
       setSaving(false);
     }
-  }, [navigation, orderId, packedItems, saving, user?.uid]);
+  }, [items, navigation, orderId, packedCount, packedState, saving, user?.uid]);
 
   const renderItem = ({ item }) => {
     const isPacked = !!packedState[item.productCode];
@@ -313,7 +532,7 @@ const KivosPackingList = ({ route, navigation }) => {
               <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
             </View>
             <Text style={styles.progressLabel}>
-              {packedItems} / {totalItems} packed
+              {packedCount} / {totalItems} packed
             </Text>
           </View>
           <View style={styles.actionsRow}>
@@ -327,9 +546,9 @@ const KivosPackingList = ({ route, navigation }) => {
             <TouchableOpacity
               style={[
                 styles.primaryButton,
-                (!packedItems || saving) && styles.disabledButton,
+                (!packedCount || saving) && styles.disabledButton,
               ]}
-              disabled={!packedItems || saving}
+              disabled={!packedCount || saving}
               onPress={markOrderPacked}
               activeOpacity={0.85}
             >

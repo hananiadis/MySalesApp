@@ -155,6 +155,12 @@ export default function OrdersManagement() {
 
   useFocusEffect(
     useCallback(() => {
+      // Reload orders whenever the screen is focused
+      loadLocal();
+      if (canAccessFirestoreOrders) {
+        loadFirestoreOrders();
+      }
+
       const unsubscribe = navigation.addListener('beforeRemove', (event) => {
         if (event.data.action?.type === 'GO_BACK') {
           event.preventDefault();
@@ -162,7 +168,7 @@ export default function OrdersManagement() {
         }
       });
       return () => unsubscribe();
-    }, [handleBackToBrandHome, navigation])
+    }, [handleBackToBrandHome, navigation, loadLocal, loadFirestoreOrders, canAccessFirestoreOrders])
   );
 
   // Check if user can filter orders by salesman

@@ -40,10 +40,13 @@ const MONTH_START_BUFFER_DAYS = 5;
 
 // Sheet key mapping for Playmobil data
 const PLAYMOBIL_SHEET_KEYS = {
+  invoiced2026: { sheetKey: 'sales2026', dataType: 'sales' },
   invoiced2025: { sheetKey: 'sales2025', dataType: 'sales' },
   invoiced2024: { sheetKey: 'sales2024', dataType: 'sales' },
+  orders2026: { sheetKey: 'orders2026', dataType: 'orders' },
   orders2025: { sheetKey: 'orders2025', dataType: 'orders' },
   orders2024: { sheetKey: 'orders2024', dataType: 'orders' },
+  balance2026: { sheetKey: 'balance2026', dataType: 'balance' },
   balance2025: { sheetKey: 'balance2025', dataType: 'balance' },
 };
 
@@ -88,14 +91,14 @@ async function fetchStoreMapping() {
       }
     }
 
-    // Fetch fresh data from 2025 sales sheet (current year as authoritative source)
-    console.log('[fetchStoreMapping] Fetching fresh data from 2025 sales sheet');
+    // Fetch fresh data from 2026 sales sheet (current year as authoritative source)
+    console.log('[fetchStoreMapping] Fetching fresh data from 2026 sales sheet');
     const records = await fetchGoogleSheetCSV(
-      PLAYMOBIL_CONFIG.sheetUrls.sales2025,
+      PLAYMOBIL_CONFIG.sheetUrls.sales2026,
       PLAYMOBIL_CONFIG.columnNames.sales
     );
 
-    console.log(`[fetchStoreMapping] Fetched ${records.length} sales records from 2025 to build store mapping`);
+    console.log(`[fetchStoreMapping] Fetched ${records.length} sales records from 2026 to build store mapping`);
 
     // Build lookup structure: { customerCode: { stores: { store: salesman }, primaryMerch: string } }
     const mapping = {};
@@ -635,10 +638,13 @@ async function loadMonthBasedDatasets() {
     
     const monthIndex = JSON.parse(indexStr);
     const datasets = {
+      invoiced2026: [],
       invoiced2025: [],
       invoiced2024: [],
+      orders2026: [],
       orders2025: [],
       orders2024: [],
+      balance2026: [],
       balance2025: [],
     };
     
@@ -705,10 +711,13 @@ export async function getAllSheetsData() {
       if (cacheAgeHours < CACHE_TTL_HOURS) {
         console.log(`[getAllSheetsData] Using in-memory cache (age: ${cacheAgeHours.toFixed(2)} hours)`);
         console.log('[getAllSheetsData] Records:', {
+          invoiced2026: _memoryCache.datasets.invoiced2026?.length || 0,
           invoiced2025: _memoryCache.datasets.invoiced2025?.length || 0,
           invoiced2024: _memoryCache.datasets.invoiced2024?.length || 0,
+          orders2026: _memoryCache.datasets.orders2026?.length || 0,
           orders2025: _memoryCache.datasets.orders2025?.length || 0,
           orders2024: _memoryCache.datasets.orders2024?.length || 0,
+          balance2026: _memoryCache.datasets.balance2026?.length || 0,
           balance2025: _memoryCache.datasets.balance2025?.length || 0,
         });
         console.log('[getAllSheetsData] END (from memory)');
@@ -749,7 +758,7 @@ export async function getAllSheetsData() {
         console.log(`[getAllSheetsData] Loaded customer data for ${Object.keys(customerDataMap).length} customers`);
         
         // Re-apply handledBy to cached data
-        ['invoiced2025', 'invoiced2024', 'orders2025', 'orders2024'].forEach(datasetKey => {
+        ['invoiced2026', 'invoiced2025', 'invoiced2024', 'orders2026', 'orders2025', 'orders2024'].forEach(datasetKey => {
           if (datasets[datasetKey]) {
             datasets[datasetKey].forEach(record => {
               const customerCode = (record.customerCode || '').trim();
@@ -780,10 +789,13 @@ export async function getAllSheetsData() {
         };
         
         console.log('[getAllSheetsData] Cached data loaded from AsyncStorage:', {
+          invoiced2026: datasets.invoiced2026?.length || 0,
           invoiced2025: datasets.invoiced2025?.length || 0,
           invoiced2024: datasets.invoiced2024?.length || 0,
+          orders2026: datasets.orders2026?.length || 0,
           orders2025: datasets.orders2025?.length || 0,
           orders2024: datasets.orders2024?.length || 0,
+          balance2026: datasets.balance2026?.length || 0,
           balance2025: datasets.balance2025?.length || 0,
         });
         console.log('[getAllSheetsData] END (from month-based cache with re-applied attribution)');
@@ -820,10 +832,13 @@ async function fetchAndCacheAllSheets() {
   console.log('[fetchAndCacheAllSheets] START');
   
   const datasets = {
+    invoiced2026: [],
     invoiced2025: [],
     invoiced2024: [],
+    orders2026: [],
     orders2025: [],
     orders2024: [],
+    balance2026: [],
     balance2025: [],
   };
   const headerDates = {};
@@ -1034,10 +1049,32 @@ export async function calculateAllKPIs(sheetsData, customerCodes, options = {}) 
   const refMonth = referenceDate.getMonth();
   const refDay = referenceDate.getDate();
   const previousYear = refYear - 1;
+  const twoYearsAgo = refYear - 2;
   
   console.log('[calculateAllKPIs] Reference date:', referenceDate.toISOString());
-  console.log('[calculateAllKPIs] Reference breakdown:', { refYear, refMonth, refDay, previousYear });
+  console.log('[calculateAllKPIs] Reference breakdown:', { refYear, refMonth, refDay, previousYear, twoYearsAgo });
   console.log('[calculateAllKPIs] Salesmen filter:', salesmenFilter);
+  
+  // Dynamically select sheets based on reference year
+  // e.g., if refYear=2026, use invoiced2026 as current, invoiced2025 as -1 year, invoiced2024 as -2 year
+  const currentYearSheetKey = `invoiced${refYear}`;
+  const previousYearSheetKey = `invoiced${previousYear}`;
+  const twoYearsAgoSheetKey = `invoiced${twoYearsAgo}`;
+  const ordersCurrentYearSheetKey = `orders${refYear}`;
+  const ordersPreviousYearSheetKey = `orders${previousYear}`;
+  const ordersTwoYearsAgoSheetKey = `orders${twoYearsAgo}`;
+  
+  const currentYearInvoiced = sheetsData[currentYearSheetKey] || [];
+  const previousYearInvoiced = sheetsData[previousYearSheetKey] || [];
+  const twoYearsAgoInvoiced = sheetsData[twoYearsAgoSheetKey] || [];
+  const currentYearOrders = sheetsData[ordersCurrentYearSheetKey] || [];
+  const previousYearOrders = sheetsData[ordersPreviousYearSheetKey] || [];
+  const twoYearsAgoOrders = sheetsData[ordersTwoYearsAgoSheetKey] || [];
+  
+  console.log('[calculateAllKPIs] Using sheets:', {
+    invoiced: { current: currentYearSheetKey, previous: previousYearSheetKey, twoYearsAgo: twoYearsAgoSheetKey },
+    orders: { current: ordersCurrentYearSheetKey, previous: ordersPreviousYearSheetKey, twoYearsAgo: ordersTwoYearsAgoSheetKey }
+  });
   
   // Fetch current store mapping for re-attributing previous year data
   console.log('[calculateAllKPIs] Fetching current store mapping...');
@@ -1113,89 +1150,23 @@ export async function calculateAllKPIs(sheetsData, customerCodes, options = {}) 
     return isNaN(parsed.getTime()) ? null : parsed;
   };
   
-  // Helper to calculate metrics for a dataset
-  const calculateDatasetMetrics = (currentYearData, previousYearData, datasetName) => {
-    console.log(`[calculateAllKPIs:${datasetName}] Calculating metrics`);
+  // Helper to calculate metrics for a dataset (supports 3 years: current, -1, -2)
+  const calculateDatasetMetrics = (currentYearData, previousYearData, twoYearsAgoData, datasetName) => {
+    console.log(`[calculateAllKPIs:${datasetName}] Calculating metrics for 3 years`);
     console.log(`[calculateAllKPIs:${datasetName}] Input data sizes:`, {
       currentYear: currentYearData.length,
-      previousYear: previousYearData.length
+      previousYear: previousYearData.length,
+      twoYearsAgo: twoYearsAgoData.length
     });
     
-    const currentFiltered = filterByCustomers(currentYearData, false); // Current year: use handledBy
-    const previousFiltered = filterByCustomers(previousYearData, true); // Previous year: use current assignment
+    const currentFiltered = filterByCustomers(currentYearData, false);
+    const previousFiltered = filterByCustomers(previousYearData, true);
+    const twoYearsAgoFiltered = filterByCustomers(twoYearsAgoData, true);
     
     console.log(`[calculateAllKPIs:${datasetName}] After customer filter:`, {
       current: currentFiltered.length,
-      previous: previousFiltered.length
-    });
-    
-    // MTD: Month-to-date
-    console.log(`[calculateAllKPIs:${datasetName}] Calculating MTD...`);
-    const mtdCurrent = currentFiltered.filter(r => {
-      const date = parseDate(r.date);
-      if (!date) return false;
-      return date.getMonth() === refMonth && 
-             date.getDate() <= refDay &&
-             date.getFullYear() === refYear;
-    });
-    
-    const mtdPrevious = previousFiltered.filter(r => {
-      const date = parseDate(r.date);
-      if (!date) return false;
-      return date.getMonth() === refMonth && 
-             date.getDate() <= refDay &&
-             date.getFullYear() === previousYear;
-    });
-    
-    console.log(`[calculateAllKPIs:${datasetName}] MTD records:`, {
-      current: mtdCurrent.length,
-      previous: mtdPrevious.length
-    });
-    
-    // YTD: Year-to-date
-    console.log(`[calculateAllKPIs:${datasetName}] Calculating YTD...`);
-    const ytdCurrent = currentFiltered.filter(r => {
-      const date = parseDate(r.date);
-      if (!date) return false;
-      if (date.getFullYear() !== refYear) return false;
-      if (date.getMonth() < refMonth) return true;
-      if (date.getMonth() === refMonth && date.getDate() <= refDay) return true;
-      return false;
-    });
-    
-    const ytdPrevious = previousFiltered.filter(r => {
-      const date = parseDate(r.date);
-      if (!date) return false;
-      if (date.getFullYear() !== previousYear) return false;
-      if (date.getMonth() < refMonth) return true;
-      if (date.getMonth() === refMonth && date.getDate() <= refDay) return true;
-      return false;
-    });
-    
-    console.log(`[calculateAllKPIs:${datasetName}] YTD records:`, {
-      current: ytdCurrent.length,
-      previous: ytdPrevious.length
-    });
-    
-    // Monthly: Full month (previous year)
-    const monthlyPrevious = previousFiltered.filter(r => {
-      const date = parseDate(r.date);
-      if (!date) return false;
-      return date.getMonth() === refMonth && date.getFullYear() === previousYear;
-    });
-    
-    // Yearly: Full year (previous year)
-    const yearlyPrevious = previousFiltered.filter(r => {
-      const date = parseDate(r.date);
-      if (!date) return false;
-      return date.getFullYear() === previousYear;
-    });
-    
-    // Yearly: Full year (current year)
-    const yearlyCurrent = currentFiltered.filter(r => {
-      const date = parseDate(r.date);
-      if (!date) return false;
-      return date.getFullYear() === refYear;
+      previous: previousFiltered.length,
+      twoYearsAgo: twoYearsAgoFiltered.length
     });
     
     // Helper to calculate totals
@@ -1221,7 +1192,7 @@ export async function calculateAllKPIs(sheetsData, customerCodes, options = {}) 
       });
     };
     
-    // Calculate diff
+    // Calculate diff between two values
     const calcDiff = (current, previous) => {
       const amountDiff = current.amount - previous.amount;
       const percentDiff = previous.amount !== 0 
@@ -1234,19 +1205,121 @@ export async function calculateAllKPIs(sheetsData, customerCodes, options = {}) 
       };
     };
     
-    // Build metric objects
+    // MTD: Month-to-date for all 3 years
+    console.log(`[calculateAllKPIs:${datasetName}] Calculating MTD for 3 years...`);
+    const mtdCurrent = currentFiltered.filter(r => {
+      const date = parseDate(r.date);
+      if (!date) return false;
+      return date.getMonth() === refMonth && 
+             date.getDate() <= refDay &&
+             date.getFullYear() === refYear;
+    });
+    
+    const mtdPrevious = previousFiltered.filter(r => {
+      const date = parseDate(r.date);
+      if (!date) return false;
+      return date.getMonth() === refMonth && 
+             date.getDate() <= refDay &&
+             date.getFullYear() === previousYear;
+    });
+    
+    const mtdTwoYearsAgo = twoYearsAgoFiltered.filter(r => {
+      const date = parseDate(r.date);
+      if (!date) return false;
+      return date.getMonth() === refMonth && 
+             date.getDate() <= refDay &&
+             date.getFullYear() === twoYearsAgo;
+    });
+    
+    console.log(`[calculateAllKPIs:${datasetName}] MTD records:`, {
+      current: mtdCurrent.length,
+      previous: mtdPrevious.length,
+      twoYearsAgo: mtdTwoYearsAgo.length
+    });
+    
+    // YTD: Year-to-date for all 3 years
+    console.log(`[calculateAllKPIs:${datasetName}] Calculating YTD for 3 years...`);
+    const ytdCurrent = currentFiltered.filter(r => {
+      const date = parseDate(r.date);
+      if (!date) return false;
+      if (date.getFullYear() !== refYear) return false;
+      if (date.getMonth() < refMonth) return true;
+      if (date.getMonth() === refMonth && date.getDate() <= refDay) return true;
+      return false;
+    });
+    
+    const ytdPrevious = previousFiltered.filter(r => {
+      const date = parseDate(r.date);
+      if (!date) return false;
+      if (date.getFullYear() !== previousYear) return false;
+      if (date.getMonth() < refMonth) return true;
+      if (date.getMonth() === refMonth && date.getDate() <= refDay) return true;
+      return false;
+    });
+    
+    const ytdTwoYearsAgo = twoYearsAgoFiltered.filter(r => {
+      const date = parseDate(r.date);
+      if (!date) return false;
+      if (date.getFullYear() !== twoYearsAgo) return false;
+      if (date.getMonth() < refMonth) return true;
+      if (date.getMonth() === refMonth && date.getDate() <= refDay) return true;
+      return false;
+    });
+    
+    console.log(`[calculateAllKPIs:${datasetName}] YTD records:`, {
+      current: ytdCurrent.length,
+      previous: ytdPrevious.length,
+      twoYearsAgo: ytdTwoYearsAgo.length
+    });
+    
+    // Monthly: Full month for previous years
+    const monthlyPrevious = previousFiltered.filter(r => {
+      const date = parseDate(r.date);
+      if (!date) return false;
+      return date.getMonth() === refMonth && date.getFullYear() === previousYear;
+    });
+    
+    const monthlyTwoYearsAgo = twoYearsAgoFiltered.filter(r => {
+      const date = parseDate(r.date);
+      if (!date) return false;
+      return date.getMonth() === refMonth && date.getFullYear() === twoYearsAgo;
+    });
+    
+    // Yearly: Full year for all 3 years
+    const yearlyCurrentFull = currentFiltered.filter(r => {
+      const date = parseDate(r.date);
+      if (!date) return false;
+      return date.getFullYear() === refYear;
+    });
+    
+    const yearlyPreviousFull = previousFiltered.filter(r => {
+      const date = parseDate(r.date);
+      if (!date) return false;
+      return date.getFullYear() === previousYear;
+    });
+    
+    const yearlyTwoYearsAgoFull = twoYearsAgoFiltered.filter(r => {
+      const date = parseDate(r.date);
+      if (!date) return false;
+      return date.getFullYear() === twoYearsAgo;
+    });
+    
+    // Calculate totals
     const mtdCurrentTotals = calculateTotals(mtdCurrent);
     const mtdPreviousTotals = calculateTotals(mtdPrevious);
+    const mtdTwoYearsAgoTotals = calculateTotals(mtdTwoYearsAgo);
     
     const ytdCurrentTotals = calculateTotals(ytdCurrent);
     const ytdPreviousTotals = calculateTotals(ytdPrevious);
+    const ytdTwoYearsAgoTotals = calculateTotals(ytdTwoYearsAgo);
     
     const monthlyPreviousTotals = calculateTotals(monthlyPrevious);
-    const yearlyPreviousTotals = calculateTotals(yearlyPrevious);
-    const yearlyCurrentTotals = calculateTotals(yearlyCurrent);
+    const monthlyTwoYearsAgoTotals = calculateTotals(monthlyTwoYearsAgo);
     
-    // Context for labels: use the provided referenceDate to ensure
-    // ranges (1/MM–DD/MM and 01/01–DD/MM) match header-derived date
+    const yearlyCurrentTotals = calculateTotals(yearlyCurrentFull);
+    const yearlyPreviousTotals = calculateTotals(yearlyPreviousFull);
+    const yearlyTwoYearsAgoTotals = calculateTotals(yearlyTwoYearsAgoFull);
+    
     const contextFromRef = {
       month: refMonth,
       day: refDay,
@@ -1258,49 +1331,57 @@ export async function calculateAllKPIs(sheetsData, customerCodes, options = {}) 
       mtd: {
         current: mtdCurrentTotals,
         previous: mtdPreviousTotals,
+        twoYearsAgo: mtdTwoYearsAgoTotals,
         diff: calcDiff(mtdCurrentTotals, mtdPreviousTotals),
+        diffTwoYears: calcDiff(mtdCurrentTotals, mtdTwoYearsAgoTotals),
         currentRecords: sortByAmount(mtdCurrent),
         previousRecords: sortByAmount(mtdPrevious),
+        twoYearsAgoRecords: sortByAmount(mtdTwoYearsAgo),
       },
       ytd: {
         current: ytdCurrentTotals,
         previous: ytdPreviousTotals,
+        twoYearsAgo: ytdTwoYearsAgoTotals,
         diff: calcDiff(ytdCurrentTotals, ytdPreviousTotals),
+        diffTwoYears: calcDiff(ytdCurrentTotals, ytdTwoYearsAgoTotals),
         currentRecords: sortByAmount(ytdCurrent),
         previousRecords: sortByAmount(ytdPrevious),
+        twoYearsAgoRecords: sortByAmount(ytdTwoYearsAgo),
       },
       monthly: {
         previous: monthlyPreviousTotals,
-      },
-      ytdComparison: {
-        current: ytdCurrentTotals,
-        previous: ytdPreviousTotals,
-        diff: calcDiff(ytdCurrentTotals, ytdPreviousTotals),
+        twoYearsAgo: monthlyTwoYearsAgoTotals,
       },
       yearly: {
         current: yearlyCurrentTotals,
         previous: yearlyPreviousTotals,
+        twoYearsAgo: yearlyTwoYearsAgoTotals,
         diff: calcDiff(yearlyCurrentTotals, yearlyPreviousTotals),
-        currentRecords: sortByAmount(yearlyCurrent),
-        previousRecords: sortByAmount(yearlyPrevious),
+        diffTwoYears: calcDiff(yearlyCurrentTotals, yearlyTwoYearsAgoTotals),
+        currentRecords: sortByAmount(yearlyCurrentFull),
+        previousRecords: sortByAmount(yearlyPreviousFull),
+        twoYearsAgoRecords: sortByAmount(yearlyTwoYearsAgoFull),
       },
       context: contextFromRef,
       allCurrentRecords: currentFiltered,
       allPreviousRecords: previousFiltered,
+      allTwoYearsAgoRecords: twoYearsAgoFiltered,
     };
   };
   
   console.log('[calculateAllKPIs] Processing invoiced dataset...');
   const invoicedMetrics = calculateDatasetMetrics(
-    sheetsData.invoiced2025,
-    sheetsData.invoiced2024,
+    currentYearInvoiced,
+    previousYearInvoiced,
+    twoYearsAgoInvoiced,
     'invoiced'
   );
   
   console.log('[calculateAllKPIs] Processing orders dataset...');
   const ordersMetrics = calculateDatasetMetrics(
-    sheetsData.orders2025,
-    sheetsData.orders2024,
+    currentYearOrders,
+    previousYearOrders,
+    twoYearsAgoOrders,
     'orders'
   );
   
@@ -1311,10 +1392,12 @@ export async function calculateAllKPIs(sheetsData, customerCodes, options = {}) 
       invoiced: {
         current: invoicedMetrics.allCurrentRecords,
         previous: invoicedMetrics.allPreviousRecords,
+        twoYearsAgo: invoicedMetrics.allTwoYearsAgoRecords,
       },
       orders: {
         current: ordersMetrics.allCurrentRecords,
         previous: ordersMetrics.allPreviousRecords,
+        twoYearsAgo: ordersMetrics.allTwoYearsAgoRecords,
       },
     },
   };

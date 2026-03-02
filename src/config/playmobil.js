@@ -10,6 +10,12 @@ export const PLAYMOBIL_CONFIG = {
 
   // Google Sheets CSV URLs (your actual published links)
   sheetUrls: {
+    sales2026:
+      'https://docs.google.com/spreadsheets/d/e/2PACX-1vTaILJrtA4JwLGO1RWuzXZpbytYf_XX1rL8VYM8ZXNUw3_JBM8gE3ozVOxmIoJox8iJXqdERKg4kS6m/pub?gid=616087206&single=true&output=csv',
+    orders2026:
+      'https://docs.google.com/spreadsheets/d/e/2PACX-1vTaILJrtA4JwLGO1RWuzXZpbytYf_XX1rL8VYM8ZXNUw3_JBM8gE3ozVOxmIoJox8iJXqdERKg4kS6m/pub?gid=724538995&single=true&output=csv',
+    balance2026:
+      'https://docs.google.com/spreadsheets/d/e/2PACX-1vTaILJrtA4JwLGO1RWuzXZpbytYf_XX1rL8VYM8ZXNUw3_JBM8gE3ozVOxmIoJox8iJXqdERKg4kS6m/pub?gid=440325138&single=true&output=csv',
     sales2025:
       'https://docs.google.com/spreadsheets/d/e/2PACX-1vTG9rEF1fDFT7Z4M4Q7ejMGFmLtbS3gsORfFOP19ESNV00TticfgHxfnmvPOd28Nm23783aXLafj-TL/pub?gid=616087206&single=true&output=csv',
     orders2025:

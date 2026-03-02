@@ -125,7 +125,7 @@ export default function SalesAnalyticsScreen({ route, navigation }) {
         console.log('[SalesAnalytics] Calling getAllSheetsData...');
         const sheetsData = await getAllSheetsData();
         console.log(`[SalesAnalytics] Sheets data loaded (${Date.now() - startSales}ms)`);
-        console.log('[SalesAnalytics] Sheets data loaded records - 2025:', sheetsData.invoiced2025?.length || 0, '2024:', sheetsData.invoiced2024?.length || 0);
+        console.log(`[SalesAnalytics] Sheets data loaded records - ${currentYear}:`, sheetsData[`invoiced${currentYear}`]?.length || 0, `${previousYear}:`, sheetsData[`invoiced${previousYear}`]?.length || 0);
         
         // Filter to only include customers that exist in Firestore
         const filterByCustomer = (records) => records.filter(r => {
@@ -133,10 +133,10 @@ export default function SalesAnalyticsScreen({ route, navigation }) {
           return validCustomerCodes.has(customerCode);
         });
         
-        const currentFiltered = filterByCustomer(sheetsData.invoiced2025 || []);
-        const previousFiltered = filterByCustomer(sheetsData.invoiced2024 || []);
+        const currentFiltered = filterByCustomer(sheetsData[`invoiced${currentYear}`] || []);
+        const previousFiltered = filterByCustomer(sheetsData[`invoiced${previousYear}`] || []);
         
-        console.log('[SalesAnalytics] After customer filter - 2025:', currentFiltered.length, '2024:', previousFiltered.length);
+        console.log(`[SalesAnalytics] After customer filter - ${currentYear}:`, currentFiltered.length, `${previousYear}:`, previousFiltered.length);
         
         // Store filtered sales data
         sales = {
@@ -158,7 +158,7 @@ export default function SalesAnalyticsScreen({ route, navigation }) {
         console.log('[SalesAnalytics] Calling getAllSheetsData...');
         const sheetsData = await getAllSheetsData();
         console.log(`[SalesAnalytics] Sheets data loaded (${Date.now() - startSales}ms)`);
-        console.log('[SalesAnalytics] Sheets data loaded records - 2025:', sheetsData.sales2025?.length || 0, '2024:', sheetsData.sales2024?.length || 0, '2023:', sheetsData.sales2023?.length || 0, '2022:', sheetsData.sales2022?.length || 0);
+        console.log(`[SalesAnalytics] Sheets data loaded records - ${currentYear}:`, sheetsData[`sales${currentYear}`]?.length || 0, `${previousYear}:`, sheetsData[`sales${previousYear}`]?.length || 0, `${currentYear - 2}:`, sheetsData[`sales${currentYear - 2}`]?.length || 0, `${currentYear - 3}:`, sheetsData[`sales${currentYear - 3}`]?.length || 0);
         
         // Filter to only include customers that exist in Firestore
         const filterByCustomer = (records) => records.filter(r => {
