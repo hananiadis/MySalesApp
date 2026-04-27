@@ -7,6 +7,12 @@ import QuickActions from './components/QuickActions';
 import VisitExecutionModal from './components/VisitExecutionModal';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
+import {
+  createVisitExecution,
+  fetchVisitPlans,
+  saveVisitPlan,
+  updateVisitExecution,
+} from '../../utils/bootApi';
 
 const MyDayMobile = () => {
   const [currentDate] = useState(new Date());
@@ -15,88 +21,63 @@ const MyDayMobile = () => {
   const [isOptimizing, setIsOptimizing] = useState(false);
   const [selectedVisit, setSelectedVisit] = useState(null);
   const [showExecutionModal, setShowExecutionModal] = useState(false);
-  const [visits, setVisits] = useState([
-  {
-    id: 1,
-    customerName: "TechCorp Solutions",
-    address: "1234 Business Ave, Suite 100, Downtown",
-    scheduledTime: "09:00",
-    status: "completed",
-    priority: "High",
-    objectives: "Product demo for new CRM system, discuss pricing options, and gather technical requirements",
-    contactPerson: "Sarah Johnson",
-    phone: "(555) 123-4567",
-    lastVisit: "Oct 15, 2025",
-    lastOutcome: "Quote requested",
-    customerPhoto: "/assets/images/avatar-placeholder.png",
-    customerPhotoAlt: "Modern glass office building with TechCorp Solutions signage in downtown business district",
-    notes: "Customer interested in enterprise package. Follow up with technical specifications."
-  },
-  {
-    id: 2,
-    customerName: "Green Valley Manufacturing",
-    address: "5678 Industrial Blvd, Manufacturing District",
-    scheduledTime: "11:30",
-    status: "in-progress",
-    priority: "Medium",
-    objectives: "Quarterly review meeting, discuss contract renewal, and present new service offerings",
-    contactPerson: "Mike Rodriguez",
-    phone: "(555) 234-5678",
-    lastVisit: "Sep 20, 2025",
-    lastOutcome: "Successful meeting",
-    customerPhoto: "/assets/images/avatar-placeholder.png",
-    customerPhotoAlt: "Large industrial manufacturing facility with Green Valley Manufacturing logo on modern warehouse building",
-    notes: ""
-  },
-  {
-    id: 3,
-    customerName: "Sunrise Retail Group",
-    address: "9012 Commerce St, Retail Plaza",
-    scheduledTime: "14:00",
-    status: "upcoming",
-    priority: "High",
-    objectives: "Present seasonal marketing campaign, discuss inventory management solutions, and review performance metrics",
-    contactPerson: "Lisa Chen",
-    phone: "(555) 345-6789",
-    lastVisit: "Oct 28, 2025",
-    lastOutcome: "Information gathering",
-    customerPhoto: "/assets/images/avatar-placeholder.png",
-    customerPhotoAlt: "Bright modern retail store interior with Sunrise Retail Group branding and organized product displays",
-    notes: ""
-  },
-  {
-    id: 4,
-    customerName: "Metro Healthcare Partners",
-    address: "3456 Medical Center Dr, Healthcare Complex",
-    scheduledTime: "16:30",
-    status: "upcoming",
-    priority: "Medium",
-    objectives: "Software training session, address user feedback, and discuss system integration requirements",
-    contactPerson: "Dr. James Wilson",
-    phone: "(555) 456-7890",
-    lastVisit: "Nov 1, 2025",
-    lastOutcome: "Training completed",
-    customerPhoto: "/assets/images/avatar-placeholder.png",
-    customerPhotoAlt: "Modern healthcare facility entrance with Metro Healthcare Partners signage and glass facade",
-    notes: ""
-  },
-  {
-    id: 5,
-    customerName: "Coastal Construction LLC",
-    address: "7890 Builder's Way, Construction Zone",
-    scheduledTime: "18:00",
-    status: "overdue",
-    priority: "High",
-    objectives: "Project status update, discuss timeline adjustments, and review budget considerations",
-    contactPerson: "Tom Anderson",
-    phone: "(555) 567-8901",
-    lastVisit: "Oct 25, 2025",
-    lastOutcome: "Rescheduled",
-    customerPhoto: "/assets/images/avatar-placeholder.png",
-    customerPhotoAlt: "Active construction site with Coastal Construction LLC equipment and workers in hard hats",
-    notes: "Customer requested evening meeting due to site schedule."
-  }]
-  );
+  const [visits, setVisits] = useState([]);
+  const [isLoadingVisits, setIsLoadingVisits] = useState(false);
+  const [visitsError, setVisitsError] = useState('');
+  const [isSavingExecution, setIsSavingExecution] = useState(false);
+
+  const toScheduledTime = (visit) => {
+    const startTime = String(visit?.startTime || '').trim();
+    if (startTime) {
+      return startTime;
+    }
+
+    const slot = String(visit?.timeSlot || '').trim();
+    if (slot.includes('-')) {
+      return slot?.split('-')?.[0]?.trim();
+    }
+
+    return slot || '09:00';
+  };
+
+  const mapVisitPlanToCard = (visit) => ({
+    id: visit?.id,
+    visitPlanId: visit?.id,
+    customerId: visit?.customerId || null,
+    customerCode: visit?.customerCode || null,
+    customerName: visit?.customerName || visit?.company || 'Πελάτης',
+    company: visit?.company || null,
+    location: visit?.location || null,
+    address: visit?.address || visit?.location || '—',
+    scheduledTime: toScheduledTime(visit),
+    status: visit?.status || 'upcoming',
+    priority: String(visit?.priority || 'medium')?.toLowerCase(),
+    objectives: visit?.objective || 'Προγραμματισμένη επίσκεψη πελάτη.',
+    contactPerson: visit?.customerName || '—',
+    phone: visit?.phone || '—',
+    lastVisit: visit?.date || '—',
+    lastOutcome: visit?.type || '—',
+    customerPhoto: '/assets/images/avatar-placeholder.png',
+    customerPhotoAlt: 'Customer location placeholder image',
+    notes: visit?.notes || '',
+    executionId: visit?.executionId || null,
+  });
+
+  const toExecutionPayload = (visit, overrides = {}) => {
+    const date = new Date().toISOString().slice(0, 10);
+    return {
+      visitPlanId: visit?.visitPlanId || visit?.id,
+      customerId: visit?.customerId || null,
+      customerCode: visit?.customerCode || null,
+      customerName: visit?.customerName || null,
+      company: visit?.company || null,
+      location: visit?.location || null,
+      address: visit?.address || null,
+      phone: visit?.phone || null,
+      date,
+      ...overrides,
+    };
+  };
 
   // Calculate stats
   const stats = {
@@ -117,6 +98,42 @@ const MyDayMobile = () => {
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
+  useEffect(() => {
+    let isActive = true;
+
+    const loadTodayPlans = async () => {
+      setIsLoadingVisits(true);
+      setVisitsError('');
+
+      try {
+        const today = new Date().toISOString().slice(0, 10);
+        const response = await fetchVisitPlans({ date: today });
+
+        if (!isActive) {
+          return;
+        }
+
+        const items = Array.isArray(response?.items) ? response.items : [];
+        setVisits(items.map(mapVisitPlanToCard));
+      } catch (error) {
+        if (isActive) {
+          setVisitsError(error?.message || 'Αδυναμία φόρτωσης σημερινών επισκέψεων.');
+          setVisits([]);
+        }
+      } finally {
+        if (isActive) {
+          setIsLoadingVisits(false);
+        }
+      }
+    };
+
+    loadTodayPlans();
+
+    return () => {
+      isActive = false;
     };
   }, []);
 
@@ -148,11 +165,47 @@ const MyDayMobile = () => {
   };
 
   const handleCheckIn = (visitId) => {
-    setVisits((prev) => prev?.map((visit) =>
-    visit?.id === visitId ?
-    { ...visit, status: 'in-progress', checkInTime: new Date() } :
-    visit
-    ));
+    const targetVisit = visits?.find((visit) => visit?.id === visitId);
+    if (!targetVisit) {
+      return;
+    }
+
+    const checkInAt = new Date().toISOString();
+    setVisits((prev) =>
+      prev?.map((visit) =>
+        visit?.id === visitId ? { ...visit, status: 'in-progress', checkInTime: checkInAt } : visit
+      )
+    );
+
+    setIsSavingExecution(true);
+    setVisitsError('');
+
+    createVisitExecution(
+      toExecutionPayload(targetVisit, {
+        status: 'in-progress',
+        checkInAt,
+      })
+    )
+      .then((response) => {
+        const executionId = response?.item?.id || null;
+        setVisits((prev) =>
+          prev?.map((visit) =>
+            visit?.id === visitId ? { ...visit, executionId: executionId || visit?.executionId } : visit
+          )
+        );
+        return saveVisitPlan({ id: targetVisit?.visitPlanId || visitId, status: 'in-progress' });
+      })
+      .catch((error) => {
+        setVisitsError(error?.message || 'Αποτυχία καταγραφής check-in επίσκεψης.');
+        setVisits((prev) =>
+          prev?.map((visit) =>
+            visit?.id === visitId ? { ...visit, status: targetVisit?.status || 'upcoming' } : visit
+          )
+        );
+      })
+      .finally(() => {
+        setIsSavingExecution(false);
+      });
   };
 
   const handleCheckOut = (visitId) => {
@@ -161,18 +214,83 @@ const MyDayMobile = () => {
     setShowExecutionModal(true);
   };
 
-  const handleCompleteVisit = (visitData) => {
-    setVisits((prev) => prev?.map((visit) =>
-    visit?.id === visitData?.id ?
-    {
-      ...visit,
-      status: 'completed',
-      completedAt: visitData?.completedAt,
-      outcome: visitData?.outcome,
-      notes: visitData?.notes
-    } :
-    visit
-    ));
+  const handleCompleteVisit = async (visitData) => {
+    const targetVisit = visits?.find((visit) => visit?.id === visitData?.id);
+    if (!targetVisit) {
+      return;
+    }
+
+    const completedAtIso = new Date(visitData?.completedAt || new Date()).toISOString();
+
+    setVisits((prev) =>
+      prev?.map((visit) =>
+        visit?.id === visitData?.id
+          ? {
+              ...visit,
+              status: 'completed',
+              completedAt: completedAtIso,
+              outcome: visitData?.outcome,
+              notes: visitData?.notes,
+            }
+          : visit
+      )
+    );
+
+    setIsSavingExecution(true);
+    setVisitsError('');
+
+    try {
+      if (targetVisit?.executionId) {
+        await updateVisitExecution(targetVisit.executionId, {
+          status: 'completed',
+          checkOutAt: completedAtIso,
+          completedAt: completedAtIso,
+          outcome: visitData?.outcome,
+          notes: visitData?.notes,
+          nextAction: visitData?.nextAction,
+          checklist: visitData?.checklist,
+          attachments: visitData?.attachments,
+        });
+      } else {
+        const createResponse = await createVisitExecution(
+          toExecutionPayload(targetVisit, {
+            status: 'completed',
+            checkInAt: completedAtIso,
+            checkOutAt: completedAtIso,
+            completedAt: completedAtIso,
+            outcome: visitData?.outcome,
+            notes: visitData?.notes,
+            nextAction: visitData?.nextAction,
+            checklist: visitData?.checklist,
+            attachments: visitData?.attachments,
+          })
+        );
+
+        const executionId = createResponse?.item?.id || null;
+        if (executionId) {
+          setVisits((prev) =>
+            prev?.map((visit) =>
+              visit?.id === visitData?.id ? { ...visit, executionId } : visit
+            )
+          );
+        }
+      }
+
+      await saveVisitPlan({
+        id: targetVisit?.visitPlanId || visitData?.id,
+        status: 'completed',
+        notes: visitData?.notes,
+      });
+    } catch (error) {
+      setVisitsError(error?.message || 'Αποτυχία ολοκλήρωσης επίσκεψης.');
+      setVisits((prev) =>
+        prev?.map((visit) =>
+          visit?.id === visitData?.id ? { ...visit, status: targetVisit?.status || 'in-progress' } : visit
+        )
+      );
+    } finally {
+      setIsSavingExecution(false);
+    }
   };
 
   const handleReschedule = (visitId) => {
@@ -226,12 +344,30 @@ const MyDayMobile = () => {
 
 
           {/* Offline Notice */}
+          {isLoadingVisits && (
+            <div className="bg-card border border-border rounded-lg p-3 mb-4 text-sm text-muted-foreground">
+              Φόρτωση σημερινών επισκέψεων...
+            </div>
+          )}
+
+          {visitsError && (
+            <div className="bg-error/10 border border-error/30 rounded-lg p-3 mb-4 text-sm text-error">
+              {visitsError}
+            </div>
+          )}
+
+          {isSavingExecution && (
+            <div className="bg-card border border-border rounded-lg p-3 mb-4 text-sm text-muted-foreground">
+              Αποθήκευση ενημέρωσης επίσκεψης...
+            </div>
+          )}
+
           {!isOnline &&
           <div className="bg-warning/10 border border-warning/20 rounded-lg p-3 mb-4">
               <div className="flex items-center space-x-2">
                 <Icon name="WifiOff" size={16} className="text-warning" />
                 <span className="text-sm text-warning font-medium">
-                  Working offline. Changes will sync when connection is restored.
+                  Εργασία εκτός σύνδεσης. Οι αλλαγές θα συγχρονιστούν όταν αποκατασταθεί η σύνδεση.
                 </span>
               </div>
             </div>
@@ -253,12 +389,12 @@ const MyDayMobile = () => {
 
             <div className="text-center py-12">
                 <Icon name="Calendar" size={48} className="text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-foreground mb-2">No visits scheduled</h3>
+                <h3 className="text-lg font-medium text-foreground mb-2">Δεν υπάρχουν προγραμματισμένες επισκέψεις</h3>
                 <p className="text-muted-foreground mb-4">
-                  You have no visits scheduled for today.
+                  Δεν έχετε προγραμματισμένες επισκέψεις για σήμερα.
                 </p>
                 <Button variant="outline" iconName="Plus">
-                  Add Visit
+                  Προσθήκη Επίσκεψης
                 </Button>
               </div>
             }
@@ -269,9 +405,9 @@ const MyDayMobile = () => {
           <div className="bg-success/10 border border-success/20 rounded-lg p-4 mt-6">
               <div className="text-center">
                 <Icon name="CheckCircle" size={32} className="text-success mx-auto mb-2" />
-                <h3 className="font-semibold text-success mb-1">Great job!</h3>
+                <h3 className="font-semibold text-success mb-1">Εξαιρετική δουλειά!</h3>
                 <p className="text-sm text-success/80">
-                  You've completed all visits for today. Time to head home!
+                  Ολοκληρώσατε όλες τις επισκέψεις για σήμερα. Ώρα για επιστροφή!
                 </p>
               </div>
             </div>

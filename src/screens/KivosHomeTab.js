@@ -25,6 +25,7 @@ import { useKivosKpi } from '../hooks/useKivosKpi';
 import { useAuth } from '../context/AuthProvider';
 import { ROLES } from '../constants/roles';
 import colors from '../theme/colors';
+import { navigateToMainHome } from '../utils/navigationHelpers';
 
 const BRAND_ART = {
   kivos: require('../../assets/kivos_logo.png'),
@@ -165,7 +166,7 @@ const KivosHomeTab = ({ navigation, route }) => {
   // KPI state
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [reloadToken, setReloadToken] = useState(0);
-  const [referenceDate] = useState(() => new Date());
+  const [referenceDate, setReferenceDate] = useState(() => new Date());
   const [selectedSalesmenIds, setSelectedSalesmenIds] = useState(null); // null = All
   
   // Modal state
@@ -597,7 +598,9 @@ const KivosHomeTab = ({ navigation, route }) => {
       ) : (
         <KivosKpiCards
           kpis={kpis}
-          referenceMoment={referenceMoment}
+          referenceMoment={referenceMoment || referenceDate}
+          selectedDate={referenceDate}
+          onDateChange={setReferenceDate}
           onCardPress={handleKpiCardPress}
         />
       )}
@@ -660,13 +663,7 @@ const KivosHomeTab = ({ navigation, route }) => {
 
           <TouchableOpacity
             style={styles.actionButton}
-            onPress={() => {
-              // Navigate back to MainHome
-              const parentNav = navigation.getParent();
-              if (parentNav) {
-                parentNav.navigate('MainHome');
-              }
-            }}
+            onPress={() => navigateToMainHome(navigation)}
           >
             <Ionicons name="arrow-back-circle-outline" size={32} color={colors.primary} />
             <Text style={styles.actionButtonText}>Επιστροφή στην κεντρική</Text>
@@ -686,7 +683,7 @@ const KivosHomeTab = ({ navigation, route }) => {
         type={modalData.type}
         activeSalesmenIds={activeSalesmenIds}
         availableSalesmen={availableSalesmen}
-        selectedDate={referenceMoment || new Date()}
+        selectedDate={referenceDate}
       />
     </SafeScreen>
   );

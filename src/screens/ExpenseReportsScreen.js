@@ -7,6 +7,17 @@ import { Ionicons } from '@expo/vector-icons';
 import { getWeekId, getMondayFromWeekId, formatDateDDMMYYYY } from '../constants/expenseConstants';
 import BackToExpensesButton from '../components/BackToExpensesButton';
 
+const TOKENS = {
+  primaryBlue: '#185FA5',
+  lightBlueBg: '#E6F1FB',
+  pageBackground: '#f7f5f0',
+  surface: '#fff',
+  border: '#e0ddd6',
+  borderSoft: '#e8e5de',
+  textPrimary: '#1a1a1a',
+  textSecondary: '#888',
+};
+
 const ExpenseReportsScreen = () => {
   const navigation = useNavigation();
   const { expenses } = useExpense();
@@ -64,7 +75,7 @@ const ExpenseReportsScreen = () => {
     >
       <View style={styles.cardHeader}>
         <View style={styles.iconContainer}>
-          <Ionicons name='calendar-outline' size={24} color='#007AFF' />
+          <Ionicons name='calendar-outline' size={24} color={TOKENS.primaryBlue} />
         </View>
         <View style={styles.textContainer}>
           <Text style={styles.weekTitle}>{getFormattedWeekRange(item.weekId)}</Text>
@@ -89,7 +100,7 @@ const ExpenseReportsScreen = () => {
   );
 
   return (
-    <SafeScreen title="Εβδομαδιαίες Αναφορές" headerLeft={<BackToExpensesButton />} style={{ backgroundColor: '#F7F9FC' }}>
+    <SafeScreen title="Εβδομαδιαίες Αναφορές" headerLeft={<BackToExpensesButton />} style={{ backgroundColor: TOKENS.pageBackground }}>
       <View style={styles.container}>
         <FlatList
           data={weeksData}
@@ -111,7 +122,7 @@ const ExpenseReportsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F7F9FC',
+    backgroundColor: TOKENS.pageBackground,
   },
   header: {
     paddingHorizontal: 20,
@@ -129,17 +140,17 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   card: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
+    backgroundColor: TOKENS.surface,
+    borderRadius: 14,
     marginBottom: 16,
     padding: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.04,
+    shadowRadius: 4,
+    elevation: 1,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: TOKENS.border,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -150,7 +161,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#EFF6FF',
+    backgroundColor: TOKENS.lightBlueBg,
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -161,16 +172,16 @@ const styles = StyleSheet.create({
   weekTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#1F2937',
+    color: TOKENS.textPrimary,
   },
   weekId: {
     fontSize: 12,
-    color: '#6B7280',
+    color: TOKENS.textSecondary,
     marginTop: 2,
   },
   divider: {
     height: 1,
-    backgroundColor: '#F3F4F6',
+    backgroundColor: TOKENS.borderSoft,
     marginVertical: 12,
   },
   statsContainer: {
@@ -182,7 +193,7 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontSize: 11,
-    color: '#6B7280',
+    color: TOKENS.textSecondary,
     fontWeight: '600',
     letterSpacing: 0.5,
     marginBottom: 4,
@@ -190,14 +201,14 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#0F172A',
+    color: TOKENS.textPrimary,
   },
   emptyContainer: {
     padding: 40,
     alignItems: 'center',
   },
   emptyText: {
-    color: '#6B7280',
+    color: TOKENS.textSecondary,
     fontSize: 16,
   },
 });

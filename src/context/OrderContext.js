@@ -1,4 +1,4 @@
-// src/context/OrderContext.js
+﻿// src/context/OrderContext.js
 import React, { createContext, useContext, useReducer, useEffect, useCallback, useRef } from 'react';
 import { Platform, InteractionManager, PermissionsAndroid } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
@@ -76,6 +76,14 @@ export function OrderProvider({ children }) {
   const orderRef = useRef(order);
   useEffect(() => { orderRef.current = order; }, [order]);
 
+  // Refs for the 60-second periodic Firestore sync.
+  // firestoreDirtyRef  — true when local changes haven't been written to Firestore yet.
+  // pendingWriteRef    — holds the latest order snapshot to write.
+  // firestoreIntervalRef — the setInterval handle for the 60-second flush.
+  const firestoreDirtyRef = useRef(false);
+  const pendingWriteRef = useRef(null);
+  const firestoreIntervalRef = useRef(null);
+
   const { isConnected } = useOnlineStatus();
   const { user } = useAuth();
   const currentUserId = user?.uid || user?.id || null;
@@ -130,73 +138,81 @@ export function OrderProvider({ children }) {
     })();
   }, []);
 
-  // === Auto-persist (avoid keeping empty drafts) ============================
+  // === Firestore flush helper ===============================================
+  // Writes pendingWriteRef to Firestore immediately and clears the dirty flag.
+  // Called by the 60-second interval AND when the user navigates away.
+  const flushFirestoreWrite = useCallback(async () => {
+    if (!firestoreDirtyRef.current || !pendingWriteRef.current) return;
+    const data = pendingWriteRef.current;
+    firestoreDirtyRef.current = false;
+    pendingWriteRef.current = null;
+    try {
+      await updateOrder(data.id, data);
+    } catch {
+      try { await createOrder(data); } catch {}
+    }
+  }, []);
+
+  // 60-second periodic Firestore flush — runs for the lifetime of the provider.
   useEffect(() => {
-    (async () => {
-      if (!order?.id || !order?.customer) return;
+    firestoreIntervalRef.current = setInterval(() => {
+      flushFirestoreWrite();
+    }, 60000);
+    return () => {
+      clearInterval(firestoreIntervalRef.current);
+      // Final flush on unmount so nothing is lost if the provider is torn down.
+      flushFirestoreWrite();
+    };
+  }, [flushFirestoreWrite]);
 
-      const lines = Array.isArray(order.lines) ? order.lines : [];
-      const hasLines = lines.some(l => Number(l.quantity || 0) > 0);
-      const hasNotes = !!(order.notes && order.notes.trim().length > 0);
-      const isDraft = order.status === 'draft';
+  // === Auto-persist =========================================================
+  // Local (AsyncStorage) -> immediate, for crash safety.
+  // Firestore            -> marks dirty + queues data; the 60-second interval
+  //                         (or navigate-away flush) does the actual write.
+  useEffect(() => {
+    if (!order?.id || !order?.customer) return;
 
-      const normalizedOrderBrand =
-        normalizeBrandOrNull(order.brand) ??
-        normalizeBrandOrNull(order.customer?.brand);
+    const lines = Array.isArray(order.lines) ? order.lines : [];
+    const hasLines = lines.some(l => Number(l.quantity || 0) > 0);
+    const hasNotes = !!(order.notes && order.notes.trim().length > 0);
+    const isDraft = order.status === 'draft';
 
-      const brandForOrder = normalizedOrderBrand ?? DEFAULT_BRAND;
-      const totals = calculateTotals({ ...order, brand: brandForOrder });
-      const withTotals = {
-        ...order,
-        ...totals,
-        brand: brandForOrder,
-        userId: order.userId || currentUserId || 'demoUserId',
-        createdBy: order.createdBy || order.userId || currentUserId || 'demoUserId',
-      };
+    const normalizedOrderBrand =
+      normalizeBrandOrNull(order.brand) ??
+      normalizeBrandOrNull(order.customer?.brand);
+    const brandForOrder = normalizedOrderBrand ?? DEFAULT_BRAND;
+    const totals = calculateTotals({ ...order, brand: brandForOrder });
+    const withTotals = {
+      ...order,
+      ...totals,
+      brand: brandForOrder,
+      userId: order.userId || currentUserId || 'demoUserId',
+      createdBy: order.createdBy || order.userId || currentUserId || 'demoUserId',
+    };
 
-      // Don’t store truly empty drafts
-      if (isDraft && !hasLines && !hasNotes) {
-        try { await deleteOrder(order.id); } catch {}
-        return;
-      }
+    // Don't store truly empty drafts
+    if (isDraft && !hasLines && !hasNotes) {
+      deleteOrder(order.id).catch(() => {});
+      return;
+    }
 
-      // Local save
-      try { await saveOrder(withTotals, order.status); } catch {}
+    // -- 1. Local save — always immediate (crash safety) ---------------------
+    saveOrder(withTotals, order.status).catch(() => {});
 
-      // Remote save (both draft and sent) - create collections for all brands
-      if (isConnected && order.id && (order.customerId || order.customer?.id)) {
-        try {
-          const firestoreOrder = {
-            ...withTotals,
-            customerId: order.customerId || order.customer?.id || null,
-            userId: withTotals.userId,
-            createdBy: withTotals.createdBy,
-            createdAt: order.createdAt || new Date().toISOString(),
-            updatedAt: order.updatedAt || new Date().toISOString(),
-            brand: brandForOrder,
-          };
-          console.log('Saving order to Firestore:', { 
-            orderId: order.id, 
-            brand: brandForOrder, 
-            collection: getCollectionName(brandForOrder, order.orderType),
-            hasLines: hasLines,
-            hasNotes: hasNotes,
-            customerId: order.customerId || order.customer?.id
-          });
-          
-          // Try to update first, if it fails, create new
-          try {
-            await updateOrder(order.id, firestoreOrder);
-          } catch (updateError) {
-            // If update fails, try to create new order
-            console.log('Order not found in Firestore, creating new order:', order.id);
-            await createOrder(firestoreOrder);
-          }
-        } catch (error) {
-          console.log('Error saving to Firestore:', error);
-        }
-      }
-    })();
+    // -- 2. Mark Firestore write as pending ----------------------------------
+    // The 60-second interval or navigate-away flush will pick this up.
+    if (!isConnected || !order.id || (!order.customerId && !order.customer?.id)) return;
+
+    firestoreDirtyRef.current = true;
+    pendingWriteRef.current = {
+      ...withTotals,
+      customerId: order.customerId || order.customer?.id || null,
+      userId: withTotals.userId,
+      createdBy: withTotals.createdBy,
+      createdAt: order.createdAt || new Date().toISOString(),
+      updatedAt: order.updatedAt || new Date().toISOString(),
+      brand: brandForOrder,
+    };
   }, [order, isConnected, calculateTotals]);
   // ========================================================================
 
@@ -364,6 +380,11 @@ export function OrderProvider({ children }) {
   };
 
   const markOrderSent = async () => {
+    // Clear any pending interval write — the explicit send below is the
+    // authoritative final state, so we don't want the interval overwriting it.
+    firestoreDirtyRef.current = false;
+    pendingWriteRef.current = null;
+
     const exportedAt = new Date().toISOString();
     const exportedLocation = await getLocationOnce();
 
@@ -403,6 +424,9 @@ export function OrderProvider({ children }) {
 
   // 🔧 FIX: don’t delete sent orders; only delete truly empty drafts
   const cancelOrder = async () => {
+    // Flush any pending Firestore write before resetting — this is the
+    // "navigate away" trigger that ensures the draft is saved to the cloud.
+    await flushFirestoreWrite();
     try {
       if (!order?.id) {
         dispatch({ type: 'RESET_ORDER' });

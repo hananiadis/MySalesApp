@@ -1,4 +1,8 @@
-import 'react-native-gesture-handler/jestSetup';
+try {
+  require('react-native-gesture-handler/jestSetup');
+} catch (error) {
+  // Optional in this workspace/test environment.
+}
 
 // Mock react-native-reanimated
 jest.mock('react-native-reanimated', () => {
@@ -8,7 +12,16 @@ jest.mock('react-native-reanimated', () => {
 });
 
 // Silence the warning: Animated: `useNativeDriver` is not supported because the native animated module is missing
-jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper');
+const nativeAnimatedHelperModule = (() => {
+  try {
+    require.resolve('react-native/Libraries/Animated/NativeAnimatedHelper');
+    return 'react-native/Libraries/Animated/NativeAnimatedHelper';
+  } catch (error) {
+    return 'react-native/src/private/animated/NativeAnimatedHelper';
+  }
+})();
+
+jest.mock(nativeAnimatedHelperModule);
 
 // Mock AsyncStorage
 jest.mock('@react-native-async-storage/async-storage', () =>

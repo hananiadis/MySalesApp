@@ -173,7 +173,18 @@ const SuperMarketOrderSummaryScreen = () => {
           onPress: () => {
             navigation.reset({
               index: 0,
-              routes: [{ name: 'John' }],
+              routes: [
+                {
+                  name: 'Home',
+                  state: {
+                    index: 1,
+                    routes: [
+                      { name: 'MainHome' },
+                      { name: 'JohnModule', params: { brand: 'john' } },
+                    ],
+                  },
+                },
+              ],
             });
           },
         },

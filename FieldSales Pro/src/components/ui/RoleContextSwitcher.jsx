@@ -9,16 +9,16 @@ const RoleContextSwitcher = ({ className = '' }) => {
   const roles = [
     {
       id: 'manager',
-      label: 'Manager View',
+      label: 'Προβολή Διαχειριστή',
       icon: 'BarChart3',
-      description: 'Strategic oversight and team management',
+      description: 'Στρατηγική επίβλεψη και διαχείριση ομάδας',
       defaultRoute: '/manager-dashboard'
     },
     {
       id: 'field',
-      label: 'Field View',
+      label: 'Προβολή Πεδίου',
       icon: 'MapPin',
-      description: 'Mobile-optimized field operations',
+      description: 'Λειτουργίες πεδίου βελτιστοποιημένες για mobile',
       defaultRoute: '/my-day-mobile'
     }
   ];
@@ -85,7 +85,7 @@ const RoleContextSwitcher = ({ className = '' }) => {
           <div className="absolute top-full right-0 mt-2 w-64 bg-popover border border-border rounded-lg shadow-elevation z-50 overflow-hidden">
             <div className="p-2">
               <div className="text-xs font-medium text-muted-foreground px-2 py-1 mb-1">
-                Switch Context
+                Αλλαγή Περιβάλλοντος
               </div>
               
               {roles?.map((role) => (
@@ -120,7 +120,7 @@ const RoleContextSwitcher = ({ className = '' }) => {
 
             <div className="border-t border-border p-3 bg-muted/50">
               <div className="text-xs text-muted-foreground">
-                Role context affects navigation emphasis and default views
+                Το περιβάλλον ρόλου επηρεάζει την πλοήγηση και τις προεπιλεγμένες προβολές
               </div>
             </div>
           </div>

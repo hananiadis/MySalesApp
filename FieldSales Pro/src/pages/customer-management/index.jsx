@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import Header from '../../components/ui/Header';
 import CustomerTable from './components/CustomerTable';
 import CustomerFilters from './components/CustomerFilters';
@@ -7,6 +7,75 @@ import BulkActionsPanel from './components/BulkActionsPanel';
 import TerritoryMap from './components/TerritoryMap';
 import Icon from '../../components/AppIcon';
 import Button from '../../components/ui/Button';
+import { fetchCustomers, fetchTerritories } from '../../utils/bootApi';
+
+function toIsoDate(input) {
+  if (!input) {
+    return null;
+  }
+
+  const date = new Date(input);
+  if (Number.isNaN(date.getTime())) {
+    return null;
+  }
+
+  return date.toISOString();
+}
+
+function computeCompliance(rawCustomer) {
+  const dueDate = toIsoDate(rawCustomer?.nextVisitDue);
+  if (dueDate) {
+    return new Date(dueDate) >= new Date() ? 95 : 60;
+  }
+
+  const lastVisit = toIsoDate(rawCustomer?.lastVisitAt);
+  if (!lastVisit) {
+    return 75;
+  }
+
+  const visitCadenceDays = Number(rawCustomer?.visitCadenceDays || 60);
+  const elapsedDays = Math.floor(
+    (Date.now() - new Date(lastVisit).getTime()) / (1000 * 60 * 60 * 24)
+  );
+
+  if (elapsedDays <= visitCadenceDays) {
+    return 95;
+  }
+
+  if (elapsedDays <= visitCadenceDays + 14) {
+    return 78;
+  }
+
+  return 62;
+}
+
+function mapCustomerToUi(rawCustomer, territoryMap) {
+  const lastVisit =
+    toIsoDate(rawCustomer?.lastVisitAt) ||
+    toIsoDate(rawCustomer?.updatedAt) ||
+    toIsoDate(new Date().toISOString());
+  const compliance = computeCompliance(rawCustomer);
+  const territoryId = String(rawCustomer?.territoryId || '').trim() || null;
+
+  return {
+    id: String(rawCustomer?.id || rawCustomer?.customerCode || ''),
+    customerCode: rawCustomer?.customerCode || '',
+    name: String(rawCustomer?.name || rawCustomer?.customerCode || 'Unknown').trim(),
+    company: String(rawCustomer?.name || rawCustomer?.customerCode || 'Unknown').trim(),
+    avatar: '/assets/images/avatar-placeholder.png',
+    avatarAlt: 'Customer avatar placeholder',
+    territoryId,
+    territory: territoryMap.get(territoryId)?.name || 'Χωρίς περιοχή',
+    lastVisit,
+    compliance,
+    priority:
+      String(rawCustomer?.priority || '').trim().toLowerCase() ||
+      (compliance >= 90 ? 'medium' : 'high'),
+    email: rawCustomer?.email || '',
+    phone: rawCustomer?.phone || '',
+    address: rawCustomer?.address || '',
+  };
+}
 
 const CustomerManagement = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -19,104 +88,69 @@ const CustomerManagement = () => {
   const [sortConfig, setSortConfig] = useState({ key: 'name', direction: 'asc' });
   const [selectedTerritory, setSelectedTerritory] = useState(null);
   const [showMap, setShowMap] = useState(false);
+  const [customers, setCustomers] = useState([]);
+  const [territories, setTerritories] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  // Mock customer data
-  const mockCustomers = [
-  {
-    id: 1,
-    name: 'Sarah Johnson',
-    company: 'TechCorp Solutions',
-    avatar: "/assets/images/avatar-placeholder.png",
-    avatarAlt: 'Professional headshot of woman with shoulder-length brown hair in business attire',
-    territory: 'North Region',
-    lastVisit: '2024-11-05',
-    compliance: 95,
-    priority: 'high',
-    email: 'sarah.johnson@techcorp.com',
-    phone: '+1 (555) 123-4567',
-    address: '123 Business Ave, Tech City, TC 12345'
-  },
-  {
-    id: 2,
-    name: 'Michael Chen',
-    company: 'Global Industries',
-    avatar: "/assets/images/avatar-placeholder.png",
-    avatarAlt: 'Professional headshot of Asian man with black hair in navy suit',
-    territory: 'East Region',
-    lastVisit: '2024-11-03',
-    compliance: 88,
-    priority: 'medium',
-    email: 'michael.chen@globalind.com',
-    phone: '+1 (555) 234-5678',
-    address: '456 Commerce St, Business Park, BP 23456'
-  },
-  {
-    id: 3,
-    name: 'Emily Rodriguez',
-    company: 'Innovation Labs',
-    avatar: "/assets/images/avatar-placeholder.png",
-    avatarAlt: 'Professional headshot of Hispanic woman with long dark hair in white blouse',
-    territory: 'West Region',
-    lastVisit: '2024-10-28',
-    compliance: 72,
-    priority: 'high',
-    email: 'emily.rodriguez@innovlabs.com',
-    phone: '+1 (555) 345-6789',
-    address: '789 Innovation Dr, Tech Valley, TV 34567'
-  },
-  {
-    id: 4,
-    name: 'David Thompson',
-    company: 'Manufacturing Plus',
-    avatar: "/assets/images/avatar-placeholder.png",
-    avatarAlt: 'Professional headshot of Caucasian man with brown hair in gray suit',
-    territory: 'South Region',
-    lastVisit: '2024-11-01',
-    compliance: 91,
-    priority: 'medium',
-    email: 'david.thompson@mfgplus.com',
-    phone: '+1 (555) 456-7890',
-    address: '321 Industrial Blvd, Factory Town, FT 45678'
-  },
-  {
-    id: 5,
-    name: 'Lisa Wang',
-    company: 'Digital Dynamics',
-    avatar: "/assets/images/avatar-placeholder.png",
-    avatarAlt: 'Professional headshot of Asian woman with short black hair in blue blazer',
-    territory: 'Central Region',
-    lastVisit: '2024-10-25',
-    compliance: 65,
-    priority: 'low',
-    email: 'lisa.wang@digitaldyn.com',
-    phone: '+1 (555) 567-8901',
-    address: '654 Digital Way, Cyber City, CC 56789'
-  },
-  {
-    id: 6,
-    name: 'Robert Martinez',
-    company: 'Enterprise Solutions',
-    avatar: "/assets/images/avatar-placeholder.png",
-    avatarAlt: 'Professional headshot of Hispanic man with beard in dark suit',
-    territory: 'North Region',
-    lastVisit: '2024-11-04',
-    compliance: 93,
-    priority: 'high',
-    email: 'robert.martinez@entsol.com',
-    phone: '+1 (555) 678-9012',
-    address: '987 Enterprise Pkwy, Business Hub, BH 67890'
-  }];
+  useEffect(() => {
+    let isMounted = true;
 
+    const loadData = async () => {
+      try {
+        setLoading(true);
+        setError('');
+
+        const [territoriesResult, customersResult] = await Promise.all([
+          fetchTerritories({ active: true }),
+          fetchCustomers({ limit: 500 }),
+        ]);
+
+        if (!isMounted) {
+          return;
+        }
+
+        const territoryItems = Array.isArray(territoriesResult?.items)
+          ? territoriesResult.items
+          : [];
+        const territoryMap = new Map(
+          territoryItems.map((territory) => [String(territory.id), territory])
+        );
+
+        const customerItems = Array.isArray(customersResult?.items)
+          ? customersResult.items
+          : [];
+
+        setTerritories(territoryItems);
+        setCustomers(customerItems.map((item) => mapCustomerToUi(item, territoryMap)));
+      } catch (loadError) {
+        if (!isMounted) {
+          return;
+        }
+        setError(loadError?.message || 'Αδυναμία φόρτωσης πελατών.');
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadData();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   // Filter and sort customers
   const filteredAndSortedCustomers = useMemo(() => {
-    let filtered = mockCustomers?.filter((customer) => {
+    let filtered = customers?.filter((customer) => {
       const matchesSearch = customer?.name?.toLowerCase()?.includes(searchTerm?.toLowerCase()) ||
       customer?.company?.toLowerCase()?.includes(searchTerm?.toLowerCase()) ||
       customer?.territory?.toLowerCase()?.includes(searchTerm?.toLowerCase());
 
       const matchesTerritory = territoryFilter === 'all' ||
-      customer?.territory?.toLowerCase()?.includes(territoryFilter);
+      customer?.territoryId === territoryFilter;
 
       const matchesPriority = priorityFilter === 'all' || customer?.priority === priorityFilter;
 
@@ -144,7 +178,18 @@ const CustomerManagement = () => {
     });
 
     return filtered;
-  }, [mockCustomers, searchTerm, territoryFilter, priorityFilter, complianceFilter, sortConfig]);
+  }, [customers, searchTerm, territoryFilter, priorityFilter, complianceFilter, sortConfig]);
+
+  const territoryOptions = useMemo(() => {
+    const dynamicOptions = territories
+      .map((territory) => ({
+        value: String(territory.id),
+        label: territory.name || String(territory.id),
+      }))
+      .sort((a, b) => a.label.localeCompare(b.label, 'el'));
+
+    return [{ value: 'all', label: 'Όλες οι Περιοχές' }, ...dynamicOptions];
+  }, [territories]);
 
   const handleSort = (key) => {
     setSortConfig((prev) => ({
@@ -207,9 +252,9 @@ const CustomerManagement = () => {
           {/* Page Header */}
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
             <div>
-              <h1 className="text-2xl font-bold text-foreground mb-2">Customer Management</h1>
+              <h1 className="text-2xl font-bold text-foreground mb-2">Διαχείριση Πελατών</h1>
               <p className="text-muted-foreground">
-                Comprehensive customer database with territory assignment and visit tracking
+                Ολοκληρωμένη βάση πελατών με ανάθεση περιοχών και παρακολούθηση επισκέψεων
               </p>
             </div>
             
@@ -220,10 +265,10 @@ const CustomerManagement = () => {
                 iconName="Map"
                 iconPosition="left">
 
-                {showMap ? 'Hide Map' : 'Show Map'}
+                {showMap ? 'Απόκρυψη Χάρτη' : 'Εμφάνιση Χάρτη'}
               </Button>
               <Button variant="outline" iconName="Filter" iconPosition="left">
-                Advanced Filters
+                Προχωρημένα Φίλτρα
               </Button>
             </div>
           </div>
@@ -243,6 +288,7 @@ const CustomerManagement = () => {
             searchTerm={searchTerm}
             onSearchChange={setSearchTerm}
             territoryFilter={territoryFilter}
+            territoryOptions={territoryOptions}
             onTerritoryChange={setTerritoryFilter}
             priorityFilter={priorityFilter}
             onPriorityChange={setPriorityFilter}
@@ -250,6 +296,18 @@ const CustomerManagement = () => {
             onComplianceChange={setComplianceFilter}
             onClearFilters={handleClearFilters}
             resultCount={filteredAndSortedCustomers?.length} />
+
+          {loading && (
+            <div className="mb-4 rounded-lg border border-border bg-card p-3 text-sm text-muted-foreground">
+              Φόρτωση πελατών από FieldSales Pro API...
+            </div>
+          )}
+
+          {error && (
+            <div className="mb-4 rounded-lg border border-error/30 bg-error/10 p-3 text-sm text-error">
+              {error}
+            </div>
+          )}
 
 
           {/* Customer Table */}
@@ -267,12 +325,12 @@ const CustomerManagement = () => {
           {filteredAndSortedCustomers?.length === 0 &&
           <div className="text-center py-12">
               <Icon name="Users" size={48} className="text-muted-foreground mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-foreground mb-2">No customers found</h3>
+              <h3 className="text-lg font-medium text-foreground mb-2">Δεν βρέθηκαν πελάτες</h3>
               <p className="text-muted-foreground mb-4">
-                Try adjusting your search criteria or filters
+                Δοκιμάστε να προσαρμόσετε τα κριτήρια αναζήτησης ή τα φίλτρα
               </p>
               <Button variant="outline" onClick={handleClearFilters}>
-                Clear Filters
+                Καθαρισμός Φίλτρων
               </Button>
             </div>
           }

@@ -35,6 +35,21 @@ const MobileScheduleView = ({
     }
   };
 
+  const getStatusMeta = (status) => {
+    switch (String(status || '').toLowerCase()) {
+      case 'completed':
+        return { label: 'Ολοκληρώθηκε', className: 'bg-success/10 text-success' };
+      case 'in-progress':
+        return { label: 'Σε εξέλιξη', className: 'bg-primary/10 text-primary' };
+      case 'overdue':
+        return { label: 'Εκπρόθεσμη', className: 'bg-error/10 text-error' };
+      case 'cancelled':
+        return { label: 'Ακυρώθηκε', className: 'bg-muted text-muted-foreground' };
+      default:
+        return { label: 'Προγραμματισμένη', className: 'bg-warning/10 text-warning' };
+    }
+  };
+
   const getTotalTravelTime = (visits) => {
     return visits?.reduce((total, visit) => total + (visit?.estimatedTravelTime || 0), 0);
   };
@@ -63,7 +78,7 @@ const MobileScheduleView = ({
               {formatDate(currentDate)}
             </div>
             <div className="text-sm text-muted-foreground">
-              {dayVisits?.length} visits • {formatTime(getTotalTravelTime(dayVisits))} travel
+              {dayVisits?.length} επισκέψεις • {formatTime(getTotalTravelTime(dayVisits))} μετακίνηση
             </div>
           </div>
           
@@ -81,7 +96,7 @@ const MobileScheduleView = ({
         {dayVisits?.length === 0 ? (
           <div className="text-center py-12">
             <Icon name="Calendar" size={48} className="text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground mb-4">No visits scheduled for this day</p>
+            <p className="text-muted-foreground mb-4">Δεν υπάρχουν επισκέψεις για αυτή την ημέρα</p>
             <Button
               variant="outline"
               onClick={() => setShowCustomerModal(true)}
@@ -93,7 +108,9 @@ const MobileScheduleView = ({
           </div>
         ) : (
           <div className="space-y-3">
-            {dayVisits?.map((visit, index) => (
+            {dayVisits?.map((visit, index) => {
+              const statusMeta = getStatusMeta(visit?.status);
+              return (
               <div
                 key={visit?.id}
                 onClick={() => onVisitClick(visit)}
@@ -109,6 +126,9 @@ const MobileScheduleView = ({
                         {visit?.customerName}
                       </div>
                     </div>
+                    <span className={`inline-flex mb-2 px-2 py-0.5 rounded-full text-[10px] font-medium ${statusMeta.className}`}>
+                      {statusMeta.label}
+                    </span>
                     
                     <div className="text-sm text-muted-foreground truncate mb-2">
                       {visit?.company}
@@ -142,11 +162,12 @@ const MobileScheduleView = ({
 
                 {visit?.objective && (
                   <div className="mt-3 p-2 bg-muted/50 rounded text-xs text-muted-foreground">
-                    <strong>Objective:</strong> {visit?.objective}
+                    <strong>Στόχος:</strong> {visit?.objective}
                   </div>
                 )}
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
@@ -170,7 +191,7 @@ const MobileScheduleView = ({
               iconPosition="left"
               fullWidth
             >
-              Optimize Route
+              Βελτιστοποίηση Διαδρομής
             </Button>
           </div>
         </div>
@@ -181,7 +202,7 @@ const MobileScheduleView = ({
           <div className="bg-card border border-border rounded-t-lg w-full max-w-md max-h-[80vh] overflow-hidden">
             <div className="p-4 border-b border-border">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-foreground">Add Visit</h3>
+                <h3 className="text-lg font-semibold text-foreground">Προσθήκη Επίσκεψης</h3>
                 <Button
                   variant="ghost"
                   size="icon"
@@ -194,7 +215,7 @@ const MobileScheduleView = ({
             
             <div className="p-4">
               <p className="text-sm text-muted-foreground mb-4">
-                Select customers to schedule visits for {formatDate(currentDate)}
+                Επιλέξτε πελάτες για προγραμματισμό επισκέψεων στις {formatDate(currentDate)}
               </p>
               <Button
                 variant="default"
@@ -204,7 +225,7 @@ const MobileScheduleView = ({
                 }}
                 fullWidth
               >
-                Open Customer Selection
+                Άνοιγμα Επιλογής Πελατών
               </Button>
             </div>
           </div>

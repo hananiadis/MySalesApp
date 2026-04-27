@@ -20,6 +20,7 @@ import firestore from '@react-native-firebase/firestore';
 import SafeScreen from '../components/SafeScreen';
 import { useAuth, ROLES } from '../context/AuthProvider';
 import { ROLE_ORDER, getRoleLabel } from '../constants/roles';
+import { getModuleAccess } from '../utils/moduleAccess';
 
 const MANAGEMENT_ROLES = [ROLES.OWNER, ROLES.ADMIN, ROLES.DEVELOPER];
 const AVAILABLE_BRANDS = ['playmobil', 'john', 'kivos'];
@@ -45,6 +46,9 @@ const FIELD_STRINGS = {
   modalTitle: 'Επεξεργασία χρήστη',
   modalRolesHeading: 'Ρόλοι',
   modalBrandsHeading: 'Μάρκες',
+  modalModulesHeading: 'Ενότητες Εφαρμογής',
+  moduleFieldSalesPro: 'Διαχείριση Επισκέψεων',
+  moduleExpenseTracker: 'Εξοδολόγιο',
   modalCancel: 'Άκυρο',
   modalSave: 'Αποθήκευση',
 };
@@ -84,6 +88,8 @@ const UserManagementScreen = ({ navigation }) => {
   const [draftMerchIds, setDraftMerchIds] = useState([]);
   const [draftManagerIds, setDraftManagerIds] = useState([]);
   const [allSalesmen, setAllSalesmen] = useState([]);
+  const [draftFieldSalesProEnabled, setDraftFieldSalesProEnabled] = useState(true);
+  const [draftExpenseTrackerEnabled, setDraftExpenseTrackerEnabled] = useState(true);
 
   const adminBrands = useMemo(
     () => (Array.isArray(profile?.brands) ? profile.brands.filter(Boolean) : []),
@@ -135,6 +141,7 @@ const UserManagementScreen = ({ navigation }) => {
               brands: Array.isArray(data.brands) ? data.brands.filter(Boolean) : [],
               merchIds: Array.isArray(data.merchIds) ? data.merchIds.filter(Boolean) : [],
               managers: Array.isArray(data.managers) ? data.managers.filter(Boolean) : [],
+              moduleAccess: getModuleAccess(data),
             };
           });
           setUsers(next);
@@ -256,6 +263,9 @@ const UserManagementScreen = ({ navigation }) => {
     setDraftMerchIds(initialMerchIds);
     const initialManagers = Array.isArray(user.managers) ? user.managers : [];
     setDraftManagerIds(initialManagers.filter(Boolean));
+    const moduleAccess = getModuleAccess(user);
+    setDraftFieldSalesProEnabled(moduleAccess.fieldSalesProEnabled);
+    setDraftExpenseTrackerEnabled(moduleAccess.expenseTrackerEnabled);
     setModalVisible(true);
   }, [canViewUser, manageableBrandSet]);
 
@@ -268,6 +278,8 @@ const UserManagementScreen = ({ navigation }) => {
     setDraftEmail('');
     setDraftMerchIds([]);
     setDraftManagerIds([]);
+    setDraftFieldSalesProEnabled(true);
+    setDraftExpenseTrackerEnabled(true);
     setModalVisible(false);
   }, []);
 
@@ -349,6 +361,10 @@ const UserManagementScreen = ({ navigation }) => {
           brands: safeBrands,
           merchIds: Array.from(new Set(draftMerchIds.filter(Boolean))),
           managers: nextManagers,
+          moduleAccess: {
+            fieldSalesProEnabled: !!draftFieldSalesProEnabled,
+            expenseTrackerEnabled: !!draftExpenseTrackerEnabled,
+          },
           updatedAt: firestore.FieldValue.serverTimestamp(),
         },
         { merge: true }
@@ -396,7 +412,7 @@ const UserManagementScreen = ({ navigation }) => {
     } finally {
       setSaving(false);
     }
-  }, [closeEditor, draftBrands, draftEmail, draftFirstName, draftLastName, draftRole, draftMerchIds, draftManagerIds, manageableBrandSet, selectedUser, users]);
+  }, [closeEditor, draftBrands, draftEmail, draftFirstName, draftLastName, draftRole, draftMerchIds, draftManagerIds, draftFieldSalesProEnabled, draftExpenseTrackerEnabled, manageableBrandSet, selectedUser, users]);
 
   useEffect(() => {
     if (!selectedUser) return;
@@ -798,6 +814,41 @@ const UserManagementScreen = ({ navigation }) => {
                 ) : (
                   <Text style={styles.noBrandsNotice}>{FIELD_STRINGS.noBrandsNotice}</Text>
                 )}
+              </View>
+
+              <Text style={[styles.subHeading, { marginTop: 18 }]}>{FIELD_STRINGS.modalModulesHeading}</Text>
+              <View style={styles.brandGrid}>
+                <TouchableOpacity
+                  style={[styles.brandToggle, draftFieldSalesProEnabled && styles.brandToggleActive]}
+                  onPress={() => setDraftFieldSalesProEnabled((prev) => !prev)}
+                  accessibilityRole="button"
+                >
+                  <Ionicons
+                    name={draftFieldSalesProEnabled ? 'checkbox-outline' : 'square-outline'}
+                    size={18}
+                    color={draftFieldSalesProEnabled ? '#1f4f8f' : '#64748b'}
+                    style={{ marginRight: 8 }}
+                  />
+                  <Text style={[styles.brandToggleText, draftFieldSalesProEnabled && styles.brandToggleTextActive]}>
+                    {FIELD_STRINGS.moduleFieldSalesPro}
+                  </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={[styles.brandToggle, draftExpenseTrackerEnabled && styles.brandToggleActive]}
+                  onPress={() => setDraftExpenseTrackerEnabled((prev) => !prev)}
+                  accessibilityRole="button"
+                >
+                  <Ionicons
+                    name={draftExpenseTrackerEnabled ? 'checkbox-outline' : 'square-outline'}
+                    size={18}
+                    color={draftExpenseTrackerEnabled ? '#1f4f8f' : '#64748b'}
+                    style={{ marginRight: 8 }}
+                  />
+                  <Text style={[styles.brandToggleText, draftExpenseTrackerEnabled && styles.brandToggleTextActive]}>
+                    {FIELD_STRINGS.moduleExpenseTracker}
+                  </Text>
+                </TouchableOpacity>
               </View>
 
               <Text style={[styles.subHeading, { marginTop: 18 }]}>Υπεύθυνος / Υπεύθυνοι (Manager)</Text>

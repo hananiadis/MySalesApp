@@ -1,6 +1,7 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, TextInput, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import colors from '../theme/colors';
 
@@ -20,7 +21,14 @@ const formatPercent = (value) => {
  * KivosKpiCards
  * Displays KPI metrics for Kivos brand with multi-year data (2026/2025/2024/2023)
  */
-const KivosKpiCards = ({ kpis, referenceMoment, onCardPress }) => {
+const KivosKpiCards = ({ kpis, referenceMoment, selectedDate, onDateChange, onCardPress }) => {
+  const insets = useSafeAreaInsets();
+  const [datePickerVisible, setDatePickerVisible] = useState(false);
+  const [dateInput, setDateInput] = useState('');
+  const [pickerMode, setPickerMode] = useState('calendar');
+  const [viewYear, setViewYear] = useState(new Date().getFullYear());
+  const [viewMonth, setViewMonth] = useState(new Date().getMonth());
+
   if (!kpis) {
     return (
       <View style={styles.emptyState}>
@@ -38,9 +46,101 @@ const KivosKpiCards = ({ kpis, referenceMoment, onCardPress }) => {
     );
   }
 
-  const refMoment = referenceMoment || new Date();
+  const effectiveSelectedDate = selectedDate instanceof Date && !Number.isNaN(selectedDate.getTime())
+    ? selectedDate
+    : (referenceMoment instanceof Date && !Number.isNaN(referenceMoment.getTime()) ? referenceMoment : new Date());
+  const refMoment = effectiveSelectedDate;
   const monthName = refMoment.toLocaleString('el-GR', { month: 'long' });
   const day = refMoment.getDate();
+
+  const handleDatePress = () => {
+    setViewYear(effectiveSelectedDate.getFullYear());
+    setViewMonth(effectiveSelectedDate.getMonth());
+    setPickerMode('calendar');
+    setDateInput(effectiveSelectedDate.toLocaleDateString('el-GR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }));
+    setDatePickerVisible(true);
+  };
+
+  const parseDateInput = (value) => {
+    if (!value) return null;
+    const parts = value.trim().split('/');
+    if (parts.length !== 3) return null;
+    const d = parseInt(parts[0], 10);
+    const m = parseInt(parts[1], 10) - 1;
+    const y = parseInt(parts[2], 10);
+    const date = new Date(y, m, d);
+    if (Number.isNaN(date.getTime())) return null;
+    if (date.getDate() !== d || date.getMonth() !== m || date.getFullYear() !== y) return null;
+    return date;
+  };
+
+  const handleDateSubmit = () => {
+    const parsed = parseDateInput(dateInput);
+    if (!parsed) {
+      Alert.alert('Μη έγκυρη ημερομηνία', 'Χρησιμοποιήστε μορφή DD/MM/YYYY.');
+      return;
+    }
+    onDateChange?.(parsed);
+    setDatePickerVisible(false);
+  };
+
+  const handleCalendarPick = (dayValue) => {
+    const picked = new Date(viewYear, viewMonth, dayValue);
+    onDateChange?.(picked);
+    setDateInput(picked.toLocaleDateString('el-GR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }));
+    setDatePickerVisible(false);
+  };
+
+  const prevMonth = () => {
+    if (viewMonth === 0) {
+      setViewMonth(11);
+      setViewYear((y) => y - 1);
+    } else {
+      setViewMonth((m) => m - 1);
+    }
+  };
+
+  const nextMonth = () => {
+    if (viewMonth === 11) {
+      setViewMonth(0);
+      setViewYear((y) => y + 1);
+    } else {
+      setViewMonth((m) => m + 1);
+    }
+  };
+
+  const dateDisplay = effectiveSelectedDate.toLocaleDateString('el-GR', {
+    weekday: 'short',
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+
+  const monthNames = ['Ιαν', 'Φεβ', 'Μαρ', 'Απρ', 'Μαΐ', 'Ιουν', 'Ιουλ', 'Αυγ', 'Σεπ', 'Οκτ', 'Νοε', 'Δεκ'];
+  const dayNames = ['Κυ', 'Δε', 'Τρ', 'Τε', 'Πε', 'Πα', 'Σα'];
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+  const firstDow = new Date(viewYear, viewMonth, 1).getDay();
+  const dayCells = [];
+  for (let i = 0; i < firstDow; i++) dayCells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) dayCells.push(d);
+
+  const isSelectedDay = (dayValue) => {
+    if (!dayValue) return false;
+    const d = new Date(viewYear, viewMonth, dayValue);
+    return (
+      d.getDate() === effectiveSelectedDate.getDate() &&
+      d.getMonth() === effectiveSelectedDate.getMonth() &&
+      d.getFullYear() === effectiveSelectedDate.getFullYear()
+    );
+  };
 
   // YTD Cards
   const renderYtdCard = () => {
@@ -296,9 +396,128 @@ const KivosKpiCards = ({ kpis, referenceMoment, onCardPress }) => {
 
   return (
     <View style={styles.container}>
+      {onDateChange && (
+        <View style={styles.datePickerContainer}>
+          <TouchableOpacity
+            style={styles.datePickerButton}
+            onPress={handleDatePress}
+            activeOpacity={0.7}
+          >
+            <Ionicons name="calendar-outline" size={20} color={colors.primary} />
+            <Text style={styles.datePickerButtonText}>{dateDisplay}</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       {renderMtdCard()}
       {renderYtdCard()}
       {renderYearlyCard()}
+
+      <Modal
+        visible={datePickerVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setDatePickerVisible(false)}
+      >
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={{ flex: 1, justifyContent: 'flex-end' }}
+        >
+          <TouchableOpacity
+            style={styles.modalOverlay}
+            activeOpacity={1}
+            onPress={() => setDatePickerVisible(false)}
+          >
+            <View style={[styles.modalContent, { paddingBottom: Math.max(insets.bottom, 12) }]} onStartShouldSetResponder={() => true}>
+              <Text style={styles.modalTitle}>Επιλογή Ημερομηνίας</Text>
+
+              <View style={styles.pickerModeRow}>
+                <TouchableOpacity
+                  style={[styles.pickerModeChip, pickerMode === 'calendar' && styles.pickerModeChipActive]}
+                  onPress={() => setPickerMode('calendar')}
+                >
+                  <Text style={[styles.pickerModeText, pickerMode === 'calendar' && styles.pickerModeTextActive]}>Ημερολόγιο</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.pickerModeChip, pickerMode === 'manual' && styles.pickerModeChipActive]}
+                  onPress={() => setPickerMode('manual')}
+                >
+                  <Text style={[styles.pickerModeText, pickerMode === 'manual' && styles.pickerModeTextActive]}>Πληκτρολόγηση</Text>
+                </TouchableOpacity>
+              </View>
+
+              {pickerMode === 'calendar' ? (
+                <>
+                  <View style={styles.calendarNavRow}>
+                    <TouchableOpacity onPress={prevMonth} style={styles.calendarNavBtn}>
+                      <Ionicons name="chevron-back" size={20} color={colors.primary || '#1d4ed8'} />
+                    </TouchableOpacity>
+                    <Text style={styles.calendarMonthLabel}>{monthNames[viewMonth]} {viewYear}</Text>
+                    <TouchableOpacity onPress={nextMonth} style={styles.calendarNavBtn}>
+                      <Ionicons name="chevron-forward" size={20} color={colors.primary || '#1d4ed8'} />
+                    </TouchableOpacity>
+                  </View>
+
+                  <View style={styles.calendarHeaders}>
+                    {dayNames.map((dn) => (
+                      <Text key={dn} style={styles.calendarHeaderText}>{dn}</Text>
+                    ))}
+                  </View>
+
+                  <View style={styles.calendarGrid}>
+                    {dayCells.map((dayValue, idx) => (
+                      <TouchableOpacity
+                        key={idx}
+                        style={[
+                          styles.calendarCell,
+                          !dayValue && styles.calendarCellEmpty,
+                          isSelectedDay(dayValue) && styles.calendarCellSelected,
+                        ]}
+                        onPress={() => dayValue && handleCalendarPick(dayValue)}
+                        disabled={!dayValue}
+                      >
+                        <Text style={[
+                          styles.calendarCellText,
+                          isSelectedDay(dayValue) && styles.calendarCellTextSelected,
+                        ]}>
+                          {dayValue || ''}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </>
+              ) : (
+                <>
+                  <Text style={styles.modalHint}>DD/MM/YYYY</Text>
+                  <TextInput
+                    style={styles.dateInput}
+                    value={dateInput}
+                    onChangeText={setDateInput}
+                    placeholder="DD/MM/YYYY"
+                    keyboardType="number-pad"
+                    autoFocus
+                  />
+                </>
+              )}
+
+              <View style={styles.modalButtons}>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.cancelButton]}
+                  onPress={() => setDatePickerVisible(false)}
+                >
+                  <Text style={styles.cancelButtonText}>Άκυρο</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.submitButton]}
+                  onPress={pickerMode === 'calendar' ? () => setDatePickerVisible(false) : handleDateSubmit}
+                >
+                  <Text style={styles.submitButtonText}>{pickerMode === 'calendar' ? 'OK' : 'Εφαρμογή'}</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </TouchableOpacity>
+        </KeyboardAvoidingView>
+      </Modal>
     </View>
   );
 };
@@ -307,6 +526,31 @@ const styles = StyleSheet.create({
   container: {
     marginTop: 12,
     marginBottom: 20,
+  },
+  datePickerContainer: {
+    marginBottom: 14,
+  },
+  datePickerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.white,
+    borderRadius: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderWidth: 2,
+    borderColor: colors.primary || '#1d4ed8',
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 2,
+    gap: 8,
+  },
+  datePickerButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.primary || '#1d4ed8',
   },
   emptyState: {
     padding: 40,
@@ -427,6 +671,157 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: '#e5e7eb',
     marginVertical: 12,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: colors.white,
+    borderTopLeftRadius: 18,
+    borderTopRightRadius: 18,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+    padding: 20,
+    width: '100%',
+    shadowColor: '#000',
+    shadowOpacity: 0.25,
+    shadowRadius: 20,
+    shadowOffset: { width: 0, height: 10 },
+    elevation: 10,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#1f2937',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  modalHint: {
+    fontSize: 14,
+    color: '#6b7280',
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  dateInput: {
+    borderWidth: 2,
+    borderColor: colors.primary || '#1d4ed8',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#1f2937',
+    backgroundColor: colors.white,
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: 12,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  cancelButton: {
+    backgroundColor: '#f3f4f6',
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+  },
+  cancelButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#374151',
+  },
+  submitButton: {
+    backgroundColor: colors.primary || '#1d4ed8',
+  },
+  submitButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.white,
+  },
+  pickerModeRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 14,
+  },
+  pickerModeChip: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: 'center',
+    borderRadius: 10,
+    backgroundColor: '#f3f4f6',
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+  },
+  pickerModeChipActive: {
+    backgroundColor: '#e8f1ff',
+    borderColor: colors.primary || '#1d4ed8',
+  },
+  pickerModeText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#6b7280',
+  },
+  pickerModeTextActive: {
+    color: colors.primary || '#1d4ed8',
+  },
+  calendarNavRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  calendarNavBtn: {
+    padding: 6,
+  },
+  calendarMonthLabel: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1f2937',
+  },
+  calendarHeaders: {
+    flexDirection: 'row',
+    marginBottom: 4,
+  },
+  calendarHeaderText: {
+    width: '14.28%',
+    textAlign: 'center',
+    fontSize: 11,
+    color: '#9ca3af',
+    fontWeight: '700',
+  },
+  calendarGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 14,
+  },
+  calendarCell: {
+    width: '14.28%',
+    aspectRatio: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 999,
+  },
+  calendarCellEmpty: {
+    opacity: 0,
+  },
+  calendarCellSelected: {
+    backgroundColor: colors.primary || '#1d4ed8',
+  },
+  calendarCellText: {
+    fontSize: 14,
+    color: '#1f2937',
+  },
+  calendarCellTextSelected: {
+    color: '#fff',
+    fontWeight: '700',
   },
   pastYearsTitle: {
     fontSize: 12,

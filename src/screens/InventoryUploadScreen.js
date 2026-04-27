@@ -365,7 +365,7 @@ export default function InventoryUploadScreen({ route, navigation }) {
   // Step: Upload
   if (step === 'upload') {
     return (
-      <SafeAreaView style={[styles.container, { paddingTop: insets.top }]}>
+      <SafeAreaView style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
@@ -442,7 +442,7 @@ export default function InventoryUploadScreen({ route, navigation }) {
     const mappedColumns = new Set(Object.values(columnMapping));
 
     return (
-      <SafeAreaView style={[styles.container, { paddingTop: insets.top }]}>
+      <SafeAreaView style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => setStep('upload')}>
             <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
@@ -544,7 +544,7 @@ export default function InventoryUploadScreen({ route, navigation }) {
   // Step: Preview
   if (step === 'preview') {
     return (
-      <SafeAreaView style={[styles.container, { paddingTop: insets.top }]}>
+      <SafeAreaView style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
         <View style={styles.header}>
           <TouchableOpacity onPress={() => setStep('mapping')}>
             <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
@@ -585,7 +585,7 @@ export default function InventoryUploadScreen({ route, navigation }) {
 
   // Step: Confirm
   return (
-    <SafeAreaView style={[styles.container, { paddingTop: insets.top }]}>
+    <SafeAreaView style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => setStep('preview')}>
           <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />

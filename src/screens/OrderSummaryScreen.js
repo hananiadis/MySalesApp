@@ -6,7 +6,7 @@ import SafeScreen from '../components/SafeScreen';
 
 import { useOrder } from '../context/OrderContext';
 import { getPaymentLabel } from '../constants/paymentOptions';
-import { normalizeBrandKey } from '../constants/brands';
+import { BRAND_LABEL, getBrandModuleRoute, normalizeBrandKey } from '../constants/brands';
 import { exportOrderAsXLSX } from '../utils/exportOrderUtils';
 import Share from 'react-native-share';
 
@@ -81,7 +81,9 @@ const OrderSummaryScreen = ({ navigation }) => {
 
   const customer = order?.customer || {};
   const brandKey = order?.brand ?? null;
-  const brandRoute = brandKey ? brandKey.charAt(0).toUpperCase() + brandKey.slice(1) : 'Playmobil';
+  const resolvedBrandKey = normalizeBrandKey(brandKey);
+  const brandRoute = getBrandModuleRoute(resolvedBrandKey);
+  const brandLabel = BRAND_LABEL[resolvedBrandKey] || 'Playmobil Hellas';
   const hasListingSnapshot = Array.isArray(order?.supermarketListings) && order.supermarketListings.length > 0;
 
   const getVat = () =>
@@ -166,10 +168,23 @@ const OrderSummaryScreen = ({ navigation }) => {
       STRINGS.exportedMessage,
       [
         {
-          text: brandRoute,
+          text: brandLabel,
           onPress: () => {
             try { cancelOrder?.(); } catch {}
-            navigation.reset({ index: 0, routes: [{ name: brandRoute }] });
+            // Single reset that encodes the nested tab state directly.
+            // Using two separate calls (reset + navigate) causes a race condition
+            // where the navigate fires before the reset settles, landing on the
+            // wrong screen. A single reset with 'state' is the correct pattern.
+            navigation.reset({
+              index: 0,
+              routes: [{
+                name: 'Home',
+                state: {
+                  index: 0,
+                  routes: [{ name: brandRoute, params: { brand: resolvedBrandKey } }],
+                },
+              }],
+            });
           },
         },
         {

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   View,
@@ -12,6 +12,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Constants from 'expo-constants';
 import SafeScreen from '../components/SafeScreen';
 import { useAuth, ROLES } from '../context/AuthProvider';
+import { AVAILABLE_BRANDS, normalizeBrandKey } from '../constants/brands';
 import {
   listSpreadsheetMeta,
   refreshSpreadsheet,
@@ -62,6 +63,19 @@ const SettingsScreen = ({ navigation }) => {
   const email = profile?.email || '—';
   const brands = Array.isArray(profile?.brands) ? profile.brands : [];
   const roleLabel = formatRole(profile?.role);
+  const linkedBrandKeys = useMemo(() => {
+    if (!Array.isArray(profile?.brands)) {
+      return [];
+    }
+
+    const validBrandSet = new Set(AVAILABLE_BRANDS);
+    const normalized = profile.brands
+      .filter((brand) => typeof brand === 'string' && brand.trim().length > 0)
+      .map((brand) => normalizeBrandKey(brand))
+      .filter((brand) => validBrandSet.has(brand));
+
+    return Array.from(new Set(normalized));
+  }, [profile?.brands]);
 
   const loadCacheMeta = useCallback(async () => {
     console.log('[SettingsScreen] Loading cache metadata...');
@@ -332,8 +346,9 @@ const SettingsScreen = ({ navigation }) => {
               <Text style={styles.cacheInfo}>Δεν βρέθηκαν καταχωρήσεις cache.</Text>
             </View>
           ) : (
-            Object.keys(BRAND_SHEETS).map((brand) => {
+            linkedBrandKeys.map((brand) => {
               const brandSheets = BRAND_SHEETS[brand];
+              if (!brandSheets) return null;
               const brandEntries = cacheMeta
                 .filter(e => brandSheets.includes(e?.key))
                 .sort((a, b) => {
@@ -414,6 +429,21 @@ const SettingsScreen = ({ navigation }) => {
               );
             })
           )}
+
+          {!cacheLoading && linkedBrandKeys.length === 0 ? (
+            <View style={styles.card}>
+              <Text style={styles.cacheInfo}>Δεν υπάρχουν συνδεδεμένα brands για τον λογαριασμό σας.</Text>
+            </View>
+          ) : null}
+
+          {!cacheLoading && linkedBrandKeys.length > 0 && linkedBrandKeys.every((brand) => {
+            const brandSheets = BRAND_SHEETS[brand] || [];
+            return !cacheMeta.some((entry) => brandSheets.includes(entry?.key));
+          }) ? (
+            <View style={styles.card}>
+              <Text style={styles.cacheInfo}>Δεν βρέθηκαν cache αρχεία για τα συνδεδεμένα brands.</Text>
+            </View>
+          ) : null}
           <TouchableOpacity style={styles.reloadButton} onPress={loadCacheMeta}>
             <Text style={styles.reloadButtonText}>Ανανέωση λίστας</Text>
           </TouchableOpacity>

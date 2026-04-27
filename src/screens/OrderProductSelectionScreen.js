@@ -95,7 +95,7 @@ export default function OrderProductSelectionScreen({ navigation, route }) {
   }, []);
 
   const handleGoBack = useCallback(() => {
-    navigation.navigate('BrandHome', { brand });
+    navigation.navigate('OrderCustomerSelectScreen', { brand });
   }, [brand, navigation]);
 
   useFocusEffect(

@@ -61,6 +61,40 @@ service cloud.firestore {
         && brandIsAccessible(brand);
     }
 
+      function hasFieldSalesBrandAccess(data) {
+        return data.brand is string && brandIsAccessible(data.brand);
+      }
+
+      function isFieldSalesPrivilegedUser() {
+        return isManagerRole() || isAdmin();
+      }
+
+      function isOwnFieldSalesSalesmanDoc(data) {
+        return data.salesmanId is string && data.salesmanId == request.auth.uid;
+      }
+
+      function canReadSalesmanScopedFieldSalesDoc(data) {
+        return isSignedIn()
+          && hasFieldSalesBrandAccess(data)
+          && (isFieldSalesPrivilegedUser() || isOwnFieldSalesSalesmanDoc(data));
+      }
+
+      function canCreateSalesmanScopedFieldSalesDoc(data) {
+        return isSignedIn()
+          && hasFieldSalesBrandAccess(data)
+          && (isFieldSalesPrivilegedUser() || isOwnFieldSalesSalesmanDoc(data));
+      }
+
+      function canUpdateSalesmanScopedFieldSalesDoc(newData, existingData) {
+        return isSignedIn()
+          && hasFieldSalesBrandAccess(newData)
+          && hasFieldSalesBrandAccess(existingData)
+          && (
+            isFieldSalesPrivilegedUser()
+            || (isOwnFieldSalesSalesmanDoc(existingData) && isOwnFieldSalesSalesmanDoc(newData))
+          );
+      }
+
     function isOrderOwner(order) {
       return isSignedIn() && order.userId == request.auth.uid;
     }
@@ -217,17 +251,94 @@ service cloud.firestore {
 
     match /customers/{docId} {
       allow read: if isSignedIn();
-      allow write: if isAdmin();
+      // Field users must be able to register new customers directly from the app.
+      allow create, update: if isSignedIn();
+      allow delete: if isAdmin();
     }
 
     match /customers_john/{docId} {
       allow read: if isSignedIn() && brandIsAccessible('john');
-      allow write: if isAdminForBrand('john');
+      // Allow signed-in app users to add or update customer records for John.
+      allow create, update: if isSignedIn();
+      allow delete: if isAdminForBrand('john');
     }
 
     match /customers_kivos/{docId} {
       allow read: if isSignedIn() && brandIsAccessible('kivos');
-      allow write: if isAdminForBrand('kivos');
+      // Allow signed-in app users to add or update customer records for Kivos.
+      allow create, update: if isSignedIn();
+      allow delete: if isAdminForBrand('kivos') || isWarehouseManagerForBrand('kivos');
+    }
+
+    // ============================================================
+    // FIELD SALES PRO (M1)
+    // ============================================================
+
+    match /territories/{docId} {
+      allow read: if isSignedIn()
+        && resource.data.brand is string
+        && brandIsAccessible(resource.data.brand);
+
+      allow create, update: if isSignedIn()
+        && isManagerRole()
+        && request.resource.data.brand is string
+        && brandIsAccessible(request.resource.data.brand);
+
+      allow delete: if isSignedIn()
+        && isAdmin()
+        && resource.data.brand is string
+        && brandIsAccessible(resource.data.brand);
+    }
+
+    match /territoryAssignments/{docId} {
+      allow read: if isSignedIn()
+        && resource.data.brand is string
+        && brandIsAccessible(resource.data.brand);
+
+      allow create, update: if isSignedIn()
+        && isManagerRole()
+        && request.resource.data.brand is string
+        && brandIsAccessible(request.resource.data.brand);
+
+      allow delete: if isSignedIn()
+        && isAdmin()
+        && resource.data.brand is string
+        && brandIsAccessible(resource.data.brand);
+    }
+
+    match /visitPlans/{docId} {
+      allow read: if canReadSalesmanScopedFieldSalesDoc(resource.data);
+
+      allow create: if canCreateSalesmanScopedFieldSalesDoc(request.resource.data);
+
+      allow update: if canUpdateSalesmanScopedFieldSalesDoc(request.resource.data, resource.data);
+
+      allow delete: if false;
+    }
+
+    match /visitExecutions/{docId} {
+      allow read: if canReadSalesmanScopedFieldSalesDoc(resource.data);
+
+      allow create: if canCreateSalesmanScopedFieldSalesDoc(request.resource.data);
+
+      allow update: if canUpdateSalesmanScopedFieldSalesDoc(request.resource.data, resource.data);
+
+      allow delete: if false;
+    }
+
+    match /schedules/{docId} {
+      allow read: if canReadSalesmanScopedFieldSalesDoc(resource.data);
+
+      allow create: if isSignedIn()
+        && isFieldSalesPrivilegedUser()
+        && hasFieldSalesBrandAccess(request.resource.data);
+
+      allow update: if isSignedIn()
+        && isFieldSalesPrivilegedUser()
+        && hasFieldSalesBrandAccess(request.resource.data)
+        && hasFieldSalesBrandAccess(resource.data);
+
+      allow delete: if false;
     }
 
     // ============================================================

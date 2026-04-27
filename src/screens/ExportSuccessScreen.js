@@ -19,7 +19,7 @@ export default function ExportSuccessScreen() {
           Η παραγγελία εξήχθη και συγχρονίστηκε με επιτυχία!
         </Text>
       </View>
-      <TouchableOpacity style={styles.actionBtn} onPress={() => navigation.navigate('Playmobil')}>
+      <TouchableOpacity style={styles.actionBtn} onPress={() => navigation.navigate('Home', { screen: 'MainHome' })}>
         <Ionicons name="home-outline" size={22} color="#fff" />
         <Text style={styles.actionBtnText}>Αρχική Οθόνη</Text>
       </TouchableOpacity>

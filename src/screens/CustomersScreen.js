@@ -11,7 +11,7 @@ import {
   ActivityIndicator,
   Platform,
 } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import SafeScreen from '../components/SafeScreen';
 import { useAuth, ROLES } from '../context/AuthProvider';
@@ -34,6 +34,7 @@ const UI_TEXT = {
   title: '\u03A0\u03b5\u03bb\u03ac\u03c4\u03b5\u03c2',
   searchPlaceholder: '\u0391\u03bd\u03b1\u03b6\u03ae\u03c4\u03b7\u03c3\u03b7...',
   empty: '\u0397 \u03b1\u03bd\u03b1\u03b6\u03ae\u03c4\u03b7\u03c3\u03b7 \u03b4\u03ad\u03bd \u03b2\u03c1\u03ae\u03ba\u03b5 \u03c0\u03b5\u03bb\u03ac\u03c4\u03b5\u03c2.',
+  addButtonLabel: 'Νέος πελάτης',
 };
 
 // Detail screen route names per brand
@@ -107,6 +108,14 @@ export default function CustomersScreen() {
     navigation.navigate('BrandHome', { brand });
   }, [navigation, brand]);
 
+  const handleAddCustomer = useCallback(() => {
+    navigation.navigate('OrderCustomerSelectScreen', {
+      brand,
+      openAddCustomer: true,
+      returnAfterCreate: true,
+    });
+  }, [brand, navigation]);
+
   const headerLeft = useMemo(
     () => (
       <TouchableOpacity
@@ -131,7 +140,7 @@ export default function CustomersScreen() {
     return unsubscribe;
   }, [navigation, handleGoBack]);
 
-  useEffect(() => {
+  const refreshCustomers = useCallback(() => {
     let isActive = true;
 
     const fetchCustomers = async () => {
@@ -162,6 +171,8 @@ export default function CustomersScreen() {
       isActive = false;
     };
   }, [brand]);
+
+  useFocusEffect(refreshCustomers);
 
   // Fetch balances for Kivos customers
   useEffect(() => {
@@ -300,6 +311,17 @@ export default function CustomersScreen() {
           }
         />
       )}
+
+      <TouchableOpacity
+        style={styles.fab}
+        activeOpacity={0.85}
+        onPress={handleAddCustomer}
+        accessibilityRole="button"
+        accessibilityLabel={UI_TEXT.addButtonLabel}
+      >
+        <Ionicons name="person-add-outline" size={20} color="#fff" />
+        <Text style={styles.fabText}>{UI_TEXT.addButtonLabel}</Text>
+      </TouchableOpacity>
     </SafeScreen>
   );
 }
@@ -319,7 +341,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   loader: { marginTop: 16 },
-  listContent: { paddingBottom: 80, paddingHorizontal: 18 },
+  listContent: { paddingBottom: 120, paddingHorizontal: 18 },
   infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -367,6 +389,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#e8f1fb',
+  },
+  fab: {
+    position: 'absolute',
+    right: 18,
+    bottom: 92,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#0f6fc6',
+    borderRadius: 28,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.18,
+    shadowRadius: 6,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 5,
+  },
+  fabText: {
+    color: '#fff',
+    fontWeight: '700',
+    marginLeft: 8,
+    fontSize: 14,
   },
 });
 

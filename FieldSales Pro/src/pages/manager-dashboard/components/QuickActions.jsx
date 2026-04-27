@@ -8,8 +8,8 @@ const QuickActions = ({ className = '' }) => {
   const quickActions = [
     {
       id: 'territory-reassign',
-      title: 'Territory Reassignment',
-      description: 'Reassign territories between salesmen',
+      title: 'Επαναανάθεση Περιοχών',
+      description: 'Επαναανάθεση περιοχών μεταξύ πωλητών',
       icon: 'Shuffle',
       color: 'text-primary',
       bgColor: 'bg-primary/10',
@@ -17,8 +17,8 @@ const QuickActions = ({ className = '' }) => {
     },
     {
       id: 'priority-visits',
-      title: 'Priority Visit Flagging',
-      description: 'Mark high-priority customer visits',
+      title: 'Σήμανση Επισκέψεων Προτεραιότητας',
+      description: 'Σημειώστε επισκέψεις πελατών υψηλής προτεραιότητας',
       icon: 'Flag',
       color: 'text-warning',
       bgColor: 'bg-warning/10',
@@ -26,8 +26,8 @@ const QuickActions = ({ className = '' }) => {
     },
     {
       id: 'bulk-messaging',
-      title: 'Bulk Team Messaging',
-      description: 'Send messages to multiple team members',
+      title: 'Μαζική Αποστολή Μηνυμάτων Ομάδας',
+      description: 'Στείλτε μηνύματα σε πολλά μέλη ομάδας',
       icon: 'MessageSquare',
       color: 'text-accent',
       bgColor: 'bg-accent/10',
@@ -35,8 +35,8 @@ const QuickActions = ({ className = '' }) => {
     },
     {
       id: 'schedule-override',
-      title: 'Schedule Override',
-      description: 'Override and adjust team schedules',
+      title: 'Παράκαμψη Προγράμματος',
+      description: 'Παράκαμψη και προσαρμογή προγραμμάτων ομάδας',
       icon: 'Calendar',
       color: 'text-secondary',
       bgColor: 'bg-secondary/10',
@@ -65,7 +65,7 @@ const QuickActions = ({ className = '' }) => {
                     <div className="text-sm text-muted-foreground">{member?.territory} Territory</div>
                   </div>
                   <Button variant="outline" size="sm">
-                    Reassign
+                    Επαναανάθεση
                   </Button>
                 </div>
               ))}
@@ -76,25 +76,25 @@ const QuickActions = ({ className = '' }) => {
       case 'priority-visits':
         return (
           <div className="space-y-4">
-            <h4 className="font-semibold text-foreground">Priority Visit Flagging</h4>
+            <h4 className="font-semibold text-foreground">Σήμανση Επισκέψεων Προτεραιότητας</h4>
             <div className="space-y-2">
               <div className="p-3 border border-border rounded-md">
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-medium text-foreground">Acme Corporation</span>
                   <Button variant="outline" size="sm" iconName="Flag">
-                    Flag Priority
+                    Σήμανση Προτεραιότητας
                   </Button>
                 </div>
-                <div className="text-sm text-muted-foreground">Scheduled: Today 2:00 PM</div>
+                <div className="text-sm text-muted-foreground">Προγραμματισμένο: Σήμερα 2:00 μ.μ.</div>
               </div>
               <div className="p-3 border border-border rounded-md">
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-medium text-foreground">Tech Solutions Inc</span>
                   <Button variant="outline" size="sm" iconName="Flag">
-                    Flag Priority
+                    Σήμανση Προτεραιότητας
                   </Button>
                 </div>
-                <div className="text-sm text-muted-foreground">Scheduled: Tomorrow 10:00 AM</div>
+                <div className="text-sm text-muted-foreground">Προγραμματισμένο: Αύριο 10:00 π.μ.</div>
               </div>
             </div>
           </div>
@@ -103,11 +103,11 @@ const QuickActions = ({ className = '' }) => {
       case 'bulk-messaging':
         return (
           <div className="space-y-4">
-            <h4 className="font-semibold text-foreground">Bulk Team Messaging</h4>
+            <h4 className="font-semibold text-foreground">Μαζική Αποστολή Μηνυμάτων Ομάδας</h4>
             <div className="space-y-3">
               <div>
                 <label className="text-sm font-medium text-foreground mb-2 block">
-                  Select Recipients
+                  Επιλογή Παραληπτών
                 </label>
                 <div className="space-y-2">
                   {teamMembers?.map((member) => (
@@ -120,16 +120,16 @@ const QuickActions = ({ className = '' }) => {
               </div>
               <div>
                 <label className="text-sm font-medium text-foreground mb-2 block">
-                  Message
+                  Μήνυμα
                 </label>
                 <textarea
                   className="w-full p-2 border border-border rounded-md text-sm"
                   rows="3"
-                  placeholder="Enter your message..."
+                  placeholder="Πληκτρολογήστε το μήνυμά σας..."
                 />
               </div>
               <Button variant="default" className="w-full" iconName="Send">
-                Send Message
+                Αποστολή Μηνύματος
               </Button>
             </div>
           </div>
@@ -138,18 +138,18 @@ const QuickActions = ({ className = '' }) => {
       case 'schedule-override':
         return (
           <div className="space-y-4">
-            <h4 className="font-semibold text-foreground">Schedule Override</h4>
+            <h4 className="font-semibold text-foreground">Παράκαμψη Προγράμματος</h4>
             <div className="space-y-2">
               {teamMembers?.map((member) => (
                 <div key={member?.id} className="p-3 border border-border rounded-md">
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-medium text-foreground">{member?.name}</span>
                     <Button variant="outline" size="sm" iconName="Edit">
-                      Override
+                      Παράκαμψη
                     </Button>
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    Current: 8 visits scheduled today
+                    Τρέχον: 8 επισκέψεις προγραμματισμένες σήμερα
                   </div>
                 </div>
               ))}
@@ -167,7 +167,7 @@ const QuickActions = ({ className = '' }) => {
       <div className="p-4 border-b border-border">
         <h3 className="text-lg font-semibold text-foreground">Quick Actions</h3>
         <p className="text-sm text-muted-foreground mt-1">
-          Manage team operations efficiently
+          Διαχειριστείτε αποτελεσματικά τις λειτουργίες της ομάδας
         </p>
       </div>
       <div className="p-4">
@@ -213,7 +213,7 @@ const QuickActions = ({ className = '' }) => {
         <div className="flex items-center justify-between text-sm">
           <span className="text-muted-foreground">Need help?</span>
           <button className="text-primary hover:text-primary/80 font-medium">
-            View Guide
+            Προβολή Οδηγού
           </button>
         </div>
       </div>

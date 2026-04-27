@@ -18,6 +18,7 @@ import { useAuth } from '../context/AuthProvider';
 import { useOnlineStatus } from '../utils/OnlineStatusContext';
 import { getRoleLabel } from '../constants/roles';
 import colors from '../theme/colors';
+import { getModuleAccess } from '../utils/moduleAccess';
 
 const BRAND_ROUTE = {
   playmobil: 'PlaymobilModule',
@@ -66,6 +67,7 @@ export default function MainHomeScreen({ navigation }) {
   const profile = auth.profile || null;
   const role = profile?.role || null;
   const brands = Array.isArray(profile?.brands) ? profile.brands : [];
+  const moduleAccess = getModuleAccess(profile);
   const { isConnected } = useOnlineStatus();
   const { width } = useWindowDimensions();
   const lastBackPressRef = useRef(0);
@@ -141,6 +143,10 @@ export default function MainHomeScreen({ navigation }) {
     navigation.navigate('FieldSalesPro');
   }, [navigation]);
 
+  const openExpenseTracker = useCallback(() => {
+    navigation.navigate('ExpenseTracker');
+  }, [navigation]);
+
   // Single status dot is shown inside SalesmanInfoCard status row; do not append extra dots in the meta line
 
   useFocusEffect(
@@ -193,33 +199,37 @@ export default function MainHomeScreen({ navigation }) {
         />
       </TouchableOpacity>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Διαχείριση Επισκέψεων</Text>
-        <TouchableOpacity
-          style={styles.ctaButton}
-          activeOpacity={0.85}
-          onPress={openFieldSalesPro}
-        >
-          <Text style={styles.ctaTitle}>Διαχείριση Επισκέψεων</Text>
-          <Text style={styles.ctaSubtitle}>
-            Προγραμματισμός εξορμήσεων και επισκέψεων
-          </Text>
-        </TouchableOpacity>
-      </View>
+      {moduleAccess.fieldSalesProEnabled ? (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Διαχείριση Επισκέψεων</Text>
+          <TouchableOpacity
+            style={styles.ctaButton}
+            activeOpacity={0.85}
+            onPress={openFieldSalesPro}
+          >
+            <Text style={styles.ctaTitle}>Διαχείριση Επισκέψεων</Text>
+            <Text style={styles.ctaSubtitle}>
+              Προγραμματισμός εξορμήσεων και επισκέψεων
+            </Text>
+          </TouchableOpacity>
+        </View>
+      ) : null}
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Άλλες Λειτουργίες</Text>
-        <TouchableOpacity
-          style={styles.ctaButton}
-          activeOpacity={0.85}
-          onPress={() => navigation.navigate('ExpenseTracker')}
-        >
-          <Text style={styles.ctaTitle}>Εξοδολόγιο</Text>
-          <Text style={styles.ctaSubtitle}>
-            Καταγραφή εξόδων, ταξιδιών, καυσίμων κ.α.
-          </Text>
-        </TouchableOpacity>
-      </View>
+      {moduleAccess.expenseTrackerEnabled ? (
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Άλλες Λειτουργίες</Text>
+          <TouchableOpacity
+            style={styles.ctaButton}
+            activeOpacity={0.85}
+            onPress={openExpenseTracker}
+          >
+            <Text style={styles.ctaTitle}>Εξοδολόγιο</Text>
+            <Text style={styles.ctaSubtitle}>
+              Καταγραφή εξόδων, ταξιδιών, καυσίμων κ.α.
+            </Text>
+          </TouchableOpacity>
+        </View>
+      ) : null}
     </SafeScreen>
   );
 }

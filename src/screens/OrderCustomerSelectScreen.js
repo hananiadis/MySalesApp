@@ -123,6 +123,7 @@ export default function OrderCustomerSelectScreen() {
   const route = useRoute();
   const insets = useSafeAreaInsets();
   const brand = useMemo(() => normalizeBrandKey(route?.params?.brand), [route?.params?.brand]);
+  const shouldReturnAfterCreate = Boolean(route?.params?.returnAfterCreate);
 
   const { profile, hasRole } = useAuth();
   const profileUid = profile?.uid || null;
@@ -322,7 +323,21 @@ export default function OrderCustomerSelectScreen() {
   const closeAddCustomerModal = useCallback(() => {
     setShowAddModal(false);
     resetCustomerForm();
-  }, [resetCustomerForm]);
+    if (shouldReturnAfterCreate && navigation.canGoBack()) {
+      requestAnimationFrame(() => {
+        navigation.goBack();
+      });
+    }
+  }, [navigation, resetCustomerForm, shouldReturnAfterCreate]);
+
+  useEffect(() => {
+    if (!route.params?.openAddCustomer) {
+      return;
+    }
+
+    openAddCustomerModal();
+    navigation.setParams({ openAddCustomer: undefined });
+  }, [navigation, openAddCustomerModal, route.params?.openAddCustomer]);
 
   const updateCustomerField = useCallback((key, value) => {
     if (key === 'vat') {
@@ -395,19 +410,30 @@ export default function OrderCustomerSelectScreen() {
   );
 
   const handleGoBack = useCallback(() => {
+    if (shouldReturnAfterCreate && navigation.canGoBack()) {
+      navigation.goBack();
+      return;
+    }
+
     navigation.navigate('BrandHome', { brand });
-  }, [brand, navigation]);
+  }, [brand, navigation, shouldReturnAfterCreate]);
 
   useFocusEffect(
     useCallback(() => {
       const unsubscribe = navigation.addListener('beforeRemove', (event) => {
-        if (event.data.action?.type === 'GO_BACK') {
-          event.preventDefault();
-          handleGoBack();
+        if (event.data.action?.type !== 'GO_BACK') {
+          return;
         }
+
+        if (shouldReturnAfterCreate && navigation.canGoBack()) {
+          return;
+        }
+
+        event.preventDefault();
+        handleGoBack();
       });
       return () => unsubscribe();
-    }, [handleGoBack, navigation])
+    }, [handleGoBack, navigation, shouldReturnAfterCreate])
   );
 
   const handleSaveCustomer = useCallback(async () => {
@@ -567,7 +593,18 @@ export default function OrderCustomerSelectScreen() {
       resetCustomerForm();
 
       const createdForCurrentBrand = createdEntries.find((entry) => entry.brand === brand);
-      if (createdForCurrentBrand) {
+      if (shouldReturnAfterCreate) {
+        Alert.alert(STRINGS.addCustomer.successTitle, STRINGS.addCustomer.successMessage, [
+          {
+            text: 'OK',
+            onPress: () => {
+              if (navigation.canGoBack()) {
+                navigation.goBack();
+              }
+            },
+          },
+        ]);
+      } else if (createdForCurrentBrand) {
         selectCustomerAndGo(createdForCurrentBrand);
       } else {
         Alert.alert(STRINGS.addCustomer.successTitle, STRINGS.addCustomer.successMessage);
@@ -587,6 +624,8 @@ export default function OrderCustomerSelectScreen() {
     brand,
     selectCustomerAndGo,
     parseCurrencyInput,
+    navigation,
+    shouldReturnAfterCreate,
   ]);
 
   const renderCustomer = useCallback(
@@ -669,11 +708,21 @@ export default function OrderCustomerSelectScreen() {
         transparent
         onRequestClose={closeAddCustomerModal}
       >
-        <View style={styles.modalBackdrop}>
-          <View style={styles.modalCard}>
-            <Text style={styles.modalTitle}>{STRINGS.addCustomer.title}</Text>
-            <Text style={styles.modalSubtitle}>{STRINGS.addCustomer.subtitle}</Text>
-            <ScrollView contentContainerStyle={styles.modalScroll}>
+        <KeyboardAvoidingView
+          style={styles.modalKeyboardAvoiding}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={Math.max(insets.top, 12)}
+        >
+          <View style={styles.modalBackdrop}>
+            <View style={[styles.modalCard, { paddingBottom: Math.max(insets.bottom, 16) }]}> 
+              <Text style={styles.modalTitle}>{STRINGS.addCustomer.title}</Text>
+              <Text style={styles.modalSubtitle}>{STRINGS.addCustomer.subtitle}</Text>
+              <ScrollView
+                style={styles.modalScrollView}
+                contentContainerStyle={[styles.modalScroll, { paddingBottom: Math.max(insets.bottom, 12) }]}
+                keyboardShouldPersistTaps="handled"
+                showsVerticalScrollIndicator={false}
+              >
               <Text style={styles.modalHeading}>{STRINGS.addCustomer.brandsHeading}</Text>
               <View style={styles.chipRow}>
                 {AVAILABLE_BRANDS.map((brandKey) => {
@@ -905,7 +954,7 @@ export default function OrderCustomerSelectScreen() {
               </View>
             </ScrollView>
 
-            <View style={styles.modalButtons}>
+            <View style={[styles.modalButtons, { paddingBottom: Math.max(insets.bottom, 4) }]}>
               <TouchableOpacity
                 style={[styles.modalButton, styles.modalButtonGhost]}
                 onPress={closeAddCustomerModal}
@@ -931,6 +980,7 @@ export default function OrderCustomerSelectScreen() {
             </View>
           </View>
         </View>
+      </KeyboardAvoidingView>
       </Modal>
     </SafeAreaView>
   );
@@ -1019,10 +1069,14 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginLeft: 8,
   },
+  modalKeyboardAvoiding: {
+    flex: 1,
+  },
   modalBackdrop: {
     flex: 1,
     backgroundColor: 'rgba(15, 23, 42, 0.35)',
     justifyContent: 'flex-end',
+    paddingTop: 24,
   },
   modalCard: {
     backgroundColor: '#fff',
@@ -1030,8 +1084,8 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 18,
     paddingHorizontal: 20,
     paddingTop: 18,
-    paddingBottom: 24,
-    maxHeight: '92%',
+    maxHeight: '94%',
+    overflow: 'hidden',
   },
   modalTitle: {
     fontSize: 20,
@@ -1043,6 +1097,9 @@ const styles = StyleSheet.create({
     color: '#475569',
     marginTop: 4,
     marginBottom: 16,
+  },
+  modalScrollView: {
+    flexGrow: 0,
   },
   modalScroll: {
     paddingBottom: 12,
@@ -1126,6 +1183,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'flex-end',
     marginTop: 12,
+    paddingTop: 12,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: '#dbe2ea',
+    backgroundColor: '#fff',
   },
   modalButton: {
     borderRadius: 10,

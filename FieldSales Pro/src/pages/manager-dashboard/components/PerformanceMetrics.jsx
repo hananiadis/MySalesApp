@@ -1,80 +1,71 @@
 import React from 'react';
 import Icon from '../../../components/AppIcon';
 
-const PerformanceMetrics = ({ className = '' }) => {
+const PerformanceMetrics = ({ className = '', data = null, loading = false }) => {
+  const completed = data?.totalVisitsCompleted ?? null;
+  const planned = data?.totalVisitsPlanned ?? null;
+  const inProgress = data?.totalVisitsInProgress ?? null;
+  const planVsActual = data?.planVsActual ?? null;
+  const totalSalesmen = data?.totalSalesmen ?? null;
+  const activeSalesmen = data?.activeSalesmen ?? null;
+
+  const completedPct = planned > 0 ? Math.round((completed / planned) * 100) : 0;
+  const inProgressPct = planned > 0 ? Math.round((inProgress / planned) * 100) : 0;
+  const activePct = totalSalesmen > 0 ? Math.round((activeSalesmen / totalSalesmen) * 100) : 0;
+
   const metricsData = [
     {
       id: 'visits-completed',
-      title: 'Visits Completed',
-      value: '27',
-      target: '32',
-      percentage: 84,
-      trend: 'up',
-      trendValue: '+12%',
+      title: 'Ολοκληρωμένες Επισκέψεις',
+      value: completed !== null ? String(completed) : '—',
+      target: planned !== null ? String(planned) : '—',
+      percentage: completedPct,
       icon: 'CheckCircle',
       color: 'text-success',
-      bgColor: 'bg-success/10'
+      bgColor: 'bg-success/10',
     },
     {
-      id: 'territory-coverage',
-      title: 'Territory Coverage',
-      value: '78%',
-      target: '85%',
-      percentage: 92,
-      trend: 'up',
-      trendValue: '+5%',
-      icon: 'Map',
+      id: 'visits-in-progress',
+      title: 'Επισκέψεις σε Εξέλιξη',
+      value: inProgress !== null ? String(inProgress) : '—',
+      target: planned !== null ? String(planned) : '—',
+      percentage: inProgressPct,
+      icon: 'MapPin',
       color: 'text-primary',
-      bgColor: 'bg-primary/10'
-    },
-    {
-      id: 'revenue-attribution',
-      title: 'Revenue Attribution',
-      value: '$24,580',
-      target: '$30,000',
-      percentage: 82,
-      trend: 'down',
-      trendValue: '-3%',
-      icon: 'DollarSign',
-      color: 'text-accent',
-      bgColor: 'bg-accent/10'
+      bgColor: 'bg-primary/10',
     },
     {
       id: 'plan-vs-actual',
-      title: 'Plan vs Actual',
-      value: '89%',
-      target: '95%',
-      percentage: 94,
-      trend: 'up',
-      trendValue: '+7%',
+      title: 'Σχέδιο έναντι Πραγματικού',
+      value: planVsActual !== null ? `${planVsActual}%` : '—',
+      target: '100%',
+      percentage: planVsActual ?? 0,
       icon: 'Target',
       color: 'text-warning',
-      bgColor: 'bg-warning/10'
-    }
+      bgColor: 'bg-warning/10',
+    },
+    {
+      id: 'active-salesmen',
+      title: 'Ενεργοί Πωλητές',
+      value: activeSalesmen !== null ? String(activeSalesmen) : '—',
+      target: totalSalesmen !== null ? String(totalSalesmen) : '—',
+      percentage: activePct,
+      icon: 'Users',
+      color: 'text-accent',
+      bgColor: 'bg-accent/10',
+    },
   ];
-
-  const getTrendIcon = (trend) => {
-    return trend === 'up' ? 'TrendingUp' : 'TrendingDown';
-  };
-
-  const getTrendColor = (trend) => {
-    return trend === 'up' ? 'text-success' : 'text-error';
-  };
 
   return (
     <div className={`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 ${className}`}>
       {metricsData?.map((metric) => (
         <div
           key={metric?.id}
-          className="bg-card border border-border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+          className={`bg-card border border-border rounded-lg p-4 hover:shadow-md transition-shadow ${loading ? 'opacity-60 animate-pulse' : ''}`}
         >
           <div className="flex items-center justify-between mb-3">
             <div className={`p-2 rounded-lg ${metric?.bgColor}`}>
               <Icon name={metric?.icon} size={20} className={metric?.color} />
-            </div>
-            <div className={`flex items-center space-x-1 ${getTrendColor(metric?.trend)}`}>
-              <Icon name={getTrendIcon(metric?.trend)} size={14} />
-              <span className="text-xs font-medium">{metric?.trendValue}</span>
             </div>
           </div>
 
@@ -95,7 +86,7 @@ const PerformanceMetrics = ({ className = '' }) => {
             {/* Progress Bar */}
             <div className="space-y-1">
               <div className="flex justify-between text-xs">
-                <span className="text-muted-foreground">Progress</span>
+                <span className="text-muted-foreground">Πρόοδος</span>
                 <span className="font-medium text-foreground">{metric?.percentage}%</span>
               </div>
               <div className="w-full bg-muted rounded-full h-2">

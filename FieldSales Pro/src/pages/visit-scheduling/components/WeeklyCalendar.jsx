@@ -80,6 +80,21 @@ const WeeklyCalendar = ({
     }
   };
 
+  const getStatusMeta = (status) => {
+    switch (String(status || '').toLowerCase()) {
+      case 'completed':
+        return { label: 'Ολοκληρώθηκε', className: 'bg-success/10 text-success' };
+      case 'in-progress':
+        return { label: 'Σε εξέλιξη', className: 'bg-primary/10 text-primary' };
+      case 'overdue':
+        return { label: 'Εκπρόθεσμη', className: 'bg-error/10 text-error' };
+      case 'cancelled':
+        return { label: 'Ακυρώθηκε', className: 'bg-muted text-muted-foreground' };
+      default:
+        return { label: 'Προγραμματισμένη', className: 'bg-warning/10 text-warning' };
+    }
+  };
+
   return (
     <div className={`bg-card border border-border rounded-lg ${className}`}>
       {/* Header */}
@@ -160,7 +175,9 @@ const WeeklyCalendar = ({
                 </div>
                 {/* Visit Slots */}
                 <div className="space-y-2">
-                  {dayVisits?.map((visit, index) => (
+                  {dayVisits?.map((visit, index) => {
+                    const statusMeta = getStatusMeta(visit?.status);
+                    return (
                     <div
                       key={visit?.id}
                       draggable
@@ -181,6 +198,9 @@ const WeeklyCalendar = ({
                               {visit?.timeSlot}
                             </div>
                           )}
+                          <span className={`inline-flex mt-2 px-2 py-0.5 rounded-full text-[10px] font-medium ${statusMeta.className}`}>
+                            {statusMeta.label}
+                          </span>
                         </div>
                         <div className="flex-shrink-0 ml-2">
                           <Icon name="GripVertical" size={14} className="text-muted-foreground" />
@@ -194,7 +214,8 @@ const WeeklyCalendar = ({
                         </div>
                       )}
                     </div>
-                  ))}
+                    );
+                  })}
 
                   {/* Drop Zone */}
                   {dayVisits?.length === 0 && (

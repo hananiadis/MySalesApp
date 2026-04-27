@@ -15,9 +15,9 @@ const TerritoryMap = ({
   const [hoveredTerritory, setHoveredTerritory] = useState(null);
 
   const mapViewOptions = [
-    { id: 'territories', label: 'Territories', icon: 'Map' },
-    { id: 'coverage', label: 'Coverage', icon: 'Target' },
-    { id: 'conflicts', label: 'Conflicts', icon: 'AlertTriangle' }
+    { id: 'territories', label: 'Περιοχές', icon: 'Map' },
+    { id: 'coverage', label: 'Κάλυψη', icon: 'Target' },
+    { id: 'conflicts', label: 'Συγκρούσεις', icon: 'AlertTriangle' }
   ];
 
   const handleDragStart = (salesman) => {
@@ -47,11 +47,11 @@ const TerritoryMap = ({
       {/* Map Header */}
       <div className="p-4 border-b border-border">
         <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-semibold text-foreground">Territory Map</h3>
+          <h3 className="text-lg font-semibold text-foreground">Χάρτης Περιοχών</h3>
           <div className="flex items-center space-x-2">
             <Button variant="outline" size="sm">
               <Icon name="Download" size={16} />
-              Export
+              Εξαγωγή
             </Button>
             <Button variant="outline" size="sm">
               <Icon name="Maximize2" size={16} />
@@ -143,19 +143,19 @@ const TerritoryMap = ({
 
         {/* Legend */}
         <div className="absolute bottom-4 left-4 bg-background/90 backdrop-blur-sm border border-border rounded-lg p-3">
-          <div className="text-xs font-medium text-foreground mb-2">Legend</div>
+          <div className="text-xs font-medium text-foreground mb-2">Υπόμνημα</div>
           <div className="space-y-1">
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 border-2 border-success bg-success/10 rounded"></div>
-              <span className="text-xs text-muted-foreground">Assigned</span>
+              <span className="text-xs text-muted-foreground">Ανατεθειμένες</span>
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 border-2 border-warning bg-warning/10 rounded"></div>
-              <span className="text-xs text-muted-foreground">Unassigned</span>
+              <span className="text-xs text-muted-foreground">Χωρίς ανάθεση</span>
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-3 h-3 border-2 border-error bg-error/10 rounded"></div>
-              <span className="text-xs text-muted-foreground">Conflicts</span>
+              <span className="text-xs text-muted-foreground">Συγκρούσεις</span>
             </div>
           </div>
         </div>
@@ -163,8 +163,8 @@ const TerritoryMap = ({
       {/* Salesman Panel */}
       <div className="p-4 border-t border-border">
         <div className="flex items-center justify-between mb-3">
-          <h4 className="text-sm font-medium text-foreground">Available Salesmen</h4>
-          <span className="text-xs text-muted-foreground">Drag to assign territories</span>
+          <h4 className="text-sm font-medium text-foreground">Διαθέσιμοι Πωλητές</h4>
+          <span className="text-xs text-muted-foreground">Σύρετε για ανάθεση περιοχών</span>
         </div>
         
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">

@@ -12,6 +12,7 @@ import * as Sharing from 'expo-sharing';
 import SafeScreen from '../components/SafeScreen';
 import colors from '../theme/colors';
 import { normalizeBrandKey, BRAND_LABEL } from '../constants/brands';
+import { navigateToMainHome } from '../utils/navigationHelpers';
 import PlaymobilKpiCards from '../components/PlaymobilKpiCards';
 import KpiDataModal from '../components/KpiDataModal';
 import usePlaymobilKpi from '../hooks/usePlaymobilKpi';
@@ -48,6 +49,7 @@ const buildActions = ({
   supportsSuperMarket,
   hasOrdersTab,
   navigateToStack,
+  goToMainHome,
 }) => {
   const actions = [
     {
@@ -98,7 +100,7 @@ const buildActions = ({
     key: 'back',
     label: STRINGS.back,
     icon: ICONS.back,
-    onPress: () => navigateToStack('MainHome'),
+    onPress: goToMainHome,
   });
 
   return actions;
@@ -639,8 +641,8 @@ const BrandHomeScreen = ({ navigation, route }) => {
   );
 
   const goToMainHome = useCallback(() => {
-    navigateToStack('MainHome');
-  }, [navigateToStack]);
+    navigateToMainHome(navigation);
+  }, [navigation]);
 
   useFocusEffect(
     useCallback(() => {
@@ -662,8 +664,9 @@ const BrandHomeScreen = ({ navigation, route }) => {
         supportsSuperMarket,
         hasOrdersTab,
         navigateToStack,
+        goToMainHome,
       }),
-    [brand, navigation, supportsSuperMarket, hasOrdersTab, navigateToStack]
+    [brand, navigation, supportsSuperMarket, hasOrdersTab, navigateToStack, goToMainHome]
   );
 
   return (

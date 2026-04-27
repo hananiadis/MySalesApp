@@ -12,38 +12,38 @@ const Header = ({ className = '' }) => {
 
   const navigationItems = [
     {
-      label: 'Dashboard',
+      label: 'Ταμπλό',
       path: '/manager-dashboard',
       icon: 'BarChart3',
-      tooltip: 'Real-time team oversight and performance monitoring'
+      tooltip: 'Παρακολούθηση ομάδας και απόδοσης σε πραγματικό χρόνο'
     },
     {
-      label: 'Planning',
+      label: 'Σχεδιασμός',
       path: '/territory-planning',
       icon: 'Map',
-      tooltip: 'Strategic territory and visit planning tools',
+      tooltip: 'Εργαλεία στρατηγικού σχεδιασμού περιοχών και επισκέψεων',
       subItems: [
-        { label: 'Territory Planning', path: '/territory-planning' },
-        { label: 'Visit Scheduling', path: '/visit-scheduling' }
+        { label: 'Σχεδιασμός Περιοχών', path: '/territory-planning' },
+        { label: 'Προγραμματισμός Επισκέψεων', path: '/visit-scheduling' }
       ]
     },
     {
-      label: 'Customers',
+      label: 'Πελάτες',
       path: '/customer-management',
       icon: 'Users',
-      tooltip: 'Customer database and territory management'
+      tooltip: 'Βάση πελατών και διαχείριση περιοχών'
     },
     {
-      label: 'My Day',
+      label: 'Η Μέρα Μου',
       path: '/my-day-mobile',
       icon: 'Calendar',
-      tooltip: 'Mobile-first field execution interface'
+      tooltip: 'Περιβάλλον εκτέλεσης πεδίου με προτεραιότητα στο mobile'
     },
     {
-      label: 'Analytics',
+      label: 'Αναλύσεις',
       path: '/performance-analytics',
       icon: 'TrendingUp',
-      tooltip: 'Performance reporting and analysis tools'
+      tooltip: 'Εργαλεία αναφορών και ανάλυσης απόδοσης'
     }
   ];
 
@@ -92,7 +92,7 @@ const Header = ({ className = '' }) => {
                     <span className="font-medium">{item?.label}</span>
                     <Icon name="ChevronDown" size={14} />
                     <NotificationBadge 
-                      count={item?.label === 'Planning' ? 3 : 0}
+                      count={item?.label === 'Σχεδιασμός' ? 3 : 0}
                       className="absolute -top-1 -right-1"
                     />
                   </Button>
@@ -124,7 +124,7 @@ const Header = ({ className = '' }) => {
                   <Icon name={item?.icon} size={18} />
                   <span className="font-medium">{item?.label}</span>
                   <NotificationBadge 
-                    count={item?.label === 'My Day' ? 2 : item?.label === 'Analytics' ? 1 : 0}
+                    count={item?.label === 'Η Μέρα Μου' ? 2 : item?.label === 'Αναλύσεις' ? 1 : 0}
                     className="absolute -top-1 -right-1"
                   />
                 </Button>
@@ -199,7 +199,7 @@ const Header = ({ className = '' }) => {
                     <span className="font-medium">{item?.label}</span>
                   </div>
                   <NotificationBadge 
-                    count={item?.label === 'My Day' ? 2 : item?.label === 'Analytics' ? 1 : 0}
+                    count={item?.label === 'Η Μέρα Μου' ? 2 : item?.label === 'Αναλύσεις' ? 1 : 0}
                   />
                 </Link>
               );

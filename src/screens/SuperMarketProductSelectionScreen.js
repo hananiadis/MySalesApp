@@ -671,7 +671,7 @@ export default function SuperMarketProductSelectionScreen({ navigation, route })
   const categories = Object.keys(groupedProducts).map((category) => ({ category }));
 
   return (
-    <SafeAreaView style={[styles.container, { paddingTop: insets.top }]}>
+    <SafeAreaView style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
       <View style={styles.header}>
         <View style={styles.headerTopRow}>
           <View style={{ flex: 1 }}>

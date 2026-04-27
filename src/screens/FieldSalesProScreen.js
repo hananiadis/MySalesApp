@@ -1,16 +1,132 @@
 // src/screens/FieldSalesProScreen.js
-import React, { useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { View, StyleSheet, Platform, ActivityIndicator, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
 import { useAuth } from '../context/AuthProvider';
+import { getFunctionUrl } from '../config/firebase';
 import colors from '../theme/colors';
+import { getModuleAccess } from '../utils/moduleAccess';
+import { navigateToMainHome } from '../utils/navigationHelpers';
 
 export default function FieldSalesProScreen({ navigation }) {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
+  const moduleAccess = getModuleAccess(profile);
   const webViewRef = useRef(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [runtimeContext, setRuntimeContext] = useState(null);
+  const [webViewKey, setWebViewKey] = useState(0);
+
+  const normalizedBrands = useMemo(
+    () =>
+      (Array.isArray(profile?.brands) ? profile.brands : [])
+        .map((brand) => String(brand || '').trim().toLowerCase())
+        .filter(Boolean),
+    [profile?.brands]
+  );
+
+  const buildRuntimeContext = useCallback(
+    async (forceRefresh = false) => {
+      if (!user) {
+        throw new Error('No authenticated user available for FieldSales Pro.');
+      }
+
+      const idToken = await user.getIdToken(forceRefresh);
+
+      return {
+        idToken,
+        uid: user.uid || '',
+        email: user.email || '',
+        role: profile?.role || '',
+        brands: normalizedBrands,
+        defaultBrand: normalizedBrands[0] || '',
+        bffBaseUrl: getFunctionUrl('api'),
+      };
+    },
+    [normalizedBrands, profile?.role, user]
+  );
+
+  const buildInjectedRuntimeScript = useCallback((context, announceUpdate = false) => {
+    const payload = JSON.stringify(context || {});
+    const shouldAnnounce = announceUpdate ? 'true' : 'false';
+
+    return `
+      (function() {
+        var runtime = ${payload};
+        window.__MYSALES_RUNTIME = runtime;
+        window.MYSALES_ID_TOKEN = runtime.idToken || '';
+        window.MYSALES_UID = runtime.uid || '';
+        window.MYSALES_EMAIL = runtime.email || '';
+        window.MYSALES_ROLE = runtime.role || '';
+        window.MYSALES_BRANDS = Array.isArray(runtime.brands) ? runtime.brands : [];
+        window.MYSALES_DEFAULT_BRAND = runtime.defaultBrand || '';
+        window.MYSALES_BFF_BASE_URL = runtime.bffBaseUrl || '';
+        window.REACT_NATIVE_WEBVIEW = true;
+        window.goBack = function() {
+          window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'NAVIGATE_BACK' }));
+        };
+        if (${shouldAnnounce}) {
+          window.dispatchEvent(new CustomEvent('mysales-runtime-updated', { detail: runtime }));
+        }
+        console.log('FieldSales Pro runtime injected', {
+          uid: window.MYSALES_UID,
+          role: window.MYSALES_ROLE,
+          brands: window.MYSALES_BRANDS,
+          bffBaseUrl: window.MYSALES_BFF_BASE_URL,
+        });
+      })();
+      true;
+    `;
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    const prepareRuntimeContext = async () => {
+      if (!moduleAccess.fieldSalesProEnabled || !user) {
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const nextRuntimeContext = await buildRuntimeContext(false);
+        if (!active) {
+          return;
+        }
+        setRuntimeContext(nextRuntimeContext);
+        setError(null);
+      } catch (runtimeError) {
+        console.error('[FieldSalesPro] Failed to build runtime context:', runtimeError);
+        if (active) {
+          setError(runtimeError.message || 'Failed to prepare FieldSales Pro session.');
+        }
+      }
+    };
+
+    prepareRuntimeContext();
+
+    return () => {
+      active = false;
+    };
+  }, [buildRuntimeContext, moduleAccess.fieldSalesProEnabled, user]);
+
+  if (!moduleAccess.fieldSalesProEnabled) {
+    return (
+      <SafeAreaView style={styles.errorContainer}>
+        <Text style={styles.errorTitle}>Μη διαθέσιμη ενότητα</Text>
+        <Text style={styles.errorMessage}>
+          Η ενότητα Διαχείριση Επισκέψεων είναι απενεργοποιημένη για τον λογαριασμό σας.
+        </Text>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => navigateToMainHome(navigation) || navigation.goBack()}
+        >
+          <Text style={styles.backButtonText}>Επιστροφή</Text>
+        </TouchableOpacity>
+      </SafeAreaView>
+    );
+  }
 
   // Construct the local file path for the WebView
   const getLocalUri = () => {
@@ -31,27 +147,7 @@ export default function FieldSalesProScreen({ navigation }) {
   console.log('[FieldSalesPro] Loading from URI:', getLocalUri());
   console.log('[FieldSalesPro] Base URL:', baseUrl);
 
-  // Inject Firebase auth token into the WebView for API calls
-  const injectedJavaScript = `
-    (function() {
-      // Store Firebase user info for the web app
-      window.FIREBASE_USER_TOKEN = "${user?.uid || ''}";
-      window.FIREBASE_USER_EMAIL = "${user?.email || ''}";
-      
-      // Signal that the app is ready
-      window.REACT_NATIVE_WEBVIEW = true;
-      
-      // Handle back navigation from WebView
-      window.goBack = function() {
-        window.ReactNativeWebView.postMessage(JSON.stringify({ type: 'NAVIGATE_BACK' }));
-      };
-      
-      console.log('FieldSales Pro: Firebase user injected', window.FIREBASE_USER_TOKEN);
-    })();
-    true; // Required for iOS
-  `;
-
-  const handleWebViewMessage = (event) => {
+  const handleWebViewMessage = async (event) => {
     try {
       const data = JSON.parse(event.nativeEvent.data);
       console.log('[FieldSalesPro] Message from WebView:', data);
@@ -59,6 +155,15 @@ export default function FieldSalesProScreen({ navigation }) {
       // Handle specific messages from the web app
       if (data.type === 'NAVIGATE_BACK') {
         navigation.goBack();
+        return;
+      }
+
+      if (data.type === 'REQUEST_ID_TOKEN') {
+        const refreshedRuntimeContext = await buildRuntimeContext(true);
+        setRuntimeContext(refreshedRuntimeContext);
+        webViewRef.current?.injectJavaScript(
+          buildInjectedRuntimeScript(refreshedRuntimeContext, true)
+        );
       }
     } catch (err) {
       console.warn('[FieldSalesPro] Failed to parse WebView message:', err);
@@ -88,17 +193,46 @@ export default function FieldSalesProScreen({ navigation }) {
     setLoading(false);
   };
 
+  const handleRetry = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const refreshedRuntimeContext = await buildRuntimeContext(true);
+      setRuntimeContext(refreshedRuntimeContext);
+      setWebViewKey((value) => value + 1);
+    } catch (retryError) {
+      setError(retryError?.message || 'Failed to refresh FieldSales Pro session.');
+      setLoading(false);
+    }
+  };
+
   if (error) {
     return (
       <SafeAreaView style={styles.errorContainer}>
         <Text style={styles.errorTitle}>Unable to Load FieldSales Pro</Text>
         <Text style={styles.errorMessage}>{error}</Text>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
-        >
-          <Text style={styles.backButtonText}>Go Back</Text>
-        </TouchableOpacity>
+        <View style={styles.errorActionsRow}>
+          <TouchableOpacity style={styles.secondaryButton} onPress={handleRetry}>
+            <Text style={styles.secondaryButtonText}>Προσπάθεια ξανά</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigateToMainHome(navigation) || navigation.goBack()}
+          >
+            <Text style={styles.backButtonText}>Αρχική</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (!runtimeContext) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={colors.primary} />
+          <Text style={styles.loadingText}>Προετοιμασία συνεδρίας FieldSales Pro...</Text>
+        </View>
       </SafeAreaView>
     );
   }
@@ -108,18 +242,19 @@ export default function FieldSalesProScreen({ navigation }) {
       {loading && (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={colors.primary} />
-          <Text style={styles.loadingText}>Loading FieldSales Pro...</Text>
+          <Text style={styles.loadingText}>Φόρτωση FieldSales Pro...</Text>
         </View>
       )}
       
       <WebView
+        key={webViewKey}
         ref={webViewRef}
         source={{ 
           uri: getLocalUri(),
           baseUrl: baseUrl
         }}
         style={styles.webview}
-        injectedJavaScript={injectedJavaScript}
+        injectedJavaScriptBeforeContentLoaded={buildInjectedRuntimeScript(runtimeContext, false)}
         onMessage={handleWebViewMessage}
         onError={handleError}
         onLoad={handleLoad}
@@ -139,7 +274,7 @@ export default function FieldSalesProScreen({ navigation }) {
         renderLoading={() => (
           <View style={styles.loadingContainer}>
             <ActivityIndicator size="large" color={colors.primary} />
-            <Text style={styles.loadingText}>Loading FieldSales Pro...</Text>
+            <Text style={styles.loadingText}>Φόρτωση FieldSales Pro...</Text>
             <Text style={styles.debugText}>{getLocalUri()}</Text>
           </View>
         )}
@@ -164,12 +299,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     justifyContent: 'center',
     alignItems: 'center',
-  debugText: {
-    marginTop: 8,
-    fontSize: 11,
-    color: colors.textSecondary,
-    opacity: 0.6,
-  },
     backgroundColor: colors.background,
     zIndex: 10,
   },
@@ -177,6 +306,12 @@ const styles = StyleSheet.create({
     marginTop: 12,
     fontSize: 16,
     color: colors.textSecondary,
+  },
+  debugText: {
+    marginTop: 8,
+    fontSize: 11,
+    color: colors.textSecondary,
+    opacity: 0.6,
   },
   errorContainer: {
     flex: 1,
@@ -204,6 +339,24 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 8,
+  },
+  errorActionsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  secondaryButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: colors.primary,
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginRight: 10,
+  },
+  secondaryButtonText: {
+    color: colors.primary,
+    fontSize: 15,
+    fontWeight: '600',
   },
   backButtonText: {
     color: '#fff',

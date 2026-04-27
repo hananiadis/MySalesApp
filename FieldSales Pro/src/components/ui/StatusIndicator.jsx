@@ -37,6 +37,10 @@ const StatusIndicator = ({ className = '' }) => {
     return 'CheckCircle';
   };
 
+  const getConnectivityLabel = () => {
+    return status?.connectivity === 'offline' ? 'εκτός σύνδεσης' : 'σε σύνδεση';
+  };
+
   return (
     <div className={`relative ${className}`}>
       {/* Desktop Status Indicator */}
@@ -47,7 +51,7 @@ const StatusIndicator = ({ className = '' }) => {
       >
         <div className={`w-2 h-2 rounded-full ${getStatusColor()?.replace('text-', 'bg-')} animate-pulse`} />
         <span className="text-sm font-medium text-muted-foreground">
-          {status?.fieldTeamActive} Active
+          {status?.fieldTeamActive} Ενεργοί
         </span>
         <Icon name="Info" size={14} className="text-muted-foreground" />
       </div>
@@ -63,26 +67,26 @@ const StatusIndicator = ({ className = '' }) => {
         <div className="absolute top-full right-0 mt-2 w-72 bg-popover border border-border rounded-lg shadow-elevation z-50 p-4">
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold text-foreground">System Status</h3>
+              <h3 className="font-semibold text-foreground">Κατάσταση Συστήματος</h3>
               <div className="flex items-center space-x-1">
                 <div className={`w-2 h-2 rounded-full ${getStatusColor()?.replace('text-', 'bg-')}`} />
                 <span className="text-xs text-muted-foreground capitalize">
-                  {status?.connectivity}
+                  {getConnectivityLabel()}
                 </span>
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1">
-                <div className="text-xs text-muted-foreground">Field Team</div>
+                <div className="text-xs text-muted-foreground">Ομάδα Πεδίου</div>
                 <div className="flex items-center space-x-1">
                   <Icon name="Users" size={14} className="text-primary" />
-                  <span className="text-sm font-medium">{status?.fieldTeamActive} Active</span>
+                  <span className="text-sm font-medium">{status?.fieldTeamActive} Ενεργοί</span>
                 </div>
               </div>
 
               <div className="space-y-1">
-                <div className="text-xs text-muted-foreground">Completion Rate</div>
+                <div className="text-xs text-muted-foreground">Ποσοστό Ολοκλήρωσης</div>
                 <div className="flex items-center space-x-1">
                   <Icon name="Target" size={14} className="text-accent" />
                   <span className="text-sm font-medium">{status?.visitCompletionRate}%</span>
@@ -92,22 +96,22 @@ const StatusIndicator = ({ className = '' }) => {
 
             <div className="pt-2 border-t border-border">
               <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span>Last sync</span>
+                <span>Τελευταίος συγχρονισμός</span>
                 <span>{status?.lastSync?.toLocaleTimeString()}</span>
               </div>
             </div>
 
             <div className="grid grid-cols-3 gap-2 pt-2">
               <div className="text-center">
-                <div className="text-xs text-muted-foreground">Visits</div>
+                <div className="text-xs text-muted-foreground">Επισκέψεις</div>
                 <div className="text-sm font-medium text-foreground">24</div>
               </div>
               <div className="text-center">
-                <div className="text-xs text-muted-foreground">Pending</div>
+                <div className="text-xs text-muted-foreground">Σε εκκρεμότητα</div>
                 <div className="text-sm font-medium text-warning">6</div>
               </div>
               <div className="text-center">
-                <div className="text-xs text-muted-foreground">Conflicts</div>
+                <div className="text-xs text-muted-foreground">Συγκρούσεις</div>
                 <div className="text-sm font-medium text-error">2</div>
               </div>
             </div>

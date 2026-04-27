@@ -1,48 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Icon from '../../../components/AppIcon';
 
-const TeamStatusMap = ({ className = '' }) => {
+const COLORS = ['#2563EB', '#059669', '#DC2626', '#7C3AED', '#D97706', '#0891B2'];
+
+const TeamStatusMap = ({ className = '', salesmen = null }) => {
   const [selectedTerritory, setSelectedTerritory] = useState(null);
   const [mapView, setMapView] = useState('territories');
 
-  const territoryData = [
-    {
-      id: 'north',
-      name: 'North Territory',
-      salesman: 'John Martinez',
-      color: '#2563EB',
-      visitProgress: { completed: 8, planned: 12 },
-      currentLocation: { lat: 40.7589, lng: -73.9851 },
-      status: 'active'
-    },
-    {
-      id: 'south',
-      name: 'South Territory',
-      salesman: 'Sarah Chen',
-      color: '#059669',
-      visitProgress: { completed: 6, planned: 10 },
-      currentLocation: { lat: 40.7282, lng: -73.7949 },
-      status: 'active'
-    },
-    {
-      id: 'east',
-      name: 'East Territory',
-      salesman: 'Michael Johnson',
-      color: '#DC2626',
-      visitProgress: { completed: 4, planned: 8 },
-      currentLocation: { lat: 40.6892, lng: -74.0445 },
-      status: 'break'
-    },
-    {
-      id: 'west',
-      name: 'West Territory',
-      salesman: 'Emily Rodriguez',
-      color: '#7C3AED',
-      visitProgress: { completed: 9, planned: 11 },
-      currentLocation: { lat: 40.7505, lng: -73.9934 },
-      status: 'active'
-    }
-  ];
+  // Build territoryData from real salesmen prop
+  const territoryData = (salesmen || []).map((s, idx) => ({
+    id: s.uid,
+    name: s.territory || s.displayName,
+    salesman: s.displayName,
+    color: COLORS[idx % COLORS.length],
+    visitProgress: { completed: s.visitsCompleted, planned: s.visitsPlanned },
+    status: s.visitsInProgress > 0 || s.visitsCompleted > 0 ? 'active' : 'offline',
+  }));
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -66,7 +39,7 @@ const TeamStatusMap = ({ className = '' }) => {
     <div className={`bg-card border border-border rounded-lg ${className}`}>
       <div className="p-4 border-b border-border">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-foreground">Live Territory Map</h3>
+          <h3 className="text-lg font-semibold text-foreground">Ζωντανός Χάρτης Περιοχών</h3>
           <div className="flex items-center space-x-2">
             <button
               onClick={() => setMapView('territories')}
@@ -74,7 +47,7 @@ const TeamStatusMap = ({ className = '' }) => {
                 mapView === 'territories' ?'bg-primary text-primary-foreground' :'text-muted-foreground hover:text-foreground'
               }`}
             >
-              Territories
+              Περιοχές
             </button>
             <button
               onClick={() => setMapView('visits')}
@@ -82,7 +55,7 @@ const TeamStatusMap = ({ className = '' }) => {
                 mapView === 'visits' ?'bg-primary text-primary-foreground' :'text-muted-foreground hover:text-foreground'
               }`}
             >
-              Visits
+              Επισκέψεις
             </button>
           </div>
         </div>
@@ -137,6 +110,13 @@ const TeamStatusMap = ({ className = '' }) => {
       </div>
       {/* Territory Legend */}
       <div className="p-4 border-t border-border">
+        {salesmen === null && (
+          <div className="flex space-x-3 animate-pulse">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="flex-1 h-10 bg-muted rounded" />
+            ))}
+          </div>
+        )}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {territoryData?.map((territory) => (
             <div
@@ -156,7 +136,7 @@ const TeamStatusMap = ({ className = '' }) => {
                   {territory?.name}
                 </div>
                 <div className="text-xs text-muted-foreground">
-                  {territory?.visitProgress?.completed}/{territory?.visitProgress?.planned} visits
+                  {territory?.visitProgress?.completed}/{territory?.visitProgress?.planned} επισκέψεις
                 </div>
               </div>
               <Icon
@@ -182,7 +162,7 @@ const TeamStatusMap = ({ className = '' }) => {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <div className="text-xs text-muted-foreground">Salesman</div>
+              <div className="text-xs text-muted-foreground">Πωλητής</div>
               <div className="text-sm font-medium text-foreground">
                 {selectedTerritory?.salesman}
               </div>
@@ -190,7 +170,7 @@ const TeamStatusMap = ({ className = '' }) => {
             <div>
               <div className="text-xs text-muted-foreground">Progress</div>
               <div className="text-sm font-medium text-foreground">
-                {selectedTerritory?.visitProgress?.completed}/{selectedTerritory?.visitProgress?.planned} visits
+                {selectedTerritory?.visitProgress?.completed}/{selectedTerritory?.visitProgress?.planned} επισκέψεις
               </div>
             </div>
           </div>

@@ -129,7 +129,7 @@ const SuperMarketStoreDetailsScreen = ({ navigation, route }) => {
   };
 
   return (
-    <SafeAreaView style={[styles.screen, { paddingTop: insets.top || 12 }]}>
+    <SafeAreaView style={[styles.screen, { paddingTop: insets.top || 12, paddingBottom: insets.bottom }]}>
       <View style={styles.header}>
         <TouchableOpacity style={styles.backButton} onPress={handleBack}>
           <Ionicons name="arrow-back" size={22} color="#1f4f8f" />

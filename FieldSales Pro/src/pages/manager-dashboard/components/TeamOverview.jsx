@@ -2,78 +2,22 @@ import React, { useState } from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 
-const TeamOverview = ({ className = '' }) => {
+const TeamOverview = ({ className = '', salesmen = null }) => {
   const [selectedMember, setSelectedMember] = useState(null);
 
-  const teamData = [
-  {
-    id: 1,
-    name: 'John Martinez',
-    avatar: "/assets/images/avatar-placeholder.png",
-    avatarAlt: 'Professional headshot of Hispanic man with short dark hair in navy suit',
-    territory: 'North Territory',
-    status: 'active',
-    currentLocation: 'Acme Corporation',
-    visitsToday: { completed: 8, planned: 12 },
-    efficiency: 92,
-    lastUpdate: new Date(Date.now() - 300000),
-    todayStats: {
-      distance: '45.2 km',
-      timeSpent: '6.5 hrs',
-      outcomes: { positive: 6, neutral: 2, negative: 0 }
-    }
-  },
-  {
-    id: 2,
-    name: 'Sarah Chen',
-    avatar: "/assets/images/avatar-placeholder.png",
-    avatarAlt: 'Professional headshot of Asian woman with long black hair in white blazer',
-    territory: 'South Territory',
-    status: 'active',
-    currentLocation: 'Tech Solutions Inc',
-    visitsToday: { completed: 6, planned: 10 },
-    efficiency: 88,
-    lastUpdate: new Date(Date.now() - 600000),
-    todayStats: {
-      distance: '38.7 km',
-      timeSpent: '5.2 hrs',
-      outcomes: { positive: 4, neutral: 2, negative: 0 }
-    }
-  },
-  {
-    id: 3,
-    name: 'Michael Johnson',
-    avatar: "/assets/images/avatar-placeholder.png",
-    avatarAlt: 'Professional headshot of African American man with beard in dark suit',
-    territory: 'East Territory',
-    status: 'break',
-    currentLocation: 'Lunch Break',
-    visitsToday: { completed: 4, planned: 8 },
-    efficiency: 75,
-    lastUpdate: new Date(Date.now() - 900000),
-    todayStats: {
-      distance: '22.1 km',
-      timeSpent: '3.8 hrs',
-      outcomes: { positive: 2, neutral: 1, negative: 1 }
-    }
-  },
-  {
-    id: 4,
-    name: 'Emily Rodriguez',
-    avatar: "/assets/images/avatar-placeholder.png",
-    avatarAlt: 'Professional headshot of Latina woman with brown hair in blue business suit',
-    territory: 'West Territory',
-    status: 'active',
-    currentLocation: 'StartUp Hub',
-    visitsToday: { completed: 9, planned: 11 },
-    efficiency: 95,
-    lastUpdate: new Date(Date.now() - 180000),
-    todayStats: {
-      distance: '52.3 km',
-      timeSpent: '7.1 hrs',
-      outcomes: { positive: 7, neutral: 2, negative: 0 }
-    }
-  }];
+  // Derive display data from real API response
+  const teamData = (salesmen || []).map((s) => {
+    const status = s.visitsInProgress > 0 ? 'active' : s.visitsCompleted > 0 ? 'active' : 'offline';
+    return {
+      id: s.uid,
+      name: s.displayName,
+      territory: s.territory || '—',
+      status,
+      visitsToday: { completed: s.visitsCompleted, planned: s.visitsPlanned },
+      efficiency: s.efficiency,
+      lastActivityAt: s.lastActivityAt,
+    };
+  });
 
 
   const getStatusColor = (status) => {
@@ -101,33 +45,58 @@ const TeamOverview = ({ className = '' }) => {
   };
 
   const formatTimeAgo = (timestamp) => {
+    if (!timestamp) return '';
     const now = new Date();
-    const diff = now - timestamp;
+    const diff = now - new Date(timestamp);
     const minutes = Math.floor(diff / 60000);
+    if (minutes < 1) return 'Μόλις τώρα';
+    if (minutes < 60) return `${minutes}λ πριν`;
+    return `${Math.floor(minutes / 60)}ω πριν`;
+  };
 
-    if (minutes < 1) return 'Just now';
-    if (minutes < 60) return `${minutes}m ago`;
-    return `${Math.floor(minutes / 60)}h ago`;
+  const getInitials = (name = '') => {
+    const parts = name.trim().split(' ');
+    if (parts.length >= 2) return `${parts[0][0]}${parts[1][0]}`.toUpperCase();
+    return (name.slice(0, 2) || '?').toUpperCase();
   };
 
   return (
     <div className={`bg-card border border-border rounded-lg ${className}`}>
       <div className="p-4 border-b border-border">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-foreground">Team Overview</h3>
+          <h3 className="text-lg font-semibold text-foreground">Επισκόπηση Ομάδας</h3>
           <div className="flex items-center space-x-2">
             <div className="flex items-center space-x-1">
               <div className="w-2 h-2 bg-success rounded-full" />
-              <span className="text-xs text-muted-foreground">3 Active</span>
+              <span className="text-xs text-muted-foreground">
+                {teamData.filter((m) => m.status === 'active').length} Ενεργοί
+              </span>
             </div>
             <div className="flex items-center space-x-1">
-              <div className="w-2 h-2 bg-warning rounded-full" />
-              <span className="text-xs text-muted-foreground">1 Break</span>
+              <div className="w-2 h-2 bg-error rounded-full" />
+              <span className="text-xs text-muted-foreground">
+                {teamData.filter((m) => m.status === 'offline').length} Εκτός
+              </span>
             </div>
           </div>
         </div>
       </div>
       <div className="p-4">
+        {salesmen === null && (
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="p-3 border border-border rounded-lg animate-pulse">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 rounded-full bg-muted" />
+                  <div className="flex-1 space-y-2">
+                    <div className="h-3 bg-muted rounded w-32" />
+                    <div className="h-2 bg-muted rounded w-24" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
         <div className="space-y-3">
           {teamData?.map((member) =>
           <div
@@ -139,15 +108,14 @@ const TeamOverview = ({ className = '' }) => {
 
               <div className="flex items-center space-x-3">
                 <div className="relative">
-                  <img
-                  src={member?.avatar}
-                  alt={member?.avatarAlt}
-                  className="w-10 h-10 rounded-full object-cover" />
-
+                  <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                    <span className="text-sm font-semibold text-primary">
+                      {getInitials(member?.name)}
+                    </span>
+                  </div>
                   <div className={`absolute -bottom-1 -right-1 w-3 h-3 rounded-full border-2 border-card ${
-                member?.status === 'active' ? 'bg-success' :
-                member?.status === 'break' ? 'bg-warning' : 'bg-error'}`
-                } />
+                    member?.status === 'active' ? 'bg-success' : 'bg-error'}`
+                  } />
                 </div>
 
                 <div className="flex-1 min-w-0">
@@ -165,9 +133,11 @@ const TeamOverview = ({ className = '' }) => {
                     <span className="text-sm text-muted-foreground">
                       {member?.territory}
                     </span>
-                    <span className="text-xs text-muted-foreground">
-                      {formatTimeAgo(member?.lastUpdate)}
-                    </span>
+                    {member?.lastActivityAt && (
+                      <span className="text-xs text-muted-foreground">
+                        {formatTimeAgo(member?.lastActivityAt)}
+                      </span>
+                    )}
                   </div>
                 </div>
 
@@ -176,7 +146,7 @@ const TeamOverview = ({ className = '' }) => {
                     {member?.visitsToday?.completed}/{member?.visitsToday?.planned}
                   </div>
                   <div className={`text-xs font-medium ${getEfficiencyColor(member?.efficiency)}`}>
-                    {member?.efficiency}% efficiency
+                    {member?.efficiency}% αποδοτικότητα
                   </div>
                 </div>
 
@@ -190,50 +160,32 @@ const TeamOverview = ({ className = '' }) => {
               {/* Expanded Details */}
               {selectedMember?.id === member?.id &&
             <div className="mt-4 pt-4 border-t border-border">
-                  <div className="grid grid-cols-2 gap-4 mb-4">
+                  <div className="grid grid-cols-3 gap-4 mb-4">
                     <div>
-                      <div className="text-xs text-muted-foreground">Current Location</div>
-                      <div className="text-sm font-medium text-foreground">
-                        {member?.currentLocation}
-                      </div>
+                      <div className="text-xs text-muted-foreground">Ολοκληρωμένες</div>
+                      <div className="text-sm font-medium text-success">{member?.visitsToday?.completed}</div>
                     </div>
                     <div>
-                      <div className="text-xs text-muted-foreground">Distance Traveled</div>
-                      <div className="text-sm font-medium text-foreground">
-                        {member?.todayStats?.distance}
-                      </div>
+                      <div className="text-xs text-muted-foreground">Προγραμματισμένες</div>
+                      <div className="text-sm font-medium text-foreground">{member?.visitsToday?.planned}</div>
                     </div>
                     <div>
-                      <div className="text-xs text-muted-foreground">Time Spent</div>
-                      <div className="text-sm font-medium text-foreground">
-                        {member?.todayStats?.timeSpent}
-                      </div>
-                    </div>
-                    <div>
-                      <div className="text-xs text-muted-foreground">Outcomes</div>
-                      <div className="flex space-x-2">
-                        <span className="text-xs text-success">
-                          +{member?.todayStats?.outcomes?.positive}
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          ={member?.todayStats?.outcomes?.neutral}
-                        </span>
-                        <span className="text-xs text-error">
-                          -{member?.todayStats?.outcomes?.negative}
-                        </span>
+                      <div className="text-xs text-muted-foreground">Αποδοτικότητα</div>
+                      <div className={`text-sm font-medium ${member?.efficiency >= 90 ? 'text-success' : member?.efficiency >= 70 ? 'text-warning' : 'text-error'}`}>
+                        {member?.efficiency}%
                       </div>
                     </div>
                   </div>
 
                   <div className="flex space-x-2">
                     <Button variant="outline" size="sm" iconName="MapPin">
-                      Track Location
+                      Παρακολούθηση Τοποθεσίας
                     </Button>
                     <Button variant="outline" size="sm" iconName="MessageSquare">
-                      Message
+                      Μήνυμα
                     </Button>
                     <Button variant="outline" size="sm" iconName="Phone">
-                      Call
+                      Κλήση
                     </Button>
                   </div>
                 </div>
@@ -244,7 +196,7 @@ const TeamOverview = ({ className = '' }) => {
       </div>
       <div className="p-4 border-t border-border">
         <Button variant="outline" className="w-full" iconName="Users">
-          View Detailed Team Report
+          Προβολή Αναλυτικής Αναφοράς Ομάδας
         </Button>
       </div>
     </div>);

@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert, ActivityIndicator, FlatList, Modal, SafeAreaView, Image } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useExpense } from '../context/ExpenseContext';
 import SafeScreen from '../components/SafeScreen';
 import { Ionicons } from '@expo/vector-icons';
 import { SvgUri } from 'react-native-svg';
-import { getWeekId, WEEKDAYS, validateWeeklyTracking, formatDateDDMMYYYY, getMondayFromWeekId, getCategoryLabel, INVOICE_TYPE_LABELS, PAYMENT_METHODS, INVOICE_TYPES, EXPENSE_STATUS } from '../constants/expenseConstants';
+import { getWeekId, WEEKDAYS, validateWeeklyTracking, formatDateDDMMYYYY, getMondayFromWeekId, getCategoryLabel, INVOICE_TYPE_LABELS, PAYMENT_METHODS, INVOICE_TYPES, EXPENSE_STATUS, getAllCategoryGroups, getCategoriesByGroup, EXPENSE_GROUPS } from '../constants/expenseConstants';
 import ExpenseDetailModal from '../components/ExpenseDetailModal';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import debounce from 'lodash.debounce';
@@ -38,9 +39,21 @@ const MONTHS = [
   'Δεκεμβρίου'
 ];
 
+const TOKENS = {
+  primaryBlue: '#185FA5',
+  surface: '#fff',
+  border: '#e0ddd6',
+  borderSoft: '#e8e5de',
+  textPrimary: '#1a1a1a',
+  textSecondary: '#888',
+  pageBackground: '#f7f5f0',
+  lightBlueBg: '#E6F1FB',
+};
+
 const WeeklyTrackingScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
+  const insets = useSafeAreaInsets();
   const { currentUserId, fetchWeeklyTracking, saveTracking, submitWeeklyReportToManager, expenses, deleteExistingExpense } = useExpense();
 
   // Params & State
@@ -52,6 +65,9 @@ const WeeklyTrackingScreen = () => {
   const [weekStatus, setWeekStatus] = useState(EXPENSE_STATUS.DRAFT);
   const [reviewNote, setReviewNote] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
+  const [categoryMenuVisible, setCategoryMenuVisible] = useState(false);
+  const [selectedGroup, setSelectedGroup] = useState(null);
+  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
   const [selectedExpenseId, setSelectedExpenseId] = useState(null);
   const hydratingRef = useRef(false);
 
@@ -73,6 +89,11 @@ const WeeklyTrackingScreen = () => {
   const [givenCash, setGivenCash] = useState('');
   const [locations, setLocations] = useState({});
   const [previousCashBalance, setPreviousCashBalance] = useState(0);
+
+  const categoriesByGroup = useMemo(
+    () => getAllCategoryGroups().map((group) => ({ group, categories: getCategoriesByGroup(group) })),
+    []
+  );
 
   const lastCarKey = useMemo(() => {
     if (!currentUserId) return null;
@@ -398,6 +419,7 @@ const WeeklyTrackingScreen = () => {
   };
 
   const handleEditExpense = (id) => {
+    setSelectedCategoryId(null);
     setSelectedExpenseId(id);
     setModalVisible(true);
   };
@@ -411,8 +433,102 @@ const WeeklyTrackingScreen = () => {
 
   const handleAddExpense = () => {
     setSelectedExpenseId(null);
-    setModalVisible(true);
+    setSelectedCategoryId(null);
+    setSelectedGroup(null);
+    setCategoryMenuVisible(true);
   };
+
+  const handleGroupSelect = useCallback((group) => {
+    setSelectedGroup(group);
+  }, []);
+
+  const handleCategorySelect = useCallback((categoryId) => {
+    setCategoryMenuVisible(false);
+    setSelectedGroup(null);
+    setSelectedCategoryId(categoryId);
+    setSelectedExpenseId(null);
+    setModalVisible(true);
+  }, []);
+
+  const handleCloseCategoryMenu = useCallback(() => {
+    setCategoryMenuVisible(false);
+    setSelectedGroup(null);
+  }, []);
+
+  const getGroupColor = useCallback((group) => {
+    switch (group) {
+      case EXPENSE_GROUPS.TRANSPORT:
+        return TOKENS.primaryBlue;
+      case EXPENSE_GROUPS.ACCOMMODATION:
+        return '#FCEFDA';
+      case EXPENSE_GROUPS.MEALS:
+        return '#FDECE2';
+      case EXPENSE_GROUPS.REPRESENTATION:
+        return '#EDE9FE';
+      case EXPENSE_GROUPS.OTHER:
+      default:
+        return '#E9EDF2';
+    }
+  }, []);
+
+  const getGroupIconColor = useCallback((group) => {
+    if (group === EXPENSE_GROUPS.TRANSPORT) {
+      return TOKENS.surface;
+    }
+    return TOKENS.textPrimary;
+  }, []);
+
+  const getCategoryIconColor = useCallback((group) => {
+    if (group === EXPENSE_GROUPS.TRANSPORT) {
+      return TOKENS.surface;
+    }
+    return TOKENS.textPrimary;
+  }, []);
+
+  const getGroupIconName = useCallback((group) => {
+    switch (group) {
+      case EXPENSE_GROUPS.TRANSPORT:
+        return 'car-sport-outline';
+      case EXPENSE_GROUPS.ACCOMMODATION:
+        return 'bed-outline';
+      case EXPENSE_GROUPS.MEALS:
+        return 'restaurant-outline';
+      case EXPENSE_GROUPS.REPRESENTATION:
+        return 'people-outline';
+      case EXPENSE_GROUPS.OTHER:
+      default:
+        return 'pricetag-outline';
+    }
+  }, []);
+
+  const getCategoryIconName = useCallback((categoryId) => {
+    switch (categoryId) {
+      case 'fuel':
+      case 'adblue':
+        return 'car-outline';
+      case 'tickets':
+        return 'ticket-outline';
+      case 'taxi':
+        return 'car-outline';
+      case 'hotel':
+        return 'business-outline';
+      case 'personal_meal':
+      case 'third_party_meal':
+        return 'restaurant-outline';
+      case 'car_service':
+        return 'build-outline';
+      case 'parking':
+        return 'car-outline';
+      case 'tolls':
+        return 'trail-sign-outline';
+      case 'office_supplies':
+        return 'document-text-outline';
+      case 'representation':
+        return 'people-outline';
+      default:
+        return 'pricetag-outline';
+    }
+  }, []);
 
   const handleClear = useCallback(() => {
     Alert.alert('Καθαρισμός', 'Να καθαριστούν όλα τα πεδία αυτής της εβδομάδας; (Δεν επηρεάζει ό,τι έχει αποθηκευτεί στο Firestore μέχρι να πατήσεις Αποθήκευση)', [
@@ -537,7 +653,7 @@ const WeeklyTrackingScreen = () => {
   const statusMeta = useMemo(() => {
     if (effectiveWeekStatus === EXPENSE_STATUS.APPROVED) return { bg: '#DCFCE7', fg: '#166534' };
     if (effectiveWeekStatus === EXPENSE_STATUS.SUBMITTED) return { bg: '#FEF3C7', fg: '#92400E' };
-    return { bg: '#E5E7EB', fg: '#111827' };
+    return { bg: TOKENS.lightBlueBg, fg: TOKENS.primaryBlue };
   }, [effectiveWeekStatus]);
 
   // Render Expense Item
@@ -567,7 +683,7 @@ const WeeklyTrackingScreen = () => {
   if (loading) {
     return (
       <SafeScreen title="Καταγραφή Εβδομάδας" headerLeft={<BackToExpensesButton />}>
-        <ActivityIndicator size='large' color='#007AFF' style={{ marginTop: 50 }} />
+        <ActivityIndicator size='large' color={TOKENS.primaryBlue} style={{ marginTop: 50 }} />
       </SafeScreen>
     );
   }
@@ -585,8 +701,8 @@ const WeeklyTrackingScreen = () => {
       <View style={styles.container}>
         <View style={styles.weekNavRow}>
           <TouchableOpacity onPress={handlePrevWeek} style={styles.weekNavBtn}>
-            <Ionicons name='chevron-back' size={18} color='#0F172A' />
-            <Text style={styles.weekNavText}>Προηγ.</Text>
+            <Ionicons name='chevron-back' size={18} color={TOKENS.textPrimary} />
+            <Text style={styles.weekNavText}>Προηγούμενη</Text>
           </TouchableOpacity>
           <View style={{ alignItems: 'center' }}>
             <Text style={styles.subTitle}>{weekId}</Text>
@@ -595,8 +711,8 @@ const WeeklyTrackingScreen = () => {
             </View>
           </View>
           <TouchableOpacity onPress={handleNextWeek} style={styles.weekNavBtn}>
-            <Text style={styles.weekNavText}>Επόμ.</Text>
-            <Ionicons name='chevron-forward' size={18} color='#0F172A' />
+            <Text style={styles.weekNavText}>Επόμενη</Text>
+            <Ionicons name='chevron-forward' size={18} color={TOKENS.textPrimary} />
           </TouchableOpacity>
         </View>
 
@@ -640,9 +756,9 @@ const WeeklyTrackingScreen = () => {
                   {selectedCarId ? (
                     <CarBrandLogo logoUrl={selectedCarBrand?.logoUrl} size={18} />
                   ) : (
-                    <Ionicons name="car-outline" size={18} color="#94A3B8" />
+                    <Ionicons name="car-outline" size={18} color={TOKENS.textSecondary} />
                   )}
-                  <Text style={[styles.carSelectText, { color: selectedCarId ? '#111827' : '#94A3B8' }]} numberOfLines={1}>
+                  <Text style={[styles.carSelectText, { color: selectedCarId ? TOKENS.textPrimary : TOKENS.textSecondary }]} numberOfLines={1}>
                     {getSelectedCarLabel()}
                   </Text>
                 </View>
@@ -751,8 +867,73 @@ const WeeklyTrackingScreen = () => {
         <ExpenseDetailModal 
           visible={modalVisible} 
           expenseId={selectedExpenseId} 
+          categoryId={selectedCategoryId}
           onClose={() => setModalVisible(false)} 
         />
+
+        <Modal visible={categoryMenuVisible} transparent animationType='fade' onRequestClose={handleCloseCategoryMenu}>
+          <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={handleCloseCategoryMenu}>
+            <View style={[styles.menuContainer, { paddingBottom: Math.max(insets.bottom, 16) + 10 }]}>
+              <View style={styles.menuHandle} />
+
+              {!selectedGroup ? (
+                <>
+                  <View style={styles.menuHeader}>
+                    <Text style={styles.menuTitle}>Επιλέξτε Κατηγορία</Text>
+                    <Text style={styles.menuSubtitle}>Επιλέξτε ομάδα εξόδων για γρήγορη καταχώρηση.</Text>
+                  </View>
+
+                  <View style={styles.menuCard}>
+                    {categoriesByGroup.map((groupItem) => (
+                      <TouchableOpacity
+                        key={groupItem.group}
+                        style={styles.menuItem}
+                        onPress={() => handleGroupSelect(groupItem.group)}
+                        activeOpacity={0.85}
+                      >
+                        <View style={[styles.menuIcon, { backgroundColor: getGroupColor(groupItem.group) }]}>
+                          <Ionicons name={getGroupIconName(groupItem.group)} size={18} color={getGroupIconColor(groupItem.group)} />
+                        </View>
+                        <Text style={styles.menuItemText}>{groupItem.group}</Text>
+                        <Ionicons name='chevron-forward' size={16} color={TOKENS.textSecondary} />
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </>
+              ) : (
+                <>
+                  <View style={styles.menuHeader}>
+                    <TouchableOpacity style={styles.menuBackButton} onPress={() => setSelectedGroup(null)} activeOpacity={0.8}>
+                      <Ionicons name='arrow-back' size={15} color={TOKENS.primaryBlue} />
+                      <Text style={styles.menuBackButtonText}>Πίσω</Text>
+                    </TouchableOpacity>
+                    <Text style={styles.menuTitle}>{selectedGroup}</Text>
+                    <Text style={styles.menuSubtitle}>Επιλέξτε κατηγορία για νέο έξοδο.</Text>
+                  </View>
+
+                  <View style={styles.menuCard}>
+                    {categoriesByGroup
+                      .find((groupItem) => groupItem.group === selectedGroup)
+                      ?.categories.map((category) => (
+                        <TouchableOpacity
+                          key={category.id}
+                          style={styles.menuItem}
+                          onPress={() => handleCategorySelect(category.id)}
+                          activeOpacity={0.85}
+                        >
+                          <View style={[styles.menuIcon, { backgroundColor: getGroupColor(selectedGroup) }]}>
+                            <Ionicons name={getCategoryIconName(category.id)} size={18} color={getCategoryIconColor(selectedGroup)} />
+                          </View>
+                          <Text style={styles.menuItemText}>{category.label}</Text>
+                          <Ionicons name='chevron-forward' size={16} color={TOKENS.textSecondary} />
+                        </TouchableOpacity>
+                      ))}
+                  </View>
+                </>
+              )}
+            </View>
+          </TouchableOpacity>
+        </Modal>
 
         {/* CARS SELECTION MODAL */}
         <Modal
@@ -771,7 +952,7 @@ const WeeklyTrackingScreen = () => {
 
             {cars.length === 0 ? (
               <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20 }}>
-                <Text style={{ fontSize: 16, color: '#6B7280', textAlign: 'center' }}>
+                <Text style={{ fontSize: 16, color: TOKENS.textSecondary, textAlign: 'center' }}>
                   Δεν υπάρχουν διαθέσιμα αυτοκίνητα
                 </Text>
               </View>
@@ -805,9 +986,9 @@ const WeeklyTrackingScreen = () => {
                         <Text style={styles.carItemLicense}>{item.color} • {item.licensePlate}</Text>
                       </View>
                       {selectedCarId === item.id ? (
-                        <Ionicons name="checkmark-circle" size={22} color="#2563EB" />
+                        <Ionicons name="checkmark-circle" size={22} color={TOKENS.primaryBlue} />
                       ) : (
-                        <Ionicons name="chevron-forward" size={18} color="#9CA3AF" />
+                        <Ionicons name="chevron-forward" size={18} color={TOKENS.textSecondary} />
                       )}
                     </View>
                   </TouchableOpacity>
@@ -822,71 +1003,154 @@ const WeeklyTrackingScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F7F9FC' },
-  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, backgroundColor: '#fff', borderBottomColor: '#E5E7EB', borderBottomWidth: 1 },
-  title: { fontSize: 18, fontWeight: '700', color: '#0F172A' },
+  container: { flex: 1, backgroundColor: TOKENS.pageBackground },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, backgroundColor: TOKENS.surface, borderBottomColor: TOKENS.border, borderBottomWidth: 1 },
+  title: { fontSize: 18, fontWeight: '700', color: TOKENS.textPrimary },
   weekNavRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingTop: 8 },
-  weekNavBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 6, paddingHorizontal: 10, backgroundColor: '#fff', borderWidth: 1, borderColor: '#E5E7EB', borderRadius: 999 },
-  weekNavText: { fontSize: 12, fontWeight: '700', color: '#0F172A' },
-  subTitle: { fontSize: 12, color: '#6B7280', textAlign: 'center' },
+  weekNavBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, paddingVertical: 6, paddingHorizontal: 10, backgroundColor: TOKENS.surface, borderWidth: 1, borderColor: TOKENS.border, borderRadius: 999 },
+  weekNavText: { fontSize: 12, fontWeight: '700', color: TOKENS.textPrimary },
+  subTitle: { fontSize: 12, color: TOKENS.textSecondary, textAlign: 'center' },
   statusBadge: { marginTop: 6, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999 },
   statusBadgeText: { fontSize: 11, fontWeight: '900' },
   reviewBanner: { marginHorizontal: 16, marginTop: 10, flexDirection: 'row', gap: 8, alignItems: 'flex-start', backgroundColor: '#FFFBEB', borderWidth: 1, borderColor: '#FDE68A', padding: 10, borderRadius: 10 },
   reviewBannerText: { flex: 1, color: '#92400E', fontWeight: '700', fontSize: 12, lineHeight: 16 },
-  saveBtn: { backgroundColor: '#007AFF', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 6 },
+  saveBtn: { backgroundColor: TOKENS.primaryBlue, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
   saveBtnText: { color: 'white', fontWeight: '600', fontSize: 13 },
   actionsRow: { paddingHorizontal: 16, paddingTop: 10, flexDirection: 'row', gap: 10 },
-  submitBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: '#7C3AED', paddingVertical: 10, borderRadius: 10 },
+  submitBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: TOKENS.primaryBlue, paddingVertical: 10, borderRadius: 10 },
   submitBtnText: { color: 'white', fontWeight: '800', fontSize: 13 },
   clearBtn: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: '#EF4444', paddingVertical: 10, borderRadius: 10 },
   clearBtnText: { color: 'white', fontWeight: '800', fontSize: 13 },
   scrollContent: { padding: 16 },
   splitRow: { flexDirection: 'row', gap: 16 },
-  leftCol: { flex: 1, backgroundColor: '#fff', padding: 12, borderRadius: 8, borderWidth: 1, borderColor: '#E5E7EB' },
-  rightCol: { flex: 1.5, backgroundColor: '#fff', padding: 12, borderRadius: 8, borderWidth: 1, borderColor: '#E5E7EB'  },
-  sectionTitle: { fontSize: 14, fontWeight: '700', color: '#111827', marginBottom: 8 },
-  inputLabel: { fontSize: 11, color: '#6B7280', marginBottom: 2 },
-  input: { backgroundColor: '#F9FAFB', borderWidth: 1, borderColor: '#D1D5DB', borderRadius: 4, padding: 6, fontSize: 13, marginBottom: 8 },
+  leftCol: { flex: 1, backgroundColor: TOKENS.surface, padding: 12, borderRadius: 12, borderWidth: 1, borderColor: TOKENS.border },
+  rightCol: { flex: 1.5, backgroundColor: TOKENS.surface, padding: 12, borderRadius: 12, borderWidth: 1, borderColor: TOKENS.border  },
+  sectionTitle: { fontSize: 14, fontWeight: '700', color: TOKENS.textPrimary, marginBottom: 8 },
+  inputLabel: { fontSize: 11, color: TOKENS.textSecondary, marginBottom: 2 },
+  input: { backgroundColor: TOKENS.surface, borderWidth: 1, borderColor: TOKENS.border, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 7, fontSize: 13, marginBottom: 8 },
   carSelectRow: { flexDirection: 'row', alignItems: 'center' },
   carSelectText: { marginLeft: 8, fontSize: 13, flex: 1 },
-  brandLogoFallback: { backgroundColor: '#E5E7EB', borderWidth: 1, borderColor: '#D1D5DB' },
-  readonlyInput: { backgroundColor: '#F3F4F6', color: '#111827' },
-  infoText: { fontSize: 12, color: '#4B5563', marginBottom: 4 },
+  brandLogoFallback: { backgroundColor: TOKENS.borderSoft, borderWidth: 1, borderColor: TOKENS.border },
+  readonlyInput: { backgroundColor: TOKENS.pageBackground, color: TOKENS.textPrimary },
+  infoText: { fontSize: 12, color: TOKENS.textSecondary, marginBottom: 4 },
   infoTextBusiness: { fontSize: 12, color: '#059669', fontWeight: '700', marginBottom: 8 },
-  divider: { height: 1, backgroundColor: '#E5E7EB', marginVertical: 12 },
+  divider: { height: 1, backgroundColor: TOKENS.borderSoft, marginVertical: 12 },
   moneyRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 6 },
-  moneyLabel: { fontSize: 12, color: '#4B5563', fontWeight: '700', flex: 1, paddingRight: 10 },
-  moneyValue: { fontSize: 12, color: '#111827', fontWeight: '800' },
-  moneyRowStrong: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 8, marginTop: 4, borderTopWidth: 1, borderTopColor: '#E5E7EB' },
-  moneyLabelStrong: { fontSize: 12, color: '#111827', fontWeight: '900', flex: 1, paddingRight: 10 },
-  moneyValueStrong: { fontSize: 13, color: '#111827', fontWeight: '900' },
+  moneyLabel: { fontSize: 12, color: TOKENS.textSecondary, fontWeight: '700', flex: 1, paddingRight: 10 },
+  moneyValue: { fontSize: 12, color: TOKENS.textPrimary, fontWeight: '800' },
+  moneyRowStrong: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 8, marginTop: 4, borderTopWidth: 1, borderTopColor: TOKENS.border },
+  moneyLabelStrong: { fontSize: 12, color: TOKENS.textPrimary, fontWeight: '900', flex: 1, paddingRight: 10 },
+  moneyValueStrong: { fontSize: 13, color: TOKENS.textPrimary, fontWeight: '900' },
   dayRow: { marginBottom: 12 },
-  dayLabel: { fontSize: 11, color: '#4B5563', fontWeight: '600', marginBottom: 4 },
-  locationInput: { backgroundColor: '#F9FAFB', borderWidth: 1, borderColor: '#D1D5DB', borderRadius: 4, padding: 6, fontSize: 12 },
+  dayLabel: { fontSize: 11, color: TOKENS.textSecondary, fontWeight: '600', marginBottom: 4 },
+  locationInput: { backgroundColor: TOKENS.surface, borderWidth: 1, borderColor: TOKENS.border, borderRadius: 8, paddingHorizontal: 8, paddingVertical: 7, fontSize: 12 },
   expensesHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
-  addBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#10B981', paddingHorizontal: 10, paddingVertical: 6, borderRadius: 6 },
+  addBtn: { flexDirection: 'row', alignItems: 'center', backgroundColor: TOKENS.primaryBlue, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 8 },
   addBtnText: { color: 'white', fontSize: 12, fontWeight: '600', marginLeft: 4 },
-  expenseItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#fff', padding: 12, borderRadius: 8, marginBottom: 8, borderWidth: 1, borderColor: '#E5E7EB' },
+  expenseItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', backgroundColor: TOKENS.surface, padding: 12, borderRadius: 10, marginBottom: 8, borderWidth: 1, borderColor: TOKENS.border },
   expenseItemNeedsReview: { borderColor: '#F59E0B', backgroundColor: '#FFFBEB' },
   expenseLeft: { flex: 1 },
-  expenseDate: { fontSize: 10, color: '#6B7280' },
-  expenseCategory: { fontSize: 13, fontWeight: '600', color: '#1F2937' },
-  expenseDesc: { fontSize: 12, color: '#4B5563' },
+  expenseDate: { fontSize: 10, color: TOKENS.textSecondary },
+  expenseCategory: { fontSize: 13, fontWeight: '600', color: TOKENS.textPrimary },
+  expenseDesc: { fontSize: 12, color: TOKENS.textSecondary },
   reviewPillText: { marginTop: 4, fontSize: 11, fontWeight: '900', color: '#92400E' },
   expenseRight: { alignItems: 'flex-end', justifyContent: 'space-between' },
-  expenseAmount: { fontSize: 14, fontWeight: '700', color: '#0F172A', marginBottom: 4 },
+  expenseAmount: { fontSize: 14, fontWeight: '700', color: TOKENS.textPrimary, marginBottom: 4 },
   deleteBtn: { padding: 4 },
-  noExpenses: { textAlign: 'center', color: '#9CA3AF', marginVertical: 20 },
+  noExpenses: { textAlign: 'center', color: TOKENS.textSecondary, marginVertical: 20 },
 
-  modalContainer: { flex: 1, backgroundColor: '#F7F9FC' },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, backgroundColor: '#FFF', borderBottomWidth: 1, borderBottomColor: '#E5E7EB' },
-  modalTitle: { fontSize: 18, fontWeight: '700', color: '#0F172A' },
-  modalCloseButton: { fontSize: 24, color: '#6B7280' },
-  carItem: { backgroundColor: '#FFF', padding: 14, borderBottomWidth: 1, borderBottomColor: '#E5E7EB' },
-  carItemSelected: { backgroundColor: '#E0E7FF' },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.45)',
+    justifyContent: 'flex-end',
+  },
+  menuContainer: {
+    backgroundColor: TOKENS.surface,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 24,
+    maxHeight: '80%',
+    borderTopWidth: 1,
+    borderColor: TOKENS.borderSoft,
+  },
+  menuHandle: {
+    alignSelf: 'center',
+    width: 46,
+    height: 5,
+    borderRadius: 999,
+    backgroundColor: '#d6d2ca',
+    marginBottom: 14,
+  },
+  menuHeader: {
+    marginBottom: 10,
+  },
+  menuTitle: {
+    fontSize: 17,
+    fontWeight: '600',
+    color: TOKENS.textPrimary,
+  },
+  menuSubtitle: {
+    marginTop: 4,
+    fontSize: 12,
+    color: TOKENS.textSecondary,
+  },
+  menuCard: {
+    backgroundColor: TOKENS.surface,
+    borderWidth: 1,
+    borderColor: TOKENS.borderSoft,
+    borderRadius: 14,
+    overflow: 'hidden',
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    minHeight: 54,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: TOKENS.border,
+  },
+  menuIcon: {
+    width: 34,
+    height: 34,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  menuItemText: {
+    flex: 1,
+    fontSize: 14,
+    color: TOKENS.textPrimary,
+  },
+  menuBackButton: {
+    marginBottom: 10,
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderRadius: 16,
+    backgroundColor: TOKENS.lightBlueBg,
+  },
+  menuBackButtonText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: TOKENS.primaryBlue,
+  },
+
+  modalContainer: { flex: 1, backgroundColor: TOKENS.pageBackground },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, backgroundColor: TOKENS.surface, borderBottomWidth: 1, borderBottomColor: TOKENS.border },
+  modalTitle: { fontSize: 18, fontWeight: '700', color: TOKENS.textPrimary },
+  modalCloseButton: { fontSize: 24, color: TOKENS.textSecondary },
+  carItem: { backgroundColor: TOKENS.surface, padding: 14, borderBottomWidth: 1, borderBottomColor: TOKENS.border },
+  carItemSelected: { backgroundColor: TOKENS.lightBlueBg },
   carItemRow: { flexDirection: 'row', alignItems: 'center' },
-  carItemText: { fontSize: 14, fontWeight: '600', color: '#111827' },
-  carItemLicense: { fontSize: 13, color: '#6B7280', marginTop: 2 },
+  carItemText: { fontSize: 14, fontWeight: '600', color: TOKENS.textPrimary },
+  carItemLicense: { fontSize: 13, color: TOKENS.textSecondary, marginTop: 2 },
 });
 
 export default WeeklyTrackingScreen;

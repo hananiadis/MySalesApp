@@ -151,8 +151,8 @@ android {
         applicationId 'com.mysalesapp'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 2026060153
-        versionName "0.4.6.2026.27"
+        versionCode 2026180206
+        versionName "0.4.18.2026.1"
 
         buildConfigField "String", "REACT_NATIVE_RELEASE_LEVEL", "\"${findProperty('reactNativeReleaseLevel') ?: 'stable'}\""
     }

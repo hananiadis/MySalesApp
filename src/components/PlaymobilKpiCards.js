@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, Modal, TextInput } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, Modal, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import colors from '../theme/colors';
 
@@ -293,8 +294,12 @@ export default function PlaymobilKpiCards({
   selectedDate = new Date(),
   onDateChange,
 }) {
+  const insets = useSafeAreaInsets();
   const [datePickerVisible, setDatePickerVisible] = useState(false);
   const [dateInput, setDateInput] = useState('');
+  const [pickerMode, setPickerMode] = useState('calendar'); // 'calendar' | 'manual'
+  const [viewYear, setViewYear] = useState(new Date().getFullYear());
+  const [viewMonth, setViewMonth] = useState(new Date().getMonth());
   
   console.log('[PlaymobilKpiCards] render with selectedDate:', {
     date: selectedDate.toISOString(),
@@ -310,35 +315,64 @@ export default function PlaymobilKpiCards({
       month: '2-digit', 
       year: 'numeric' 
     });
+    setViewYear(selectedDate.getFullYear());
+    setViewMonth(selectedDate.getMonth());
+    setPickerMode('calendar');
     setDateInput(formattedDate);
     setDatePickerVisible(true);
+  };
+
+  const parseDateInput = (value) => {
+    if (!value) return null;
+    const parts = value.trim().split('/');
+    if (parts.length !== 3) return null;
+    const day = parseInt(parts[0], 10);
+    const month = parseInt(parts[1], 10) - 1;
+    const year = parseInt(parts[2], 10);
+    const date = new Date(year, month, day);
+    if (Number.isNaN(date.getTime())) return null;
+    if (date.getDate() !== day || date.getMonth() !== month || date.getFullYear() !== year) return null;
+    return date;
+  };
+
+  const handleCalendarPick = (day) => {
+    const picked = new Date(viewYear, viewMonth, day);
+    onDateChange?.(picked);
+    setDateInput(picked.toLocaleDateString('el-GR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+    }));
+    setDatePickerVisible(false);
+  };
+
+  const prevMonth = () => {
+    if (viewMonth === 0) {
+      setViewMonth(11);
+      setViewYear((y) => y - 1);
+    } else {
+      setViewMonth((m) => m - 1);
+    }
+  };
+
+  const nextMonth = () => {
+    if (viewMonth === 11) {
+      setViewMonth(0);
+      setViewYear((y) => y + 1);
+    } else {
+      setViewMonth((m) => m + 1);
+    }
   };
   
   const handleDateSubmit = () => {
     console.log('[PlaymobilKpiCards] Date picker submitted:', dateInput);
-    if (dateInput) {
-      // Parse DD/MM/YYYY format
-      const parts = dateInput.trim().split('/');
-      if (parts.length === 3) {
-        const day = parseInt(parts[0], 10);
-        const month = parseInt(parts[1], 10) - 1; // Month is 0-indexed
-        const year = parseInt(parts[2], 10);
-        console.log('[PlaymobilKpiCards] Parsed date:', { day, month, year });
-        const date = new Date(year, month, day);
-        if (!isNaN(date.getTime())) {
-          console.log('[PlaymobilKpiCards] Valid date created:', date.toISOString());
-          console.log('[PlaymobilKpiCards] Calling onDateChange');
-          onDateChange?.(date);
-          setDatePickerVisible(false);
-        } else {
-          console.log('[PlaymobilKpiCards] Invalid date');
-          Alert.alert('Invalid Date', 'Please enter a valid date');
-        }
-      } else {
-        console.log('[PlaymobilKpiCards] Wrong date format');
-        Alert.alert('Invalid Format', 'Please use DD/MM/YYYY format');
-      }
+    const parsed = parseDateInput(dateInput);
+    if (!parsed) {
+      Alert.alert('Μη έγκυρη ημερομηνία', 'Χρησιμοποιήστε μορφή DD/MM/YYYY.');
+      return;
     }
+    onDateChange?.(parsed);
+    setDatePickerVisible(false);
   };
 
   console.log('[PlaymobilKpiCards] render', {
@@ -416,6 +450,24 @@ export default function PlaymobilKpiCards({
     month: 'short',
     day: 'numeric',
   });
+
+  const monthNames = ['Ιαν', 'Φεβ', 'Μαρ', 'Απρ', 'Μαΐ', 'Ιουν', 'Ιουλ', 'Αυγ', 'Σεπ', 'Οκτ', 'Νοε', 'Δεκ'];
+  const dayNames = ['Κυ', 'Δε', 'Τρ', 'Τε', 'Πε', 'Πα', 'Σα'];
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+  const firstDow = new Date(viewYear, viewMonth, 1).getDay();
+  const dayCells = [];
+  for (let i = 0; i < firstDow; i++) dayCells.push(null);
+  for (let d = 1; d <= daysInMonth; d++) dayCells.push(d);
+
+  const isSelectedDay = (day) => {
+    if (!day) return false;
+    const d = new Date(viewYear, viewMonth, day);
+    return (
+      d.getDate() === selectedDate.getDate() &&
+      d.getMonth() === selectedDate.getMonth() &&
+      d.getFullYear() === selectedDate.getFullYear()
+    );
+  };
 
   return (
     <View style={styles.cardStack}>
@@ -545,41 +597,107 @@ export default function PlaymobilKpiCards({
       <Modal
         visible={datePickerVisible}
         transparent
-        animationType="fade"
+        animationType="slide"
         onRequestClose={() => setDatePickerVisible(false)}
       >
-        <TouchableOpacity 
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setDatePickerVisible(false)}
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={{ flex: 1, justifyContent: 'flex-end' }}
         >
-          <View style={styles.modalContent} onStartShouldSetResponder={() => true}>
-            <Text style={styles.modalTitle}>Select Date</Text>
-            <Text style={styles.modalHint}>Enter date (DD/MM/YYYY)</Text>
-            <TextInput
-              style={styles.dateInput}
-              value={dateInput}
-              onChangeText={setDateInput}
-              placeholder="DD/MM/YYYY"
-              keyboardType="numbers-and-punctuation"
-              autoFocus
-            />
-            <View style={styles.modalButtons}>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.cancelButton]}
-                onPress={() => setDatePickerVisible(false)}
-              >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.modalButton, styles.submitButton]}
-                onPress={handleDateSubmit}
-              >
-                <Text style={styles.submitButtonText}>OK</Text>
-              </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.modalOverlay}
+            activeOpacity={1}
+            onPress={() => setDatePickerVisible(false)}
+          >
+            <View style={[styles.modalContent, { paddingBottom: Math.max(insets.bottom, 12) }]} onStartShouldSetResponder={() => true}>
+              <Text style={styles.modalTitle}>Επιλογή Ημερομηνίας</Text>
+
+              <View style={styles.pickerModeRow}>
+                <TouchableOpacity
+                  style={[styles.pickerModeChip, pickerMode === 'calendar' && styles.pickerModeChipActive]}
+                  onPress={() => setPickerMode('calendar')}
+                >
+                  <Text style={[styles.pickerModeText, pickerMode === 'calendar' && styles.pickerModeTextActive]}>Ημερολόγιο</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.pickerModeChip, pickerMode === 'manual' && styles.pickerModeChipActive]}
+                  onPress={() => setPickerMode('manual')}
+                >
+                  <Text style={[styles.pickerModeText, pickerMode === 'manual' && styles.pickerModeTextActive]}>Πληκτρολόγηση</Text>
+                </TouchableOpacity>
+              </View>
+
+              {pickerMode === 'calendar' ? (
+                <>
+                  <View style={styles.calendarNavRow}>
+                    <TouchableOpacity onPress={prevMonth} style={styles.calendarNavBtn}>
+                      <Ionicons name="chevron-back" size={20} color={colors.primary || '#1d4ed8'} />
+                    </TouchableOpacity>
+                    <Text style={styles.calendarMonthLabel}>{monthNames[viewMonth]} {viewYear}</Text>
+                    <TouchableOpacity onPress={nextMonth} style={styles.calendarNavBtn}>
+                      <Ionicons name="chevron-forward" size={20} color={colors.primary || '#1d4ed8'} />
+                    </TouchableOpacity>
+                  </View>
+
+                  <View style={styles.calendarHeaders}>
+                    {dayNames.map((dn) => (
+                      <Text key={dn} style={styles.calendarHeaderText}>{dn}</Text>
+                    ))}
+                  </View>
+
+                  <View style={styles.calendarGrid}>
+                    {dayCells.map((day, idx) => (
+                      <TouchableOpacity
+                        key={idx}
+                        style={[
+                          styles.calendarCell,
+                          !day && styles.calendarCellEmpty,
+                          isSelectedDay(day) && styles.calendarCellSelected,
+                        ]}
+                        onPress={() => day && handleCalendarPick(day)}
+                        disabled={!day}
+                      >
+                        <Text style={[
+                          styles.calendarCellText,
+                          isSelectedDay(day) && styles.calendarCellTextSelected,
+                        ]}>
+                          {day || ''}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </>
+              ) : (
+                <>
+                  <Text style={styles.modalHint}>DD/MM/YYYY</Text>
+                  <TextInput
+                    style={styles.dateInput}
+                    value={dateInput}
+                    onChangeText={setDateInput}
+                    placeholder="DD/MM/YYYY"
+                    keyboardType="number-pad"
+                    autoFocus
+                  />
+                </>
+              )}
+
+              <View style={styles.modalButtons}>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.cancelButton]}
+                  onPress={() => setDatePickerVisible(false)}
+                >
+                  <Text style={styles.cancelButtonText}>Άκυρο</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.submitButton]}
+                  onPress={pickerMode === 'calendar' ? () => setDatePickerVisible(false) : handleDateSubmit}
+                >
+                  <Text style={styles.submitButtonText}>{pickerMode === 'calendar' ? 'OK' : 'Εφαρμογή'}</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
-        </TouchableOpacity>
+          </TouchableOpacity>
+        </KeyboardAvoidingView>
       </Modal>
     </View>
   );
@@ -725,10 +843,13 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     backgroundColor: colors.white,
-    borderRadius: 16,
+    borderTopLeftRadius: 18,
+    borderTopRightRadius: 18,
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
     padding: 24,
     width: '100%',
-    maxWidth: 400,
+    maxWidth: 700,
     shadowColor: '#000',
     shadowOpacity: 0.25,
     shadowRadius: 20,
@@ -789,5 +910,82 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: colors.white,
+  },
+  pickerModeRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: 14,
+  },
+  pickerModeChip: {
+    flex: 1,
+    paddingVertical: 10,
+    alignItems: 'center',
+    borderRadius: 10,
+    backgroundColor: '#f3f4f6',
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+  },
+  pickerModeChipActive: {
+    backgroundColor: '#e8f1ff',
+    borderColor: colors.primary || '#1d4ed8',
+  },
+  pickerModeText: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#6b7280',
+  },
+  pickerModeTextActive: {
+    color: colors.primary || '#1d4ed8',
+  },
+  calendarNavRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  calendarNavBtn: {
+    padding: 6,
+  },
+  calendarMonthLabel: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#1f2937',
+  },
+  calendarHeaders: {
+    flexDirection: 'row',
+    marginBottom: 4,
+  },
+  calendarHeaderText: {
+    width: '14.28%',
+    textAlign: 'center',
+    fontSize: 11,
+    color: '#9ca3af',
+    fontWeight: '700',
+  },
+  calendarGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 14,
+  },
+  calendarCell: {
+    width: '14.28%',
+    aspectRatio: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 999,
+  },
+  calendarCellEmpty: {
+    opacity: 0,
+  },
+  calendarCellSelected: {
+    backgroundColor: colors.primary || '#1d4ed8',
+  },
+  calendarCellText: {
+    fontSize: 14,
+    color: '#1f2937',
+  },
+  calendarCellTextSelected: {
+    color: '#fff',
+    fontWeight: '700',
   },
 });

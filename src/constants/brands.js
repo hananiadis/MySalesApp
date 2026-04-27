@@ -20,6 +20,18 @@ export const BRAND_LABEL = {
 
 export const DEFAULT_BRAND = 'playmobil';
 
+export const BRAND_STACK_ROUTES = {
+  playmobil: 'Playmobil',
+  john: 'John',
+  kivos: 'Kivos',
+};
+
+export const BRAND_MODULE_ROUTES = {
+  playmobil: 'PlaymobilModule',
+  john: 'JohnModule',
+  kivos: 'KivosModule',
+};
+
 const BRAND_ALIASES = {
   playmobil: ['playmobil hellas', 'playmobil_hellas', 'playmobilhellas', 'pm'],
   john: ['john hellas', 'john_hellas', 'johnhellas', 'john toys', 'john toys hellas'],
@@ -65,6 +77,16 @@ export function normalizeBrandKey(rawBrand) {
 }
 
 export const SUPERMARKET_BRANDS = ['playmobil', 'john'];
+
+export function getBrandStackRoute(rawBrand) {
+  const normalized = normalizeBrandKey(rawBrand);
+  return BRAND_STACK_ROUTES[normalized] || BRAND_STACK_ROUTES[DEFAULT_BRAND];
+}
+
+export function getBrandModuleRoute(rawBrand) {
+  const normalized = normalizeBrandKey(rawBrand);
+  return BRAND_MODULE_ROUTES[normalized] || BRAND_MODULE_ROUTES[DEFAULT_BRAND];
+}
 
 export function isSuperMarketBrand(brand) {
   return ['john', 'kivos', 'playmobil', 'supermarket'].includes(brand);

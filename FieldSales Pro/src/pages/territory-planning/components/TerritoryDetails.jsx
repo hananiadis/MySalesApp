@@ -20,9 +20,9 @@ const TerritoryDetails = ({
   });
 
   const priorityOptions = [
-    { value: 'high', label: 'High Priority' },
-    { value: 'medium', label: 'Medium Priority' },
-    { value: 'low', label: 'Low Priority' }
+    { value: 'high', label: 'Υψηλή Προτεραιότητα' },
+    { value: 'medium', label: 'Μεσαία Προτεραιότητα' },
+    { value: 'low', label: 'Χαμηλή Προτεραιότητα' }
   ];
 
   const salesmanOptions = salesmen?.map(s => ({
@@ -50,7 +50,7 @@ const TerritoryDetails = ({
       <div className={`bg-card border border-border rounded-lg p-6 ${className}`}>
         <div className="text-center text-muted-foreground">
           <Icon name="Map" size={48} className="mx-auto mb-3 opacity-50" />
-          <p>Select a territory to view details</p>
+          <p>Επιλέξτε περιοχή για να δείτε λεπτομέρειες</p>
         </div>
       </div>
     );
@@ -61,22 +61,22 @@ const TerritoryDetails = ({
       {/* Header */}
       <div className="p-4 border-b border-border">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-foreground">Territory Details</h3>
+          <h3 className="text-lg font-semibold text-foreground">Λεπτομέρειες Περιοχής</h3>
           <div className="flex items-center space-x-2">
             {editMode ? (
               <>
                 <Button variant="outline" size="sm" onClick={handleCancel}>
-                  Cancel
+                  Ακύρωση
                 </Button>
                 <Button variant="default" size="sm" onClick={handleSave}>
-                  Save
+                  Αποθήκευση
                 </Button>
               </>
             ) : (
               <>
                 <Button variant="outline" size="sm" onClick={() => setEditMode(true)}>
                   <Icon name="Edit" size={16} />
-                  Edit
+                  Επεξεργασία
                 </Button>
                 <Button variant="ghost" size="sm" onClick={onClose}>
                   <Icon name="X" size={16} />
@@ -90,25 +90,25 @@ const TerritoryDetails = ({
       <div className="p-4 space-y-6">
         {/* Basic Information */}
         <div className="space-y-4">
-          <h4 className="text-sm font-medium text-foreground">Basic Information</h4>
+          <h4 className="text-sm font-medium text-foreground">Βασικές Πληροφορίες</h4>
           
           {editMode ? (
             <div className="space-y-3">
               <Input
-                label="Territory Name"
+                label="Όνομα Περιοχής"
                 value={formData?.name}
                 onChange={(e) => setFormData({ ...formData, name: e?.target?.value })}
               />
               
               <Select
-                label="Assigned Salesman"
-                options={[{ value: '', label: 'Unassigned' }, ...salesmanOptions]}
+                label="Ανατεθειμένος Πωλητής"
+                options={[{ value: '', label: 'Χωρίς Ανάθεση' }, ...salesmanOptions]}
                 value={formData?.assignedSalesman}
                 onChange={(value) => setFormData({ ...formData, assignedSalesman: value })}
               />
               
               <Input
-                label="Visit Limit per Week"
+                label="Όριο Επισκέψεων ανά Εβδομάδα"
                 type="number"
                 value={formData?.visitLimit}
                 onChange={(e) => setFormData({ ...formData, visitLimit: parseInt(e?.target?.value) })}
@@ -117,7 +117,7 @@ const TerritoryDetails = ({
               />
               
               <Select
-                label="Priority Level"
+                label="Επίπεδο Προτεραιότητας"
                 options={priorityOptions}
                 value={formData?.priority}
                 onChange={(value) => setFormData({ ...formData, priority: value })}
@@ -126,31 +126,31 @@ const TerritoryDetails = ({
           ) : (
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <div className="text-xs text-muted-foreground mb-1">Territory Name</div>
+                <div className="text-xs text-muted-foreground mb-1">Όνομα Περιοχής</div>
                 <div className="text-sm font-medium text-foreground">{territory?.name}</div>
               </div>
               
               <div>
-                <div className="text-xs text-muted-foreground mb-1">Assigned Salesman</div>
+                <div className="text-xs text-muted-foreground mb-1">Ανατεθειμένος Πωλητής</div>
                 <div className="text-sm font-medium text-foreground">
                   {territory?.assignedSalesman 
-                    ? salesmen?.find(s => s?.id === territory?.assignedSalesman)?.name || 'Unknown' :'Unassigned'
+                    ? salesmen?.find(s => s?.id === territory?.assignedSalesman)?.name || 'Άγνωστος' :'Χωρίς Ανάθεση'
                   }
                 </div>
               </div>
               
               <div>
-                <div className="text-xs text-muted-foreground mb-1">Visit Limit</div>
-                <div className="text-sm font-medium text-foreground">{territory?.visitLimit} per week</div>
+                <div className="text-xs text-muted-foreground mb-1">Όριο Επισκέψεων</div>
+                <div className="text-sm font-medium text-foreground">{territory?.visitLimit} ανά εβδομάδα</div>
               </div>
               
               <div>
-                <div className="text-xs text-muted-foreground mb-1">Priority</div>
+                <div className="text-xs text-muted-foreground mb-1">Προτεραιότητα</div>
                 <div className={`text-sm font-medium capitalize ${
                   territory?.priority === 'high' ? 'text-error' :
                   territory?.priority === 'medium' ? 'text-warning' : 'text-success'
                 }`}>
-                  {territory?.priority}
+                  {territory?.priority === 'high' ? 'Υψηλή' : territory?.priority === 'medium' ? 'Μεσαία' : territory?.priority === 'low' ? 'Χαμηλή' : territory?.priority}
                 </div>
               </div>
             </div>
@@ -159,13 +159,13 @@ const TerritoryDetails = ({
 
         {/* Coverage Statistics */}
         <div className="space-y-4">
-          <h4 className="text-sm font-medium text-foreground">Coverage Statistics</h4>
+          <h4 className="text-sm font-medium text-foreground">Στατιστικά Κάλυψης</h4>
           
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-muted/50 rounded-lg p-3">
               <div className="flex items-center space-x-2 mb-2">
                 <Icon name="MapPin" size={16} className="text-primary" />
-                <span className="text-xs text-muted-foreground">Postcodes</span>
+                <span className="text-xs text-muted-foreground">Ταχ. Κώδικες</span>
               </div>
               <div className="text-lg font-semibold text-foreground">{territory?.postcodes?.length}</div>
             </div>
@@ -173,7 +173,7 @@ const TerritoryDetails = ({
             <div className="bg-muted/50 rounded-lg p-3">
               <div className="flex items-center space-x-2 mb-2">
                 <Icon name="Users" size={16} className="text-accent" />
-                <span className="text-xs text-muted-foreground">Customers</span>
+                <span className="text-xs text-muted-foreground">Πελάτες</span>
               </div>
               <div className="text-lg font-semibold text-foreground">{territory?.customerCount}</div>
             </div>
@@ -181,7 +181,7 @@ const TerritoryDetails = ({
             <div className="bg-muted/50 rounded-lg p-3">
               <div className="flex items-center space-x-2 mb-2">
                 <Icon name="Route" size={16} className="text-warning" />
-                <span className="text-xs text-muted-foreground">Avg Distance</span>
+                <span className="text-xs text-muted-foreground">Μέση Απόσταση</span>
               </div>
               <div className="text-lg font-semibold text-foreground">{territory?.avgDistance} km</div>
             </div>
@@ -189,7 +189,7 @@ const TerritoryDetails = ({
             <div className="bg-muted/50 rounded-lg p-3">
               <div className="flex items-center space-x-2 mb-2">
                 <Icon name="Clock" size={16} className="text-secondary" />
-                <span className="text-xs text-muted-foreground">Est. Time</span>
+                <span className="text-xs text-muted-foreground">Εκτιμ. Χρόνος</span>
               </div>
               <div className="text-lg font-semibold text-foreground">{territory?.estimatedTime}h</div>
             </div>
@@ -199,10 +199,10 @@ const TerritoryDetails = ({
         {/* Postcodes List */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h4 className="text-sm font-medium text-foreground">Postcodes ({territory?.postcodes?.length})</h4>
+            <h4 className="text-sm font-medium text-foreground">Ταχ. Κώδικες ({territory?.postcodes?.length})</h4>
             <Button variant="outline" size="sm">
               <Icon name="Plus" size={16} />
-              Add Postcode
+              Προσθήκη Ταχ. Κώδικα
             </Button>
           </div>
           
@@ -228,7 +228,7 @@ const TerritoryDetails = ({
           <div className="space-y-4">
             <h4 className="text-sm font-medium text-foreground flex items-center space-x-2">
               <Icon name="AlertTriangle" size={16} className="text-error" />
-              <span>Conflicts & Issues</span>
+              <span>Συγκρούσεις & Ζητήματα</span>
             </h4>
             
             <div className="space-y-2">
@@ -253,17 +253,17 @@ const TerritoryDetails = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2 text-xs text-muted-foreground">
             <Icon name="Clock" size={14} />
-            <span>Last updated: {new Date()?.toLocaleDateString()}</span>
+            <span>Τελευταία ενημέρωση: {new Date()?.toLocaleDateString('el-GR')}</span>
           </div>
           
           <div className="flex items-center space-x-2">
             <Button variant="outline" size="sm">
               <Icon name="Copy" size={16} />
-              Duplicate
+              Αντιγραφή
             </Button>
             <Button variant="destructive" size="sm">
               <Icon name="Trash2" size={16} />
-              Delete
+              Διαγραφή
             </Button>
           </div>
         </div>

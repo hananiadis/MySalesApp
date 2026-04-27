@@ -32,9 +32,15 @@ export async function createOrder(order) {
   return docId;
 }
 
+// DELETE an order document from Firestore
+export async function deleteFirestoreOrder(orderId, brand, orderType = null) {
+  if (!orderId) throw new Error('orderId is required!');
+  const collectionName = getCollectionName(brand, orderType);
+  await firestore().collection(collectionName).doc(String(orderId)).delete();
+}
+
 // UPSERT an order by document ID (merge = true)
 export async function updateOrder(orderId, data) {
-  if (!orderId || !data) throw new Error('orderId or data missing!');
   const collectionName = getCollectionName(data.brand, data.orderType);
   await firestore()
     .collection(collectionName)

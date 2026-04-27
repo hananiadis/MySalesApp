@@ -6,6 +6,7 @@ import RouteOptimizationPanel from './components/RouteOptimizationPanel';
 import VisitDetailsModal from './components/VisitDetailsModal';
 import MobileScheduleView from './components/MobileScheduleView';
 import Button from '../../components/ui/Button';
+import { fetchVisitExecutions, fetchVisitPlans, saveVisitPlan } from '../../utils/bootApi';
 
 
 const VisitScheduling = () => {
@@ -23,6 +24,8 @@ const VisitScheduling = () => {
   const [showVisitDetails, setShowVisitDetails] = useState(false);
   const [isMobileView, setIsMobileView] = useState(false);
   const [currentMobileDate, setCurrentMobileDate] = useState(new Date());
+  const [isLoadingVisits, setIsLoadingVisits] = useState(false);
+  const [visitsError, setVisitsError] = useState('');
 
   // Mock data
   const territories = [
@@ -113,80 +116,78 @@ const VisitScheduling = () => {
     }
   ];
 
-  const mockScheduledVisits = [
-    {
-      id: 'visit-1',
-      customerId: 'cust-1',
-      customerName: 'Sarah Johnson',
-      company: 'TechCorp Solutions',
-      location: 'Downtown District',
-      phone: '+1 (555) 123-4567',
-      date: '2025-11-10',
-      timeSlot: '09:00-10:00',
-      priority: 'high',
-      type: 'sales',
-      duration: 60,
-      objective: 'Present new product features and pricing proposal',
-      estimatedTravelTime: 25,
-      distance: '8.5',
-      notes: 'Bring updated product brochures and pricing sheets'
-    },
-    {
-      id: 'visit-2',
-      customerId: 'cust-2',
-      customerName: 'Michael Chen',
-      company: 'Global Industries Inc',
-      location: 'Business Park',
-      phone: '+1 (555) 234-5678',
-      date: '2025-11-10',
-      timeSlot: '11:00-12:00',
-      priority: 'medium',
-      type: 'follow-up',
-      duration: 45,
-      objective: 'Contract renewal discussion and technical requirements',
-      estimatedTravelTime: 20,
-      distance: '6.2',
-      notes: 'Review technical specifications document'
-    },
-    {
-      id: 'visit-3',
-      customerId: 'cust-3',
-      customerName: 'Emily Rodriguez',
-      company: 'StartUp Dynamics',
-      location: 'Innovation Hub',
-      phone: '+1 (555) 345-6789',
-      date: '2025-11-11',
-      timeSlot: '14:00-15:00',
-      priority: 'high',
-      type: 'demo',
-      duration: 90,
-      objective: 'Product demonstration and custom solution presentation',
-      estimatedTravelTime: 30,
-      distance: '12.1',
-      notes: 'Prepare demo environment and custom integration examples'
-    },
-    {
-      id: 'visit-4',
-      customerId: 'cust-6',
-      customerName: 'Robert Kim',
-      company: 'Financial Services Ltd',
-      location: 'Financial District',
-      phone: '+1 (555) 678-9012',
-      date: '2025-11-12',
-      timeSlot: '10:00-11:00',
-      priority: 'high',
-      type: 'meeting',
-      duration: 60,
-      objective: 'Implementation timeline review and compliance discussion',
-      estimatedTravelTime: 15,
-      distance: '4.8',
-      notes: 'Bring compliance documentation and implementation roadmap'
-    }
-  ];
-
   useEffect(() => {
-    setScheduledVisits(mockScheduledVisits);
-  }, []);
+    let isActive = true;
+
+    const loadWeekVisitPlans = async () => {
+      setIsLoadingVisits(true);
+      setVisitsError('');
+
+      try {
+        const weekOf = currentWeek?.toISOString()?.slice(0, 10);
+        const [plansResponse, executionsResponse] = await Promise.all([
+          fetchVisitPlans({ weekOf }),
+          fetchVisitExecutions({ weekOf }),
+        ]);
+
+        if (!isActive) {
+          return;
+        }
+
+        const plans = Array.isArray(plansResponse?.items) ? plansResponse.items : [];
+        const executions = Array.isArray(executionsResponse?.items) ? executionsResponse.items : [];
+
+        const executionByPlanId = new Map(
+          executions
+            .filter((execution) => execution?.visitPlanId)
+            .map((execution) => [String(execution.visitPlanId), execution])
+        );
+
+        const merged = plans.map((plan) => {
+          const directMatch = executionByPlanId.get(String(plan?.id || '')) || null;
+          const fallbackMatch =
+            directMatch ||
+            executions.find(
+              (execution) =>
+                execution?.date === plan?.date &&
+                String(execution?.customerId || '') === String(plan?.customerId || '') &&
+                String(execution?.customerCode || '') === String(plan?.customerCode || '')
+            ) ||
+            null;
+
+          if (!fallbackMatch) {
+            return plan;
+          }
+
+          return {
+            ...plan,
+            status: String(fallbackMatch?.status || plan?.status || 'upcoming').toLowerCase(),
+            executionId: fallbackMatch?.id || null,
+            checkInAt: fallbackMatch?.checkInAt || null,
+            checkOutAt: fallbackMatch?.checkOutAt || null,
+            completedAt: fallbackMatch?.completedAt || null,
+          };
+        });
+
+        setScheduledVisits(merged);
+      } catch (error) {
+        if (isActive) {
+          setVisitsError(error?.message || 'Αδυναμία φόρτωσης επισκέψεων.');
+          setScheduledVisits([]);
+        }
+      } finally {
+        if (isActive) {
+          setIsLoadingVisits(false);
+        }
+      }
+    };
+
+    loadWeekVisitPlans();
+
+    return () => {
+      isActive = false;
+    };
+  }, [currentWeek]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -219,10 +220,29 @@ const VisitScheduling = () => {
     console.log('Bulk scheduling for:', selectedCustomers);
   };
 
-  const handleVisitDrop = (visitId, newDate) => {
-    setScheduledVisits(prev => prev?.map(visit => 
-      visit?.id === visitId ? { ...visit, date: newDate } : visit
-    ));
+  const handleVisitDrop = async (visitId, newDate) => {
+    let movedVisit = null;
+
+    setScheduledVisits(prev => prev?.map(visit => {
+      if (visit?.id !== visitId) {
+        return visit;
+      }
+      movedVisit = visit;
+      return { ...visit, date: newDate };
+    }));
+
+    if (!movedVisit) {
+      return;
+    }
+
+    try {
+      await saveVisitPlan({ ...movedVisit, date: newDate });
+    } catch (error) {
+      setVisitsError(error?.message || 'Αποτυχία αποθήκευσης μετακίνησης επίσκεψης.');
+      setScheduledVisits(prev => prev?.map(visit =>
+        visit?.id === visitId ? { ...visit, date: movedVisit?.date } : visit
+      ));
+    }
   };
 
   const handleVisitClick = (visit) => {
@@ -267,9 +287,9 @@ const VisitScheduling = () => {
           <div className="mb-6">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Visit Scheduling</h1>
+                <h1 className="text-2xl lg:text-3xl font-bold text-foreground">Προγραμματισμός Επισκέψεων</h1>
                 <p className="text-muted-foreground mt-1">
-                  Plan and optimize customer visits with route optimization
+                  Σχεδιάστε και βελτιστοποιήστε τις επισκέψεις πελατών
                 </p>
               </div>
               
@@ -281,7 +301,7 @@ const VisitScheduling = () => {
                   iconPosition="left"
                   className="hidden lg:flex"
                 >
-                  {isMobileView ? 'Desktop View' : 'Mobile View'}
+                  {isMobileView ? 'Προβολή Desktop' : 'Προβολή Mobile'}
                 </Button>
                 
                 <Button
@@ -290,7 +310,7 @@ const VisitScheduling = () => {
                   iconName="Route"
                   iconPosition="left"
                 >
-                  Optimize All Routes
+                  Βελτιστοποίηση Όλων των Διαδρομών
                 </Button>
               </div>
             </div>
@@ -336,26 +356,38 @@ const VisitScheduling = () => {
           )}
 
           {/* Quick Stats */}
+          {isLoadingVisits && (
+            <div className="mt-4 rounded-lg border border-border bg-card p-3 text-sm text-muted-foreground">
+              Φόρτωση προγραμματισμένων επισκέψεων...
+            </div>
+          )}
+
+          {visitsError && (
+            <div className="mt-4 rounded-lg border border-error/30 bg-error/10 p-3 text-sm text-error">
+              {visitsError}
+            </div>
+          )}
+
           <div className="mt-6 grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="p-4 bg-card border border-border rounded-lg text-center">
               <div className="text-2xl font-bold text-foreground">{scheduledVisits?.length}</div>
-              <div className="text-sm text-muted-foreground">Scheduled Visits</div>
+              <div className="text-sm text-muted-foreground">Προγραμματισμένες Επισκέψεις</div>
             </div>
             <div className="p-4 bg-card border border-border rounded-lg text-center">
               <div className="text-2xl font-bold text-foreground">
                 {customers?.filter(c => c?.isOverdue)?.length}
               </div>
-              <div className="text-sm text-muted-foreground">Overdue Customers</div>
+              <div className="text-sm text-muted-foreground">Εκπρόθεσμοι Πελάτες</div>
             </div>
             <div className="p-4 bg-card border border-border rounded-lg text-center">
               <div className="text-2xl font-bold text-foreground">
                 {customers?.filter(c => c?.priority === 'high')?.length}
               </div>
-              <div className="text-sm text-muted-foreground">High Priority</div>
+              <div className="text-sm text-muted-foreground">Υψηλή Προτεραιότητα</div>
             </div>
             <div className="p-4 bg-card border border-border rounded-lg text-center">
               <div className="text-2xl font-bold text-foreground">4</div>
-              <div className="text-sm text-muted-foreground">Active Territories</div>
+              <div className="text-sm text-muted-foreground">Ενεργές Περιοχές</div>
             </div>
           </div>
         </div>

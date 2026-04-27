@@ -28,10 +28,10 @@ const VisitCard = ({ visit, onCheckIn, onCheckOut, onReschedule, onAddNotes }) =
   };
 
   const formatTime = (time) => {
-    return new Date(`2025-11-07 ${time}`)?.toLocaleTimeString('en-US', {
+    return new Date(`2025-11-07 ${time}`)?.toLocaleTimeString('el-GR', {
       hour: 'numeric',
       minute: '2-digit',
-      hour12: true
+      hour12: false
     });
   };
 
@@ -45,7 +45,7 @@ const VisitCard = ({ visit, onCheckIn, onCheckOut, onReschedule, onAddNotes }) =
               <h3 className="font-semibold text-foreground text-lg">{visit?.customerName}</h3>
               <div className={`flex items-center space-x-1 ${getStatusColor()}`}>
                 <Icon name={getStatusIcon()} size={16} />
-                <span className="text-xs font-medium capitalize">{visit?.status}</span>
+                <span className="text-xs font-medium capitalize">{visit?.status === 'completed' ? 'ολοκληρωμένη' : visit?.status === 'in-progress' ? 'σε εξέλιξη' : visit?.status === 'overdue' ? 'εκπρόθεσμη' : visit?.status === 'upcoming' ? 'επερχόμενη' : visit?.status}</span>
               </div>
             </div>
             <div className="flex items-center space-x-1 text-muted-foreground mb-2">
@@ -59,7 +59,7 @@ const VisitCard = ({ visit, onCheckIn, onCheckOut, onReschedule, onAddNotes }) =
               </div>
               <div className="flex items-center space-x-1">
                 <Icon name="Target" size={14} className="text-accent" />
-                <span>{visit?.priority}</span>
+                <span>{visit?.priority === 'high' ? 'Υψηλή' : visit?.priority === 'medium' ? 'Μεσαία' : visit?.priority === 'low' ? 'Χαμηλή' : visit?.priority}</span>
               </div>
             </div>
           </div>
@@ -84,7 +84,7 @@ const VisitCard = ({ visit, onCheckIn, onCheckOut, onReschedule, onAddNotes }) =
               iconName="MapPin"
               iconPosition="left"
             >
-              Check In
+              Έναρξη Επίσκεψης
             </Button>
           )}
           
@@ -96,7 +96,7 @@ const VisitCard = ({ visit, onCheckIn, onCheckOut, onReschedule, onAddNotes }) =
               iconName="CheckCircle"
               iconPosition="left"
             >
-              Check Out
+              Ολοκλήρωση Επίσκεψης
             </Button>
           )}
           
@@ -108,7 +108,7 @@ const VisitCard = ({ visit, onCheckIn, onCheckOut, onReschedule, onAddNotes }) =
               iconName="CheckCircle"
               iconPosition="left"
             >
-              Completed
+              Ολοκληρωμένη
             </Button>
           )}
           
@@ -127,7 +127,7 @@ const VisitCard = ({ visit, onCheckIn, onCheckOut, onReschedule, onAddNotes }) =
 
         {/* Visit Objectives */}
         <div className="bg-muted/50 rounded-md p-3">
-          <div className="text-xs font-medium text-muted-foreground mb-1">Visit Objectives</div>
+          <div className="text-xs font-medium text-muted-foreground mb-1">Στόχοι Επίσκεψης</div>
           <div className="text-sm text-foreground">{visit?.objectives}</div>
         </div>
       </div>
@@ -136,12 +136,12 @@ const VisitCard = ({ visit, onCheckIn, onCheckOut, onReschedule, onAddNotes }) =
         <div className="border-t border-border p-4 bg-muted/20">
           <div className="grid grid-cols-2 gap-4 mb-4">
             <div>
-              <div className="text-xs font-medium text-muted-foreground mb-1">Contact</div>
+              <div className="text-xs font-medium text-muted-foreground mb-1">Επικοινωνία</div>
               <div className="text-sm text-foreground">{visit?.contactPerson}</div>
               <div className="text-xs text-muted-foreground">{visit?.phone}</div>
             </div>
             <div>
-              <div className="text-xs font-medium text-muted-foreground mb-1">Last Visit</div>
+              <div className="text-xs font-medium text-muted-foreground mb-1">Τελευταία Επίσκεψη</div>
               <div className="text-sm text-foreground">{visit?.lastVisit}</div>
               <div className="text-xs text-muted-foreground">{visit?.lastOutcome}</div>
             </div>
@@ -150,7 +150,7 @@ const VisitCard = ({ visit, onCheckIn, onCheckOut, onReschedule, onAddNotes }) =
           {/* Customer Photo */}
           {visit?.customerPhoto && (
             <div className="mb-4">
-              <div className="text-xs font-medium text-muted-foreground mb-2">Customer Location</div>
+              <div className="text-xs font-medium text-muted-foreground mb-2">Τοποθεσία Πελάτη</div>
               <div className="w-full h-32 rounded-md overflow-hidden">
                 <Image
                   src={visit?.customerPhoto}
@@ -164,13 +164,13 @@ const VisitCard = ({ visit, onCheckIn, onCheckOut, onReschedule, onAddNotes }) =
           {/* Quick Actions */}
           <div className="grid grid-cols-3 gap-2">
             <Button variant="outline" size="sm" iconName="Phone">
-              Call
+              Κλήση
             </Button>
             <Button variant="outline" size="sm" iconName="Navigation">
-              Navigate
+              Πλοήγηση
             </Button>
             <Button variant="outline" size="sm" iconName="MessageCircle">
-              Message
+              Μήνυμα
             </Button>
           </div>
         </div>
@@ -178,19 +178,19 @@ const VisitCard = ({ visit, onCheckIn, onCheckOut, onReschedule, onAddNotes }) =
       {/* Notes Section */}
       {showNotes && (
         <div className="border-t border-border p-4 bg-background">
-          <div className="text-sm font-medium text-foreground mb-2">Visit Notes</div>
+          <div className="text-sm font-medium text-foreground mb-2">Σημειώσεις Επίσκεψης</div>
           <textarea
             className="w-full h-20 p-2 border border-border rounded-md text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary"
-            placeholder="Add notes about this visit..."
+            placeholder="Προσθέστε σημειώσεις για αυτή την επίσκεψη..."
             defaultValue={visit?.notes}
             onBlur={(e) => onAddNotes(visit?.id, e?.target?.value)}
           />
           <div className="flex justify-between items-center mt-2">
             <Button variant="ghost" size="sm" iconName="Mic">
-              Voice Note
+              Φωνητική Σημείωση
             </Button>
             <Button variant="ghost" size="sm" iconName="Camera">
-              Add Photo
+              Προσθήκη Φωτογραφίας
             </Button>
           </div>
         </div>

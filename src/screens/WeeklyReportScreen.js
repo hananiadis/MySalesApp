@@ -1,6 +1,7 @@
 import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Alert, Modal, FlatList, TextInput } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useExpense } from '../context/ExpenseContext';
 import { getWeekId, getWeekStartEnd, getCategoryLabel, EXPENSE_GROUPS, getMondayFromWeekId, formatDateDDMMYYYY, EXPENSE_STATUS } from '../constants/expenseConstants';
 import { approveWeeklyReportSubmission, getWeeklyReport, requestWeeklyReportReview } from '../services/expenseService';
@@ -10,11 +11,29 @@ import { Ionicons } from '@expo/vector-icons';
 import BackToExpensesButton from '../components/BackToExpensesButton';
 import { generateWeeklyReportPdf } from '../utils/weeklyReportPdf';
 
+const TOKENS = {
+  primaryBlue: '#185FA5',
+  lightBlueBg: '#E6F1FB',
+  amber: '#EF9F27',
+  amberBg: '#FAEEDA',
+  amberText: '#854F0B',
+  green: '#639922',
+  greenBg: '#EAF3DE',
+  greenText: '#3B6D11',
+  pageBackground: '#f7f5f0',
+  surface: '#fff',
+  border: '#e0ddd6',
+  borderSoft: '#e8e5de',
+  textPrimary: '#1a1a1a',
+  textSecondary: '#888',
+};
+
 const groupOrder = [EXPENSE_GROUPS.TRAVEL, EXPENSE_GROUPS.ACCOMMODATION_FOOD, EXPENSE_GROUPS.MISCELLANEOUS];
 
 const WeeklyReportScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
+  const insets = useSafeAreaInsets();
   const { currentUserId } = useExpense();
 
   const managerMode = !!route.params?.managerMode;
@@ -68,9 +87,9 @@ const WeeklyReportScreen = () => {
 
   const status = report?.tracking?.status || EXPENSE_STATUS.DRAFT;
   const statusMeta = useMemo(() => {
-    if (status === EXPENSE_STATUS.SUBMITTED) return { label: 'Υποβληθέν', bg: '#FEF3C7', fg: '#92400E' };
-    if (status === EXPENSE_STATUS.APPROVED) return { label: 'Εγκεκριμένο', bg: '#DCFCE7', fg: '#166534' };
-    return { label: 'Πρόχειρο', bg: '#E5E7EB', fg: '#111827' };
+    if (status === EXPENSE_STATUS.SUBMITTED) return { label: 'Υποβληθέν', bg: TOKENS.lightBlueBg, fg: TOKENS.primaryBlue };
+    if (status === EXPENSE_STATUS.APPROVED) return { label: 'Εγκεκριμένο', bg: TOKENS.greenBg, fg: TOKENS.greenText };
+    return { label: 'Πρόχειρο', bg: TOKENS.amberBg, fg: TOKENS.amberText };
   }, [status]);
 
   const handlePrint = useCallback(async () => {
@@ -226,7 +245,7 @@ const WeeklyReportScreen = () => {
       <SafeScreen
         title="Εβδομαδιαίο Εξοδολόγιο"
         headerLeft={<BackToExpensesButton />}
-        style={{ backgroundColor: '#F7F9FC' }}
+        style={{ backgroundColor: TOKENS.pageBackground }}
       >
         <View style={[styles.centerFill]}>
           <ActivityIndicator size="large" color="#007AFF" />
@@ -240,7 +259,7 @@ const WeeklyReportScreen = () => {
       <SafeScreen
         title="Εβδομαδιαίο Εξοδολόγιο"
         headerLeft={<BackToExpensesButton />}
-        style={{ backgroundColor: '#F7F9FC' }}
+        style={{ backgroundColor: TOKENS.pageBackground }}
       >
         <View style={[styles.centerFill]}>
           <Text style={styles.emptyText}>Δεν υπάρχουν δεδομένα για αυτή την εβδομάδα</Text>
@@ -260,12 +279,12 @@ const WeeklyReportScreen = () => {
           style={[styles.headerIconBtn, printing ? { opacity: 0.6 } : null]}
           activeOpacity={0.85}
         >
-          <Ionicons name="print-outline" size={18} color="#1D4ED8" />
+          <Ionicons name="print-outline" size={18} color={TOKENS.primaryBlue} />
           <Text style={styles.headerIconBtnText}>{printing ? 'PDF...' : 'PDF'}</Text>
         </TouchableOpacity>
       }
       scroll
-      style={{ backgroundColor: '#F7F9FC' }}
+      style={{ backgroundColor: TOKENS.pageBackground }}
     >
       <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40, paddingTop: 10 }}>
         <View style={styles.weekCard}>
@@ -274,22 +293,22 @@ const WeeklyReportScreen = () => {
             <Text style={styles.weekRange}>{weekRange}</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={() => setWeekPickerOpen(true)} style={styles.weekPrimaryBtn}>
-            <Ionicons name="calendar-outline" size={16} color="#FFFFFF" />
+            <Ionicons name="calendar-outline" size={16} color={TOKENS.surface} />
             <Text style={styles.weekPrimaryBtnText}>Επιλογή</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.weekActionsRow}>
           <TouchableOpacity onPress={handlePrevWeek} style={styles.weekActionBtn}>
-            <Ionicons name="arrow-back" size={16} color="#1D4ED8" />
+            <Ionicons name="arrow-back" size={16} color={TOKENS.primaryBlue} />
             <Text style={styles.weekActionText}>Προηγούμενη εβδομάδα</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={handleGoToCurrentWeek} style={styles.weekActionBtn}>
-            <Ionicons name="today-outline" size={16} color="#1D4ED8" />
+            <Ionicons name="today-outline" size={16} color={TOKENS.primaryBlue} />
             <Text style={styles.weekActionText}>Τρέχουσα εβδομάδα</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={handleNextWeek} style={styles.weekActionBtn}>
-            <Ionicons name="arrow-forward" size={16} color="#1D4ED8" />
+            <Ionicons name="arrow-forward" size={16} color={TOKENS.primaryBlue} />
             <Text style={styles.weekActionText}>Επόμενη εβδομάδα</Text>
           </TouchableOpacity>
         </View>
@@ -300,7 +319,7 @@ const WeeklyReportScreen = () => {
         </View>
         {managerMode && status === EXPENSE_STATUS.SUBMITTED ? (
           <TouchableOpacity onPress={handleApprove} style={styles.approveTopBtn}>
-            <Ionicons name="checkmark-circle-outline" size={18} color="#FFFFFF" />
+            <Ionicons name="checkmark-circle-outline" size={18} color={TOKENS.surface} />
             <Text style={styles.approveTopBtnText}>Έγκριση</Text>
           </TouchableOpacity>
         ) : managerMode ? (
@@ -436,7 +455,8 @@ const WeeklyReportScreen = () => {
 
       <Modal visible={weekPickerOpen} transparent animationType="slide" onRequestClose={() => setWeekPickerOpen(false)}>
         <View style={styles.modalOverlay}>
-          <View style={styles.weekPickerCard}>
+          <View style={[styles.weekPickerCard, { paddingBottom: Math.max(insets.bottom, 12) + 6 }]}>
+            <View style={styles.weekPickerHandle} />
             <View style={styles.weekPickerHeader}>
               <Text style={styles.weekPickerTitle}>Επιλογή εβδομάδας</Text>
               <TouchableOpacity onPress={() => setWeekPickerOpen(false)}>
@@ -478,7 +498,7 @@ const WeeklyReportScreen = () => {
                     <Text style={styles.weekPickerRowTitle}>{item.id}</Text>
                     <Text style={styles.weekPickerRowSub}>{item.range}</Text>
                   </View>
-                  {item.id === weekId ? <Ionicons name="checkmark-circle" size={20} color="#2563EB" /> : null}
+                    {item.id === weekId ? <Ionicons name="checkmark-circle" size={20} color={TOKENS.primaryBlue} /> : null}
                 </TouchableOpacity>
               )}
             />
@@ -490,7 +510,7 @@ const WeeklyReportScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F7F9FC', padding: 16 },
+  container: { flex: 1, backgroundColor: TOKENS.pageBackground, padding: 16 },
   centerFill: { flex: 1, justifyContent: 'center', alignItems: 'center' },
 
   headerIconBtn: {
@@ -500,72 +520,73 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 10,
     borderRadius: 999,
-    backgroundColor: '#EEF2FF',
+    backgroundColor: TOKENS.lightBlueBg,
     borderWidth: 1,
-    borderColor: '#E0E7FF',
+    borderColor: TOKENS.borderSoft,
   },
-  headerIconBtnText: { color: '#1D4ED8', fontWeight: '900', fontSize: 12 },
+  headerIconBtnText: { color: TOKENS.primaryBlue, fontWeight: '900', fontSize: 12 },
 
-  weekCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#FFF', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: '#E5E7EB', marginBottom: 10, marginTop: 6 },
+  weekCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: TOKENS.surface, borderRadius: 12, padding: 12, borderWidth: 1, borderColor: TOKENS.border, marginBottom: 10, marginTop: 6 },
   weekInfoBtn: { flex: 1, alignItems: 'flex-start', paddingRight: 10 },
-  weekTitle: { fontSize: 18, fontWeight: '700', color: '#111827' },
-  weekRange: { fontSize: 12, color: '#6B7280', marginTop: 2 },
-  weekPrimaryBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#2563EB', paddingHorizontal: 12, paddingVertical: 10, borderRadius: 12 },
-  weekPrimaryBtnText: { color: '#FFFFFF', fontWeight: '900', fontSize: 12 },
+  weekTitle: { fontSize: 18, fontWeight: '700', color: TOKENS.textPrimary },
+  weekRange: { fontSize: 12, color: TOKENS.textSecondary, marginTop: 2 },
+  weekPrimaryBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: TOKENS.primaryBlue, paddingHorizontal: 12, paddingVertical: 10, borderRadius: 12 },
+  weekPrimaryBtnText: { color: TOKENS.surface, fontWeight: '900', fontSize: 12 },
   weekActionsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginBottom: 14 },
-  weekActionBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#E0E7FF', paddingHorizontal: 12, paddingVertical: 10, borderRadius: 12 },
-  weekActionText: { color: '#1D4ED8', fontWeight: '800', fontSize: 12 },
+  weekActionBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: TOKENS.lightBlueBg, paddingHorizontal: 12, paddingVertical: 10, borderRadius: 12 },
+  weekActionText: { color: TOKENS.primaryBlue, fontWeight: '800', fontSize: 12 },
   statusRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 },
   statusBadge: { paddingVertical: 6, paddingHorizontal: 10, borderRadius: 999 },
   statusBadgeText: { fontWeight: '800', fontSize: 12 },
-  managerModeText: { color: '#6B7280', fontSize: 12, fontWeight: '700' },
-  approveTopBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#10B981', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10 },
-  approveTopBtnText: { color: '#FFFFFF', fontWeight: '900', fontSize: 12 },
-  reviewBanner: { backgroundColor: '#FEF3C7', borderRadius: 12, padding: 12, marginBottom: 12, borderWidth: 1, borderColor: '#FDE68A' },
-  reviewBannerTitle: { fontWeight: '800', color: '#92400E', marginBottom: 4 },
-  reviewBannerText: { color: '#92400E' },
-  summaryCard: { backgroundColor: '#FFF', padding: 14, borderRadius: 12, marginBottom: 14, shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 6, elevation: 2 },
-  summaryRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#E5E7EB' },
-  summaryLabel: { color: '#6B7280', fontSize: 13 },
-  summaryValue: { color: '#111827', fontWeight: '700', fontSize: 13 },
-  groupCard: { backgroundColor: '#FFF', padding: 12, borderRadius: 12, marginBottom: 12, shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 6, elevation: 2 },
-  groupTitle: { fontSize: 15, fontWeight: '700', color: '#1D4ED8', marginBottom: 10 },
-  expenseItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#F3F4F6' },
-  expenseNeedsReview: { backgroundColor: '#FFF7ED' },
-  expenseSelected: { backgroundColor: '#EFF6FF' },
+  managerModeText: { color: TOKENS.textSecondary, fontSize: 12, fontWeight: '700' },
+  approveTopBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: TOKENS.green, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10 },
+  approveTopBtnText: { color: TOKENS.surface, fontWeight: '900', fontSize: 12 },
+  reviewBanner: { backgroundColor: TOKENS.amberBg, borderRadius: 12, padding: 12, marginBottom: 12, borderWidth: 1, borderColor: '#FAD38A' },
+  reviewBannerTitle: { fontWeight: '800', color: TOKENS.amberText, marginBottom: 4 },
+  reviewBannerText: { color: TOKENS.amberText },
+  summaryCard: { backgroundColor: TOKENS.surface, padding: 14, borderRadius: 12, marginBottom: 14, borderWidth: 1, borderColor: TOKENS.border },
+  summaryRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: TOKENS.borderSoft },
+  summaryLabel: { color: TOKENS.textSecondary, fontSize: 13 },
+  summaryValue: { color: TOKENS.textPrimary, fontWeight: '700', fontSize: 13 },
+  groupCard: { backgroundColor: TOKENS.surface, padding: 12, borderRadius: 12, marginBottom: 12, borderWidth: 1, borderColor: TOKENS.border },
+  groupTitle: { fontSize: 15, fontWeight: '700', color: TOKENS.primaryBlue, marginBottom: 10 },
+  expenseItem: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: TOKENS.borderSoft },
+  expenseNeedsReview: { backgroundColor: TOKENS.amberBg },
+  expenseSelected: { backgroundColor: TOKENS.lightBlueBg },
   checkbox: { width: 18, height: 18, borderRadius: 4, borderWidth: 2, borderColor: '#9CA3AF', alignItems: 'center', justifyContent: 'center', marginRight: 10 },
-  checkboxChecked: { borderColor: '#2563EB', backgroundColor: '#2563EB' },
+  checkboxChecked: { borderColor: TOKENS.primaryBlue, backgroundColor: TOKENS.primaryBlue },
   checkboxText: { fontSize: 12, fontWeight: '900', color: 'transparent', lineHeight: 14 },
-  checkboxTextChecked: { color: '#FFFFFF' },
-  expenseDate: { color: '#6B7280', fontSize: 12, minWidth: 80 },
-  expenseLabel: { color: '#111827', fontSize: 13, flex: 1, marginLeft: 8 },
-  expenseAmount: { color: '#111827', fontWeight: '700', minWidth: 70, textAlign: 'right' },
-  groupTotal: { flexDirection: 'row', justifyContent: 'space-between', paddingTop: 10, marginTop: 10, borderTopWidth: 2, borderTopColor: '#E0E7FF' },
-  groupTotalLabel: { fontWeight: '700', color: '#1D4ED8' },
-  groupTotalValue: { fontWeight: '700', color: '#1D4ED8' },
-  dailyCard: { backgroundColor: '#FFF', padding: 12, borderRadius: 12, marginBottom: 14, shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 6, elevation: 2 },
-  dailyTitle: { fontSize: 15, fontWeight: '700', color: '#111827', marginBottom: 10 },
-  dayRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#E5E7EB' },
-  dayLabel: { color: '#111827', fontSize: 13 },
-  dayTotal: { color: '#111827', fontWeight: '700' },
-  printButton: { backgroundColor: '#10B981', paddingVertical: 12, alignItems: 'center', borderRadius: 12 },
-  printButtonText: { color: '#FFF', fontWeight: '700', fontSize: 15 },
-  emptyText: { color: '#6B7280', fontSize: 16 },
-  reviewActionCard: { backgroundColor: '#FFF', padding: 14, borderRadius: 12, marginTop: 14, shadowColor: '#000', shadowOpacity: 0.04, shadowRadius: 6, elevation: 2 },
-  reviewActionTitle: { fontSize: 15, fontWeight: '800', color: '#111827' },
-  reviewActionSub: { marginTop: 6, color: '#6B7280', fontSize: 12 },
-  reviewInput: { marginTop: 10, minHeight: 90, borderWidth: 1, borderColor: '#E5E7EB', borderRadius: 12, padding: 12, backgroundColor: '#F9FAFB', textAlignVertical: 'top' },
-  reviewSubmitBtn: { marginTop: 10, backgroundColor: '#F59E0B', paddingVertical: 12, alignItems: 'center', borderRadius: 12 },
-  reviewSubmitBtnText: { color: '#FFF', fontWeight: '800', fontSize: 14 },
+  checkboxTextChecked: { color: TOKENS.surface },
+  expenseDate: { color: TOKENS.textSecondary, fontSize: 12, minWidth: 80 },
+  expenseLabel: { color: TOKENS.textPrimary, fontSize: 13, flex: 1, marginLeft: 8 },
+  expenseAmount: { color: TOKENS.textPrimary, fontWeight: '700', minWidth: 70, textAlign: 'right' },
+  groupTotal: { flexDirection: 'row', justifyContent: 'space-between', paddingTop: 10, marginTop: 10, borderTopWidth: 2, borderTopColor: TOKENS.lightBlueBg },
+  groupTotalLabel: { fontWeight: '700', color: TOKENS.primaryBlue },
+  groupTotalValue: { fontWeight: '700', color: TOKENS.primaryBlue },
+  dailyCard: { backgroundColor: TOKENS.surface, padding: 12, borderRadius: 12, marginBottom: 14, borderWidth: 1, borderColor: TOKENS.border },
+  dailyTitle: { fontSize: 15, fontWeight: '700', color: TOKENS.textPrimary, marginBottom: 10 },
+  dayRow: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: TOKENS.borderSoft },
+  dayLabel: { color: TOKENS.textPrimary, fontSize: 13 },
+  dayTotal: { color: TOKENS.textPrimary, fontWeight: '700' },
+  printButton: { backgroundColor: TOKENS.primaryBlue, paddingVertical: 12, alignItems: 'center', borderRadius: 12 },
+  printButtonText: { color: TOKENS.surface, fontWeight: '700', fontSize: 15 },
+  emptyText: { color: TOKENS.textSecondary, fontSize: 16 },
+  reviewActionCard: { backgroundColor: TOKENS.surface, padding: 14, borderRadius: 12, marginTop: 14, borderWidth: 1, borderColor: TOKENS.border },
+  reviewActionTitle: { fontSize: 15, fontWeight: '800', color: TOKENS.textPrimary },
+  reviewActionSub: { marginTop: 6, color: TOKENS.textSecondary, fontSize: 12 },
+  reviewInput: { marginTop: 10, minHeight: 90, borderWidth: 1, borderColor: TOKENS.border, borderRadius: 12, padding: 12, backgroundColor: TOKENS.pageBackground, textAlignVertical: 'top' },
+  reviewSubmitBtn: { marginTop: 10, backgroundColor: TOKENS.amber, paddingVertical: 12, alignItems: 'center', borderRadius: 12 },
+  reviewSubmitBtnText: { color: TOKENS.surface, fontWeight: '800', fontSize: 14 },
 
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.35)', justifyContent: 'flex-end' },
-  weekPickerCard: { backgroundColor: '#FFF', borderTopLeftRadius: 16, borderTopRightRadius: 16, maxHeight: '80%', paddingBottom: 12 },
-  weekPickerHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#E5E7EB' },
-  weekPickerTitle: { fontSize: 16, fontWeight: '800', color: '#0F172A' },
-  weekPickerRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#F1F5F9' },
-  weekPickerRowActive: { backgroundColor: '#EFF6FF' },
-  weekPickerRowTitle: { fontSize: 14, fontWeight: '800', color: '#0F172A' },
-  weekPickerRowSub: { marginTop: 2, fontSize: 12, color: '#64748B' },
+  weekPickerCard: { backgroundColor: TOKENS.surface, borderTopLeftRadius: 16, borderTopRightRadius: 16, maxHeight: '80%', paddingBottom: 12, borderTopWidth: 1, borderColor: TOKENS.borderSoft },
+  weekPickerHandle: { alignSelf: 'center', width: 46, height: 5, borderRadius: 999, backgroundColor: '#d6d2ca', marginTop: 8, marginBottom: 10 },
+  weekPickerHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: TOKENS.border },
+  weekPickerTitle: { fontSize: 16, fontWeight: '800', color: TOKENS.textPrimary },
+  weekPickerRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: TOKENS.borderSoft },
+  weekPickerRowActive: { backgroundColor: TOKENS.lightBlueBg },
+  weekPickerRowTitle: { fontSize: 14, fontWeight: '800', color: TOKENS.textPrimary },
+  weekPickerRowSub: { marginTop: 2, fontSize: 12, color: TOKENS.textSecondary },
 });
 
 export default WeeklyReportScreen;

@@ -25,14 +25,14 @@ const DayHeader = ({ currentDate, stats, onSyncData, isOnline, lastSync }) => {
       {/* Date and Sync Status */}
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h1 className="text-xl font-semibold text-foreground">My Day</h1>
+          <h1 className="text-xl font-semibold text-foreground">Η Μέρα Μου</h1>
           <p className="text-sm text-muted-foreground">{formatDate(currentDate)}</p>
         </div>
         
         <div className="flex items-center space-x-2">
           <div className={`flex items-center space-x-1 ${isOnline ? 'text-success' : 'text-error'}`}>
             <Icon name={isOnline ? "Wifi" : "WifiOff"} size={16} />
-            <span className="text-xs font-medium">{isOnline ? 'Online' : 'Offline'}</span>
+            <span className="text-xs font-medium">{isOnline ? 'Σε σύνδεση' : 'Εκτός σύνδεσης'}</span>
           </div>
           
           <Button
@@ -49,25 +49,25 @@ const DayHeader = ({ currentDate, stats, onSyncData, isOnline, lastSync }) => {
       <div className="grid grid-cols-4 gap-3 mb-4">
         <div className="text-center">
           <div className="text-lg font-semibold text-foreground">{stats?.total}</div>
-          <div className="text-xs text-muted-foreground">Total</div>
+          <div className="text-xs text-muted-foreground">Σύνολο</div>
         </div>
         <div className="text-center">
           <div className="text-lg font-semibold text-success">{stats?.completed}</div>
-          <div className="text-xs text-muted-foreground">Done</div>
+          <div className="text-xs text-muted-foreground">Ολοκληρωμένα</div>
         </div>
         <div className="text-center">
           <div className="text-lg font-semibold text-primary">{stats?.inProgress}</div>
-          <div className="text-xs text-muted-foreground">Active</div>
+          <div className="text-xs text-muted-foreground">Ενεργά</div>
         </div>
         <div className="text-center">
           <div className="text-lg font-semibold text-warning">{stats?.pending}</div>
-          <div className="text-xs text-muted-foreground">Pending</div>
+          <div className="text-xs text-muted-foreground">Σε εκκρεμότητα</div>
         </div>
       </div>
       {/* Progress Bar */}
       <div className="mb-4">
         <div className="flex items-center justify-between text-sm mb-1">
-          <span className="text-muted-foreground">Progress</span>
+          <span className="text-muted-foreground">Πρόοδος</span>
           <span className="font-medium text-foreground">
             {Math.round((stats?.completed / stats?.total) * 100)}%
           </span>
@@ -82,7 +82,7 @@ const DayHeader = ({ currentDate, stats, onSyncData, isOnline, lastSync }) => {
       {/* Last Sync Info */}
       {lastSync && (
         <div className="text-xs text-muted-foreground text-center">
-          Last sync: {formatSyncTime(lastSync)}
+          Τελευταίος συγχρονισμός: {formatSyncTime(lastSync)}
         </div>
       )}
     </div>

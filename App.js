@@ -64,13 +64,8 @@ import CustomerSalesSummaryTest from './src/screens/CustomerSalesSummaryTest';
 import TestKPI from './src/screens/TestKPI';
 import KivosWarehouseNavigator from './src/navigation/KivosWarehouseNavigator';
 import FieldSalesProScreen from './src/screens/FieldSalesProScreen';
-import ExpenseTrackerScreen from './src/screens/ExpenseTrackerScreen';
 import ExpenseDetailScreen from './src/screens/ExpenseDetailScreen';
-import ExpenseReportsScreen from './src/screens/ExpenseReportsScreen';
-import WeeklyTrackingScreen from './src/screens/WeeklyTrackingScreen';
-import WeeklyReportScreen from './src/screens/WeeklyReportScreen';
-import ManagerWeeklyReportScreen from './src/screens/ManagerWeeklyReportScreen';
-import ManagerInboxScreen from './src/screens/ManagerInboxScreen';
+import ExpenseTabsNavigator from './src/navigation/ExpenseTabsNavigator';
 const Stack = createNativeStackNavigator();
 
 const loadFonts = async () => {
@@ -135,6 +130,7 @@ function AppNavigator() {
         <Stack.Screen name="OrdersManagement" component={OrdersManagementScreen} />
         <Stack.Screen name="OrderCustomerSelectScreen" component={OrderCustomerSelectScreen} />
         <Stack.Screen name="OrderProductSelectionScreen" component={OrderProductSelectionScreen} />
+        <Stack.Screen name="OrderDetailScreen" component={OrderDetailScreen} />
         <Stack.Screen name="OrderReviewScreen" component={OrderReviewScreen} />
         <Stack.Screen name="OrderSummaryScreen" component={OrderSummaryScreen} />
         <Stack.Screen name="ExportSuccessScreen" component={ExportSuccessScreen} />
@@ -160,13 +156,8 @@ function AppNavigator() {
         <Stack.Screen name="ScanInventory" component={ScanInventoryScreen} />
         <Stack.Screen name="InventoryUpload" component={InventoryUploadScreen} />
         <Stack.Screen name="FieldSalesPro" component={FieldSalesProScreen} />
-        <Stack.Screen name="ExpenseTracker" component={ExpenseTrackerScreen} />
+        <Stack.Screen name="ExpenseTracker" component={ExpenseTabsNavigator} />
         <Stack.Screen name="ExpenseDetail" component={ExpenseDetailScreen} />
-        <Stack.Screen name="ExpenseReports" component={ExpenseReportsScreen} />
-        <Stack.Screen name="WeeklyTracking" component={WeeklyTrackingScreen} />
-        <Stack.Screen name="WeeklyReport" component={WeeklyReportScreen} />
-        <Stack.Screen name="ManagerWeeklyReport" component={ManagerWeeklyReportScreen} />
-        <Stack.Screen name="ManagerInbox" component={ManagerInboxScreen} />
       </Stack.Navigator>
     </ExpenseProvider>
   );

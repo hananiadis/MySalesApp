@@ -14,6 +14,22 @@ import { isExpenseApproverRole } from '../constants/roles';
 import { approveWeeklyReportSubmission, getManagerWeeklyReportSubmissions } from '../services/expenseService';
 import { generateWeeklyReportPdf } from '../utils/weeklyReportPdf';
 
+const TOKENS = {
+  primaryBlue: '#185FA5',
+  lightBlueBg: '#E6F1FB',
+  green: '#639922',
+  greenBg: '#EAF3DE',
+  greenText: '#3B6D11',
+  amber: '#EF9F27',
+  amberBg: '#FAEEDA',
+  amberText: '#854F0B',
+  pageBackground: '#f7f5f0',
+  surface: '#fff',
+  border: '#e0ddd6',
+  textPrimary: '#1a1a1a',
+  textSecondary: '#888',
+};
+
 const STATUS_LABELS = {
   [EXPENSE_STATUS.DRAFT]: 'Πρόχειρο',
   [EXPENSE_STATUS.SUBMITTED]: 'Υποβληθέν',
@@ -21,9 +37,9 @@ const STATUS_LABELS = {
 };
 
 const STATUS_COLORS = {
-  [EXPENSE_STATUS.DRAFT]: { bg: '#E5E7EB', fg: '#111827' },
-  [EXPENSE_STATUS.SUBMITTED]: { bg: '#FEF3C7', fg: '#92400E' },
-  [EXPENSE_STATUS.APPROVED]: { bg: '#DCFCE7', fg: '#166534' },
+  [EXPENSE_STATUS.DRAFT]: { bg: TOKENS.amberBg, fg: TOKENS.amberText },
+  [EXPENSE_STATUS.SUBMITTED]: { bg: TOKENS.lightBlueBg, fg: TOKENS.primaryBlue },
+  [EXPENSE_STATUS.APPROVED]: { bg: TOKENS.greenBg, fg: TOKENS.greenText },
 };
 
 export default function ManagerInboxScreen() {
@@ -238,7 +254,7 @@ export default function ManagerInboxScreen() {
         <TouchableOpacity style={styles.card} onPress={() => handleOpen(item)} activeOpacity={0.8}>
           <View style={styles.cardHeader}>
             <View style={styles.cardHeaderLeft}>
-              <Ionicons name="mail-unread-outline" size={22} color={colors.primary} />
+              <Ionicons name="mail-unread-outline" size={22} color={TOKENS.primaryBlue} />
               <View style={{ marginLeft: 10 }}>
                 <Text style={styles.weekId}>{item.weekId}</Text>
                 <Text style={styles.weekRange}>{weekRange}</Text>
@@ -263,7 +279,7 @@ export default function ManagerInboxScreen() {
           <View style={styles.actionsRow}>
             <TouchableOpacity style={styles.openBtn} onPress={() => handleOpen(item)}>
               <Ionicons name="eye-outline" size={18} color={colors.white} />
-              <Text style={styles.openBtnText}>Άνοιγμα</Text>
+              <Text style={styles.openBtnText}>Προβολή</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -312,16 +328,16 @@ export default function ManagerInboxScreen() {
 
   if (!isManagerRole) {
     return (
-      <SafeScreen title="Inbox" headerLeft={<BackToExpensesButton />} style={{ flex: 1, backgroundColor: '#F7F9FC' }}>
+      <SafeScreen title="Εισερχόμενα" headerLeft={<BackToExpensesButton />} style={{ flex: 1, backgroundColor: TOKENS.pageBackground }}>
         <View style={styles.center}>
-          <Text style={styles.errorText}>Αυτή η λειτουργία είναι διαθέσιμη μόνο για managers.</Text>
+          <Text style={styles.errorText}>Αυτή η λειτουργία είναι διαθέσιμη μόνο για διαχειριστές.</Text>
         </View>
       </SafeScreen>
     );
   }
 
   return (
-    <SafeScreen title="Inbox" headerLeft={<BackToExpensesButton />} style={{ flex: 1, backgroundColor: '#F7F9FC' }}>
+    <SafeScreen title="Εισερχόμενα" headerLeft={<BackToExpensesButton />} style={{ flex: 1, backgroundColor: TOKENS.pageBackground }}>
       <View style={styles.container}>
         {loading ? (
           <View style={styles.center}>
@@ -344,12 +360,12 @@ export default function ManagerInboxScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F7F9FC' },
+  container: { flex: 1, backgroundColor: TOKENS.pageBackground },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 20 },
   errorText: { color: '#EF4444', fontWeight: '700', textAlign: 'center' },
 
   card: {
-    backgroundColor: colors.white,
+    backgroundColor: TOKENS.surface,
     borderRadius: 16,
     padding: 14,
     marginBottom: 12,
@@ -359,34 +375,34 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: TOKENS.border,
   },
   cardHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   cardHeaderLeft: { flexDirection: 'row', alignItems: 'center', flex: 1 },
-  weekId: { fontSize: 15, fontWeight: '800', color: '#111827' },
-  weekRange: { fontSize: 12, color: '#6B7280', marginTop: 2 },
-  submittedBy: { fontSize: 13, color: '#111827', marginTop: 3, fontWeight: '800' },
+  weekId: { fontSize: 15, fontWeight: '800', color: TOKENS.textPrimary },
+  weekRange: { fontSize: 12, color: TOKENS.textSecondary, marginTop: 2 },
+  submittedBy: { fontSize: 13, color: TOKENS.textPrimary, marginTop: 3, fontWeight: '800' },
 
   badge: { paddingHorizontal: 10, paddingVertical: 6, borderRadius: 999 },
   badgeText: { fontSize: 11, fontWeight: '800' },
 
   statsRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 12 },
-  statText: { color: '#111827', fontWeight: '700' },
-  breakdownText: { marginTop: 6, fontSize: 12, color: '#6B7280' },
+  statText: { color: TOKENS.textPrimary, fontWeight: '700' },
+  breakdownText: { marginTop: 6, fontSize: 12, color: TOKENS.textSecondary },
 
   actionsRow: { flexDirection: 'row', alignItems: 'center', flexWrap: 'wrap', gap: 10, marginTop: 12 },
-  openBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.primary, paddingVertical: 10, paddingHorizontal: 14, borderRadius: 10 },
+  openBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: TOKENS.primaryBlue, paddingVertical: 10, paddingHorizontal: 14, borderRadius: 10 },
   openBtnText: { color: colors.white, fontWeight: '800', fontSize: 12 },
   pdfBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#334155', paddingVertical: 10, paddingHorizontal: 14, borderRadius: 10 },
   pdfBtnText: { color: colors.white, fontWeight: '800', fontSize: 12 },
-  approveBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#10B981', paddingVertical: 10, paddingHorizontal: 14, borderRadius: 10 },
+  approveBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: TOKENS.green, paddingVertical: 10, paddingHorizontal: 14, borderRadius: 10 },
   approveBtnText: { color: colors.white, fontWeight: '800', fontSize: 12 },
-  reviewBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#F59E0B', paddingVertical: 10, paddingHorizontal: 14, borderRadius: 10 },
+  reviewBtn: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: TOKENS.amber, paddingVertical: 10, paddingHorizontal: 14, borderRadius: 10 },
   reviewBtnText: { color: colors.white, fontWeight: '800', fontSize: 12 },
-  approvedPill: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#DCFCE7', paddingVertical: 10, paddingHorizontal: 14, borderRadius: 10 },
-  approvedPillText: { color: '#166534', fontWeight: '900', fontSize: 12 },
+  approvedPill: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: TOKENS.greenBg, paddingVertical: 10, paddingHorizontal: 14, borderRadius: 10 },
+  approvedPillText: { color: TOKENS.greenText, fontWeight: '900', fontSize: 12 },
 
   emptyWrap: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24 },
-  emptyTitle: { marginTop: 10, fontSize: 16, fontWeight: '800', color: '#111827' },
-  emptySub: { marginTop: 6, fontSize: 12, color: '#6B7280', textAlign: 'center', maxWidth: 320 },
+  emptyTitle: { marginTop: 10, fontSize: 16, fontWeight: '800', color: TOKENS.textPrimary },
+  emptySub: { marginTop: 6, fontSize: 12, color: TOKENS.textSecondary, textAlign: 'center', maxWidth: 320 },
 });

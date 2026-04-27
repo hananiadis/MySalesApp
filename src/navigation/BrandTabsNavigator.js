@@ -49,7 +49,7 @@ function getIcon(name, focused, color, size) {
 }
 
 const defaultLayoutStrategy = (routes, { isTablet }) => {
-  const targetLeft = Math.min(isTablet ? 3 : 2, routes.length);
+  const targetLeft = Math.min(isTablet ? 3 : 3, routes.length);
   return {
     leftRoutes: routes.slice(0, targetLeft),
     rightRoutes: routes.slice(targetLeft),

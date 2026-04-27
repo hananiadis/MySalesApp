@@ -1,17 +1,34 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import Icon from '../../../components/AppIcon';
 import Button from '../../../components/ui/Button';
 import Select from '../../../components/ui/Select';
 
+function getStatusMeta(status) {
+  switch (status) {
+    case 'approved':
+      return { label: 'approved', color: 'text-success', icon: 'CheckCircle' };
+    case 'pending':
+      return { label: 'pending', color: 'text-warning', icon: 'Clock' };
+    case 'rejected':
+      return { label: 'rejected', color: 'text-error', icon: 'XCircle' };
+    default:
+      return { label: 'draft', color: 'text-muted-foreground', icon: 'Edit' };
+  }
+}
 
-const PlanningControls = ({ 
-  onBulkAssign, 
-  onOptimize, 
-  onExport, 
+const PlanningControls = ({
+  salesmen = [],
+  territories = [],
+  stats = {},
+  lastSavedAt = null,
+  saving = false,
+  onBulkAssign,
+  onOptimize,
+  onExport,
   onSave,
   onSubmitApproval,
   planningStatus,
-  className = '' 
+  className = '',
 }) => {
   const [bulkAssignMode, setBulkAssignMode] = useState(false);
   const [selectedSalesman, setSelectedSalesman] = useState('');
@@ -19,280 +36,263 @@ const PlanningControls = ({
   const [optimizationSettings, setOptimizationSettings] = useState({
     prioritizeDistance: true,
     balanceWorkload: true,
-    respectCapacity: true
+    respectCapacity: true,
   });
 
-  const salesmanOptions = [
-    { value: 'sm001', label: 'John Smith (2/5 territories)' },
-    { value: 'sm002', label: 'Sarah Johnson (3/4 territories)' },
-    { value: 'sm003', label: 'Mike Chen (1/6 territories)' },
-    { value: 'sm004', label: 'Lisa Rodriguez (4/5 territories)' },
-    { value: 'sm005', label: 'David Wilson (0/4 territories)' }
-  ];
+  const statusMeta = getStatusMeta(planningStatus);
+
+  const salesmanOptions = salesmen.map((salesman) => ({
+    value: salesman.id,
+    label: `${salesman.name} (${salesman.assignedTerritories}/${salesman.maxTerritories})`,
+  }));
+
+  const territoryOptions = useMemo(
+    () =>
+      territories.map((territory) => ({
+        value: territory.id,
+        label: `${territory.name}${territory.assignedSalesman ? ' • ανατεθειμένη' : ''}`,
+      })),
+    [territories]
+  );
 
   const exportOptions = [
     { value: 'pdf', label: 'PDF Report', icon: 'FileText' },
     { value: 'excel', label: 'Excel Spreadsheet', icon: 'FileSpreadsheet' },
     { value: 'csv', label: 'CSV Data', icon: 'Database' },
-    { value: 'map', label: 'Map Export', icon: 'Map' }
+    { value: 'map', label: 'Map Export', icon: 'Map' },
   ];
 
-  const handleBulkAssign = () => {
-    if (selectedSalesman && selectedTerritories?.length > 0) {
-      onBulkAssign(selectedSalesman, selectedTerritories);
-      setBulkAssignMode(false);
-      setSelectedTerritories([]);
-      setSelectedSalesman('');
+  const handleBulkAssignClick = async () => {
+    if (!selectedSalesman || selectedTerritories.length === 0) {
+      return;
     }
+
+    await onBulkAssign?.(selectedSalesman, selectedTerritories);
+    setBulkAssignMode(false);
+    setSelectedSalesman('');
+    setSelectedTerritories([]);
   };
 
-  const handleOptimize = () => {
-    onOptimize(optimizationSettings);
-  };
-
-  const getStatusColor = () => {
-    switch (planningStatus) {
-      case 'draft': return 'text-muted-foreground';
-      case 'pending': return 'text-warning';
-      case 'approved': return 'text-success';
-      case 'rejected': return 'text-error';
-      default: return 'text-muted-foreground';
-    }
-  };
-
-  const getStatusIcon = () => {
-    switch (planningStatus) {
-      case 'draft': return 'Edit';
-      case 'pending': return 'Clock';
-      case 'approved': return 'CheckCircle';
-      case 'rejected': return 'XCircle';
-      default: return 'FileText';
-    }
+  const toggleTerritory = (territoryId) => {
+    setSelectedTerritories((prev) =>
+      prev.includes(territoryId)
+        ? prev.filter((item) => item !== territoryId)
+        : [...prev, territoryId]
+    );
   };
 
   return (
     <div className={`bg-card border border-border rounded-lg ${className}`}>
-      {/* Header */}
       <div className="p-4 border-b border-border">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-foreground">Planning Controls</h3>
+          <h3 className="text-lg font-semibold text-foreground">Έλεγχοι Σχεδιασμού</h3>
           <div className="flex items-center space-x-2">
-            <Icon name={getStatusIcon()} size={16} className={getStatusColor()} />
-            <span className={`text-sm font-medium capitalize ${getStatusColor()}`}>
-              {planningStatus}
+            <Icon name={statusMeta.icon} size={16} className={statusMeta.color} />
+            <span className={`text-sm font-medium capitalize ${statusMeta.color}`}>
+              {statusMeta.label}
             </span>
           </div>
         </div>
       </div>
-      {/* Quick Actions */}
+
       <div className="p-4 space-y-4">
         <div>
-          <h4 className="text-sm font-medium text-foreground mb-3">Quick Actions</h4>
+          <h4 className="text-sm font-medium text-foreground mb-3">Γρήγορες Ενέργειες</h4>
           <div className="grid grid-cols-2 gap-2">
-            <Button 
-              variant="outline" 
-              className="justify-start"
-              onClick={() => setBulkAssignMode(!bulkAssignMode)}
-            >
+            <Button variant="outline" className="justify-start" onClick={() => setBulkAssignMode((prev) => !prev)}>
               <Icon name="Users" size={16} />
-              Bulk Assign
+              Μαζική Ανάθεση
             </Button>
-            
-            <Button 
-              variant="outline" 
-              className="justify-start"
-              onClick={handleOptimize}
-            >
+
+            <Button variant="outline" className="justify-start" onClick={() => onOptimize?.(optimizationSettings)}>
               <Icon name="Zap" size={16} />
-              Auto Optimize
+              Αυτόματη Βελτιστοποίηση
             </Button>
-            
-            <Button 
-              variant="outline" 
-              className="justify-start"
-            >
+
+            <Button variant="outline" className="justify-start" onClick={() => onExport?.('csv')}>
               <Icon name="Copy" size={16} />
-              Copy Previous
+              Εξαγωγή CSV
             </Button>
-            
-            <Button 
-              variant="outline" 
+
+            <Button
+              variant="outline"
               className="justify-start"
+              onClick={() => {
+                setSelectedSalesman('');
+                setSelectedTerritories([]);
+              }}
             >
               <Icon name="RotateCcw" size={16} />
-              Reset All
+              Καθαρισμός
             </Button>
           </div>
         </div>
 
-        {/* Bulk Assignment Panel */}
         {bulkAssignMode && (
           <div className="p-4 bg-muted/50 rounded-lg border border-border">
-            <h5 className="text-sm font-medium text-foreground mb-3">Bulk Territory Assignment</h5>
-            
+            <h5 className="text-sm font-medium text-foreground mb-3">Μαζική Ανάθεση Περιοχών</h5>
+
             <div className="space-y-3">
               <Select
-                label="Select Salesman"
+                label="Επιλογή Πωλητή"
                 options={salesmanOptions}
                 value={selectedSalesman}
                 onChange={setSelectedSalesman}
-                placeholder="Choose salesman..."
+                placeholder="Διαλέξτε πωλητή..."
               />
-              
+
               <div>
                 <label className="text-xs font-medium text-muted-foreground mb-2 block">
-                  Selected Territories ({selectedTerritories?.length})
+                  Περιοχές ({selectedTerritories.length})
                 </label>
-                <div className="text-xs text-muted-foreground mb-2">
-                  Click territories on the map to select them for bulk assignment
+                <div className="max-h-48 overflow-y-auto space-y-2 pr-1">
+                  {territoryOptions.map((territory) => (
+                    <label
+                      key={territory.value}
+                      className="flex items-center space-x-2 rounded-md border border-border bg-card px-3 py-2"
+                    >
+                      <input
+                        type="checkbox"
+                        checked={selectedTerritories.includes(territory.value)}
+                        onChange={() => toggleTerritory(territory.value)}
+                        className="rounded border-border"
+                      />
+                      <span className="text-sm text-foreground">{territory.label}</span>
+                    </label>
+                  ))}
                 </div>
-                {selectedTerritories?.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
-                    {selectedTerritories?.map((territoryId) => (
-                      <span
-                        key={territoryId}
-                        className="inline-flex items-center space-x-1 px-2 py-1 bg-primary/10 text-primary text-xs rounded-md"
-                      >
-                        <span>Territory {territoryId}</span>
-                        <button
-                          onClick={() => setSelectedTerritories(prev => prev?.filter(id => id !== territoryId))}
-                          className="hover:text-primary/70"
-                        >
-                          <Icon name="X" size={12} />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                )}
               </div>
-              
+
               <div className="flex space-x-2">
-                <Button 
-                  variant="default" 
-                  size="sm" 
-                  onClick={handleBulkAssign}
-                  disabled={!selectedSalesman || selectedTerritories?.length === 0}
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={handleBulkAssignClick}
+                  disabled={!selectedSalesman || selectedTerritories.length === 0 || saving}
                 >
-                  Assign Selected
+                  Ανάθεση Επιλεγμένων
                 </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => setBulkAssignMode(false)}
-                >
-                  Cancel
+                <Button variant="outline" size="sm" onClick={() => setBulkAssignMode(false)}>
+                  Ακύρωση
                 </Button>
               </div>
             </div>
           </div>
         )}
 
-        {/* Optimization Settings */}
         <div>
-          <h4 className="text-sm font-medium text-foreground mb-3">Optimization Settings</h4>
+          <h4 className="text-sm font-medium text-foreground mb-3">Ρυθμίσεις Βελτιστοποίησης</h4>
           <div className="space-y-2">
             <label className="flex items-center space-x-2">
               <input
                 type="checkbox"
-                checked={optimizationSettings?.prioritizeDistance}
-                onChange={(e) => setOptimizationSettings(prev => ({
-                  ...prev,
-                  prioritizeDistance: e?.target?.checked
-                }))}
+                checked={optimizationSettings.prioritizeDistance}
+                onChange={(e) =>
+                  setOptimizationSettings((prev) => ({
+                    ...prev,
+                    prioritizeDistance: e.target.checked,
+                  }))
+                }
                 className="rounded border-border"
               />
-              <span className="text-sm text-foreground">Minimize travel distance</span>
+              <span className="text-sm text-foreground">Ελαχιστοποίηση απόστασης μετακίνησης</span>
             </label>
-            
+
             <label className="flex items-center space-x-2">
               <input
                 type="checkbox"
-                checked={optimizationSettings?.balanceWorkload}
-                onChange={(e) => setOptimizationSettings(prev => ({
-                  ...prev,
-                  balanceWorkload: e?.target?.checked
-                }))}
+                checked={optimizationSettings.balanceWorkload}
+                onChange={(e) =>
+                  setOptimizationSettings((prev) => ({
+                    ...prev,
+                    balanceWorkload: e.target.checked,
+                  }))
+                }
                 className="rounded border-border"
               />
-              <span className="text-sm text-foreground">Balance workload evenly</span>
+              <span className="text-sm text-foreground">Ισορροπία φόρτου εργασίας</span>
             </label>
-            
+
             <label className="flex items-center space-x-2">
               <input
                 type="checkbox"
-                checked={optimizationSettings?.respectCapacity}
-                onChange={(e) => setOptimizationSettings(prev => ({
-                  ...prev,
-                  respectCapacity: e?.target?.checked
-                }))}
+                checked={optimizationSettings.respectCapacity}
+                onChange={(e) =>
+                  setOptimizationSettings((prev) => ({
+                    ...prev,
+                    respectCapacity: e.target.checked,
+                  }))
+                }
                 className="rounded border-border"
               />
-              <span className="text-sm text-foreground">Respect capacity limits</span>
+              <span className="text-sm text-foreground">Τήρηση ορίων χωρητικότητας</span>
             </label>
           </div>
         </div>
 
-        {/* Export Options */}
         <div>
-          <h4 className="text-sm font-medium text-foreground mb-3">Export & Reports</h4>
+          <h4 className="text-sm font-medium text-foreground mb-3">Εξαγωγή και Αναφορές</h4>
           <div className="grid grid-cols-2 gap-2">
-            {exportOptions?.map((option) => (
+            {exportOptions.map((option) => (
               <Button
-                key={option?.value}
+                key={option.value}
                 variant="outline"
                 size="sm"
                 className="justify-start"
-                onClick={() => onExport(option?.value)}
+                onClick={() => onExport?.(option.value)}
               >
-                <Icon name={option?.icon} size={14} />
-                {option?.label}
+                <Icon name={option.icon} size={14} />
+                {option.label}
               </Button>
             ))}
           </div>
         </div>
 
-        {/* Planning Statistics */}
         <div>
-          <h4 className="text-sm font-medium text-foreground mb-3">Planning Summary</h4>
+          <h4 className="text-sm font-medium text-foreground mb-3">Σύνοψη Σχεδιασμού</h4>
           <div className="grid grid-cols-2 gap-3">
             <div className="text-center p-2 bg-muted/50 rounded-md">
-              <div className="text-lg font-semibold text-foreground">12</div>
-              <div className="text-xs text-muted-foreground">Territories</div>
+              <div className="text-lg font-semibold text-foreground">{stats.territoryCount || 0}</div>
+              <div className="text-xs text-muted-foreground">Περιοχές</div>
             </div>
-            
+
             <div className="text-center p-2 bg-muted/50 rounded-md">
-              <div className="text-lg font-semibold text-foreground">5</div>
-              <div className="text-xs text-muted-foreground">Salesmen</div>
+              <div className="text-lg font-semibold text-foreground">{stats.salesmanCount || 0}</div>
+              <div className="text-xs text-muted-foreground">Πωλητές</div>
             </div>
-            
+
             <div className="text-center p-2 bg-muted/50 rounded-md">
-              <div className="text-lg font-semibold text-success">8</div>
-              <div className="text-xs text-muted-foreground">Assigned</div>
+              <div className="text-lg font-semibold text-success">{stats.assignedCount || 0}</div>
+              <div className="text-xs text-muted-foreground">Ανατεθειμένα</div>
             </div>
-            
+
             <div className="text-center p-2 bg-muted/50 rounded-md">
-              <div className="text-lg font-semibold text-warning">2</div>
-              <div className="text-xs text-muted-foreground">Conflicts</div>
+              <div className="text-lg font-semibold text-warning">{stats.conflictsCount || 0}</div>
+              <div className="text-xs text-muted-foreground">Συγκρούσεις</div>
             </div>
+          </div>
+          <div className="mt-3 rounded-md bg-primary/5 border border-primary/15 p-3">
+            <div className="text-xs text-muted-foreground">Συνολικές προγραμματισμένες επισκέψεις</div>
+            <div className="text-lg font-semibold text-foreground">{stats.totalPlannedVisits || 0}</div>
           </div>
         </div>
       </div>
-      {/* Action Buttons */}
+
       <div className="p-4 border-t border-border bg-muted/30">
         <div className="flex flex-col space-y-2">
           <div className="flex space-x-2">
-            <Button variant="outline" className="flex-1" onClick={onSave}>
+            <Button variant="outline" className="flex-1" onClick={onSave} disabled={saving}>
               <Icon name="Save" size={16} />
-              Save Draft
+              {saving ? 'Αποθήκευση...' : 'Αποθήκευση Πρόχειρου'}
             </Button>
-            <Button variant="default" className="flex-1" onClick={onSubmitApproval}>
+            <Button variant="default" className="flex-1" onClick={onSubmitApproval} disabled={saving}>
               <Icon name="Send" size={16} />
-              Submit for Approval
+              Υποβολή για Έγκριση
             </Button>
           </div>
-          
+
           <div className="text-xs text-muted-foreground text-center">
-            Last saved: {new Date()?.toLocaleTimeString()}
+            Τελευταία αποθήκευση: {lastSavedAt ? lastSavedAt.toLocaleTimeString('el-GR') : 'Δεν υπάρχει ακόμη'}
           </div>
         </div>
       </div>

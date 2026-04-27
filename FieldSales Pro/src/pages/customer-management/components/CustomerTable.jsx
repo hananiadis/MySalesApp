@@ -22,9 +22,9 @@ const CustomerTable = ({
 
   const getPriorityBadge = (priority) => {
     const configs = {
-      high: { color: 'bg-error text-error-foreground', label: 'High' },
-      medium: { color: 'bg-warning text-warning-foreground', label: 'Medium' },
-      low: { color: 'bg-muted text-muted-foreground', label: 'Low' }
+      high: { color: 'bg-error text-error-foreground', label: 'Υψηλή' },
+      medium: { color: 'bg-warning text-warning-foreground', label: 'Μεσαία' },
+      low: { color: 'bg-muted text-muted-foreground', label: 'Χαμηλή' }
     };
     
     const config = configs?.[priority] || configs?.low;
@@ -36,9 +36,9 @@ const CustomerTable = ({
   };
 
   const getComplianceStatus = (compliance) => {
-    if (compliance >= 90) return { color: 'text-success', icon: 'CheckCircle', label: 'Compliant' };
-    if (compliance >= 70) return { color: 'text-warning', icon: 'AlertTriangle', label: 'At Risk' };
-    return { color: 'text-error', icon: 'XCircle', label: 'Non-Compliant' };
+    if (compliance >= 90) return { color: 'text-success', icon: 'CheckCircle', label: 'Συμμορφωμένος' };
+    if (compliance >= 70) return { color: 'text-warning', icon: 'AlertTriangle', label: 'Σε Κίνδυνο' };
+    return { color: 'text-error', icon: 'XCircle', label: 'Μη Συμμορφωμένος' };
   };
 
   const formatLastVisit = (date) => {
@@ -46,10 +46,10 @@ const CustomerTable = ({
     const visitDate = new Date(date);
     const diffDays = Math.floor((now - visitDate) / (1000 * 60 * 60 * 24));
     
-    if (diffDays === 0) return 'Today';
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 7) return `${diffDays} days ago`;
-    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+    if (diffDays === 0) return 'Σήμερα';
+    if (diffDays === 1) return 'Χθες';
+    if (diffDays < 7) return `${diffDays} ημέρες πριν`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)} εβδομάδες πριν`;
     return visitDate?.toLocaleDateString();
   };
 
@@ -68,12 +68,12 @@ const CustomerTable = ({
                 />
               </th>
               {[
-                { key: 'name', label: 'Customer' },
-                { key: 'territory', label: 'Territory' },
-                { key: 'lastVisit', label: 'Last Visit' },
-                { key: 'compliance', label: 'Compliance' },
-                { key: 'priority', label: 'Priority' },
-                { key: 'actions', label: 'Actions', sortable: false }
+                { key: 'name', label: 'Πελάτης' },
+                { key: 'territory', label: 'Περιοχή' },
+                { key: 'lastVisit', label: 'Τελευταία Επίσκεψη' },
+                { key: 'compliance', label: 'Συμμόρφωση' },
+                { key: 'priority', label: 'Προτεραιότητα' },
+                { key: 'actions', label: 'Ενέργειες', sortable: false }
               ]?.map((column) => (
                 <th key={column?.key} className="text-left p-4">
                   {column?.sortable !== false ? (
@@ -218,7 +218,7 @@ const CustomerTable = ({
               </div>
               <div className="flex items-center justify-between mt-3 pt-3 border-t border-border">
                 <div className="text-sm text-muted-foreground">
-                  Last visit: {formatLastVisit(customer?.lastVisit)}
+                  Τελευταία επίσκεψη: {formatLastVisit(customer?.lastVisit)}
                 </div>
                 <div className="flex items-center space-x-1" onClick={(e) => e?.stopPropagation()}>
                   <Button variant="ghost" size="icon" className="h-8 w-8">

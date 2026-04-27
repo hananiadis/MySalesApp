@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, Modal, FlatList } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { FlashList } from '@shopify/flash-list';
 import firestore from '@react-native-firebase/firestore';
@@ -14,8 +15,22 @@ import { ROLES, isExpenseApproverRole } from '../constants/roles';
 import { getManagerWeeklyReportSubmissions, getWeeklyReportSubmissionsByWeekId } from '../services/expenseService';
 import { generateWeeklyReportPdf } from '../utils/weeklyReportPdf';
 
+const TOKENS = {
+  primaryBlue: '#185FA5',
+  lightBlueBg: '#E6F1FB',
+  pageBackground: '#f7f5f0',
+  surface: '#fff',
+  border: '#e0ddd6',
+  borderSoft: '#e8e5de',
+  textPrimary: '#1a1a1a',
+  textSecondary: '#888',
+  amberBg: '#FAEEDA',
+  amberText: '#854F0B',
+};
+
 export default function ManagerWeeklyReportScreen() {
   const navigation = useNavigation();
+  const insets = useSafeAreaInsets();
   const { currentUserId, userRole } = useExpense();
 
   const isManagerRole = isExpenseApproverRole(userRole);
@@ -242,9 +257,9 @@ export default function ManagerWeeklyReportScreen() {
                 onPress={() => handlePrint(item)}
                 disabled={printing}
               >
-                <Ionicons name="print-outline" size={18} color="#1D4ED8" />
+                <Ionicons name="print-outline" size={18} color={TOKENS.primaryBlue} />
               </TouchableOpacity>
-              <Ionicons name="chevron-forward" size={18} color="#64748B" />
+              <Ionicons name="chevron-forward" size={18} color={TOKENS.textSecondary} />
             </View>
           </View>
         </TouchableOpacity>
@@ -263,22 +278,22 @@ export default function ManagerWeeklyReportScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity onPress={() => setWeekPickerOpen(true)} style={styles.weekPrimaryBtn}>
-            <Ionicons name="calendar-outline" size={16} color="#FFFFFF" />
+            <Ionicons name="calendar-outline" size={16} color={TOKENS.surface} />
             <Text style={styles.weekPrimaryBtnText}>Επιλογή</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.weekActionsRow}>
           <TouchableOpacity onPress={handlePrevWeek} style={styles.weekActionBtn}>
-            <Ionicons name="arrow-back" size={16} color="#1D4ED8" />
+            <Ionicons name="arrow-back" size={16} color={TOKENS.primaryBlue} />
             <Text style={styles.weekActionText}>Προηγούμενη</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={handleGoToCurrentWeek} style={styles.weekActionBtn}>
-            <Ionicons name="today-outline" size={16} color="#1D4ED8" />
+            <Ionicons name="today-outline" size={16} color={TOKENS.primaryBlue} />
             <Text style={styles.weekActionText}>Τρέχουσα</Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={handleNextWeek} style={styles.weekActionBtn}>
-            <Ionicons name="arrow-forward" size={16} color="#1D4ED8" />
+            <Ionicons name="arrow-forward" size={16} color={TOKENS.primaryBlue} />
             <Text style={styles.weekActionText}>Επόμενη</Text>
           </TouchableOpacity>
         </View>
@@ -286,7 +301,7 @@ export default function ManagerWeeklyReportScreen() {
         <View style={styles.sectionTitleRow}>
           <Text style={styles.sectionTitle}>Υποβληθέντα για έγκριση</Text>
           <TouchableOpacity onPress={loadWeekSubmissions} style={styles.refreshBtn}>
-            <Ionicons name="refresh" size={16} color="#1D4ED8" />
+            <Ionicons name="refresh" size={16} color={TOKENS.primaryBlue} />
             <Text style={styles.refreshBtnText}>Ανανέωση</Text>
           </TouchableOpacity>
         </View>
@@ -311,14 +326,14 @@ export default function ManagerWeeklyReportScreen() {
     return (
       <SafeScreen title="Εβδομαδιαία Εξοδολόγια" headerLeft={<BackToExpensesButton />} scroll>
         <View style={{ paddingVertical: 40, alignItems: 'center' }}>
-          <Text style={styles.errorText}>Αυτή η λειτουργία είναι διαθέσιμη μόνο για managers.</Text>
+          <Text style={styles.errorText}>Αυτή η λειτουργία είναι διαθέσιμη μόνο για διαχειριστές.</Text>
         </View>
       </SafeScreen>
     );
   }
 
   return (
-    <SafeScreen title="Εβδομαδιαία Εξοδολόγια" headerLeft={<BackToExpensesButton />} style={{ backgroundColor: '#F7F9FC' }}>
+    <SafeScreen title="Εβδομαδιαία Εξοδολόγια" headerLeft={<BackToExpensesButton />} style={{ backgroundColor: TOKENS.pageBackground }}>
       <View style={{ flex: 1 }}>
         <FlashList
           data={!loading ? submissions : []}
@@ -331,11 +346,12 @@ export default function ManagerWeeklyReportScreen() {
 
         <Modal visible={weekPickerOpen} transparent animationType="slide" onRequestClose={() => setWeekPickerOpen(false)}>
           <View style={styles.modalOverlay}>
-            <View style={styles.weekPickerCard}>
+            <View style={[styles.weekPickerCard, { paddingBottom: Math.max(insets.bottom, 12) + 6 }]}>
+              <View style={styles.weekPickerHandle} />
               <View style={styles.weekPickerHeader}>
                 <Text style={styles.weekPickerTitle}>Επιλογή εβδομάδας</Text>
                 <TouchableOpacity onPress={() => setWeekPickerOpen(false)}>
-                  <Ionicons name="close" size={22} color="#0F172A" />
+                  <Ionicons name="close" size={22} color={TOKENS.textPrimary} />
                 </TouchableOpacity>
               </View>
 
@@ -373,7 +389,7 @@ export default function ManagerWeeklyReportScreen() {
                       <Text style={styles.weekPickerRowTitle}>{item.id}</Text>
                       <Text style={styles.weekPickerRowSub}>{item.range}</Text>
                     </View>
-                    {item.id === weekId ? <Ionicons name="checkmark-circle" size={20} color="#2563EB" /> : null}
+                    {item.id === weekId ? <Ionicons name="checkmark-circle" size={20} color={TOKENS.primaryBlue} /> : null}
                   </TouchableOpacity>
                 )}
               />
@@ -388,43 +404,44 @@ export default function ManagerWeeklyReportScreen() {
 const styles = StyleSheet.create({
   errorText: { color: '#EF4444', fontSize: 16, fontWeight: '700' },
 
-  weekCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#FFF', borderRadius: 12, padding: 12, borderWidth: 1, borderColor: '#E5E7EB', marginTop: 6 },
+  weekCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: TOKENS.surface, borderRadius: 12, padding: 12, borderWidth: 1, borderColor: TOKENS.border, marginTop: 6 },
   weekInfoBtn: { flex: 1, alignItems: 'flex-start', paddingRight: 10 },
-  weekTitle: { fontSize: 16, fontWeight: '800', color: '#111827' },
-  weekRange: { fontSize: 12, color: '#6B7280', marginTop: 2 },
-  weekPrimaryBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#2563EB', paddingHorizontal: 12, paddingVertical: 10, borderRadius: 12 },
-  weekPrimaryBtnText: { color: '#FFFFFF', fontWeight: '900', fontSize: 12 },
+  weekTitle: { fontSize: 16, fontWeight: '800', color: TOKENS.textPrimary },
+  weekRange: { fontSize: 12, color: TOKENS.textSecondary, marginTop: 2 },
+  weekPrimaryBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: TOKENS.primaryBlue, paddingHorizontal: 12, paddingVertical: 10, borderRadius: 12 },
+  weekPrimaryBtnText: { color: TOKENS.surface, fontWeight: '900', fontSize: 12 },
 
   weekActionsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, marginTop: 10, marginBottom: 14 },
-  weekActionBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#E0E7FF', paddingHorizontal: 12, paddingVertical: 10, borderRadius: 12 },
-  weekActionText: { color: '#1D4ED8', fontWeight: '800', fontSize: 12 },
+  weekActionBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: TOKENS.lightBlueBg, paddingHorizontal: 12, paddingVertical: 10, borderRadius: 12 },
+  weekActionText: { color: TOKENS.primaryBlue, fontWeight: '800', fontSize: 12 },
 
   sectionTitleRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 },
-  sectionTitle: { fontSize: 15, fontWeight: '900', color: '#0F172A' },
-  refreshBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#E0E7FF', paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10 },
-  refreshBtnText: { color: '#1D4ED8', fontWeight: '900', fontSize: 12 },
+  sectionTitle: { fontSize: 15, fontWeight: '900', color: TOKENS.textPrimary },
+  refreshBtn: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: TOKENS.lightBlueBg, paddingHorizontal: 12, paddingVertical: 8, borderRadius: 10 },
+  refreshBtnText: { color: TOKENS.primaryBlue, fontWeight: '900', fontSize: 12 },
 
   loader: { justifyContent: 'center', alignItems: 'center', minHeight: 120 },
   emptyStateContainer: { alignItems: 'center', paddingVertical: 22 },
-  emptyStateText: { color: '#6B7280', fontSize: 14, fontWeight: '700', textAlign: 'center' },
+  emptyStateText: { color: TOKENS.textSecondary, fontSize: 14, fontWeight: '700', textAlign: 'center' },
 
-  submissionRow: { backgroundColor: '#FFF', padding: 12, borderRadius: 12, marginBottom: 10, borderWidth: 1, borderColor: '#E5E7EB' },
+  submissionRow: { backgroundColor: TOKENS.surface, padding: 12, borderRadius: 12, marginBottom: 10, borderWidth: 1, borderColor: TOKENS.border },
   submissionRowTop: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  submissionUser: { fontSize: 14, fontWeight: '900', color: '#111827' },
-  submissionMeta: { marginTop: 4, fontSize: 12, fontWeight: '700', color: '#64748B' },
-  submissionBreakdown: { marginTop: 4, fontSize: 12, color: '#64748B' },
-  submissionAmount: { fontSize: 14, fontWeight: '900', color: '#1D4ED8' },
+  submissionUser: { fontSize: 14, fontWeight: '900', color: TOKENS.textPrimary },
+  submissionMeta: { marginTop: 4, fontSize: 12, fontWeight: '700', color: TOKENS.textSecondary },
+  submissionBreakdown: { marginTop: 4, fontSize: 12, color: TOKENS.textSecondary },
+  submissionAmount: { fontSize: 14, fontWeight: '900', color: TOKENS.primaryBlue },
   submissionRowBottom: { marginTop: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  submittedBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999, backgroundColor: '#FEF3C7' },
-  submittedBadgeText: { fontSize: 11, fontWeight: '900', color: '#92400E' },
-  pdfIconBtn: { padding: 6, borderRadius: 10, backgroundColor: '#E0E7FF', borderWidth: 1, borderColor: '#BFDBFE' },
+  submittedBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 999, backgroundColor: TOKENS.amberBg },
+  submittedBadgeText: { fontSize: 11, fontWeight: '900', color: TOKENS.amberText },
+  pdfIconBtn: { padding: 6, borderRadius: 10, backgroundColor: TOKENS.lightBlueBg, borderWidth: 1, borderColor: TOKENS.borderSoft },
 
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.35)', justifyContent: 'flex-end' },
-  weekPickerCard: { backgroundColor: '#FFF', borderTopLeftRadius: 16, borderTopRightRadius: 16, maxHeight: '80%', paddingBottom: 12 },
-  weekPickerHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#E5E7EB' },
-  weekPickerTitle: { fontSize: 16, fontWeight: '800', color: '#0F172A' },
-  weekPickerRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: '#F1F5F9' },
-  weekPickerRowActive: { backgroundColor: '#EFF6FF' },
-  weekPickerRowTitle: { fontSize: 14, fontWeight: '800', color: '#0F172A' },
-  weekPickerRowSub: { marginTop: 2, fontSize: 12, color: '#64748B' },
+  weekPickerCard: { backgroundColor: TOKENS.surface, borderTopLeftRadius: 16, borderTopRightRadius: 16, maxHeight: '80%', paddingBottom: 12, borderTopWidth: 1, borderColor: TOKENS.borderSoft },
+  weekPickerHandle: { alignSelf: 'center', width: 46, height: 5, borderRadius: 999, backgroundColor: '#d6d2ca', marginTop: 8, marginBottom: 10 },
+  weekPickerHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: TOKENS.border },
+  weekPickerTitle: { fontSize: 16, fontWeight: '800', color: TOKENS.textPrimary },
+  weekPickerRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: TOKENS.borderSoft },
+  weekPickerRowActive: { backgroundColor: TOKENS.lightBlueBg },
+  weekPickerRowTitle: { fontSize: 14, fontWeight: '800', color: TOKENS.textPrimary },
+  weekPickerRowSub: { marginTop: 2, fontSize: 12, color: TOKENS.textSecondary },
 });

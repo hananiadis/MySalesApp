@@ -71,11 +71,11 @@ export default function CurvedBottomBar({
   const barWidth = Math.min(screenWidth * 0.96, MAX_BAR_WIDTH);
   const hasFab = Boolean(fab);
   const fabSize = hasFab ? fab?.size || DEFAULT_FAB_SIZE : DEFAULT_FAB_SIZE;
-  const notchDepth = hasFab ? fabSize / 2 + 12 : 0;
-  const barHeight = 74 + Math.max(insets.bottom, 12);
-  const svgHeight = barHeight + notchDepth + 12;
-  const notchWidth = hasFab ? fabSize + 28 : 0;
-  const radius = 26;
+  const notchDepth = hasFab ? Math.max(30, fabSize / 2 + 6) : 0;
+  const barHeight = 44;
+  const svgHeight = barHeight + notchDepth + 4;
+  const notchWidth = hasFab ? fabSize + 24 : 0;
+  const radius = 24;
 
   const centerX = barWidth / 2;
   const maxNotchHalfWidth = Math.max(
@@ -86,7 +86,7 @@ export default function CurvedBottomBar({
   const notchLeft = centerX - notchHalfWidth;
   const notchRight = centerX + notchHalfWidth;
 
-  const horizontalPadding = Math.max(12, Math.min(24, screenWidth * 0.04));
+  const horizontalPadding = Math.max(10, Math.min(20, screenWidth * 0.035));
   const pathD = hasFab
     ? `
       M0,${radius}
@@ -110,7 +110,7 @@ export default function CurvedBottomBar({
       Z
     `;
 
-  const fabBottom = insets.bottom + 24;
+  const fabBottom = Math.max(insets.bottom + 4, 8);
 
   const handleTabPress = (route, isFocused) => {
     const event = navigation.emit({
@@ -266,8 +266,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
-    paddingTop: 18,
-    paddingBottom: 10,
+    paddingTop: 3,
+    paddingBottom: 3,
   },
   sideGroup: {
     flexDirection: 'row',

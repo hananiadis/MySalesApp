@@ -26,7 +26,7 @@ const RouteOptimizer = ({ visits, onOptimizeRoute, isOptimizing }) => {
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center space-x-2">
           <Icon name="Route" size={20} className="text-primary" />
-          <h3 className="font-semibold text-foreground">Route Optimization</h3>
+          <h3 className="font-semibold text-foreground">Βελτιστοποίηση Διαδρομής</h3>
         </div>
         
         <Button
@@ -41,15 +41,15 @@ const RouteOptimizer = ({ visits, onOptimizeRoute, isOptimizing }) => {
       <div className="grid grid-cols-3 gap-3 mb-4">
         <div className="text-center">
           <div className="text-lg font-semibold text-foreground">{pendingVisits?.length}</div>
-          <div className="text-xs text-muted-foreground">Remaining</div>
+          <div className="text-xs text-muted-foreground">Υπόλοιπο</div>
         </div>
         <div className="text-center">
           <div className="text-lg font-semibold text-accent">{calculateTotalDistance()} mi</div>
-          <div className="text-xs text-muted-foreground">Distance</div>
+          <div className="text-xs text-muted-foreground">Απόσταση</div>
         </div>
         <div className="text-center">
           <div className="text-lg font-semibold text-warning">{calculateTotalTime()}h</div>
-          <div className="text-xs text-muted-foreground">Est. Time</div>
+          <div className="text-xs text-muted-foreground">Εκτ. Χρόνος</div>
         </div>
       </div>
       {/* Optimize Button */}
@@ -62,13 +62,13 @@ const RouteOptimizer = ({ visits, onOptimizeRoute, isOptimizing }) => {
         iconPosition="left"
         disabled={pendingVisits?.length === 0}
       >
-        {isOptimizing ? 'Optimizing Route...' : 'Optimize My Route'}
+        {isOptimizing ? 'Βελτιστοποίηση Διαδρομής...' : 'Βελτιστοποίηση Διαδρομής Μου'}
       </Button>
       {/* Route Details */}
       {showRouteDetails && (
         <div className="mt-4 pt-4 border-t border-border">
           <div className="space-y-3">
-            <div className="text-sm font-medium text-foreground mb-2">Route Sequence</div>
+            <div className="text-sm font-medium text-foreground mb-2">Σειρά Διαδρομής</div>
             
             {pendingVisits?.map((visit, index) => (
               <div key={visit?.id} className="flex items-center space-x-3">
@@ -89,10 +89,10 @@ const RouteOptimizer = ({ visits, onOptimizeRoute, isOptimizing }) => {
           {/* Navigation Options */}
           <div className="grid grid-cols-2 gap-2 mt-4">
             <Button variant="outline" size="sm" iconName="Navigation">
-              Google Maps
+Χάρτες Google
             </Button>
             <Button variant="outline" size="sm" iconName="Map">
-              Apple Maps
+Χάρτες Apple
             </Button>
           </div>
 
@@ -101,7 +101,7 @@ const RouteOptimizer = ({ visits, onOptimizeRoute, isOptimizing }) => {
             <div className="flex items-center space-x-2">
               <Icon name="AlertTriangle" size={14} className="text-warning" />
               <span className="text-xs text-muted-foreground">
-                Moderate traffic on Main St. Consider alternate route.
+                Μέτρια κίνηση στη Main St. Εξετάστε εναλλακτική διαδρομή.
               </span>
             </div>
           </div>

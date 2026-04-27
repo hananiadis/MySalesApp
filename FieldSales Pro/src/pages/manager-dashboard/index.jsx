@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import Header from '../../components/ui/Header';
 import Icon from '../../components/AppIcon';
@@ -8,57 +8,70 @@ import PerformanceMetrics from './components/PerformanceMetrics';
 import ActivityFeed from './components/ActivityFeed';
 import QuickActions from './components/QuickActions';
 import TeamOverview from './components/TeamOverview';
+import { fetchManagerTeamStatus, fetchManagerActivity } from '../../utils/bootApi';
 
 const ManagerDashboard = () => {
   const [lastRefresh, setLastRefresh] = useState(new Date());
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [teamStatus, setTeamStatus] = useState(null);
+  const [activities, setActivities] = useState(null);
+  const [loadError, setLoadError] = useState(null);
 
-  useEffect(() => {
-    // Auto-refresh every 30 seconds
-    const interval = setInterval(() => {
+  const loadDashboardData = useCallback(async () => {
+    setIsRefreshing(true);
+    setLoadError(null);
+    try {
+      const today = new Date().toISOString().slice(0, 10);
+      const [statusRes, activityRes] = await Promise.all([
+        fetchManagerTeamStatus(today),
+        fetchManagerActivity({ limit: 30 }),
+      ]);
+      if (statusRes?.ok) setTeamStatus(statusRes);
+      if (activityRes?.ok) setActivities(activityRes.activities || []);
+    } catch (err) {
+      setLoadError('Αποτυχία φόρτωσης δεδομένων ταμπλό.');
+    } finally {
+      setIsRefreshing(false);
       setLastRefresh(new Date());
-    }, 30000);
-
-    return () => clearInterval(interval);
+    }
   }, []);
 
-  const handleManualRefresh = async () => {
-    setIsRefreshing(true);
-    // Simulate refresh delay
-    setTimeout(() => {
-      setLastRefresh(new Date());
-      setIsRefreshing(false);
-    }, 1000);
-  };
+  useEffect(() => {
+    loadDashboardData();
+    const interval = setInterval(loadDashboardData, 30000);
+    return () => clearInterval(interval);
+  }, [loadDashboardData]);
+
+  const handleManualRefresh = () => loadDashboardData();
 
   const navigationCards = [
     {
-      title: 'Territory Planning',
-      description: 'Strategic 2-month territory planning with visual mapping',
+      title: 'Σχεδιασμός Περιοχών',
+      description: 'Στρατηγικός σχεδιασμός περιοχών 2 μηνών με οπτική χαρτογράφηση',
       icon: 'Map',
       path: '/territory-planning',
       color: 'text-primary',
       bgColor: 'bg-primary/10'
     },
     {
-      title: 'Visit Scheduling',
-      description: 'Dynamic daily visit scheduling with route optimization',
+      title: 'Προγραμματισμός Επισκέψεων',
+      description: 'Δυναμικός ημερήσιος προγραμματισμός επισκέψεων με βελτιστοποίηση διαδρομής',
       icon: 'Calendar',
       path: '/visit-scheduling',
       color: 'text-accent',
       bgColor: 'bg-accent/10'
     },
     {
-      title: 'Customer Management',
-      description: 'Customer database and territory management tools',
+      title: 'Διαχείριση Πελατών',
+      description: 'Βάση πελατών και εργαλεία διαχείρισης περιοχών',
       icon: 'Users',
       path: '/customer-management',
       color: 'text-success',
       bgColor: 'bg-success/10'
     },
     {
-      title: 'Performance Analytics',
-      description: 'Comprehensive performance reporting and analysis',
+      title: 'Αναλύσεις Απόδοσης',
+      description: 'Ολοκληρωμένες αναφορές και ανάλυση απόδοσης',
       icon: 'TrendingUp',
       path: '/performance-analytics',
       color: 'text-warning',
@@ -75,16 +88,16 @@ const ManagerDashboard = () => {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6">
             <div>
               <h1 className="text-2xl lg:text-3xl font-bold text-foreground mb-2">
-                Manager Dashboard
+                Ταμπλό Διαχειριστή
               </h1>
               <p className="text-muted-foreground">
-                Real-time oversight of field operations and team performance
+                Παρακολούθηση λειτουργιών πεδίου και απόδοσης ομάδας σε πραγματικό χρόνο
               </p>
             </div>
             
             <div className="flex items-center space-x-3 mt-4 lg:mt-0">
               <div className="text-sm text-muted-foreground">
-                Last updated: {lastRefresh?.toLocaleTimeString()}
+                Τελευταία ενημέρωση: {lastRefresh?.toLocaleTimeString()}
               </div>
               <Button
                 variant="outline"
@@ -93,33 +106,36 @@ const ManagerDashboard = () => {
                 loading={isRefreshing}
                 iconName="RefreshCw"
               >
-                Refresh
+                Ανανέωση
               </Button>
             </div>
           </div>
 
           {/* Performance Metrics */}
-          <PerformanceMetrics className="mb-6" />
+          {loadError && (
+            <div className="mb-4 p-3 bg-error/10 text-error rounded-lg text-sm">{loadError}</div>
+          )}
+          <PerformanceMetrics className="mb-6" data={teamStatus?.summary} loading={isRefreshing && !teamStatus} />
 
           {/* Main Content Grid */}
           <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
             {/* Map and Team Status - Takes 2 columns on xl screens */}
             <div className="xl:col-span-2 space-y-6">
-              <TeamStatusMap />
-              <TeamOverview />
+              <TeamStatusMap salesmen={teamStatus?.salesmen} />
+              <TeamOverview salesmen={teamStatus?.salesmen} />
             </div>
 
             {/* Right Sidebar - Takes 1 column on xl screens */}
             <div className="space-y-6">
               <QuickActions />
-              <ActivityFeed />
+              <ActivityFeed activities={activities} />
             </div>
           </div>
 
           {/* Navigation Cards */}
           <div className="mb-6">
             <h2 className="text-xl font-semibold text-foreground mb-4">
-              Quick Navigation
+              Γρήγορη Πλοήγηση
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
               {navigationCards?.map((card) => (
@@ -147,7 +163,7 @@ const ManagerDashboard = () => {
           {/* Mobile Quick Actions */}
           <div className="lg:hidden">
             <h2 className="text-xl font-semibold text-foreground mb-4">
-              Mobile Actions
+              Ενέργειες Mobile
             </h2>
             <div className="grid grid-cols-2 gap-3">
               <Link
@@ -155,14 +171,14 @@ const ManagerDashboard = () => {
                 className="flex items-center justify-center space-x-2 p-4 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
               >
                 <Icon name="Smartphone" size={20} />
-                <span className="font-medium">My Day</span>
+                <span className="font-medium">Η Μέρα Μου</span>
               </Link>
               <Button
                 variant="outline"
                 className="flex items-center justify-center space-x-2 p-4"
                 iconName="Bell"
               >
-                <span className="font-medium">Alerts</span>
+                <span className="font-medium">Ειδοποιήσεις</span>
               </Button>
             </div>
           </div>
@@ -171,14 +187,14 @@ const ManagerDashboard = () => {
           <div className="mt-8 p-4 bg-muted/30 rounded-lg">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between">
               <div className="text-sm text-muted-foreground">
-                <p>Dashboard automatically refreshes every 30 seconds for real-time updates.</p>
+                <p>Το ταμπλό ανανεώνεται αυτόματα κάθε 30 δευτερόλεπτα για ενημέρωση σε πραγματικό χρόνο.</p>
                 <p className="mt-1">
-                  For urgent issues, use the quick actions panel or contact team members directly.
+                  Για επείγοντα ζητήματα, χρησιμοποιήστε το πάνελ γρήγορων ενεργειών ή επικοινωνήστε άμεσα με μέλη της ομάδας.
                 </p>
               </div>
               <div className="mt-3 md:mt-0">
                 <Button variant="ghost" size="sm" iconName="HelpCircle">
-                  Help & Support
+                  Βοήθεια και Υποστήριξη
                 </Button>
               </div>
             </div>

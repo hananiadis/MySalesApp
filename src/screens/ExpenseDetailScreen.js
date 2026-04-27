@@ -1,5 +1,6 @@
 import React, { useMemo, useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert, SafeAreaView, Modal, FlatList, Switch, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, Alert, Modal, FlatList, Switch, KeyboardAvoidingView, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
 import {
@@ -20,9 +21,20 @@ import { useExpense } from '../context/ExpenseContext';
 import { isExpenseApproverRole } from '../constants/roles';
 import { getAllCars, getCachedCars } from '../services/carsService';
 
+const TOKENS = {
+  primaryBlue: '#185FA5',
+  lightBlueBg: '#E6F1FB',
+  pageBackground: '#f7f5f0',
+  surface: '#fff',
+  border: '#e0ddd6',
+  borderSoft: '#e8e5de',
+  textPrimary: '#1a1a1a',
+  textSecondary: '#888',
+};
+
 const statusOptions = [
   { id: EXPENSE_STATUS.DRAFT, label: 'Πρόχειρο' },
-  { id: EXPENSE_STATUS.SUBMITTED, label: 'Υποβλημένο' },
+  { id: EXPENSE_STATUS.SUBMITTED, label: 'Υποβληθέν' },
   { id: EXPENSE_STATUS.APPROVED, label: 'Εγκεκριμένο' }
 ];
 
@@ -166,7 +178,7 @@ const ExpenseDetailScreen = () => {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: '#F7F9FC' }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: TOKENS.pageBackground }}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={{ flex: 1 }}
@@ -178,7 +190,7 @@ const ExpenseDetailScreen = () => {
           keyboardShouldPersistTaps="handled"
         >
         <TouchableOpacity onPress={goToExpenses} style={styles.backPill} activeOpacity={0.85}>
-          <Ionicons name="chevron-back" size={18} color="#1D4ED8" />
+          <Ionicons name="chevron-back" size={18} color={TOKENS.primaryBlue} />
           <Text style={styles.backPillText}>Έξοδα</Text>
         </TouchableOpacity>
         <Text style={styles.title}>{existingExpense ? 'Επεξεργασία Εξόδου' : 'Νέο Έξοδο'}</Text>
@@ -271,11 +283,11 @@ const ExpenseDetailScreen = () => {
         {/* DYNAMIC FIELDS - FUEL */}
         {category === 'fuel' && (
           <>
-            <Text style={[styles.label, { marginTop: 16, fontWeight: '700', color: '#1D4ED8' }]}>⛽ Καύσιμα</Text>
+            <Text style={styles.sectionAccentTitle}>⛽ Καύσιμα</Text>
 
             <Text style={styles.label}>Αυτοκίνητο</Text>
             <TouchableOpacity style={styles.input} onPress={() => setCarsModalVisible(true)}>
-              <Text style={{ color: selectedCar ? '#111827' : '#CBD5E1' }}>
+              <Text style={[styles.selectInputText, !selectedCar && styles.selectInputPlaceholder]}>
                 {getSelectedCarLabel()}
               </Text>
             </TouchableOpacity>
@@ -339,9 +351,9 @@ const ExpenseDetailScreen = () => {
             </View>
 
             {/* TOTAL FUEL COST SECTION */}
-            <Text style={[styles.label, { marginTop: 20, fontWeight: '700', fontSize: 15, color: '#1D4ED8' }]}>💰 Συνολικό Κόστος Ανεφοδίασης</Text>
+            <Text style={styles.sectionAccentTitleLarge}>💰 Συνολικό Κόστος Ανεφοδίασης</Text>
             <TextInput
-              style={[styles.input, { backgroundColor: '#E0E7FF', fontWeight: '600', fontSize: 15 }]}
+              style={[styles.input, styles.emphasisInput]}
               placeholder="Σύνολο"
               value={totalCost}
               onChangeText={setTotalCost}
@@ -368,11 +380,11 @@ const ExpenseDetailScreen = () => {
         {/* DYNAMIC FIELDS - CAR SERVICE */}
         {category === 'car_service' && (
           <>
-            <Text style={[styles.label, { marginTop: 16, fontWeight: '700', color: '#1D4ED8' }]}>🔧 Service</Text>
+            <Text style={styles.sectionAccentTitle}>🔧 Service</Text>
 
             <Text style={styles.label}>Αυτοκίνητο</Text>
             <TouchableOpacity style={styles.input} onPress={() => setCarsModalVisible(true)}>
-              <Text style={{ color: selectedCar ? '#111827' : '#CBD5E1' }}>
+              <Text style={[styles.selectInputText, !selectedCar && styles.selectInputPlaceholder]}>
                 {getSelectedCarLabel()}
               </Text>
             </TouchableOpacity>
@@ -392,7 +404,7 @@ const ExpenseDetailScreen = () => {
         {/* DYNAMIC FIELDS - HOTEL */}
         {category === 'hotel' && (
           <>
-            <Text style={[styles.label, { marginTop: 16, fontWeight: '700', color: '#1D4ED8' }]}>🏨 Ξενοδοχείο</Text>
+            <Text style={styles.sectionAccentTitle}>🏨 Ξενοδοχείο</Text>
 
             <Text style={styles.label}>Όνομα Ξενοδοχείου</Text>
             <TextInput
@@ -418,7 +430,7 @@ const ExpenseDetailScreen = () => {
         {/* DYNAMIC FIELDS - TICKETS */}
         {category === 'tickets' && (
           <>
-            <Text style={[styles.label, { marginTop: 16, fontWeight: '700', color: '#1D4ED8' }]}>🎫 Εισιτήριο</Text>
+            <Text style={styles.sectionAccentTitle}>🎫 Εισιτήριο</Text>
 
             <Text style={styles.label}>Αναχώρηση</Text>
             <TextInput
@@ -452,7 +464,7 @@ const ExpenseDetailScreen = () => {
         {/* DYNAMIC FIELDS - TAXI */}
         {category === 'taxi' && (
           <>
-            <Text style={[styles.label, { marginTop: 16, fontWeight: '700', color: '#1D4ED8' }]}>🚕 Ταξί</Text>
+            <Text style={styles.sectionAccentTitle}>🚕 Ταξί</Text>
 
             <Text style={styles.label}>Αναχώρηση</Text>
             <TextInput
@@ -538,7 +550,7 @@ const ExpenseDetailScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F7F9FC', padding: 16 },
+  container: { flex: 1, backgroundColor: TOKENS.pageBackground, padding: 16 },
   backPill: {
     alignSelf: 'flex-start',
     flexDirection: 'row',
@@ -547,46 +559,51 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
     paddingHorizontal: 10,
     borderRadius: 999,
-    backgroundColor: '#EEF2FF',
+    backgroundColor: TOKENS.lightBlueBg,
     borderWidth: 1,
-    borderColor: '#E0E7FF',
+    borderColor: TOKENS.borderSoft,
     marginBottom: 12,
   },
-  backPillText: { color: '#1D4ED8', fontWeight: '800', fontSize: 12 },
-  title: { fontSize: 22, fontWeight: '700', color: '#0F172A', marginBottom: 12 },
-  label: { fontSize: 14, fontWeight: '600', color: '#1F2937', marginTop: 14, marginBottom: 6 },
+  backPillText: { color: TOKENS.primaryBlue, fontWeight: '800', fontSize: 12 },
+  title: { fontSize: 22, fontWeight: '700', color: TOKENS.textPrimary, marginBottom: 12 },
+  label: { fontSize: 14, fontWeight: '600', color: TOKENS.textPrimary, marginTop: 14, marginBottom: 6 },
   groupBlock: { marginBottom: 10 },
-  groupTitle: { fontSize: 12, fontWeight: '600', color: '#6B7280', marginBottom: 8 },
+  groupTitle: { fontSize: 12, fontWeight: '600', color: TOKENS.textSecondary, marginBottom: 8 },
+  sectionAccentTitle: { marginTop: 16, fontWeight: '700', color: TOKENS.primaryBlue, fontSize: 14 },
+  sectionAccentTitleLarge: { marginTop: 20, fontWeight: '700', fontSize: 15, color: TOKENS.primaryBlue },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
-  chip: { backgroundColor: '#E5E7EB', borderRadius: 14, paddingHorizontal: 12, paddingVertical: 8 },
-  chipSelected: { backgroundColor: '#1D4ED8' },
-  chipText: { color: '#0F172A', fontSize: 13 },
+  chip: { backgroundColor: TOKENS.pageBackground, borderRadius: 14, paddingHorizontal: 12, paddingVertical: 8, borderWidth: 1, borderColor: TOKENS.border },
+  chipSelected: { backgroundColor: TOKENS.primaryBlue, borderColor: TOKENS.primaryBlue },
+  chipText: { color: TOKENS.textPrimary, fontSize: 13 },
   chipTextSelected: { color: '#FFF' },
-  input: { backgroundColor: '#FFF', borderWidth: 1, borderColor: '#E5E7EB', borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10, fontSize: 14 },
+  input: { backgroundColor: TOKENS.surface, borderWidth: 1, borderColor: TOKENS.border, borderRadius: 10, paddingHorizontal: 12, paddingVertical: 10, fontSize: 14 },
+  emphasisInput: { backgroundColor: TOKENS.lightBlueBg, fontWeight: '600', fontSize: 15 },
+  selectInputText: { color: TOKENS.textPrimary },
+  selectInputPlaceholder: { color: '#CBD5E1' },
   textArea: { minHeight: 80, textAlignVertical: 'top' },
   paymentMethodRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 12 },
   statusRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 12 },
-  statusChip: { borderWidth: 1, borderColor: '#CBD5E1', borderRadius: 14, paddingHorizontal: 10, paddingVertical: 8 },
-  statusChipSelected: { backgroundColor: '#E0E7FF', borderColor: '#A5B4FC' },
-  statusText: { color: '#111827', fontSize: 13 },
-  statusTextSelected: { color: '#1D4ED8', fontWeight: '700' },
-  infoBox: { backgroundColor: '#E0E7FF', padding: 12, borderRadius: 10, marginTop: 12, marginBottom: 12 },
-  infoLabel: { fontSize: 12, color: '#1D4ED8', marginBottom: 4 },
-  infoValue: { fontSize: 18, fontWeight: '700', color: '#1D4ED8' },
+  statusChip: { borderWidth: 1, borderColor: TOKENS.border, borderRadius: 14, paddingHorizontal: 10, paddingVertical: 8, backgroundColor: TOKENS.surface },
+  statusChipSelected: { backgroundColor: TOKENS.lightBlueBg, borderColor: TOKENS.primaryBlue },
+  statusText: { color: TOKENS.textPrimary, fontSize: 13 },
+  statusTextSelected: { color: TOKENS.primaryBlue, fontWeight: '700' },
+  infoBox: { backgroundColor: TOKENS.lightBlueBg, padding: 12, borderRadius: 10, marginTop: 12, marginBottom: 12 },
+  infoLabel: { fontSize: 12, color: TOKENS.primaryBlue, marginBottom: 4 },
+  infoValue: { fontSize: 18, fontWeight: '700', color: TOKENS.primaryBlue },
   checkboxRow: { marginTop: 12, marginBottom: 12 },
   checkboxItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8 },
-  checkboxLabel: { marginLeft: 12, color: '#111827', fontSize: 14 },
-  primaryButton: { backgroundColor: '#007AFF', paddingVertical: 14, alignItems: 'center', borderRadius: 12, marginTop: 20 },
+  checkboxLabel: { marginLeft: 12, color: TOKENS.textPrimary, fontSize: 14 },
+  primaryButton: { backgroundColor: TOKENS.primaryBlue, paddingVertical: 14, alignItems: 'center', borderRadius: 12, marginTop: 20 },
   primaryButtonText: { color: '#FFF', fontWeight: '700', fontSize: 15 },
   buttonDisabled: { opacity: 0.7 },
-  modalContainer: { flex: 1, backgroundColor: '#F7F9FC' },
-  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, backgroundColor: '#FFF', borderBottomWidth: 1, borderBottomColor: '#E5E7EB' },
-  modalTitle: { fontSize: 18, fontWeight: '700', color: '#0F172A' },
-  modalCloseButton: { fontSize: 24, color: '#6B7280' },
-  carItem: { backgroundColor: '#FFF', padding: 14, borderBottomWidth: 1, borderBottomColor: '#E5E7EB' },
-  carItemSelected: { backgroundColor: '#E0E7FF' },
-  carItemText: { fontSize: 14, fontWeight: '600', color: '#111827' },
-  carItemLicense: { fontSize: 13, color: '#6B7280', marginTop: 4 }
+  modalContainer: { flex: 1, backgroundColor: TOKENS.pageBackground },
+  modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 12, backgroundColor: TOKENS.surface, borderBottomWidth: 1, borderBottomColor: TOKENS.border },
+  modalTitle: { fontSize: 18, fontWeight: '700', color: TOKENS.textPrimary },
+  modalCloseButton: { fontSize: 24, color: TOKENS.textSecondary },
+  carItem: { backgroundColor: TOKENS.surface, padding: 14, borderBottomWidth: 1, borderBottomColor: TOKENS.border },
+  carItemSelected: { backgroundColor: TOKENS.lightBlueBg },
+  carItemText: { fontSize: 14, fontWeight: '600', color: TOKENS.textPrimary },
+  carItemLicense: { fontSize: 13, color: TOKENS.textSecondary, marginTop: 4 }
 });
 
 export default ExpenseDetailScreen;

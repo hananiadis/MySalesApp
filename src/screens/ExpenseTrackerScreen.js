@@ -1,36 +1,107 @@
-import React, { useMemo, useState, useEffect, useCallback } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, ScrollView, ActivityIndicator, Modal, Alert } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  ActivityIndicator,
+  Modal,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import SafeScreen from '../components/SafeScreen';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
+
 import ExpenseDetailModal from '../components/ExpenseDetailModal';
 import { useExpense } from '../context/ExpenseContext';
-import { isExpenseApproverRole } from '../constants/roles';
-import { EXPENSE_GROUPS, EXPENSE_STATUS, getAllCategoryGroups, getCategoriesByGroup, getCategoryLabel, formatDateDDMMYYYY, getWeekId, getMondayFromWeekId, getWeekStartEnd } from '../constants/expenseConstants';
-import colors from '../theme/colors';
-import CurvedBottomBar from '../components/CurvedBottomBar';
+import {
+  EXPENSE_GROUPS,
+  EXPENSE_STATUS,
+  getAllCategoryGroups,
+  getCategoriesByGroup,
+  getCategoryLabel,
+  formatDateDDMMYYYY,
+  getWeekId,
+  getMondayFromWeekId,
+  getWeekStartEnd,
+} from '../constants/expenseConstants';
+import { useAuth } from '../context/AuthProvider';
+import { getModuleAccess } from '../utils/moduleAccess';
 
-const BOTTOM_BAR_HEIGHT = 140;
+const TOKENS = {
+  primaryBlue: '#185FA5',
+  lightBlueBg: '#E6F1FB',
+  lightBlueText: '#E6F1FB',
+  amber: '#EF9F27',
+  amberDark: '#BA7517',
+  amberBg: '#FAEEDA',
+  amberText: '#854F0B',
+  amberBorder: '#FAC775',
+  green: '#639922',
+  greenBg: '#EAF3DE',
+  greenText: '#3B6D11',
+  greenBorder: '#C0DD97',
+  redDark: '#A32D2D',
+  redBg: '#FCEBEB',
+  redBorder: '#F7C1C1',
+  pageBackground: '#f7f5f0',
+  summaryBar: '#ece9e3',
+  surface: '#fff',
+  border: '#e0ddd6',
+  borderSoft: '#e8e5de',
+  textPrimary: '#1a1a1a',
+  textSecondary: '#888',
+  textTertiary: '#aaa',
+  pillNeutral: '#f0ede8',
+  progressTrack: '#f0ede8',
+  headerPillBorder: '#d8d5ce',
+};
+
+const BOTTOM_NAV_HEIGHT = 104;
+const MONTH_NAMES = [
+  'Ιανουάριος',
+  'Φεβρουάριος',
+  'Μάρτιος',
+  'Απρίλιος',
+  'Μάιος',
+  'Ιούνιος',
+  'Ιούλιος',
+  'Αύγουστος',
+  'Σεπτέμβριος',
+  'Οκτώβριος',
+  'Νοέμβριος',
+  'Δεκέμβριος',
+];
 
 const STRINGS = {
   title: 'Εξοδολόγιο',
+  back: '← Επιστροφή',
   newExpense: 'Νέο Έξοδο',
   expenseReports: 'Αναφορές Εξόδων',
   weeklyTracking: 'Εβδομαδιαία Καταγραφή',
   weeklyReport: 'Εβδομαδιαίο Εξοδολόγιο',
   managerReports: 'Αναφορές Ομάδας',
-  inbox: 'Inbox',
+  inbox: 'Εισερχόμενα',
   backToHome: 'Επιστροφή στην κεντρική',
-};
-
-const ICONS = {
-  newExpense: 'add',
-  expenseReports: 'document-text-outline',
-  weeklyTracking: 'calendar-outline',
-  weeklyReport: 'file-tray-full-outline',
-  managerReports: 'people-outline',
-  inbox: 'mail-unread-outline',
-  back: 'arrow-back-circle-outline',
+  monthTotal: 'Σύνολο Μήνα',
+  expenses: 'Έξοδα',
+  drafts: 'Πρόχειρα',
+  all: 'Όλες',
+  draftsPlural: 'Πρόχειρες',
+  submittedPlural: 'Υποβληθείσες',
+  approvedPlural: 'Εγκεκριμένες',
+  sectionTitle: 'ΠΡΟΣΦΑΤΕΣ ΕΒΔΟΜΑΔΙΑΙΕΣ ΑΝΑΦΟΡΕΣ',
+  distributionSuffix: 'κατανομή εξόδων',
+  fuel: 'Καύσιμα',
+  accommodation: 'Διαμονή',
+  submit: 'Υποβολή →',
+  notSubmitted: 'Δεν έχει υποβληθεί',
+  noReports: 'Δεν υπάρχουν εβδομαδιαίες αναφορές',
+  noReportsSubtitle: 'Πατήστε το + για να προσθέσετε έξοδο.',
+  selectCategory: 'Επιλέξτε Κατηγορία',
+  selectGroupHint: 'Επιλέξτε ομάδα εξόδων για γρήγορη καταχώρηση.',
+  selectCategoryHint: 'Επιλέξτε κατηγορία για νέο έξοδο.',
 };
 
 const STATUS_LABELS = {
@@ -39,22 +110,75 @@ const STATUS_LABELS = {
   [EXPENSE_STATUS.APPROVED]: 'Εγκεκριμένο',
 };
 
-const STATUS_COLORS = {
-  [EXPENSE_STATUS.DRAFT]: { bg: '#E5E7EB', fg: '#111827' },
-  [EXPENSE_STATUS.SUBMITTED]: { bg: '#FEF3C7', fg: '#92400E' },
-  [EXPENSE_STATUS.APPROVED]: { bg: '#DCFCE7', fg: '#166534' },
+const STATUS_META = {
+  [EXPENSE_STATUS.DRAFT]: {
+    borderColor: TOKENS.amber,
+    badgeBackground: TOKENS.amberBg,
+    badgeText: TOKENS.amberText,
+    iconBackground: TOKENS.lightBlueBg,
+    opacity: 1,
+  },
+  [EXPENSE_STATUS.SUBMITTED]: {
+    borderColor: TOKENS.primaryBlue,
+    badgeBackground: TOKENS.lightBlueBg,
+    badgeText: TOKENS.primaryBlue,
+    iconBackground: TOKENS.lightBlueBg,
+    opacity: 0.75,
+  },
+  [EXPENSE_STATUS.APPROVED]: {
+    borderColor: TOKENS.green,
+    badgeBackground: TOKENS.greenBg,
+    badgeText: TOKENS.greenText,
+    iconBackground: TOKENS.greenBg,
+    opacity: 0.65,
+  },
+};
+
+const FILTERS = [
+  { key: 'all', label: STRINGS.all, variant: 'all' },
+  { key: EXPENSE_STATUS.DRAFT, label: STRINGS.draftsPlural, variant: 'default' },
+  { key: EXPENSE_STATUS.SUBMITTED, label: STRINGS.submittedPlural, variant: 'default' },
+  { key: EXPENSE_STATUS.APPROVED, label: STRINGS.approvedPlural, variant: 'green' },
+];
+
+const FUEL_CATEGORY_IDS = new Set(['fuel']);
+const ACCOMMODATION_CATEGORY_IDS = new Set(['hotel', 'personal_meal', 'third_party_meal']);
+
+const formatWholeEuro = (value) => `€${Math.round(Number(value || 0)).toLocaleString('el-GR')}`;
+const formatCurrency = (value) =>
+  `€${Number(value || 0).toLocaleString('el-GR', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })}`;
+
+const getProfileInitials = (profile) => {
+  const source = [profile?.firstName, profile?.lastName].filter(Boolean).join(' ').trim()
+    || profile?.name
+    || profile?.displayName
+    || profile?.email
+    || 'ΧΑ';
+  const parts = source.split(/\s+/).filter(Boolean);
+  if (parts.length === 1) {
+    return parts[0].slice(0, 2).toUpperCase();
+  }
+  return parts
+    .slice(0, 2)
+    .map((part) => (part[0] || '').toUpperCase())
+    .join('');
 };
 
 const ExpenseTrackerScreen = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+  const insets = useSafeAreaInsets();
+  const { profile } = useAuth();
+  const moduleAccess = getModuleAccess(profile);
   const {
     expenses,
-    filteredExpenses,
-    summary,
     loading,
     userRole,
     fetchWeeklyTracking,
-    deleteExistingExpense
+    deleteExistingExpense,
   } = useExpense();
 
   const [menuVisible, setMenuVisible] = useState(false);
@@ -62,288 +186,96 @@ const ExpenseTrackerScreen = () => {
   const [expenseModalVisible, setExpenseModalVisible] = useState(false);
   const [selectedExpenseId, setSelectedExpenseId] = useState(null);
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
-
   const [weekStatusById, setWeekStatusById] = useState({});
-
-  const categoriesByGroup = useMemo(() => {
-    return getAllCategoryGroups().map((group) => ({
-      group,
-      categories: getCategoriesByGroup(group)
-    }));
-  }, []);
+  const [activeFilter, setActiveFilter] = useState('all');
 
   useEffect(() => {
-    console.log('[ExpenseTrackerScreen] mounted');
-    return () => console.log('[ExpenseTrackerScreen] unmounted');
-  }, []);
-
-  // Custom layout strategy to show all tabs (no matter how many)
-  const layoutStrategy = useMemo(() => {
-    return (routes) => {
-      const splitIndex = Math.ceil(routes.length / 2);
-      return {
-        leftRoutes: routes.slice(0, splitIndex),
-        rightRoutes: routes.slice(splitIndex),
-      };
-    };
-  }, []);
-
-  const bottomTabs = useMemo(() => {
-    const isManagerRole = isExpenseApproverRole(userRole);
-    const tabs = [
-      {
-        key: 'expense-reports',
-        name: 'ExpenseReports',
-        label: STRINGS.expenseReports,
-        icon: ICONS.expenseReports,
-      },
-      {
-        key: 'weekly-tracking',
-        name: 'WeeklyTracking',
-        label: STRINGS.weeklyTracking,
-        icon: ICONS.weeklyTracking,
-      },
-      {
-        key: 'weekly-report',
-        name: 'WeeklyReport',
-        label: STRINGS.weeklyReport,
-        icon: ICONS.weeklyReport,
-      },
-    ];
-
-    if (isManagerRole) {
-      tabs.push({
-        key: 'inbox',
-        name: 'ManagerInbox',
-        label: STRINGS.inbox,
-        icon: ICONS.inbox,
-      });
-      tabs.push({
-        key: 'manager-reports',
-        name: 'ManagerWeeklyReport',
-        label: STRINGS.managerReports,
-        icon: ICONS.managerReports,
-      });
+    if (route?.params?.openAddMenu) {
+      setMenuVisible(true);
+      navigation.setParams({ openAddMenu: false });
     }
+  }, [navigation, route?.params?.openAddMenu]);
 
-    return tabs;
-  }, [userRole]);
+  const salespersonInitials = useMemo(() => getProfileInitials(profile), [profile]);
 
-  const bottomState = useMemo(() => ({
-    index: -1,
-    routes: bottomTabs.map((tab) => ({
-      key: tab.key,
-      name: tab.key,
-      params: undefined,
-    })),
-  }), [bottomTabs]);
-
-  const bottomDescriptors = useMemo(() => {
-    return bottomTabs.reduce((acc, tab) => {
-      acc[tab.key] = {
-        options: {
-          tabBarVisible: true,
-          tabBarLabel: tab.label,
-          tabBarIcon: ({ color, size, focused }) => (
-            <Ionicons name={tab.icon} size={size} color={color} />
-          ),
-        },
-      };
-      return acc;
-    }, {});
-  }, [bottomTabs]);
-
-  // Custom navigation wrapper that intercepts tab presses and navigates correctly
-  const customBottomNavigation = useMemo(() => ({
-    ...navigation,
-    navigate: (routeName, params) => {
-      const tab = bottomTabs.find((t) => t.key === routeName);
-      console.log('[ExpenseTrackerScreen] BottomBar navigate:', { routeName, params, tab });
-      if (tab && tab.name) {
-        try {
-          navigation.navigate(tab.name, params);
-        } catch (error) {
-          console.warn(`Navigation failed for ${tab.name}:`, error.message);
-        }
-      } else {
-        console.warn('[ExpenseTrackerScreen] BottomBar route not found:', { routeName });
-      }
-    },
-    emit: ({ type, target }) => {
-      console.log('[ExpenseTrackerScreen] BottomBar emit:', { type, target });
-      return { defaultPrevented: false };
-    },
-  }), [navigation, bottomTabs]);
-
-  const handleGroupSelect = (group) => {
-    setSelectedGroup(group);
-  };
-
-  const handleCategorySelect = (categoryId) => {
-    setMenuVisible(false);
-    setSelectedGroup(null);
-    setSelectedCategoryId(categoryId);
-    setSelectedExpenseId(null);
-    setExpenseModalVisible(true);
-  };
-
-  const handleCloseMenu = () => {
-    setMenuVisible(false);
-    setSelectedGroup(null);
-  };
-
-  const handleExpensePress = (expenseId) => {
-    setSelectedExpenseId(expenseId);
-    setSelectedCategoryId(null);
-    setExpenseModalVisible(true);
-  };
-
-  const handleDeleteExpense = (expenseId) => {
-    console.log('[ExpenseTrackerScreen] Delete requested:', { expenseId });
-    Alert.alert(
-      'Διαγραφή Εξόδου',
-      'Είστε σίγουρος ότι θέλετε να διαγράψετε αυτό το έξοδο;',
-      [
-        {
-          text: 'Ακύρωση',
-          onPress: () => {},
-          style: 'cancel',
-        },
-        {
-          text: 'Διαγραφή',
-          onPress: async () => {
-            try {
-              console.log('[ExpenseTrackerScreen] Deleting expense:', { expenseId });
-              await deleteExistingExpense(expenseId);
-              console.log('[ExpenseTrackerScreen] Deleted expense:', { expenseId });
-            } catch (error) {
-              Alert.alert('Σφάλμα', 'Αποτυχία διαγραφής εξόδου: ' + error.message);
-            }
-          },
-          style: 'destructive',
-        },
-      ]
-    );
-  };
-
-  const handleCloseExpenseModal = () => {
-    setExpenseModalVisible(false);
-    setSelectedExpenseId(null);
-    setSelectedCategoryId(null);
-  };
-
-  const getGroupIcon = (group) => {
-    switch (group) {
-      case EXPENSE_GROUPS.TRAVEL:
-        return '🚗';
-      case EXPENSE_GROUPS.ACCOMMODATION_FOOD:
-        return '🏨';
-      case EXPENSE_GROUPS.MISCELLANEOUS:
-        return '📋';
-      default:
-        return '📝';
-    }
-  };
-
-  const getGroupColor = (group) => {
-    switch (group) {
-      case EXPENSE_GROUPS.TRAVEL:
-        return '#0891B2'; // Cyan
-      case EXPENSE_GROUPS.ACCOMMODATION_FOOD:
-        return '#10B981'; // Green
-      case EXPENSE_GROUPS.MISCELLANEOUS:
-        return '#F59E0B'; // Amber
-      default:
-        return '#6B7280';
-    }
-  };
-
-  const renderExpense = ({ item }) => (
-    <View style={styles.expenseItemContainer}>
-      <TouchableOpacity
-        style={styles.expenseItem}
-        onPress={() => handleExpensePress(item.id)}
-        activeOpacity={0.7}
-      >
-        <View style={styles.expenseRow}>
-          <Text style={styles.expenseDate}>{formatDateDDMMYYYY(new Date(item.date))}</Text>
-          <Text style={styles.expenseAmount}>€{item.amount.toFixed(2)}</Text>
-        </View>
-        <View style={styles.expenseRow}>
-          <Text style={styles.expenseCategory}>{getCategoryLabel(item.category)}</Text>
-          <Text style={styles.expenseStatus}>{item.status}</Text>
-        </View>
-        {!!item.description && <Text style={styles.expenseDescription}>{item.description}</Text>}
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.deleteButton}
-        onPress={() => handleDeleteExpense(item.id)}
-        activeOpacity={0.8}
-      >
-        <Ionicons name="trash-outline" size={20} color={colors.white} />
-      </TouchableOpacity>
-    </View>
+  const categoriesByGroup = useMemo(
+    () => getAllCategoryGroups().map((group) => ({ group, categories: getCategoriesByGroup(group) })),
+    []
   );
 
-  const recentWeeklyReports = useMemo(() => {
+  const groupedReports = useMemo(() => {
     const byWeek = new Map();
 
-    (expenses || []).forEach((exp) => {
-      const expDate = new Date(exp.date);
-      const weekId = getWeekId(expDate);
+    (expenses || []).forEach((expense) => {
+      const expenseDate = new Date(expense.date);
+      const weekId = getWeekId(expenseDate);
       const current = byWeek.get(weekId) || {
         weekId,
         totalAmount: 0,
         expenseCount: 0,
-        latestDate: expDate,
+        latestDate: expenseDate,
         baseStatus: EXPENSE_STATUS.DRAFT,
+        categoryTotals: {},
+        expenseIds: [],
       };
 
-      current.totalAmount += Number(exp.amount || 0);
+      current.totalAmount += Number(expense.amount || 0);
       current.expenseCount += 1;
-      if (expDate > current.latestDate) current.latestDate = expDate;
+      current.categoryTotals[expense.category] = (current.categoryTotals[expense.category] || 0) + Number(expense.amount || 0);
+      current.expenseIds.push(expense.id);
 
-      if (exp.status === EXPENSE_STATUS.APPROVED) current.baseStatus = EXPENSE_STATUS.APPROVED;
-      else if (exp.status === EXPENSE_STATUS.SUBMITTED && current.baseStatus !== EXPENSE_STATUS.APPROVED) {
+      if (expenseDate > current.latestDate) {
+        current.latestDate = expenseDate;
+      }
+
+      if (expense.status === EXPENSE_STATUS.APPROVED) {
+        current.baseStatus = EXPENSE_STATUS.APPROVED;
+      } else if (
+        expense.status === EXPENSE_STATUS.SUBMITTED
+        && current.baseStatus !== EXPENSE_STATUS.APPROVED
+      ) {
         current.baseStatus = EXPENSE_STATUS.SUBMITTED;
       }
 
       byWeek.set(weekId, current);
     });
 
-    return Array.from(byWeek.values())
-      .sort((a, b) => new Date(b.latestDate) - new Date(a.latestDate))
-      .slice(0, 6);
+    return Array.from(byWeek.values()).sort((left, right) => new Date(right.latestDate) - new Date(left.latestDate));
   }, [expenses]);
 
   useEffect(() => {
     let cancelled = false;
 
     const loadWeekStatuses = async () => {
-      if (!fetchWeeklyTracking) return;
-      if (!recentWeeklyReports.length) return;
+      if (!fetchWeeklyTracking || groupedReports.length === 0) {
+        return;
+      }
+
       try {
         const results = await Promise.all(
-          recentWeeklyReports.map(async (w) => {
+          groupedReports.map(async (report) => {
             try {
-              const tracking = await fetchWeeklyTracking(w.weekId);
-              return { weekId: w.weekId, status: tracking?.status };
+              const tracking = await fetchWeeklyTracking(report.weekId);
+              return { weekId: report.weekId, status: tracking?.status || null };
             } catch {
-              return { weekId: w.weekId, status: null };
+              return { weekId: report.weekId, status: null };
             }
           })
         );
 
-        if (cancelled) return;
-        setWeekStatusById((prev) => {
-          const next = { ...prev };
-          results.forEach((r) => {
-            if (r?.weekId && r.status) next[r.weekId] = r.status;
-          });
-          return next;
+        if (cancelled) {
+          return;
+        }
+
+        const nextStatuses = {};
+        results.forEach((result) => {
+          if (result.weekId && result.status) {
+            nextStatuses[result.weekId] = result.status;
+          }
         });
-      } catch (e) {
-        console.warn('[ExpenseTrackerScreen] Failed loading week statuses:', e?.message);
+        setWeekStatusById(nextStatuses);
+      } catch (error) {
+        console.warn('[ExpenseTrackerScreen] loadWeekStatuses failed:', error?.message);
       }
     };
 
@@ -351,616 +283,964 @@ const ExpenseTrackerScreen = () => {
     return () => {
       cancelled = true;
     };
-  }, [fetchWeeklyTracking, recentWeeklyReports]);
+  }, [fetchWeeklyTracking, groupedReports]);
 
-  const openWeek = useCallback(
-    (weekId) => {
-      navigation.navigate('WeeklyTracking', { weekId });
-    },
-    [navigation]
+  const reports = useMemo(
+    () => groupedReports.map((report) => ({
+      ...report,
+      status: weekStatusById[report.weekId] || report.baseStatus || EXPENSE_STATUS.DRAFT,
+    })),
+    [groupedReports, weekStatusById]
   );
 
-  const renderWeeklyReportCard = useCallback(
-    ({ item }) => {
-      const monday = getMondayFromWeekId(item.weekId);
-      const { start, end } = getWeekStartEnd(monday);
-      const weekRange = `${formatDateDDMMYYYY(start)} - ${formatDateDDMMYYYY(end)}`;
-      const status = weekStatusById[item.weekId] || item.baseStatus || EXPENSE_STATUS.DRAFT;
-      const statusMeta = STATUS_COLORS[status] || STATUS_COLORS[EXPENSE_STATUS.DRAFT];
+  const filteredReports = useMemo(() => {
+    if (activeFilter === 'all') {
+      return reports;
+    }
+    return reports.filter((report) => report.status === activeFilter);
+  }, [activeFilter, reports]);
 
-      return (
-        <TouchableOpacity style={styles.weekCard} onPress={() => openWeek(item.weekId)} activeOpacity={0.8}>
-          <View style={styles.weekCardHeader}>
-            <View style={styles.weekCardHeaderLeft}>
-              <Ionicons name="calendar-outline" size={22} color={colors.primary} />
-              <View style={{ marginLeft: 10 }}>
-                <Text style={styles.weekCardTitle}>{item.weekId}</Text>
-                <Text style={styles.weekCardSubtitle}>{weekRange}</Text>
-              </View>
-            </View>
-            <View style={[styles.statusBadge, { backgroundColor: statusMeta.bg }]}>
-              <Text style={[styles.statusBadgeText, { color: statusMeta.fg }]}>{STATUS_LABELS[status] || status}</Text>
-            </View>
-          </View>
+  const currentMonthSummary = useMemo(() => {
+    const now = new Date();
+    const monthExpenses = (expenses || []).filter((expense) => {
+      const date = new Date(expense.date);
+      return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
+    });
 
-          <View style={styles.weekCardStats}>
-            <Text style={styles.weekCardStat}>{item.expenseCount} έξοδα</Text>
-            <Text style={styles.weekCardStat}>€{Number(item.totalAmount).toFixed(2)}</Text>
-          </View>
-        </TouchableOpacity>
-      );
-    },
-    [openWeek, weekStatusById]
-  );
+    const fuelAmount = monthExpenses.reduce(
+      (sum, expense) => sum + (FUEL_CATEGORY_IDS.has(expense.category) ? Number(expense.amount || 0) : 0),
+      0
+    );
+    const accommodationAmount = monthExpenses.reduce(
+      (sum, expense) => sum + (ACCOMMODATION_CATEGORY_IDS.has(expense.category) ? Number(expense.amount || 0) : 0),
+      0
+    );
+    const breakdownTotal = fuelAmount + accommodationAmount;
 
-  const emptyList = (
-    <View style={styles.emptyState}>
-      <Text style={styles.emptyTitle}>Δεν υπάρχουν εβδομαδιαίες αναφορές</Text>
-      <Text style={styles.emptySubtitle}>Πατήστε το κουμπί + για να προσθέσετε έξοδο.</Text>
+    return {
+      monthLabel: `${MONTH_NAMES[now.getMonth()]} ${now.getFullYear()} — ${STRINGS.distributionSuffix}`,
+      totalAmount: monthExpenses.reduce((sum, expense) => sum + Number(expense.amount || 0), 0),
+      expenseCount: monthExpenses.length,
+      draftCount: reports.filter((report) => report.status === EXPENSE_STATUS.DRAFT).length,
+      fuelAmount,
+      accommodationAmount,
+      fuelProgress: breakdownTotal > 0 ? fuelAmount / breakdownTotal : 0,
+      accommodationProgress: breakdownTotal > 0 ? accommodationAmount / breakdownTotal : 0,
+    };
+  }, [expenses, reports]);
+
+  const handleGroupSelect = useCallback((group) => {
+    setSelectedGroup(group);
+  }, []);
+
+  const handleCategorySelect = useCallback((categoryId) => {
+    setMenuVisible(false);
+    setSelectedGroup(null);
+    setSelectedCategoryId(categoryId);
+    setSelectedExpenseId(null);
+    setExpenseModalVisible(true);
+  }, []);
+
+  const handleCloseMenu = useCallback(() => {
+    setMenuVisible(false);
+    setSelectedGroup(null);
+  }, []);
+
+  const handleCloseExpenseModal = useCallback(() => {
+    setExpenseModalVisible(false);
+    setSelectedExpenseId(null);
+    setSelectedCategoryId(null);
+  }, []);
+
+  const openWeek = useCallback((weekId) => {
+    navigation.navigate('WeeklyTracking', { weekId });
+  }, [navigation]);
+
+  const getWeeklyTags = useCallback((report) => {
+    const fuelTotal = Object.entries(report.categoryTotals || {}).reduce(
+      (sum, [categoryId, amount]) => sum + (FUEL_CATEGORY_IDS.has(categoryId) ? Number(amount || 0) : 0),
+      0
+    );
+    const accommodationTotal = Object.entries(report.categoryTotals || {}).reduce(
+      (sum, [categoryId, amount]) => sum + (ACCOMMODATION_CATEGORY_IDS.has(categoryId) ? Number(amount || 0) : 0),
+      0
+    );
+
+    const tags = [];
+    if (fuelTotal > 0) {
+      tags.push({ key: 'fuel', label: `${STRINGS.fuel} ${formatWholeEuro(fuelTotal)}`, tone: 'blue' });
+    }
+    if (accommodationTotal > 0) {
+      tags.push({ key: 'accommodation', label: `${STRINGS.accommodation} ${formatWholeEuro(accommodationTotal)}`, tone: 'amber' });
+    }
+
+    if (tags.length > 0) {
+      return tags;
+    }
+
+    return Object.entries(report.categoryTotals || {})
+      .sort((left, right) => Number(right[1] || 0) - Number(left[1] || 0))
+      .slice(0, 2)
+      .map(([categoryId, amount], index) => ({
+        key: `${categoryId}-${index}`,
+        label: `${getCategoryLabel(categoryId)} ${formatWholeEuro(amount)}`,
+        tone: index === 0 ? 'blue' : 'amber',
+      }));
+  }, []);
+
+  const getGroupIconName = useCallback((group) => {
+    switch (group) {
+      case EXPENSE_GROUPS.TRAVEL:
+        return 'car-sport-outline';
+      case EXPENSE_GROUPS.ACCOMMODATION_FOOD:
+        return 'bed-outline';
+      case EXPENSE_GROUPS.MISCELLANEOUS:
+        return 'receipt-outline';
+      default:
+        return 'pricetag-outline';
+    }
+  }, []);
+
+  const getCategoryIconName = useCallback((categoryId) => {
+    switch (categoryId) {
+      case 'fuel':
+      case 'adblue':
+        return 'car-outline';
+      case 'tickets':
+        return 'ticket-outline';
+      case 'taxi':
+        return 'car-outline';
+      case 'hotel':
+        return 'business-outline';
+      case 'personal_meal':
+      case 'third_party_meal':
+        return 'restaurant-outline';
+      case 'car_service':
+        return 'build-outline';
+      case 'parking':
+        return 'car-outline';
+      case 'tolls':
+        return 'trail-sign-outline';
+      case 'office_supplies':
+        return 'document-text-outline';
+      case 'representation':
+        return 'people-outline';
+      default:
+        return 'pricetag-outline';
+    }
+  }, []);
+
+  const getGroupColor = useCallback((group) => {
+    switch (group) {
+      case EXPENSE_GROUPS.TRAVEL:
+        return TOKENS.primaryBlue;
+      case EXPENSE_GROUPS.ACCOMMODATION_FOOD:
+        return TOKENS.amber;
+      case EXPENSE_GROUPS.MISCELLANEOUS:
+        return TOKENS.green;
+      default:
+        return TOKENS.textSecondary;
+    }
+  }, []);
+
+  const getGroupIconColor = useCallback((group) => {
+    if (group === EXPENSE_GROUPS.TRAVEL) {
+      return TOKENS.surface;
+    }
+    return TOKENS.textPrimary;
+  }, []);
+
+  const getCategoryIconColor = useCallback((group) => {
+    if (group === EXPENSE_GROUPS.TRAVEL) {
+      return TOKENS.surface;
+    }
+    return TOKENS.textPrimary;
+  }, []);
+
+  const renderBreakdownRow = useCallback((label, amount, progress, fillColor) => (
+    <View style={styles.breakdownRow} key={label}>
+      <Text style={styles.breakdownLabel}>{label}</Text>
+      <View style={styles.breakdownTrack}>
+        <View
+          style={[
+            styles.breakdownFill,
+            {
+              width: `${Math.max(progress * 100, amount > 0 ? 6 : 0)}%`,
+              backgroundColor: fillColor,
+            },
+          ]}
+        />
+      </View>
+      <Text style={styles.breakdownAmount}>{formatWholeEuro(amount)}</Text>
     </View>
-  );
+  ), []);
+
+  const renderReportCard = useCallback((report) => {
+    const monday = getMondayFromWeekId(report.weekId);
+    const { start, end } = getWeekStartEnd(monday);
+    const statusMeta = STATUS_META[report.status] || STATUS_META[EXPENSE_STATUS.DRAFT];
+    const tags = getWeeklyTags(report);
+    const showDraftDetails = report.status === EXPENSE_STATUS.DRAFT;
+
+    return (
+      <TouchableOpacity
+        key={report.weekId}
+        style={[
+          styles.reportCard,
+          {
+            borderLeftColor: statusMeta.borderColor,
+            opacity: statusMeta.opacity,
+          },
+        ]}
+        activeOpacity={0.9}
+        onPress={() => openWeek(report.weekId)}
+      >
+        <View style={styles.reportTopRow}>
+          <View style={styles.reportHeaderBlock}>
+            <View style={[styles.reportIconSquare, { backgroundColor: statusMeta.iconBackground }]}>
+              <Text style={styles.reportIconEmoji}>📅</Text>
+            </View>
+
+            <View style={styles.reportHeaderTextBlock}>
+              <View style={styles.reportTitleRow}>
+                <Text style={styles.reportWeekTitle}>{report.weekId}</Text>
+                <View style={[styles.statusBadge, { backgroundColor: statusMeta.badgeBackground }]}>
+                  <Text style={[styles.statusBadgeText, { color: statusMeta.badgeText }]}>
+                    {STATUS_LABELS[report.status]}
+                  </Text>
+                </View>
+              </View>
+              <Text style={styles.reportDateRange}>
+                {formatDateDDMMYYYY(start)} – {formatDateDDMMYYYY(end)}
+              </Text>
+            </View>
+          </View>
+
+          <Text style={styles.reportAmount}>{formatCurrency(report.totalAmount)}</Text>
+        </View>
+
+        {showDraftDetails && tags.length > 0 ? (
+          <View style={styles.reportTagsRow}>
+            {tags.map((tag) => (
+              <View
+                key={tag.key}
+                style={[
+                  styles.expenseTag,
+                  tag.tone === 'amber' ? styles.expenseTagAmber : styles.expenseTagBlue,
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.expenseTagText,
+                    tag.tone === 'amber' ? styles.expenseTagTextAmber : styles.expenseTagTextBlue,
+                  ]}
+                >
+                  {tag.label}
+                </Text>
+              </View>
+            ))}
+          </View>
+        ) : null}
+
+        {showDraftDetails ? (
+          <View style={styles.reportFooterRow}>
+            <Text style={styles.reportFooterText}>
+              {report.expenseCount} έξοδα · {STRINGS.notSubmitted}
+            </Text>
+
+            <View style={styles.reportFooterActions}>
+              <TouchableOpacity
+                style={styles.submitButton}
+                onPress={() => openWeek(report.weekId)}
+                activeOpacity={0.88}
+              >
+                <Text style={styles.submitButtonText}>{STRINGS.submit}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        ) : null}
+      </TouchableOpacity>
+    );
+  }, [getWeeklyTags, openWeek]);
+
+  if (!moduleAccess.expenseTrackerEnabled) {
+    return (
+      <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+        <StatusBar barStyle="dark-content" backgroundColor={TOKENS.surface} />
+        <View style={styles.disabledState}>
+          <Ionicons name="lock-closed-outline" size={56} color="#94a3b8" />
+          <Text style={styles.disabledTitle}>Μη διαθέσιμη ενότητα</Text>
+          <Text style={styles.disabledSubtitle}>
+            Η ενότητα Εξοδολόγιο είναι απενεργοποιημένη για τον λογαριασμό σας.
+          </Text>
+          <TouchableOpacity style={styles.disabledBackButton} onPress={() => navigation.goBack()} activeOpacity={0.85}>
+            <Text style={styles.disabledBackButtonText}>{STRINGS.backToHome}</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
-    <SafeScreen
-      title={STRINGS.title}
-      style={styles.screen}
-      bodyStyle={styles.body}
-      headerLeft={(
-        <TouchableOpacity
-          style={styles.headerBack}
-          onPress={() => navigation.navigate('MainHome')}
-          accessibilityRole="button"
-        >
-          <Ionicons name={ICONS.back} size={22} color={colors.primary} />
-          <Text style={styles.headerBackText}>{STRINGS.backToHome}</Text>
-        </TouchableOpacity>
-      )}
-    >
-      <View style={styles.container}>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+      <StatusBar barStyle="dark-content" backgroundColor={TOKENS.surface} />
+
+      <View style={styles.screen}>
+        <View style={styles.header}>
+          <TouchableOpacity style={styles.headerBackButton} onPress={() => navigation.navigate('MainHome')} activeOpacity={0.8}>
+            <Text style={styles.headerBackText}>{STRINGS.back}</Text>
+          </TouchableOpacity>
+
+          <Text style={styles.headerTitle}>{STRINGS.title}</Text>
+
+          <TouchableOpacity style={styles.headerSalespersonPill} activeOpacity={0.85}>
+            <Text style={styles.headerSalespersonPillText}>{salespersonInitials} ▾</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.summaryBar}>
+          <View style={styles.summaryColumn}>
+            <Text style={styles.summaryLabel}>{STRINGS.monthTotal}</Text>
+            <Text style={styles.summaryValue}>{formatWholeEuro(currentMonthSummary.totalAmount)}</Text>
+          </View>
+          <View style={styles.summaryDivider} />
+          <View style={styles.summaryColumn}>
+            <Text style={styles.summaryLabel}>{STRINGS.expenses}</Text>
+            <Text style={styles.summaryValue}>{currentMonthSummary.expenseCount}</Text>
+          </View>
+          <View style={styles.summaryDivider} />
+          <View style={styles.summaryColumn}>
+            <Text style={styles.summaryLabel}>{STRINGS.drafts}</Text>
+            <Text style={[styles.summaryValue, styles.summaryValueAmber]}>{currentMonthSummary.draftCount}</Text>
+          </View>
+        </View>
+
         <ScrollView
-          contentContainerStyle={[
-            styles.scrollContent,
-            { paddingBottom: BOTTOM_BAR_HEIGHT },
-          ]}
+          style={styles.content}
+          contentContainerStyle={{ paddingBottom: BOTTOM_NAV_HEIGHT + Math.max(insets.bottom, 14) }}
           showsVerticalScrollIndicator={false}
         >
-          {/* Summary Card */}
-          <View style={styles.summaryCard}>
-            <View style={styles.summaryHeader}>
-              <Ionicons name="wallet-outline" size={28} color={colors.primary} />
-              <View style={styles.summaryInfo}>
-                <Text style={styles.summaryLabel}>Σύνολο Εξόδων</Text>
-                <Text style={styles.summaryValue}>€{summary.grandTotal.toFixed(2)}</Text>
-                <Text style={styles.summarySub}>{summary.expenseCount} έξοδα</Text>
-              </View>
-            </View>
+          <View style={styles.breakdownSection}>
+            <Text style={styles.breakdownSectionLabel}>{currentMonthSummary.monthLabel}</Text>
+            {renderBreakdownRow(
+              STRINGS.fuel,
+              currentMonthSummary.fuelAmount,
+              currentMonthSummary.fuelProgress,
+              TOKENS.primaryBlue
+            )}
+            {renderBreakdownRow(
+              STRINGS.accommodation,
+              currentMonthSummary.accommodationAmount,
+              currentMonthSummary.accommodationProgress,
+              TOKENS.amber
+            )}
           </View>
 
-          {/* Expenses List */}
-          <View style={styles.expensesSection}>
-            <Text style={styles.expensesTitle}>Πρόσφατες Εβδομαδιαίες Αναφορές</Text>
-            {loading ? (
-              <View style={styles.loader}>
-                <ActivityIndicator size="large" color={colors.primary} />
-              </View>
-            ) : (
-              <FlatList
-                data={recentWeeklyReports}
-                keyExtractor={(item) => item.weekId}
-                renderItem={renderWeeklyReportCard}
-                ListEmptyComponent={emptyList}
-                contentContainerStyle={styles.listContent}
-                scrollEnabled={false}
-              />
-            )}
+          <View style={styles.filtersSection}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.filtersRow}
+            >
+              {FILTERS.map((filter) => {
+                const isActive = activeFilter === filter.key;
+                return (
+                  <TouchableOpacity
+                    key={filter.key}
+                    style={[
+                      styles.filterPill,
+                      isActive && filter.variant !== 'green' && styles.filterPillActive,
+                      filter.variant === 'green' && styles.filterPillGreen,
+                      isActive && filter.variant === 'green' && styles.filterPillGreenActive,
+                    ]}
+                    onPress={() => setActiveFilter(filter.key)}
+                    activeOpacity={0.85}
+                  >
+                    <Text
+                      style={[
+                        styles.filterPillText,
+                        isActive && filter.variant !== 'green' && styles.filterPillTextActive,
+                        filter.variant === 'green' && styles.filterPillTextGreen,
+                      ]}
+                    >
+                      {filter.label}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </ScrollView>
+          </View>
+
+          <View style={styles.sectionHeaderRow}>
+            <Text style={styles.sectionHeaderText}>{STRINGS.sectionTitle}</Text>
+          </View>
+
+          {loading ? (
+            <View style={styles.loadingBlock}>
+              <ActivityIndicator size="large" color={TOKENS.primaryBlue} />
+            </View>
+          ) : filteredReports.length > 0 ? (
+            <View style={styles.reportsList}>{filteredReports.map(renderReportCard)}</View>
+          ) : (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyTitle}>{STRINGS.noReports}</Text>
+              <Text style={styles.emptySubtitle}>{STRINGS.noReportsSubtitle}</Text>
+            </View>
+          )}
+
+          <View style={styles.legend}>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, { backgroundColor: TOKENS.amber }]} />
+              <Text style={styles.legendText}>{STATUS_LABELS[EXPENSE_STATUS.DRAFT]}</Text>
+            </View>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, { backgroundColor: TOKENS.primaryBlue }]} />
+              <Text style={styles.legendText}>{STATUS_LABELS[EXPENSE_STATUS.SUBMITTED]}</Text>
+            </View>
+            <View style={styles.legendItem}>
+              <View style={[styles.legendDot, { backgroundColor: TOKENS.green }]} />
+              <Text style={styles.legendText}>{STATUS_LABELS[EXPENSE_STATUS.APPROVED]}</Text>
+            </View>
           </View>
         </ScrollView>
 
-        {/* Bottom Navigation Bar (matches brand tabs) */}
-        <View style={styles.bottomBar}>
-          <CurvedBottomBar
-            state={bottomState}
-            descriptors={bottomDescriptors}
-            navigation={customBottomNavigation}
-            layoutStrategy={layoutStrategy}
-            fab={{
-              icon: ICONS.newExpense,
-              onPress: () => setMenuVisible(true),
-              accessibilityLabel: STRINGS.newExpense,
-              testID: 'expense-tracker-fab',
-            }}
-            testIDPrefix="expense"
-          />
-        </View>
       </View>
 
-      {/* POPUP MENU MODAL */}
-      <Modal
-        visible={menuVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={handleCloseMenu}
-      >
-        <TouchableOpacity
-          style={styles.modalOverlay}
-          activeOpacity={1}
-          onPress={handleCloseMenu}
-        >
-          <View style={styles.menuContainer}>
+      <Modal visible={menuVisible} transparent animationType="fade" onRequestClose={handleCloseMenu}>
+        <TouchableOpacity style={styles.modalOverlay} activeOpacity={1} onPress={handleCloseMenu}>
+          <View style={[styles.menuContainer, { paddingBottom: Math.max(insets.bottom, 16) + 10 }]}>
+            <View style={styles.menuHandle} />
+
             {!selectedGroup ? (
               <>
-                <Text style={styles.menuTitle}>Επιλέξτε Κατηγορία</Text>
-                {categoriesByGroup.map((groupItem) => (
-                  <TouchableOpacity
-                    key={groupItem.group}
-                    style={styles.menuItem}
-                    onPress={() => handleGroupSelect(groupItem.group)}
-                  >
-                    <View style={[styles.menuIcon, { backgroundColor: getGroupColor(groupItem.group) }]}>
-                      <Text style={styles.menuIconText}>{getGroupIcon(groupItem.group)}</Text>
-                    </View>
-                    <Text style={styles.menuItemText}>{groupItem.group}</Text>
-                  </TouchableOpacity>
-                ))}
-                <TouchableOpacity style={styles.menuCloseButton} onPress={handleCloseMenu}>
-                  <View style={styles.menuIcon}>
-                    <Text style={styles.menuIconText}>✕</Text>
-                  </View>
-                </TouchableOpacity>
+                <View style={styles.menuHeader}>
+                  <Text style={styles.menuTitle}>{STRINGS.selectCategory}</Text>
+                  <Text style={styles.menuSubtitle}>{STRINGS.selectGroupHint}</Text>
+                </View>
+
+                <View style={styles.menuCard}>
+                  {categoriesByGroup.map((groupItem) => (
+                    <TouchableOpacity
+                      key={groupItem.group}
+                      style={styles.menuItem}
+                      onPress={() => handleGroupSelect(groupItem.group)}
+                      activeOpacity={0.85}
+                    >
+                      <View style={[styles.menuIcon, { backgroundColor: getGroupColor(groupItem.group) }]}>
+                        <Ionicons name={getGroupIconName(groupItem.group)} size={18} color={getGroupIconColor(groupItem.group)} />
+                      </View>
+                      <Text style={styles.menuItemText}>{groupItem.group}</Text>
+                      <Ionicons name="chevron-forward" size={16} color={TOKENS.textSecondary} />
+                    </TouchableOpacity>
+                  ))}
+                </View>
               </>
             ) : (
               <>
-                <TouchableOpacity style={styles.backButton} onPress={() => setSelectedGroup(null)}>
-                  <Text style={styles.backButtonText}>← Πίσω</Text>
-                </TouchableOpacity>
-                <Text style={styles.menuTitle}>{selectedGroup}</Text>
-                {categoriesByGroup
-                  .find((g) => g.group === selectedGroup)
-                  ?.categories.map((cat) => (
-                    <TouchableOpacity
-                      key={cat.id}
-                      style={styles.menuItem}
-                      onPress={() => handleCategorySelect(cat.id)}
-                    >
-                      <View style={[styles.menuIcon, { backgroundColor: getGroupColor(selectedGroup) }]}>
-                        <Text style={styles.menuIconText}>📝</Text>
-                      </View>
-                      <Text style={styles.menuItemText}>{cat.label}</Text>
-                    </TouchableOpacity>
-                  ))}
+                <View style={styles.menuHeader}>
+                  <TouchableOpacity style={styles.menuBackButton} onPress={() => setSelectedGroup(null)} activeOpacity={0.8}>
+                    <Ionicons name="arrow-back" size={15} color={TOKENS.primaryBlue} />
+                    <Text style={styles.menuBackButtonText}>Πίσω</Text>
+                  </TouchableOpacity>
+                  <Text style={styles.menuTitle}>{selectedGroup}</Text>
+                  <Text style={styles.menuSubtitle}>{STRINGS.selectCategoryHint}</Text>
+                </View>
+
+                <View style={styles.menuCard}>
+                  {categoriesByGroup
+                    .find((groupItem) => groupItem.group === selectedGroup)
+                    ?.categories.map((category) => (
+                      <TouchableOpacity
+                        key={category.id}
+                        style={styles.menuItem}
+                        onPress={() => handleCategorySelect(category.id)}
+                        activeOpacity={0.85}
+                      >
+                        <View style={[styles.menuIcon, { backgroundColor: getGroupColor(selectedGroup) }]}>
+                          <Ionicons name={getCategoryIconName(category.id)} size={18} color={getCategoryIconColor(selectedGroup)} />
+                        </View>
+                        <Text style={styles.menuItemText}>{category.label}</Text>
+                        <Ionicons name="chevron-forward" size={16} color={TOKENS.textSecondary} />
+                      </TouchableOpacity>
+                    ))}
+                </View>
               </>
             )}
           </View>
         </TouchableOpacity>
       </Modal>
 
-      {/* EXPENSE DETAIL MODAL */}
       <ExpenseDetailModal
         visible={expenseModalVisible}
         expenseId={selectedExpenseId}
         categoryId={selectedCategoryId}
         onClose={handleCloseExpenseModal}
       />
-    </SafeScreen>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: TOKENS.surface,
+  },
   screen: {
     flex: 1,
-    backgroundColor: '#F7F9FC',
+    backgroundColor: TOKENS.pageBackground,
   },
-  body: {
+  disabledState: {
     flex: 1,
-    backgroundColor: '#F7F9FC',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 28,
+    backgroundColor: TOKENS.pageBackground,
   },
-  container: {
-    flex: 1,
+  disabledTitle: {
+    marginTop: 16,
+    fontSize: 18,
+    fontWeight: '700',
+    color: TOKENS.textPrimary,
+    textAlign: 'center',
   },
-  scrollContent: {
-    paddingHorizontal: 16,
-    paddingBottom: 20,
+  disabledSubtitle: {
+    marginTop: 8,
+    fontSize: 14,
+    color: '#64748b',
+    textAlign: 'center',
+    lineHeight: 20,
   },
-  headerBack: {
+  disabledBackButton: {
+    marginTop: 20,
+    backgroundColor: TOKENS.primaryBlue,
+    borderRadius: 8,
+    paddingHorizontal: 18,
+    paddingVertical: 11,
+  },
+  disabledBackButtonText: {
+    color: TOKENS.surface,
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  header: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingVertical: 11,
+    backgroundColor: TOKENS.surface,
+    borderBottomWidth: 0.5,
+    borderBottomColor: TOKENS.border,
+  },
+  headerBackButton: {
+    minWidth: 84,
   },
   headerBackText: {
-    fontSize: 12,
-    color: colors.primary,
-    fontWeight: '600',
+    fontSize: 13,
+    color: TOKENS.primaryBlue,
+    fontWeight: '400',
   },
-  
-  // Summary Card (similar to brand header card)
-  summaryCard: {
-    backgroundColor: colors.white,
-    borderRadius: 18,
-    padding: 20,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    elevation: 3,
+  headerTitle: {
+    fontSize: 17,
+    fontWeight: '500',
+    color: TOKENS.textPrimary,
+    letterSpacing: 0.1,
   },
-  summaryHeader: {
-    flexDirection: 'row',
+  headerSalespersonPill: {
+    minWidth: 58,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
+    backgroundColor: TOKENS.pillNeutral,
+    borderWidth: 0.5,
+    borderColor: TOKENS.headerPillBorder,
     alignItems: 'center',
   },
-  summaryInfo: {
-    marginLeft: 16,
+  headerSalespersonPillText: {
+    fontSize: 13,
+    color: TOKENS.textPrimary,
+    fontWeight: '500',
+  },
+  summaryBar: {
+    flexDirection: 'row',
+    backgroundColor: TOKENS.summaryBar,
+    paddingVertical: 10,
+  },
+  summaryColumn: {
     flex: 1,
+    alignItems: 'center',
+  },
+  summaryDivider: {
+    width: 0.5,
+    backgroundColor: '#ccc9c0',
+    marginVertical: 4,
   },
   summaryLabel: {
-    fontSize: 14,
-    color: colors.textSecondary,
-    marginBottom: 4,
-  },
-  summaryValue: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: colors.textPrimary,
+    fontSize: 11,
+    color: TOKENS.textSecondary,
     marginBottom: 2,
   },
-  summarySub: {
-    fontSize: 13,
-    color: colors.textSecondary,
+  summaryValue: {
+    fontSize: 20,
+    fontWeight: '500',
+    color: TOKENS.textPrimary,
+    letterSpacing: -0.2,
   },
-
-  // New Expense Button (centered like brand home)
-  newExpenseSection: {
-    marginBottom: 24,
-    alignItems: 'center',
+  summaryValueAmber: {
+    color: TOKENS.amberDark,
   },
-  newExpenseButton: {
-    backgroundColor: colors.primary,
-    borderRadius: 20,
-    paddingVertical: 16,
-    paddingHorizontal: 32,
-    flexDirection: 'row',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 6,
-  },
-  newExpenseIconWrap: {
-    marginRight: 12,
-  },
-  newExpenseText: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.white,
-  },
-
-  // Actions Grid (like brand home)
-  actionsSection: {
-    marginBottom: 24,
-  },
-  actionsTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginBottom: 16,
-  },
-  actionGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  actionCard: {
-    width: '48%',
-    backgroundColor: colors.white,
-    borderRadius: 18,
-    paddingVertical: 24,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 10,
-    elevation: 3,
-    paddingHorizontal: 12,
-  },
-  actionIconWrap: {
-    width: 54,
-    height: 54,
-    borderRadius: 27,
-    backgroundColor: '#e2efff',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 12,
-  },
-  actionLabel: {
-    textAlign: 'center',
-    fontSize: 14,
-    fontWeight: '600',
-    color: colors.textPrimary,
-  },
-
-  // Filters
-  filtersSection: {
-    marginBottom: 20,
-  },
-  filterTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginBottom: 12,
-  },
-  filterRow: {
-    marginBottom: 8,
-  },
-  filterChip: {
-    backgroundColor: '#E5E7EB',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 16,
-    marginRight: 8,
-  },
-  filterText: {
-    color: '#111827',
-    fontSize: 13,
-    fontWeight: '600',
-  },
-
-  // Categories
-  categoriesSection: {
-    marginBottom: 20,
-  },
-  categoryTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginBottom: 12,
-  },
-  categoriesContainer: {
-    maxHeight: 200,
-  },
-  groupSection: {
-    marginBottom: 16,
-  },
-  groupTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#1F2937',
-    marginBottom: 8,
-  },
-  chipsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  categoryChip: {
-    borderWidth: 1,
-    borderColor: '#CBD5E1',
-    borderRadius: 16,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    marginRight: 6,
-    marginBottom: 6,
-  },
-  categoryChipSelected: {
-    backgroundColor: colors.primary,
-    borderColor: colors.primary,
-  },
-  categoryChipText: {
-    color: '#0F172A',
-    fontSize: 13,
-  },
-  categoryChipTextSelected: {
-    color: colors.white,
-  },
-
-  // Expenses List
-  expensesSection: {
-    marginBottom: 20,
-  },
-  expensesTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.textPrimary,
-    marginBottom: 12,
-  },
-  weekCard: {
-    backgroundColor: colors.white,
-    borderRadius: 16,
-    padding: 14,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    elevation: 2,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-  weekCardHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  weekCardHeaderLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  content: {
     flex: 1,
   },
-  weekCardTitle: {
-    fontSize: 15,
-    fontWeight: '800',
-    color: '#111827',
+  breakdownSection: {
+    backgroundColor: TOKENS.surface,
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 14,
+    borderBottomWidth: 0.5,
+    borderBottomColor: TOKENS.border,
   },
-  weekCardSubtitle: {
+  breakdownSectionLabel: {
     fontSize: 12,
-    color: '#6B7280',
+    color: TOKENS.textSecondary,
+    marginBottom: 10,
+  },
+  breakdownRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  breakdownLabel: {
+    width: 75,
+    fontSize: 12,
+    color: '#555',
+  },
+  breakdownTrack: {
+    flex: 1,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: TOKENS.progressTrack,
+    overflow: 'hidden',
+  },
+  breakdownFill: {
+    height: '100%',
+    borderRadius: 4,
+  },
+  breakdownAmount: {
+    width: 42,
+    marginLeft: 12,
+    fontSize: 12,
+    fontWeight: '700',
+    color: TOKENS.textPrimary,
+    textAlign: 'right',
+  },
+  filtersSection: {
+    backgroundColor: TOKENS.surface,
+    borderBottomWidth: 0.5,
+    borderBottomColor: TOKENS.borderSoft,
+  },
+  filtersRow: {
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    gap: 8,
+    alignItems: 'center',
+  },
+  filterPill: {
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 20,
+    backgroundColor: TOKENS.pageBackground,
+    borderWidth: 1,
+    borderColor: '#dedad3',
+  },
+  filterPillActive: {
+    backgroundColor: TOKENS.primaryBlue,
+    borderColor: TOKENS.primaryBlue,
+  },
+  filterPillGreen: {
+    backgroundColor: TOKENS.greenBg,
+    borderColor: TOKENS.greenBorder,
+  },
+  filterPillGreenActive: {
+    backgroundColor: TOKENS.greenBg,
+    borderColor: TOKENS.greenBorder,
+  },
+  filterPillText: {
+    fontSize: 13,
+    color: '#555',
+    fontWeight: '500',
+  },
+  filterPillTextActive: {
+    color: TOKENS.lightBlueText,
+  },
+  filterPillTextGreen: {
+    color: TOKENS.greenText,
+  },
+  sectionHeaderRow: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: TOKENS.pageBackground,
+    borderBottomWidth: 0.5,
+    borderBottomColor: TOKENS.borderSoft,
+  },
+  sectionHeaderText: {
+    fontSize: 11,
+    color: TOKENS.textTertiary,
+    letterSpacing: 0.5,
+  },
+  loadingBlock: {
+    paddingVertical: 40,
+    alignItems: 'center',
+  },
+  reportsList: {
+    backgroundColor: TOKENS.surface,
+  },
+  reportCard: {
+    backgroundColor: TOKENS.surface,
+    borderBottomWidth: 0.5,
+    borderBottomColor: TOKENS.border,
+    borderLeftWidth: 3,
+    paddingLeft: 12,
+    paddingRight: 16,
+    paddingTop: 12,
+    paddingBottom: 12,
+  },
+  reportTopRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+  },
+  reportHeaderBlock: {
+    flexDirection: 'row',
+    flex: 1,
+    marginRight: 10,
+  },
+  reportIconSquare: {
+    width: 30,
+    height: 30,
+    borderRadius: 7,
+    alignItems: 'center',
+    justifyContent: 'center',
     marginTop: 2,
   },
+  reportIconEmoji: {
+    fontSize: 16,
+  },
+  reportHeaderTextBlock: {
+    flex: 1,
+    marginLeft: 9,
+  },
+  reportTitleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 2,
+    flexWrap: 'wrap',
+  },
+  reportWeekTitle: {
+    fontSize: 15,
+    fontWeight: '500',
+    color: TOKENS.textPrimary,
+  },
   statusBadge: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
-    borderRadius: 999,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 20,
   },
   statusBadgeText: {
     fontSize: 11,
-    fontWeight: '800',
+    fontWeight: '500',
   },
-  weekCardStats: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 12,
-  },
-  weekCardStat: {
-    color: '#111827',
-    fontWeight: '700',
-  },
-  expenseItemContainer: {
-    flexDirection: 'row',
-    marginBottom: 12,
-    gap: 10,
-    alignItems: 'center',
-  },
-  expenseItem: {
-    flex: 1,
-    backgroundColor: colors.white,
-    padding: 14,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    elevation: 1,
-  },
-  deleteButton: {
-    backgroundColor: '#EF4444',
-    width: 40,
-    height: 40,
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 3,
-  },
-  expenseRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  expenseDate: {
-    color: colors.textSecondary,
-    fontSize: 13,
-  },
-  expenseAmount: {
-    color: colors.textPrimary,
-    fontWeight: '700',
+  reportAmount: {
     fontSize: 16,
+    fontWeight: '500',
+    color: TOKENS.textPrimary,
   },
-  expenseCategory: {
-    color: colors.textPrimary,
-    fontSize: 14,
-    marginTop: 4,
-  },
-  expenseStatus: {
-    color: colors.textSecondary,
+  reportDateRange: {
     fontSize: 12,
-    marginTop: 4,
+    color: '#999',
   },
-  expenseDescription: {
-    color: '#4B5563',
-    marginTop: 6,
-    fontSize: 13,
+  reportTagsRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginLeft: 39,
+    marginTop: 8,
+  },
+  expenseTag: {
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 20,
+  },
+  expenseTagBlue: {
+    backgroundColor: TOKENS.lightBlueBg,
+  },
+  expenseTagAmber: {
+    backgroundColor: TOKENS.amberBg,
+  },
+  expenseTagText: {
+    fontSize: 11,
+    fontWeight: '500',
+  },
+  expenseTagTextBlue: {
+    color: TOKENS.primaryBlue,
+  },
+  expenseTagTextAmber: {
+    color: TOKENS.amberText,
+  },
+  reportFooterRow: {
+    marginLeft: 39,
+    marginTop: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  reportFooterText: {
+    flex: 1,
+    fontSize: 12,
+    color: TOKENS.textSecondary,
+    marginRight: 10,
+  },
+  reportFooterActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  submitButton: {
+    backgroundColor: TOKENS.primaryBlue,
+    paddingHorizontal: 14,
+    paddingVertical: 5,
+    borderRadius: 8,
+  },
+  submitButtonText: {
+    fontSize: 12,
+    color: TOKENS.surface,
+    fontWeight: '500',
   },
   emptyState: {
     alignItems: 'center',
-    paddingVertical: 40,
+    justifyContent: 'center',
+    paddingVertical: 44,
+    paddingHorizontal: 24,
+    backgroundColor: TOKENS.surface,
   },
   emptyTitle: {
     fontSize: 16,
-    fontWeight: '700',
-    color: colors.textPrimary,
+    fontWeight: '500',
+    color: TOKENS.textPrimary,
   },
   emptySubtitle: {
-    color: colors.textSecondary,
     marginTop: 6,
+    fontSize: 13,
+    color: TOKENS.textSecondary,
+    textAlign: 'center',
   },
-  listContent: {
-    paddingBottom: 20,
-  },
-  loader: {
-    paddingVertical: 40,
+  legend: {
+    flexDirection: 'row',
+    justifyContent: 'center',
     alignItems: 'center',
+    gap: 16,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: TOKENS.pageBackground,
+    borderTopWidth: 0.5,
+    borderTopColor: TOKENS.border,
   },
-  bottomBar: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: 0,
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  legendDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  legendText: {
+    fontSize: 11,
+    color: TOKENS.textSecondary,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.45)',
+    justifyContent: 'flex-end',
   },
   menuContainer: {
-    backgroundColor: '#FFF',
-    borderRadius: 20,
-    padding: 20,
-    width: '85%',
-    maxHeight: '70%',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 10,
-    elevation: 10,
+    backgroundColor: TOKENS.surface,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 24,
+    maxHeight: '80%',
+    borderTopWidth: 1,
+    borderColor: TOKENS.borderSoft,
+  },
+  menuHandle: {
+    alignSelf: 'center',
+    width: 46,
+    height: 5,
+    borderRadius: 999,
+    backgroundColor: '#d6d2ca',
+    marginBottom: 14,
+  },
+  menuHeader: {
+    marginBottom: 10,
   },
   menuTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#111827',
-    marginBottom: 20,
-    textAlign: 'center',
+    fontSize: 17,
+    fontWeight: '600',
+    color: TOKENS.textPrimary,
+  },
+  menuSubtitle: {
+    marginTop: 4,
+    fontSize: 12,
+    color: TOKENS.textSecondary,
+  },
+  menuCard: {
+    backgroundColor: TOKENS.surface,
+    borderWidth: 1,
+    borderColor: TOKENS.borderSoft,
+    borderRadius: 14,
+    overflow: 'hidden',
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 8,
+    minHeight: 54,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#F3F4F6',
+    borderBottomColor: TOKENS.border,
   },
   menuIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#E5E7EB',
-    justifyContent: 'center',
+    width: 34,
+    height: 34,
+    borderRadius: 8,
     alignItems: 'center',
-    marginRight: 16,
-  },
-  menuIconText: {
-    fontSize: 24,
+    justifyContent: 'center',
+    marginRight: 12,
   },
   menuItemText: {
-    fontSize: 16,
-    color: '#111827',
     flex: 1,
+    fontSize: 14,
+    color: TOKENS.textPrimary,
   },
-  menuCloseButton: {
-    marginTop: 16,
-    alignSelf: 'center',
+  menuBackButton: {
+    marginBottom: 10,
+    alignSelf: 'flex-start',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderRadius: 16,
+    backgroundColor: TOKENS.lightBlueBg,
   },
-  backButton: {
-    marginBottom: 12,
-  },
-  backButtonText: {
-    fontSize: 16,
-    color: '#0891B2',
+  menuBackButtonText: {
+    fontSize: 12,
     fontWeight: '600',
+    color: TOKENS.primaryBlue,
   },
 });
 

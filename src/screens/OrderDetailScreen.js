@@ -13,7 +13,8 @@ import SafeScreen from '../components/SafeScreen';
 import { useOrder } from '../context/OrderContext';
 
 export default function OrderDetailScreen({ navigation }) {
-  const { orderLines, setOrderLines, customer } = useOrder();
+  const { orderLines, setOrderLines, customer, order } = useOrder();
+  const brand = order?.brand ?? null;
 
   const lines = useMemo(
     () => (Array.isArray(orderLines) ? orderLines.filter(Boolean) : []),
@@ -56,6 +57,14 @@ export default function OrderDetailScreen({ navigation }) {
 
   return (
     <SafeScreen title="Καλάθι" headerRight={headerRight}>
+      <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => navigation.navigate('OrderProductSelectionScreen', { brand })}
+        activeOpacity={0.85}
+      >
+        <Icon name="arrow-back" size={18} color="#1565c0" />
+        <Text style={styles.backButtonText}>Επιστροφή στα προϊόντα</Text>
+      </TouchableOpacity>
       {customer ? (
         <View style={styles.customerBar}>
           <Icon name="person-circle-outline" size={18} color="#1976d2" />
@@ -159,6 +168,22 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   sep: { height: StyleSheet.hairlineWidth, backgroundColor: '#e5e7eb' },
+  backButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'flex-start',
+    backgroundColor: '#e3f2fd',
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    marginBottom: 10,
+  },
+  backButtonText: {
+    marginLeft: 6,
+    color: '#1565c0',
+    fontWeight: '700',
+    fontSize: 14,
+  },
   row: {
     paddingVertical: 12,
     alignItems: 'center',

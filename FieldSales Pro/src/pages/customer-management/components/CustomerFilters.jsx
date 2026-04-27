@@ -8,6 +8,7 @@ const CustomerFilters = ({
   searchTerm, 
   onSearchChange, 
   territoryFilter, 
+  territoryOptions,
   onTerritoryChange, 
   priorityFilter, 
   onPriorityChange, 
@@ -16,27 +17,27 @@ const CustomerFilters = ({
   onClearFilters,
   resultCount 
 }) => {
-  const territoryOptions = [
-    { value: 'all', label: 'All Territories' },
-    { value: 'north', label: 'North Region' },
-    { value: 'south', label: 'South Region' },
-    { value: 'east', label: 'East Region' },
-    { value: 'west', label: 'West Region' },
-    { value: 'central', label: 'Central Region' }
+  const defaultTerritoryOptions = [
+    { value: 'all', label: 'Όλες οι Περιοχές' },
+    { value: 'north', label: 'Βόρεια Ζώνη' },
+    { value: 'south', label: 'Νότια Ζώνη' },
+    { value: 'east', label: 'Ανατολική Ζώνη' },
+    { value: 'west', label: 'Δυτική Ζώνη' },
+    { value: 'central', label: 'Κεντρική Ζώνη' }
   ];
 
   const priorityOptions = [
-    { value: 'all', label: 'All Priorities' },
-    { value: 'high', label: 'High Priority' },
-    { value: 'medium', label: 'Medium Priority' },
-    { value: 'low', label: 'Low Priority' }
+    { value: 'all', label: 'Όλες οι Προτεραιότητες' },
+    { value: 'high', label: 'Υψηλή Προτεραιότητα' },
+    { value: 'medium', label: 'Μεσαία Προτεραιότητα' },
+    { value: 'low', label: 'Χαμηλή Προτεραιότητα' }
   ];
 
   const complianceOptions = [
-    { value: 'all', label: 'All Compliance' },
-    { value: 'compliant', label: 'Compliant (90%+)' },
-    { value: 'at-risk', label: 'At Risk (70-89%)' },
-    { value: 'non-compliant', label: 'Non-Compliant (<70%)' }
+    { value: 'all', label: 'Όλη η Συμμόρφωση' },
+    { value: 'compliant', label: 'Συμμορφωμένοι (90%+)' },
+    { value: 'at-risk', label: 'Σε Κίνδυνο (70-89%)' },
+    { value: 'non-compliant', label: 'Μη Συμμορφωμένοι (<70%)' }
   ];
 
   const hasActiveFilters = territoryFilter !== 'all' || priorityFilter !== 'all' || complianceFilter !== 'all' || searchTerm;
@@ -48,7 +49,7 @@ const CustomerFilters = ({
         <div className="flex-1 max-w-md">
           <Input
             type="search"
-            placeholder="Search customers by name, company, or territory..."
+            placeholder="Αναζήτηση πελατών με όνομα, εταιρεία ή περιοχή..."
             value={searchTerm}
             onChange={(e) => onSearchChange(e?.target?.value)}
             className="w-full"
@@ -57,25 +58,25 @@ const CustomerFilters = ({
         
         <div className="flex items-center space-x-2">
           <Button variant="outline" iconName="Download" iconPosition="left">
-            Export
+            Εξαγωγή
           </Button>
           <Button variant="default" iconName="Plus" iconPosition="left">
-            Add Customer
+            Προσθήκη Πελάτη
           </Button>
         </div>
       </div>
       {/* Filter Controls */}
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
         <Select
-          label="Territory"
-          options={territoryOptions}
+          label="Περιοχή"
+          options={territoryOptions?.length ? territoryOptions : defaultTerritoryOptions}
           value={territoryFilter}
           onChange={onTerritoryChange}
           className="w-full"
         />
 
         <Select
-          label="Priority Level"
+          label="Επίπεδο Προτεραιότητας"
           options={priorityOptions}
           value={priorityFilter}
           onChange={onPriorityChange}
@@ -83,7 +84,7 @@ const CustomerFilters = ({
         />
 
         <Select
-          label="Visit Compliance"
+          label="Συμμόρφωση Επισκέψεων"
           options={complianceOptions}
           value={complianceFilter}
           onChange={onComplianceChange}
@@ -99,7 +100,7 @@ const CustomerFilters = ({
               iconPosition="left"
               className="w-full md:w-auto"
             >
-              Clear Filters
+              Καθαρισμός Φίλτρων
             </Button>
           )}
         </div>
@@ -108,12 +109,12 @@ const CustomerFilters = ({
       <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
         <div className="flex items-center space-x-4 text-sm text-muted-foreground">
           <span>
-            Showing <span className="font-medium text-foreground">{resultCount}</span> customers
+            Εμφάνιση <span className="font-medium text-foreground">{resultCount}</span> πελατών
           </span>
           {hasActiveFilters && (
             <div className="flex items-center space-x-1">
               <Icon name="Filter" size={14} />
-              <span>Filters active</span>
+              <span>Ενεργά φίλτρα</span>
             </div>
           )}
         </div>
